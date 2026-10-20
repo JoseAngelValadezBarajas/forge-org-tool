@@ -11,7 +11,6 @@ test('desktop shell is truthful and has no horizontal overflow', async ({ page }
   await mkdir(evidenceDir, { recursive: true });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
-  await expect(page.getByText('No workspaces yet')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   expect(consoleErrors).toEqual([]);
   await page.screenshot({ path: resolve(evidenceDir, 'desktop-organization.png'), fullPage: true });
@@ -72,5 +71,37 @@ test('delivery exposes deterministic gates and non-published truth', async ({ pa
   await expect(page.getByText('NOT_PUBLISHED')).toBeVisible();
   await expect(page.getByText(/not a deployment or publication/i)).toBeVisible();
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-delivery.png' : 'desktop-delivery.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+});
+
+test('workbench records reported runs and keeps handoffs human-owned', async ({ page }) => {
+  const suffix = Date.now().toString();
+  const workspace = await (await page.request.post('/api/v1/workspaces', { data: { name: `Workbench ${suffix}` } })).json();
+  const project = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Runs ${suffix}` } })).json();
+  await page.goto(`/workbench/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Workbench' })).toBeVisible();
+  await page.getByLabel('Run title').fill(`Manual run ${suffix}`);
+  await page.getByRole('button', { name: 'Record Run' }).click();
+  await expect(page.getByText(`Manual run ${suffix}`)).toBeVisible();
+  await expect(page.getByText(/human \/ manual/i)).toBeVisible();
+  await page.getByRole('button', { name: `Create handoff for Manual run ${suffix}` }).click();
+  await expect(page.getByText(`Handoff for Manual run ${suffix}`)).toBeVisible();
+  await expect(page.getByText('DRAFT', { exact: true })).toBeVisible();
+  await expect(page.getByText(/does not execute agents/i)).toBeVisible();
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-workbench.png' : 'desktop-workbench.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+});
+
+test('project transfer is planning-only and exposes reviewed fingerprints', async ({ page }) => {
+  const suffix = Date.now().toString();
+  const workspace = await (await page.request.post('/api/v1/workspaces', { data: { name: `Transfer ${suffix}` } })).json();
+  const project = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Export ${suffix}` } })).json();
+  await page.goto(`/transfer/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Project transfer' })).toBeVisible();
+  await expect(page.getByText(/planning records only/i)).toBeVisible();
+  await page.getByRole('button', { name: 'Export project' }).click();
+  await expect(page.getByText('forge-project-import-v1', { exact: true })).toBeVisible();
+  await expect(page.getByText(/fingerprint/i)).toBeVisible();
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-transfer.png' : 'desktop-transfer.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });

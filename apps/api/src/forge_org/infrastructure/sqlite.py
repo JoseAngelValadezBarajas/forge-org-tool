@@ -562,7 +562,7 @@ class OrganizationRepository:
         return [dict(row) for row in self.connection.execute('SELECT * FROM run_events WHERE run_id = ? ORDER BY created_at', (run_id,)).fetchall()]
 
     def create_handoff(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
-        now, handoff_id = utc_now(), str(uuid4()); self.connection.execute('INSERT INTO handoffs(id, project_id, feature_id, run_id, context_package_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (handoff_id, project_id, values.get('feature_id'), values['run_id'], values.get('context_package_id'), now, now)); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM handoffs WHERE id = ?', (handoff_id,)).fetchone()) or {}
+        now, handoff_id = utc_now(), str(uuid4()); self.connection.execute('INSERT INTO handoffs(id, project_id, feature_id, run_id, context_package_id, title, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (handoff_id, project_id, values.get('feature_id'), values['run_id'], values.get('context_package_id'), values.get('title', ''), now, now)); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM handoffs WHERE id = ?', (handoff_id,)).fetchone()) or {}
 
     def get_handoff(self, project_id: str, handoff_id: str) -> dict[str, Any] | None:
         return row_dict(self.connection.execute('SELECT * FROM handoffs WHERE project_id = ? AND id = ?', (project_id, handoff_id)).fetchone())

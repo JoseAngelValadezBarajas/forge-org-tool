@@ -5,6 +5,7 @@ import { ReadinessPage } from '../features/readiness';
 import { WorkbenchPage } from '../features/workbench';
 import { DeliveryPage } from '../features/delivery';
 import { RepositoriesPage } from '../features/repositories';
+import { TransferPage } from '../features/transfer';
 import { ComponentGallery } from './component-gallery/ComponentGallery';
 import styles from './App.module.css';
 export function App() {
@@ -20,6 +21,7 @@ export function App() {
         <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
         <Route path="/delivery/:workspaceId/:projectId" element={<DeliveryPage />} />
         <Route path="/repositories/:workspaceId/:projectId" element={<RepositoriesPage />} />
+        <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
         {import.meta.env.DEV && <Route path="/__components" element={<ComponentGallery />} />}
         <Route path="*" element={<p>Page not found.</p>} />
       </Routes>

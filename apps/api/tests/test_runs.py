@@ -23,6 +23,7 @@ def test_reported_run_lifecycle_and_immutable_handoff(tmp_path: Path) -> None:
             event = client.post(f"{root}/runs/{run['id']}/events", json={'event_type': 'progress', 'title': 'Work reported', 'description': 'A human reported progress', 'expected_version': 2})
             assert event.status_code == 201
             handoff = client.post(f"{root}/runs/{run['id']}/handoffs", json={'title': 'Next handoff'}).json()
+            assert handoff['title'] == 'Next handoff'
             ready = client.post(f"{root}/handoffs/{handoff['id']}/ready", json={'expected_version': handoff['version']})
             assert ready.status_code == 422
             draft = client.patch(f"{root}/handoffs/{handoff['id']}", json={'expected_version': handoff['version'], 'title': 'Ready handoff', 'summary': 'Reported summary', 'next_actions': 'Review manually'}).json()

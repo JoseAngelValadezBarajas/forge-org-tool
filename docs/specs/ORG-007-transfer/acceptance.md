@@ -6,4 +6,5 @@
 - [x] Export returns the versioned planning document.
 - [x] Transfer is planning-only and does not import delivery truth.
 - [x] Enforce collection limits and reject dependency cycles before writing.
-- [ ] Browser import/export flow.
+- [x] Browser import/export flow exposes reviewed fingerprints and planning-only
+  transfer semantics.

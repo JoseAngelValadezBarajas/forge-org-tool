@@ -7,6 +7,9 @@ const e2eDatabasePath = join(tmpdir(), `forge-org-e2e-${process.pid}-${Date.now(
 export default defineConfig({
   testDir: './e2e',
   outputDir: '../../test-results/m1-browser',
+  // The API smoke uses one disposable SQLite database for the run; serialize
+  // write-heavy journeys so browser evidence cannot race schema migration.
+  workers: 1,
   use: {
     baseURL: 'http://127.0.0.1:5173',
     trace: 'retain-on-failure',
