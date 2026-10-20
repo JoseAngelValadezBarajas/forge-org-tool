@@ -8,3 +8,6 @@ metadata such as HEAD, branch, dirty counts, and unborn state.
 Feature context packages use schema `forge-context-v1`, contain planning data
 and metadata-only observations, are fingerprinted canonically, and are
 immutable/deduplicated by feature, schema, and fingerprint.
+Saved packages can be retrieved and downloaded as JSON or Markdown. Feature
+repository links can be listed and removed without deleting repository or
+observation history.

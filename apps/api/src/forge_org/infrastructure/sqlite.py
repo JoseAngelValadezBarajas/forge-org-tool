@@ -501,6 +501,11 @@ class OrganizationRepository:
     def feature_repositories(self, feature_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT r.* FROM repositories r JOIN feature_repository_links l ON l.repository_id = r.id WHERE l.feature_id = ?', (feature_id,)).fetchall()]
 
+    def unlink_repository(self, feature_id: str, repository_id: str) -> bool:
+        cursor = self.connection.execute('DELETE FROM feature_repository_links WHERE feature_id = ? AND repository_id = ?', (feature_id, repository_id))
+        self.connection.commit()
+        return cursor.rowcount == 1
+
     def find_context_package(self, feature_id: str, schema_version: str, fingerprint: str) -> dict[str, Any] | None:
         return row_dict(self.connection.execute('SELECT * FROM context_packages WHERE feature_id = ? AND schema_version = ? AND fingerprint = ?', (feature_id, schema_version, fingerprint)).fetchone())
 
@@ -513,6 +518,9 @@ class OrganizationRepository:
 
     def list_context_packages(self, feature_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT * FROM context_packages WHERE feature_id = ? ORDER BY created_at DESC, id DESC', (feature_id,)).fetchall()]
+
+    def get_context_package(self, feature_id: str, package_id: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM context_packages WHERE feature_id = ? AND id = ?', (feature_id, package_id)).fetchone())
 
     def create_run(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         now, run_id = utc_now(), str(uuid4())

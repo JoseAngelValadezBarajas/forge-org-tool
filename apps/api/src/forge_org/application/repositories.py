@@ -79,3 +79,14 @@ class RepositoryService:
         if self.repository.feature(project_id, feature_id) is None: raise LookupError('Feature not found')
         self._repository(workspace_id, project_id, repository_id)
         return self.repository.link_repository(feature_id, repository_id)
+
+    def unlink_feature(self, workspace_id: str, project_id: str, feature_id: str, repository_id: str) -> None:
+        self._project(workspace_id, project_id)
+        if self.repository.feature(project_id, feature_id) is None: raise LookupError('Feature not found')
+        self._repository(workspace_id, project_id, repository_id)
+        if not self.repository.unlink_repository(feature_id, repository_id): raise LookupError('Repository link not found')
+
+    def feature_links(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:
+        self._project(workspace_id, project_id)
+        if self.repository.feature(project_id, feature_id) is None: raise LookupError('Feature not found')
+        return self.repository.feature_repositories(feature_id)

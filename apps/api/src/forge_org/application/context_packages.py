@@ -36,3 +36,9 @@ class ContextPackageService:
 
     def list(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:
         self._scope(workspace_id, project_id, feature_id); return self.repository.list_context_packages(feature_id)
+
+    def get(self, workspace_id: str, project_id: str, feature_id: str, package_id: str) -> dict[str, Any]:
+        self._scope(workspace_id, project_id, feature_id)
+        package = self.repository.get_context_package(feature_id, package_id)
+        if package is None: raise LookupError('Context package not found')
+        return package

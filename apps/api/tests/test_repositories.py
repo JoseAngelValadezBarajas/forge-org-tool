@@ -40,6 +40,13 @@ def test_repository_connection_is_allowlisted_and_observations_are_metadata_only
             saved = client.post(f"{root}/features/{feature['id']}/context/packages")
             duplicate = client.post(f"{root}/features/{feature['id']}/context/packages")
             assert saved.status_code == 201 and duplicate.json()['id'] == saved.json()['id']
+            package_id = saved.json()['id']
+            fetched = client.get(f"{root}/features/{feature['id']}/context/packages/{package_id}")
+            assert fetched.status_code == 200 and fetched.json()['fingerprint'] == saved.json()['fingerprint']
+            downloaded = client.get(f"{root}/features/{feature['id']}/context/packages/{package_id}/download?format=markdown")
+            assert downloaded.status_code == 200 and downloaded.headers['content-type'].startswith('text/markdown')
+            assert client.delete(f"{root}/features/{feature['id']}/repositories/{repository['id']}").status_code == 204
+            assert client.get(f"{root}/features/{feature['id']}/repositories").json() == []
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
         os.environ.pop('FORGE_ALLOWED_REPOSITORY_ROOTS', None)
