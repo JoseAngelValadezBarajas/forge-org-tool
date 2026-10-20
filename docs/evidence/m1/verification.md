@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), `13f7fc5` (isolated desktop CI frontend build), and final documentation commit `cdbcd9c`.
+Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), `13f7fc5` (isolated desktop CI frontend build), and Figma evidence commit `cbb3841`.
 
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the
@@ -30,7 +30,7 @@ The final public repository was cloned into an isolated temporary directory. `np
 - Repository: `https://github.com/JoseAngelValadezBarajas/forge-org-tool`
 - Visibility: public.
 - Default branch: `main`.
-- Quality workflow: [run 39382624398](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382624398) passed for final commit `cdbcd9cf49289d904ec79dfeeff497586dd217a4`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed.
+- Quality workflow: [run 39383229077](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39383229077) passed for evidence commit `cbb38412147a73a10202e0facc029238d7bbedc8`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed. The current commit contains documentation-only finalization after this verified run.
 
 ## RED/GREEN notes
 
