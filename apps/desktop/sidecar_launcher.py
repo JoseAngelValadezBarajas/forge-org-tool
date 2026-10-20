@@ -85,4 +85,6 @@ def start_sidecar() -> SidecarSession:
         stderr=subprocess.STDOUT,
     )
     log.close()
+    if process.poll() is not None:
+        raise RuntimeError('Sidecar exited before the sidecar became ready')
     return SidecarSession(process=process, token=token, port=port)

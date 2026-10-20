@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parents[1]))
-from sidecar_launcher import app_data_root, backup_database, local_paths  # noqa: E402
+from sidecar_launcher import app_data_root, backup_database, local_paths, start_sidecar  # noqa: E402
 
 
 class SidecarLauncherTests(unittest.TestCase):
@@ -32,6 +32,14 @@ class SidecarLauncherTests(unittest.TestCase):
                     self.assertIsNotNone(backup)
                     self.assertEqual(backup.read_bytes(), b'forge-db')
                     self.assertEqual(backup.parent, app_data_root() / 'backups')
+
+    def test_start_rejects_a_sidecar_that_exits_immediately(self) -> None:
+        with TemporaryDirectory() as temporary_root:
+            with patch.dict(os.environ, {'LOCALAPPDATA': temporary_root}, clear=False):
+                with patch('sidecar_launcher.free_loopback_port', return_value=43123), patch('sidecar_launcher.secrets.token_urlsafe', return_value='a' * 32), patch('sidecar_launcher.subprocess.Popen') as popen:
+                    popen.return_value.poll.return_value = 17
+                    with self.assertRaisesRegex(RuntimeError, 'Sidecar exited before the sidecar became ready'):
+                        start_sidecar()
 
 
 if __name__ == '__main__':
