@@ -8,7 +8,8 @@ Implementation commits include `6eca0da` (ORG-001), `e909ce9` (planning
 mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 `3a39790` (evidence filtering), `01c6e42` (run retrieval), `fec502d`
 (transfer limits), `6c7e309` (repository web surface), and `96ed4b9`
-(latest retained browser evidence).
+(latest retained browser evidence). Subsequent delivery/workbench commits are
+`4a1c5c9` (handoff revisions) and `aecf36b` (release-candidate history).
 
 ## Automated verification
 
