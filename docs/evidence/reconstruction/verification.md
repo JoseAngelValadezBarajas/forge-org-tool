@@ -42,6 +42,7 @@ desktop/mobile import evidence.
 - GitHub Quality run [39388716075](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39388716075) passed for implementation commit `f83e1a9`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39390208428](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390208428) passed for ORG-007 commit `cdc8114`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39390708097](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390708097) passed for final documentation commit `39b0421`; web, API, and Windows desktop jobs completed successfully.
+- GitHub Quality run [39391658113](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39391658113) passed for ORG-009 behavior-status commit `c112f2b`; web, API, and Windows desktop jobs completed successfully.
 - Isolated Chromium: 18/18 passed across desktop/mobile. The delivery journey
   records and filters reported evidence, invalidates it without erasure, edits
   and freezes a candidate, evaluates a blocked gate, and retains gate history.
