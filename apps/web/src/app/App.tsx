@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { OrganizationPage } from '../features/organization';
 import { PlanningPage } from '../features/planning';
+import { ReadinessPage } from '../features/readiness';
 import { ComponentGallery } from './component-gallery/ComponentGallery';
 import styles from './App.module.css';
 export function App() {
@@ -12,6 +13,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<OrganizationPage />} />
         <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        <Route path="/readiness/:workspaceId/:projectId/:featureId" element={<ReadinessPage />} />
         {import.meta.env.DEV && <Route path="/__components" element={<ComponentGallery />} />}
         <Route path="*" element={<p>Page not found.</p>} />
       </Routes>

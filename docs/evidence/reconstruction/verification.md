@@ -37,8 +37,11 @@ reference remain explicit review items.
 
 ORG-001 is verified for workspace/project persistence, selection, search,
 create, archive, restore, duplicate protection, and cross-workspace isolation.
-ORG-002 has API and frontend implementation tests for epic/feature creation and
-manual overview grouping, but remains `IMPLEMENTED_NOT_REVIEWED` until its
-remaining hierarchy interactions and browser evidence are complete. ORG-003
-through ORG-009 remain not started. No legacy code/assets, private
+ORG-002 has API and frontend implementation tests for epic/feature creation,
+tasks, criteria, dependencies, and manual overview grouping, but remains
+`IMPLEMENTED_NOT_REVIEWED` until browser evidence is complete. ORG-003 has
+API tests for revisioned decisions, invariant acknowledgements, deterministic
+R01–R06 evaluation, and stale saved history; it also remains
+`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-004 through ORG-009
+remain not started. No legacy code/assets, private
 bundles, real data migration, or desktop packaging were introduced.

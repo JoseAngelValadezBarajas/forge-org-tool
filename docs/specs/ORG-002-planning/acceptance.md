@@ -6,5 +6,6 @@
 - [x] Return an overview grouped by epic and unassigned features.
 - [x] Render a board route with explicit manual status columns.
 - [x] Keep manual planning state distinct from delivery evidence.
-- [ ] Tasks, acceptance criteria, dependencies, filtering, edit, and reorder.
+- [x] Tasks, acceptance criteria, and project-scoped dependencies.
+- [ ] Filtering, edit, reorder, and full board interactions.
 - [ ] Chromium review of the planning route and responsive evidence.
