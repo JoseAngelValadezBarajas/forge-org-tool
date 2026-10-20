@@ -10,12 +10,12 @@ Review states: `NOT_IMPLEMENTED`, `IMPLEMENTED_NOT_REVIEWED`, `PASS`,
 | Component | Source/export | Figma reference | Variants and states | Tests | Screenshot | Review |
 | --- | --- | --- | --- | --- | --- | --- |
 | Semantic tokens | `packages/tokens` | Page 02: Foundations and Tokens | light, dark | host render and theme interaction | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
-| Button | `packages/ui`, public barrel | `173:27` Button component set | current API: primary, secondary, ghost, danger; default, hover, active, focus-visible, disabled, loading | focused public-contract test | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
-| Card | `packages/ui`, public barrel | `173:2` Core UI Components | default `div`; typed `section`, `article`, `aside`; Elevated variant outstanding | focused public-contract test | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
+| Button | `packages/ui`, public barrel | `173:27` Actions / Button | API supports primary, secondary, ghost, danger; implementation covers default, hover, pressed, focus-visible, disabled, loading. Figma also contains explicit 36/38px size variants; current implementation is 40px minimum height. | focused public-contract test | [Figma](../evidence/m1/figma-button-173-27.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
+| Card | `packages/ui`, public barrel | `173:65` Surfaces / Card | default `div`; typed `section`, `article`, `aside`; Figma Default and Elevated are present, but Elevated is not implemented | focused public-contract test | [Figma](../evidence/m1/figma-card-173-65.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
 | Input | `packages/ui`, public barrel | `173:2` Core UI Components | native text-compatible input; default, focus-visible, disabled | organization and host render tests | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
-| StatusChip | `packages/ui`, public barrel | `173:2` Core UI Components | current API: neutral, accent, success, warning, danger; Figma Info and Reported names outstanding | host and application tests | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
-| SectionHeader | `packages/ui`, public barrel | `173:2` Core UI Components | eyebrow, action slot; counter composition outstanding | host and application tests | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
-| OrganizationEmptyState | `apps/web/src/features/organization`, public feature index | closest product reference: Workspace Home `4:32`; no confirmed exact native master on page 20 | backend-free host fixture; real organization empty state is in `OrganizationPage` | application shell and host tests | [desktop](../evidence/m1/desktop-organization.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
+| StatusChip | `packages/ui`, public barrel | `173:40` Status / StatusChip | current API: neutral, accent, success, warning, danger. Figma exposes Neutral, Success, Warning, Danger, Info, Reported; `Accent` is not a confirmed Figma mapping. | host and application tests | [Figma](../evidence/m1/figma-status-chip-173-40.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
+| SectionHeader | `packages/ui`, public barrel | `178:191` SectionHeader | current API: title, eyebrow, action slot. Figma includes a title-plus-counter composition; counter parity is outstanding. | host and application tests | [Figma](../evidence/m1/figma-section-header-178-191.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
+| OrganizationEmptyState | `apps/web/src/features/organization`, public feature index | closest product reference: Workspace Home `4:32`; this is a product screen, not a confirmed native empty-state master on page 20 | backend-free host fixture; real organization empty state is in `OrganizationPage` | application shell and host tests | [Figma](../evidence/m1/figma-workspace-home-4-32.png), [desktop](../evidence/m1/desktop-organization.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
 | Icon library | not implemented | `173:2` Core UI Components | planned | no implementation | none | `NOT_IMPLEMENTED` |
 
 The Figma file is the visual reference; pages 19/20 and the supplied primary
@@ -30,6 +30,10 @@ and [mobile light](../evidence/m1/mobile-gallery-light.png).
 
 ## Focused audit notes
 
+- Read-only Figma review on 2026-10-20 confirmed `173:27` contains explicit
+  Default, Hover, Pressed, Focused, Disabled and Loading states for Primary,
+  Secondary, Ghost and Danger. The implementation covers the supported state
+  behavior; visual certification is intentionally not claimed.
 - Button now exposes semantic hover and pressed treatments while retaining
   focus-visible and disabled precedence. The current implementation uses a
   40px minimum height; the `173:27` reference shows 36/38px variants. This is
@@ -37,6 +41,16 @@ and [mobile light](../evidence/m1/mobile-gallery-light.png).
 - StatusChip `Accent` is the current API name. It is not being represented as
   Figma `Info` or `Reported`; those mappings require a future contract/design
   decision.
+- Read-only Figma review confirmed `173:40` names the two currently missing
+  StatusChip concepts `Info` and `Reported`; the current `Accent` API is not
+  silently relabeled.
 - Card's default neutral root is a `div`. The Figma Elevated variant is not
   implemented.
-- SectionHeader has no counter composition in its public contract.
+- Read-only Figma review confirmed `178:191` includes a title-plus-counter
+  composition. SectionHeader has no counter composition in its public contract.
+- `4:32` is retained as the closest matching product empty-state screen. No
+  exact native OrganizationEmptyState master on page 20 was confirmed.
+
+The retained Figma captures document the reviewed references only. They do not
+change the review status to `PASS`; human parity certification remains a
+separate decision requiring side-by-side review of the Chromium evidence.

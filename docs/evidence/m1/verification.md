@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), and `13f7fc5` (isolated desktop CI frontend build).
+Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), `13f7fc5` (isolated desktop CI frontend build), and final documentation commit `cdbcd9c`.
 
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the
@@ -17,6 +17,7 @@ foundation audit record.
 - Live API: `/api/v1/health` returned HTTP 200 with `scope=bootstrap-only`; fabricated `/api/v1/workspaces` returned HTTP 404.
 - Public-file audit: no credential patterns, machine-specific absolute paths, databases, keys, logs, backups, or attachments were staged.
 - Component Host: `/__components` renders public `@forge-org/ui` exports and the existing organization feature with deterministic local fixtures; it makes no backend calls.
+- Figma review: read-only node context and retained captures were reviewed for Button `173:27`, StatusChip `173:40`, Card `173:65`, SectionHeader `178:191`, and product reference screen `4:32`. These are human-review inputs, not visual certification.
 - Playwright isolation: both servers use `reuseExistingServer: false`; the API also receives a unique temporary SQLite path per run, so occupied ports or stale local data cannot silently affect assertions.
 - Shared contracts: Card default `div` and typed semantic option passed; Button loading/disabled/pressed DOM contract passed. Button visual parity remains unreviewed, including the 40px implementation height versus the 36/38px Figma reference.
 
@@ -29,7 +30,7 @@ The final public repository was cloned into an isolated temporary directory. `np
 - Repository: `https://github.com/JoseAngelValadezBarajas/forge-org-tool`
 - Visibility: public.
 - Default branch: `main`.
-- Quality workflow: [run 39382267348](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382267348) passed for final commit `13f7fc5f58ca7bc4d04d7b2b8f96cd7b535ae471`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed.
+- Quality workflow: [run 39382624398](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382624398) passed for final commit `cdbcd9cf49289d904ec79dfeeff497586dd217a4`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed.
 
 ## RED/GREEN notes
 
