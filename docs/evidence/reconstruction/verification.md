@@ -17,7 +17,7 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
   architecture tests 5/5, and Vitest 9/9.
 - API Ruff and strict mypy: passed.
 - API pytest: 15/15 passed; one upstream Starlette/httpx deprecation warning.
-- Desktop launch policy: 2 Python unit tests passed; the authenticated sidecar
+- Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
   tests passed as part of the API suite. Native Rust/Tauri compilation remains
   unavailable because `cargo`/`rustc` are not installed.
 - OpenAPI export check: passed.
