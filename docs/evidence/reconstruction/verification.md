@@ -50,7 +50,7 @@ compilation in CI.
 - GitHub Quality run [39390708097](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390708097) passed for final documentation commit `39b0421`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39391658113](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39391658113) passed for ORG-009 behavior-status commit `c112f2b`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39392594672](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39392594672) passed for ORG-008 sidecar lifecycle commit `8ed6b3c`; web, API, and Windows desktop jobs completed successfully.
-- GitHub Quality run [39421568364](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39421568364) passed API and web but failed before desktop compilation because the packaged sidecar was created after Tauri resource validation; commit `8031914` corrects that ordering and a replacement run is required before certification.
+- GitHub Quality run [39422706855](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39422706855) passed API, web, isolated Chromium, sidecar packaging, desktop smoke, Tauri tests, and Windows release build for commit `b71c63e`.
 - Isolated Chromium: 18/18 passed across desktop/mobile. The delivery journey
   records and filters reported evidence, invalidates it without erasure, edits
   and freezes a candidate, evaluates a blocked gate, and retains gate history.

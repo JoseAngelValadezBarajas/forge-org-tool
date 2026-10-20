@@ -2,6 +2,8 @@
 
 Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), `13f7fc5` (isolated desktop CI frontend build), `f83e1a9` (ORG-006 delivery truth vertical slice), `3221de0` (versioned persistence migrations), `159a930` (desktop lifecycle and product hierarchy), `f6bfdce` (isolated browser assertion), `8031914` (sidecar-before-Tauri CI ordering), and Figma evidence commit `cbb3841`.
 
+Final verification commit: `b71c63e`; GitHub Quality run `39422706855` passed all API, web, and Windows desktop jobs.
+
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the
 foundation audit record.
