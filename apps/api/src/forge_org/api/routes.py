@@ -17,6 +17,7 @@ from forge_org.api.schemas import (
     CriterionUpdate,
     DecisionCreate,
     DecisionResponse,
+    DecisionRevisionResponse,
     DecisionUpdate,
     DependencyCreate,
     DependencyResponse,
@@ -40,6 +41,7 @@ from forge_org.api.schemas import (
     ImportResponse,
     InvariantCreate,
     InvariantResponse,
+    InvariantRevisionResponse,
     InvariantUpdate,
     ObservationResponse,
     ProjectCreate,
@@ -320,6 +322,11 @@ def update_decision(workspace_id: str, project_id: str, decision_id: str, payloa
     try: return knowledge.update_decision(workspace_id, project_id, decision_id, payload.model_dump(exclude_unset=True))
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/revisions', response_model=list[DecisionRevisionResponse])
+def decision_revisions(workspace_id: str, project_id: str, decision_id: str, knowledge: KnowledgeService = Depends(knowledge_service)) -> list[dict[str, Any]]:
+    try: return knowledge.decision_revisions(workspace_id, project_id, decision_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/accept', response_model=DecisionResponse)
 def accept_decision(workspace_id: str, project_id: str, decision_id: str, knowledge: KnowledgeService = Depends(knowledge_service)) -> dict[str, Any]:
     try: return knowledge.accept_decision(workspace_id, project_id, decision_id)
@@ -345,6 +352,11 @@ def list_invariants(workspace_id: str, project_id: str, knowledge: KnowledgeServ
 @router.patch('/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}', response_model=InvariantResponse)
 def update_invariant(workspace_id: str, project_id: str, invariant_id: str, payload: InvariantUpdate, knowledge: KnowledgeService = Depends(knowledge_service)) -> dict[str, Any]:
     try: return knowledge.update_invariant(workspace_id, project_id, invariant_id, payload.model_dump(exclude_unset=True))
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}/revisions', response_model=list[InvariantRevisionResponse])
+def invariant_revisions(workspace_id: str, project_id: str, invariant_id: str, knowledge: KnowledgeService = Depends(knowledge_service)) -> list[dict[str, Any]]:
+    try: return knowledge.invariant_revisions(workspace_id, project_id, invariant_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/invariants/{invariant_id}/acknowledge', response_model=AcknowledgeResponse)

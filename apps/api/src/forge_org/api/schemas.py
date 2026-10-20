@@ -199,6 +199,8 @@ class DecisionUpdate(BaseModel):
 
 class DecisionResponse(BaseModel):
     id: str; project_id: str; title: str; context: str; decision: str; rationale: str; alternatives_considered: str | None; tradeoffs: str | None; status: str; revision: int; superseded_by_id: str | None; created_at: datetime; updated_at: datetime
+class DecisionRevisionResponse(BaseModel):
+    id: str; decision_id: str; revision: int; title: str; context: str; decision: str; rationale: str; alternatives_considered: str | None; tradeoffs: str | None; status: str; superseded_by_id: str | None; created_at: datetime
 
 class InvariantCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200); statement: str = Field(min_length=1, max_length=4000); rationale: str = Field(min_length=1, max_length=4000); feature_id: str | None = None
@@ -208,6 +210,8 @@ class InvariantUpdate(BaseModel):
 
 class InvariantResponse(BaseModel):
     id: str; project_id: str; feature_id: str | None; title: str; statement: str; rationale: str; status: str; revision: int; created_at: datetime; updated_at: datetime; acknowledged_revision: int | None = None
+class InvariantRevisionResponse(BaseModel):
+    id: str; invariant_id: str; revision: int; title: str; statement: str; rationale: str; status: str; feature_id: str | None; created_at: datetime
 
 class AcknowledgeRequest(BaseModel):
     expected_revision: int = Field(ge=1)

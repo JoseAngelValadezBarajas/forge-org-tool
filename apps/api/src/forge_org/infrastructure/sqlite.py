@@ -421,6 +421,10 @@ class OrganizationRepository:
     def feature_decisions(self, feature_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT d.* FROM decisions d JOIN decision_feature_links l ON l.decision_id = d.id WHERE l.feature_id = ? ORDER BY d.updated_at DESC', (feature_id,)).fetchall()]
 
+    def decision_revisions(self, project_id: str, decision_id: str) -> list[dict[str, Any]]:
+        if self.get_decision(project_id, decision_id) is None: return []
+        return [dict(row) for row in self.connection.execute('SELECT * FROM decision_revisions WHERE decision_id = ? ORDER BY revision', (decision_id,)).fetchall()]
+
     def create_invariant(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         now, invariant_id = utc_now(), str(uuid4())
         self.connection.execute('INSERT INTO invariants(id, project_id, feature_id, title, statement, rationale, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (invariant_id, project_id, values.get('feature_id'), values['title'], values['statement'], values['rationale'], now, now))
@@ -456,6 +460,10 @@ class OrganizationRepository:
 
     def feature_invariants(self, project_id: str, feature_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute("SELECT i.*, a.acknowledged_revision FROM invariants i LEFT JOIN invariant_acknowledgements a ON a.invariant_id = i.id AND a.feature_id = ? WHERE i.project_id = ? AND i.status = 'active' AND (i.feature_id IS NULL OR i.feature_id = ?) ORDER BY i.updated_at DESC", (feature_id, project_id, feature_id)).fetchall()]
+
+    def invariant_revisions(self, project_id: str, invariant_id: str) -> list[dict[str, Any]]:
+        if self.get_invariant(project_id, invariant_id) is None: return []
+        return [dict(row) for row in self.connection.execute('SELECT * FROM invariant_revisions WHERE invariant_id = ? ORDER BY revision', (invariant_id,)).fetchall()]
 
     def save_evaluation(self, values: dict[str, Any]) -> dict[str, Any]:
         evaluation_id = str(uuid4()); self.connection.execute('INSERT INTO readiness_evaluations(id, feature_id, evaluated_at, rule_set_version, input_fingerprint, outcome, passed_checks, failed_checks, blockers, results, input_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (evaluation_id, values['feature_id'], values['evaluated_at'], values['rule_set_version'], values['input_fingerprint'], values['outcome'], values['passed_checks'], values['failed_checks'], values['blockers'], values['results'], values['input_snapshot'])); self.connection.commit()

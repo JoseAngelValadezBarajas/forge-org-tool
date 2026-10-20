@@ -32,5 +32,9 @@ def test_revisioned_decisions_invariants_and_readiness_are_explicit(tmp_path: Pa
             assert changed.json()['revision'] == 2
             history = client.get(f"{root}/features/{feature['id']}/readiness/evaluations").json()
             assert history[0]['stale'] is True
+            assert len(client.get(f"{root}/invariants/{invariant['id']}/revisions").json()) == 2
+            updated_decision = client.patch(f"{root}/decisions/{decision['id']}", json={'rationale': 'More explicit rationale'})
+            assert updated_decision.json()['revision'] == 2
+            assert len(client.get(f"{root}/decisions/{decision['id']}/revisions").json()) == 2
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)

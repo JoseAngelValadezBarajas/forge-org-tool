@@ -451,6 +451,96 @@
         "title": "DecisionResponse",
         "type": "object"
       },
+      "DecisionRevisionResponse": {
+        "properties": {
+          "alternatives_considered": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternatives Considered"
+          },
+          "context": {
+            "title": "Context",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "decision_id": {
+            "title": "Decision Id",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "superseded_by_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Superseded By Id"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tradeoffs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tradeoffs"
+          }
+        },
+        "required": [
+          "id",
+          "decision_id",
+          "revision",
+          "title",
+          "context",
+          "decision",
+          "rationale",
+          "alternatives_considered",
+          "tradeoffs",
+          "status",
+          "superseded_by_id",
+          "created_at"
+        ],
+        "title": "DecisionRevisionResponse",
+        "type": "object"
+      },
       "DecisionUpdate": {
         "properties": {
           "alternatives_considered": {
@@ -1580,6 +1670,67 @@
           "updated_at"
         ],
         "title": "InvariantResponse",
+        "type": "object"
+      },
+      "InvariantRevisionResponse": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "feature_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "invariant_id": {
+            "title": "Invariant Id",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "invariant_id",
+          "revision",
+          "title",
+          "statement",
+          "rationale",
+          "status",
+          "feature_id",
+          "created_at"
+        ],
+        "title": "InvariantRevisionResponse",
         "type": "object"
       },
       "InvariantUpdate": {
@@ -3412,6 +3563,70 @@
           }
         },
         "summary": "Link Decision",
+        "tags": [
+          "organization"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/revisions": {
+      "get": {
+        "operationId": "decision_revisions_api_v1_workspaces__workspace_id__projects__project_id__decisions__decision_id__revisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "decision_id",
+            "required": true,
+            "schema": {
+              "title": "Decision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DecisionRevisionResponse"
+                  },
+                  "title": "Response Decision Revisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Decisions  Decision Id  Revisions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decision Revisions",
         "tags": [
           "organization"
         ]
@@ -5712,6 +5927,70 @@
           }
         },
         "summary": "Update Invariant",
+        "tags": [
+          "organization"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}/revisions": {
+      "get": {
+        "operationId": "invariant_revisions_api_v1_workspaces__workspace_id__projects__project_id__invariants__invariant_id__revisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "invariant_id",
+            "required": true,
+            "schema": {
+              "title": "Invariant Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InvariantRevisionResponse"
+                  },
+                  "title": "Response Invariant Revisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Invariants  Invariant Id  Revisions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Invariant Revisions",
         "tags": [
           "organization"
         ]

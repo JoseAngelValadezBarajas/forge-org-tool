@@ -33,6 +33,10 @@ class KnowledgeService:
         self.project(workspace_id, project_id); item = self.repository.update_decision(project_id, decision_id, values)
         if item is None: raise LookupError('Decision not found')
         return item
+    def decision_revisions(self, workspace_id: str, project_id: str, decision_id: str) -> list[dict[str, Any]]:
+        self.project(workspace_id, project_id)
+        if self.repository.get_decision(project_id, decision_id) is None: raise LookupError('Decision not found')
+        return self.repository.decision_revisions(project_id, decision_id)
     def accept_decision(self, workspace_id: str, project_id: str, decision_id: str) -> dict[str, Any]:
         self.project(workspace_id, project_id); item = self.repository.accept_decision(project_id, decision_id)
         if item is None: raise LookupError('Decision not found')
@@ -52,6 +56,10 @@ class KnowledgeService:
         self.project(workspace_id, project_id); item = self.repository.update_invariant(project_id, invariant_id, values)
         if item is None: raise LookupError('Invariant not found')
         return item
+    def invariant_revisions(self, workspace_id: str, project_id: str, invariant_id: str) -> list[dict[str, Any]]:
+        self.project(workspace_id, project_id)
+        if self.repository.get_invariant(project_id, invariant_id) is None: raise LookupError('Invariant not found')
+        return self.repository.invariant_revisions(project_id, invariant_id)
     def acknowledge(self, workspace_id: str, project_id: str, feature_id: str, invariant_id: str, expected_revision: int) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id); invariant = self.repository.get_invariant(project_id, invariant_id)
         if invariant is None or (invariant['feature_id'] is not None and invariant['feature_id'] != feature_id): raise LookupError('Invariant does not apply to this feature')
