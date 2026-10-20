@@ -57,5 +57,8 @@ test('planning and readiness remain manual truth states', async ({ page }) => {
   await expect(page.getByText(/not delivery, CI, deployment/i)).toBeVisible();
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-readiness.png' : 'desktop-planning.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+  await page.goto(`/repositories/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Repositories' })).toBeVisible();
+  await expect(page.getByText(/never reads source content/i)).toBeVisible();
   expect(feature.id).toBeTruthy();
 });

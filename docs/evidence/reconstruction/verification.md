@@ -22,7 +22,7 @@ Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
 ## Retained browser evidence
 
 - Organization: [desktop](../m1/desktop-organization.png).
-- Planning/readiness: [desktop planning](../m1/desktop-planning.png), [mobile readiness](../m1/mobile-readiness.png).
+- Planning/readiness/repository navigation: [desktop planning](../m1/desktop-planning.png), [mobile readiness](../m1/mobile-readiness.png); the same isolated Chromium journey also opens the repository metadata-only surface.
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
   [desktop light](../m1/desktop-component-host.png), [mobile dark](../m1/mobile-component-host-dark.png),
   and [mobile light](../m1/mobile-gallery-light.png).
