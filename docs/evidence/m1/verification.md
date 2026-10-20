@@ -10,7 +10,7 @@ foundation audit record.
 
 - Node/npm: Node 24.13.0, npm 11.6.2.
 - Python/uv: Python 3.12.10, uv 0.12.7.
-- `npm run test`: architecture boundaries passed, token check passed, typecheck passed, architecture tests 5/5, Vitest 17/17 across 10 files.
+- `npm run test`: architecture boundaries passed, token check passed, typecheck passed, architecture tests 5/5, Vitest 19/19 across 11 files.
 - `npm run build`: Vite production build passed; the development-only `/__components` route was absent from `apps/web/dist`.
 - `npm run test:e2e`: isolated Chromium desktop/mobile smoke passed 18/18, including shell command-palette/theme behavior, planning feature detail, readiness/repository context, delivery, workbench/handoff, transfer truth-state navigation, and the feature context package journey; Component Host dark/light and representative feature screenshots are retained beside this file: `desktop-component-host-dark.png`, `desktop-component-host.png`, `mobile-component-host-dark.png`, `mobile-gallery-light.png`, `desktop-planning.png`, `mobile-readiness.png`, `desktop-delivery.png`, `mobile-delivery.png`, `desktop-workbench.png`, `mobile-workbench.png`, `desktop-transfer.png`, `mobile-transfer.png`, `desktop-context.png`, `mobile-context.png`, `desktop-context-package.png`, `mobile-context-package.png`, `desktop-feature-detail.png`, and `mobile-feature-detail.png`.
 - API: Ruff passed, strict mypy passed, pytest passed 13/13, OpenAPI check passed.

@@ -24,11 +24,14 @@ downloads. `f83e1a9` completes the ORG-006 delivery truth vertical slice with
 evidence filtering/invalidation, draft candidate revision and freeze controls,
 candidate and gate history, deterministic verification controls, blocked gate
 evaluation, and retained non-published manifest behavior.
+`dcda574` completes ORG-007 transfer verification with reviewed import commit
+coverage, controlled duplicate-name rejection, focused UI tests, and retained
+desktop/mobile import evidence.
 
 ## Automated verification
 
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
-  architecture tests 5/5, and Vitest 17/17 across 10 files.
+  architecture tests 5/5, and Vitest 19/19 across 11 files.
 - API Ruff and strict mypy: passed.
 - API pytest: 13/13 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
@@ -95,10 +98,13 @@ desktop/mobile browser journey cover evidence filtering/invalidation, draft
 candidate editing/freezing, candidate/gate history, and the blocked gate
 truth boundary. ORG-006 is `VERIFIED` for automated behavior; this does not
 certify Figma visual parity. ORG-007 has API
-coverage for
-preview fingerprints, planning-only import, export, stale-fingerprint
-rejection, collection limits, cycle rejection, and the browser transfer flow;
-it remains `IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-008 has
+coverage for preview fingerprints, planning-only import, export,
+stale-fingerprint rejection, controlled duplicate-name rejection, collection
+limits, cycle rejection, and new-ID creation. Its focused UI test and
+desktop/mobile browser journey cover export, edited-document preview, reviewed
+fingerprint commit, validation errors, and the `IMPORTED_PLANNING_ONLY` truth
+state. ORG-007 is `VERIFIED` for automated behavior; this does not certify
+Figma visual parity. ORG-008 has
 an
   authenticated sidecar boundary, desktop launch/path policy, and restricted
   Tauri host skeleton; automated Cargo/Tauri compilation is verified in CI, but
