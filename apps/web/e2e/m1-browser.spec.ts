@@ -94,7 +94,7 @@ test('delivery exposes deterministic gates and non-published truth', async ({ pa
   await page.getByLabel('New candidate title').fill(`Candidate ${suffix}`);
   await page.getByLabel('New candidate summary').fill('Candidate under review');
   await page.getByRole('button', { name: 'Create Candidate' }).click();
-  await expect(page.getByLabel('Candidate title')).toHaveValue(`Candidate ${suffix}`);
+  await expect(page.getByRole('textbox', { name: 'Candidate title', exact: true })).toHaveValue(`Candidate ${suffix}`);
   await page.getByRole('textbox', { name: 'Candidate title', exact: true }).fill(`Edited candidate ${suffix}`);
   await page.getByRole('textbox', { name: 'Candidate summary', exact: true }).fill('Edited candidate summary');
   await page.getByRole('button', { name: 'Save candidate' }).click();
