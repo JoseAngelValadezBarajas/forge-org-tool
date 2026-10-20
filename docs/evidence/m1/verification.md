@@ -30,7 +30,7 @@ The final public repository was cloned into an isolated temporary directory. `np
 - Repository: `https://github.com/JoseAngelValadezBarajas/forge-org-tool`
 - Visibility: public.
 - Default branch: `main`.
-- Quality workflow: [run 39383229077](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39383229077) passed for evidence commit `cbb38412147a73a10202e0facc029238d7bbedc8`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed. The current commit contains documentation-only finalization after this verified run.
+- Quality workflow: [run 39387177955](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39387177955) passed for the current reconstruction branch at verification commit `c218406`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed.
 
 ## RED/GREEN notes
 

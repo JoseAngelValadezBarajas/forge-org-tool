@@ -30,7 +30,7 @@ downloads.
 - API pytest: 13/13 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
   tests passed as part of the API suite. Native Rust/Tauri compilation and
-  desktop launcher tests passed in [GitHub Quality run 39382267348](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382267348).
+  desktop launcher tests passed in [GitHub Quality run 39387177955](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39387177955).
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
 - Isolated Chromium: 18/18 passed across desktop/mobile. Playwright starts its
