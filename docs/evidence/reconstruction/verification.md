@@ -4,7 +4,11 @@ This record covers the reconstructed ORG-001 through ORG-009 slices. It does
 not certify Figma visual parity, desktop packaging, or unimplemented legacy
 capabilities.
 
-Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
+Implementation commits include `6eca0da` (ORG-001), `e909ce9` (planning
+mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
+`3a39790` (evidence filtering), `01c6e42` (run retrieval), `fec502d`
+(transfer limits), `6c7e309` (repository web surface), and `96ed4b9`
+(latest retained browser evidence).
 
 ## Automated verification
 
