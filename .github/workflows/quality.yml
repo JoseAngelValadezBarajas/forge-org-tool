@@ -27,3 +27,13 @@ jobs:
       - run: uv run --project apps/api --locked mypy apps/api/src
       - run: uv run --project apps/api --locked pytest apps/api/tests
       - run: uv run --project apps/api --locked python tooling/scripts/export-openapi.py --check
+  desktop:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --manifest-path apps/desktop/Cargo.toml
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s apps/desktop/tests -p "test_*.py"
