@@ -62,6 +62,9 @@ from forge_org.api.schemas import (
     TaskCreate,
     TaskResponse,
     TaskUpdate,
+    VerificationRequest,
+    VerificationResponse,
+    VerificationRuleResponse,
     WorkspaceCreate,
     WorkspaceResponse,
     WorkspaceUpdate,
@@ -558,6 +561,33 @@ def invalidate_evidence(workspace_id: str, project_id: str, evidence_id: str, de
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/evidence/{evidence_id}', response_model=EvidenceResponse)
 def get_evidence(workspace_id: str, project_id: str, evidence_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
     try: return delivery.evidence_get(workspace_id, project_id, evidence_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/verifications/rules', response_model=list[VerificationRuleResponse])
+def list_verification_rules(workspace_id: str, project_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, str]]:
+    try: return delivery.verification_rules(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/verifications', response_model=list[VerificationResponse])
+def list_verifications(workspace_id: str, project_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
+    try: return delivery.verification_list(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/verifications/preview', response_model=VerificationResponse)
+def preview_verification(workspace_id: str, project_id: str, payload: VerificationRequest, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.verification_preview(workspace_id, project_id, payload.rule_id, payload.candidate_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/verifications/evaluate', response_model=VerificationResponse, status_code=201)
+def evaluate_verification(workspace_id: str, project_id: str, payload: VerificationRequest, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.verification_evaluate(workspace_id, project_id, payload.rule_id, payload.candidate_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/verifications/{evaluation_id}', response_model=VerificationResponse)
+def get_verification(workspace_id: str, project_id: str, evaluation_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.verification_get(workspace_id, project_id, evaluation_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates', response_model=list[CandidateResponse])

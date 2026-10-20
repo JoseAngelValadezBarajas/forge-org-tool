@@ -45,6 +45,7 @@ export type HandoffRevision = { id: string; handoff_id: string; revision: number
 export type Evidence = { id: string; project_id: string; feature_id: string | null; title: string; summary: string; provenance: string; reference_kind: string; reference_value: string; status: string; created_at: string; updated_at: string };
 export type ReleaseCandidate = { id: string; project_id: string; title: string; summary: string; status: string; revision: number; fingerprint: string | null; created_at: string; updated_at: string };
 export type CandidateHistory = { id: string; candidate_id: string; revision: number; status: string; snapshot_json: string; fingerprint: string; created_at: string };
+export type Verification = { id: string | null; project_id: string; rule_id: string; candidate_id: string | null; outcome: string; input_fingerprint: string; blockers: string[]; created_at: string | null; stale: boolean };
 
 async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -109,6 +110,10 @@ export const organizationApi = {
   createHandoff: (workspaceId: string, projectId: string, runId: string, title: string) => sendJson<Handoff>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}/handoffs`, { method: 'POST', body: JSON.stringify({ title }) }),
   listEvidence: (workspaceId: string, projectId: string, search = '', provenance = '', status = '') => getApiJson<Evidence[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence?search=${encodeURIComponent(search)}&provenance=${encodeURIComponent(provenance)}&status=${encodeURIComponent(status)}` as `/api/v1/${string}` }),
   getEvidence: (workspaceId: string, projectId: string, evidenceId: string) => getApiJson<Evidence>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence/${evidenceId}` }),
+  listVerificationRules: (workspaceId: string, projectId: string) => getApiJson<Array<{ id: string; label: string; description: string }>>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/verifications/rules` }),
+  previewVerification: (workspaceId: string, projectId: string, rule_id: string, candidate_id?: string) => sendJson<Verification>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/verifications/preview`, { method: 'POST', body: JSON.stringify({ rule_id, candidate_id }) }),
+  evaluateVerification: (workspaceId: string, projectId: string, rule_id: string, candidate_id?: string) => sendJson<Verification>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/verifications/evaluate`, { method: 'POST', body: JSON.stringify({ rule_id, candidate_id }) }),
+  listVerifications: (workspaceId: string, projectId: string) => getApiJson<Verification[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/verifications` }),
   createEvidence: (workspaceId: string, projectId: string, values: { title: string; summary: string; provenance: string; reference_kind: string; reference_value: string }) => sendJson<Evidence>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence`, { method: 'POST', body: JSON.stringify(values) }),
   listCandidates: (workspaceId: string, projectId: string) => getApiJson<ReleaseCandidate[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates` }),
   createCandidate: (workspaceId: string, projectId: string, title: string, summary: string) => sendJson<ReleaseCandidate>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates`, { method: 'POST', body: JSON.stringify({ title, summary }) }),

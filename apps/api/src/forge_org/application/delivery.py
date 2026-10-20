@@ -7,6 +7,11 @@ from forge_org.infrastructure.sqlite import OrganizationRepository
 
 class DeliveryService:
     def __init__(self, connection): self.repository = OrganizationRepository(connection)
+    VERIFICATION_RULES = (
+        {'id': 'candidate-frozen', 'label': 'Candidate is frozen', 'description': 'The selected release candidate is frozen.'},
+        {'id': 'verified-evidence-present', 'label': 'Verified evidence is present', 'description': 'At least one active evidence record has VERIFIED provenance.'},
+        {'id': 'release-gate-passes', 'label': 'Release gate passes', 'description': 'The selected candidate has a stored PASS gate evaluation at its current revision.'},
+    )
     def _project(self, workspace_id: str, project_id: str) -> dict[str, Any]:
         project = self.repository.get_project(workspace_id, project_id)
         if project is None: raise LookupError('Project not found')
@@ -64,3 +69,46 @@ class DeliveryService:
         blockers = [] if item['status'] == 'FROZEN' and any(e['status'] == 'ACTIVE' and e['provenance'] == 'VERIFIED' for e in self.repository.list_evidence(project_id)) else ['A frozen candidate and active VERIFIED evidence are required']
         result = {'candidate_id': candidate_id, 'candidate_revision': item['revision'], 'outcome': 'PASS' if not blockers else 'BLOCKED', 'input_fingerprint': item.get('fingerprint') or '', 'blockers': blockers}
         return self.repository.save_gate(result) if save else result
+
+    def verification_rules(self, workspace_id: str, project_id: str) -> list[dict[str, str]]:
+        self._project(workspace_id, project_id)
+        return list(self.VERIFICATION_RULES)
+
+    def _verification(self, workspace_id: str, project_id: str, rule_id: str, candidate_id: str | None) -> dict[str, Any]:
+        self._project(workspace_id, project_id)
+        rule = next((item for item in self.VERIFICATION_RULES if item['id'] == rule_id), None)
+        if rule is None: raise ValueError('Unknown verification rule')
+        candidate = self.candidate_get(workspace_id, project_id, candidate_id) if candidate_id else None
+        evidence = self.repository.list_evidence(project_id)
+        gates = self.repository.list_gates(candidate_id) if candidate_id else []
+        snapshot = {'rule_id': rule_id, 'candidate': candidate, 'evidence': evidence, 'gates': gates}
+        input_fingerprint = hashlib.sha256(json.dumps(snapshot, sort_keys=True, separators=(',', ':'), default=str).encode()).hexdigest()
+        blockers: list[str] = []
+        if rule_id == 'candidate-frozen' and (candidate is None or candidate['status'] != 'FROZEN'):
+            blockers.append('The selected candidate is not frozen')
+        if rule_id == 'verified-evidence-present' and not any(item['status'] == 'ACTIVE' and item['provenance'] == 'VERIFIED' for item in evidence):
+            blockers.append('No active VERIFIED evidence is present')
+        if rule_id == 'release-gate-passes' and not any(item['outcome'] == 'PASS' and candidate and item['candidate_revision'] == candidate['revision'] for item in gates):
+            blockers.append('No PASS gate evaluation exists for the current candidate revision')
+        return {'project_id': project_id, 'rule_id': rule_id, 'candidate_id': candidate_id, 'outcome': 'PASS' if not blockers else 'BLOCKED', 'input_fingerprint': input_fingerprint, 'blockers': blockers}
+
+    def verification_preview(self, workspace_id: str, project_id: str, rule_id: str, candidate_id: str | None) -> dict[str, Any]:
+        return self._verification(workspace_id, project_id, rule_id, candidate_id)
+
+    def verification_evaluate(self, workspace_id: str, project_id: str, rule_id: str, candidate_id: str | None) -> dict[str, Any]:
+        saved = self.repository.save_verification(self._verification(workspace_id, project_id, rule_id, candidate_id))
+        return {**saved, 'blockers': json.loads(saved['blockers']), 'stale': False}
+
+    def _verification_response(self, item: dict[str, Any], workspace_id: str, project_id: str) -> dict[str, Any]:
+        current = self._verification(workspace_id, project_id, item['rule_id'], item['candidate_id'])
+        return {**item, 'blockers': json.loads(item['blockers']), 'stale': current['input_fingerprint'] != item['input_fingerprint']}
+
+    def verification_list(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]:
+        self._project(workspace_id, project_id)
+        return [self._verification_response(item, workspace_id, project_id) for item in self.repository.list_verifications(project_id)]
+
+    def verification_get(self, workspace_id: str, project_id: str, evaluation_id: str) -> dict[str, Any]:
+        self._project(workspace_id, project_id)
+        item = self.repository.get_verification(project_id, evaluation_id)
+        if item is None: raise LookupError('Verification evaluation not found')
+        return self._verification_response(item, workspace_id, project_id)

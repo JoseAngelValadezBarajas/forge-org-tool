@@ -29,5 +29,15 @@ def test_delivery_keeps_reported_evidence_and_release_gates_explicit(tmp_path: P
             evaluated = client.post(f"{root}/release-candidates/{candidate['id']}/gates/evaluate")
             assert evaluated.status_code == 201
             assert len(client.get(f"{root}/release-candidates/{candidate['id']}/gates").json()) == 1
+            rules = client.get(f'{root}/verifications/rules')
+            assert rules.status_code == 200 and any(rule['id'] == 'verified-evidence-present' for rule in rules.json())
+            blocked_verification = client.post(f'{root}/verifications/preview', json={'rule_id': 'verified-evidence-present', 'candidate_id': candidate['id']})
+            assert blocked_verification.status_code == 200 and blocked_verification.json()['outcome'] == 'BLOCKED'
+            verified = client.post(f'{root}/evidence', json={'title': 'Verified artifact', 'summary': 'Reviewed artifact', 'provenance': 'VERIFIED', 'reference_kind': 'artifact', 'reference_value': 'artifact-1'}).json()
+            passed_verification = client.post(f'{root}/verifications/evaluate', json={'rule_id': 'verified-evidence-present', 'candidate_id': candidate['id']})
+            assert passed_verification.status_code == 201 and passed_verification.json()['outcome'] == 'PASS'
+            assert len(client.get(f'{root}/verifications').json()) == 1
+            client.post(f"{root}/evidence/{verified['id']}/invalidate")
+            assert client.get(f"{root}/verifications/{passed_verification.json()['id']}").json()['stale'] is True
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)

@@ -196,6 +196,11 @@ def migrate(connection: sqlite3.Connection) -> None:
             candidate_revision INTEGER NOT NULL, outcome TEXT NOT NULL, input_fingerprint TEXT NOT NULL,
             blockers TEXT NOT NULL, created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS verification_evaluations (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            rule_id TEXT NOT NULL, candidate_id TEXT REFERENCES release_candidates(id) ON DELETE SET NULL,
+            outcome TEXT NOT NULL, input_fingerprint TEXT NOT NULL, blockers TEXT NOT NULL, created_at TEXT NOT NULL
+        );
         INSERT OR IGNORE INTO schema_version(version) VALUES (1);
         """
     )
@@ -596,3 +601,15 @@ class OrganizationRepository:
         item_id = str(uuid4()); self.connection.execute('INSERT INTO gate_evaluations(id, candidate_id, candidate_revision, outcome, input_fingerprint, blockers, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (item_id, values['candidate_id'], values['candidate_revision'], values['outcome'], values['input_fingerprint'], json.dumps(values['blockers'], sort_keys=True), utc_now())); self.connection.commit(); return {**values, 'id': item_id}
     def list_gates(self, candidate_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT * FROM gate_evaluations WHERE candidate_id = ? ORDER BY created_at DESC', (candidate_id,)).fetchall()]
+
+    def save_verification(self, values: dict[str, Any]) -> dict[str, Any]:
+        item_id = str(uuid4())
+        self.connection.execute('INSERT INTO verification_evaluations(id, project_id, rule_id, candidate_id, outcome, input_fingerprint, blockers, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (item_id, values['project_id'], values['rule_id'], values.get('candidate_id'), values['outcome'], values['input_fingerprint'], json.dumps(values['blockers'], sort_keys=True), utc_now()))
+        self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM verification_evaluations WHERE id = ?', (item_id,)).fetchone()) or {}
+
+    def list_verifications(self, project_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM verification_evaluations WHERE project_id = ? ORDER BY created_at DESC', (project_id,)).fetchall()]
+
+    def get_verification(self, project_id: str, evaluation_id: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM verification_evaluations WHERE project_id = ? AND id = ?', (project_id, evaluation_id)).fetchone())

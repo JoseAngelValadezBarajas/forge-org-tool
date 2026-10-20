@@ -183,6 +183,13 @@ class CandidateHistoryResponse(BaseModel):
     id: str; candidate_id: str; revision: int; status: str; snapshot_json: str; fingerprint: str; created_at: datetime
 class GateEvaluationResponse(BaseModel):
     id: str | None = None; candidate_id: str; candidate_revision: int; outcome: str; input_fingerprint: str; blockers: list[str]; created_at: datetime | None = None
+class VerificationRequest(BaseModel):
+    rule_id: str
+    candidate_id: str | None = None
+class VerificationRuleResponse(BaseModel):
+    id: str; label: str; description: str
+class VerificationResponse(BaseModel):
+    id: str | None = None; project_id: str; rule_id: str; candidate_id: str | None; outcome: str; input_fingerprint: str; blockers: list[str]; created_at: datetime | None = None; stale: bool = False
 
 class ImportPreviewResponse(BaseModel):
     schema_version: str; fingerprint: str; project: dict[str, Any]; counts: dict[str, int]
