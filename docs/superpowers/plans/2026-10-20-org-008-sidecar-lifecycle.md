@@ -47,5 +47,5 @@
 - Modify: `docs/evidence/reconstruction/verification.md`
 - Modify: `docs/specs/ORG-008-desktop/acceptance.md` only if evidence wording needs clarification.
 
-- [ ] Record lifecycle policy verification separately from the still-outstanding packaging/installed-product acceptance items.
-- [ ] Run local policy checks and GitHub Quality CI; do not mark ORG-008 fully verified.
+- [x] Record lifecycle policy verification separately from the still-outstanding packaging/installed-product acceptance items.
+- [x] Run local policy checks and GitHub Quality CI (`39392594672`); do not mark ORG-008 fully verified.

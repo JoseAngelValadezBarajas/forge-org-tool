@@ -43,6 +43,7 @@ desktop/mobile import evidence.
 - GitHub Quality run [39390208428](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390208428) passed for ORG-007 commit `cdc8114`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39390708097](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390708097) passed for final documentation commit `39b0421`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39391658113](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39391658113) passed for ORG-009 behavior-status commit `c112f2b`; web, API, and Windows desktop jobs completed successfully.
+- GitHub Quality run [39392594672](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39392594672) passed for ORG-008 sidecar lifecycle commit `8ed6b3c`; web, API, and Windows desktop jobs completed successfully.
 - Isolated Chromium: 18/18 passed across desktop/mobile. The delivery journey
   records and filters reported evidence, invalidates it without erasure, edits
   and freezes a candidate, evaluates a blocked gate, and retains gate history.
@@ -107,11 +108,11 @@ limits, cycle rejection, and new-ID creation. Its focused UI test and
 desktop/mobile browser journey cover export, edited-document preview, reviewed
 fingerprint commit, validation errors, and the `IMPORTED_PLANNING_ONLY` truth
 state. ORG-007 is `VERIFIED` for automated behavior; this does not certify
-Figma visual parity. ORG-008 has
-an
-  authenticated sidecar boundary, desktop launch/path policy, and restricted
-  Tauri host skeleton; automated Cargo/Tauri compilation is verified in CI, but
-  packaging and installed Windows smoke are not certified. ORG-009 has
+Figma visual parity. ORG-008 has an authenticated sidecar boundary, desktop
+launch/path policy, restricted Tauri host skeleton, and a tested guard against
+returning a dead sidecar session; automated Cargo/Tauri compilation is
+verified in CI, but packaging, migration safety, and installed Windows smoke
+are not certified. ORG-009 has
 feature-owned organization, planning, readiness, workbench, and delivery
 surfaces with responsive browser evidence and explicit manual/reported/blocked
 truth states. ORG-009 is `VERIFIED` for automated behavior; human Figma review
