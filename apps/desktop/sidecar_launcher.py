@@ -8,11 +8,16 @@ import socket
 import shutil
 import subprocess
 import sys
+import json
+import time
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
 MIN_TOKEN_BYTES = 32
+READINESS_TIMEOUT_SECONDS = 15
 
 
 def app_data_root() -> Path:
@@ -42,6 +47,43 @@ def free_loopback_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind(('127.0.0.1', 0))
         return int(server.getsockname()[1])
+
+
+def sidecar_command(port: int) -> list[str]:
+    configured = os.environ.get('FORGE_SIDECAR_COMMAND')
+    if configured:
+        command = json.loads(configured)
+        if not isinstance(command, list) or not command or not all(
+            isinstance(item, str) and item for item in command
+        ):
+            raise RuntimeError('FORGE_SIDECAR_COMMAND must be a non-empty JSON string list')
+        return [*command, '--port', str(port)]
+    return [
+        sys.executable,
+        '-m',
+        'uvicorn',
+        'forge_org.desktop_sidecar:app',
+        '--host',
+        '127.0.0.1',
+        '--port',
+        str(port),
+    ]
+
+
+def wait_for_readiness(port: int, token: str) -> None:
+    deadline = time.monotonic() + READINESS_TIMEOUT_SECONDS
+    request = Request(
+        f'http://127.0.0.1:{port}/api/v1/health',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    while time.monotonic() < deadline:
+        try:
+            with urlopen(request, timeout=1) as response:
+                if response.status == 200:
+                    return
+        except (OSError, URLError):
+            time.sleep(0.05)
+    raise RuntimeError('Sidecar did not become ready before the startup timeout')
 
 
 @dataclass
@@ -79,7 +121,7 @@ def start_sidecar() -> SidecarSession:
     }
     log = log_path.open('ab')
     process = subprocess.Popen(
-        [sys.executable, '-m', 'uvicorn', 'forge_org.desktop_sidecar:app', '--host', '127.0.0.1', '--port', str(port)],
+        sidecar_command(port),
         env=environment,
         stdout=log,
         stderr=subprocess.STDOUT,
@@ -87,4 +129,5 @@ def start_sidecar() -> SidecarSession:
     log.close()
     if process.poll() is not None:
         raise RuntimeError('Sidecar exited before the sidecar became ready')
+    wait_for_readiness(port, token)
     return SidecarSession(process=process, token=token, port=port)

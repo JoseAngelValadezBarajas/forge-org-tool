@@ -13,7 +13,8 @@ test('desktop shell is truthful and has no horizontal overflow', async ({ page }
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   expect(consoleErrors).toEqual([]);
-  await page.screenshot({ path: resolve(evidenceDir, 'desktop-organization.png'), fullPage: true });
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-organization.png' : 'desktop-organization.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });
 
 test('mobile gallery switches from dark to light with no browser errors', async ({ page }) => {
@@ -79,7 +80,7 @@ test('delivery exposes deterministic gates and non-published truth', async ({ pa
   const project = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Release ${suffix}` } })).json();
   await page.goto(`/delivery/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Delivery verification' })).toBeVisible();
-  await expect(page.getByText('NOT_PUBLISHED')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Delivery verification' }).locator('..').getByText('NOT_PUBLISHED')).toBeVisible();
   await expect(page.getByText(/not a deployment or publication/i)).toBeVisible();
   await page.getByLabel('Evidence title').fill(`Reported evidence ${suffix}`);
   await page.getByLabel('Evidence summary').fill('Human-reported delivery evidence');

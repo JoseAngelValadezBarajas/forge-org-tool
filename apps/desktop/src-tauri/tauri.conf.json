@@ -14,8 +14,9 @@
     }
   },
   "bundle": {
-    "active": false,
+    "active": true,
     "targets": "nsis",
-    "icon": []
+    "icon": [],
+    "externalBin": ["binaries/forge-sidecar"]
   }
 }

@@ -15,6 +15,9 @@ export function OrganizationPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const selectedWorkspace = workspaces.find((item) => item.id === workspaceId);
+  const activeProjects = projects.filter((item) => item.status === 'active').length;
+  const archivedProjects = projects.filter((item) => item.status !== 'active').length;
 
   async function loadWorkspaces() {
     setLoading(true); setError('');
@@ -59,6 +62,12 @@ export function OrganizationPage() {
       <StatusChip tone="warning">Getting started</StatusChip><h3>No workspaces yet</h3><p>Create a workspace to organize projects and keep the next decision visible.</p>
       <form onSubmit={createWorkspace} className={styles.form}><label htmlFor="workspace-name">Workspace name</label><Input id="workspace-name" value={workspaceName} onChange={(event) => setWorkspaceName(event.target.value)} required /><Button type="submit">Create Workspace</Button></form>
     </Card> : <>
+      <div className={styles.summaryGrid} aria-label="Workspace summary">
+        <Card><span className={styles.metricLabel}>Projects</span><strong className={styles.metricValue}>{projects.length}</strong><small>{projects.length} total</small></Card>
+        <Card><span className={styles.metricLabel}>Active</span><strong className={styles.metricValue}>{activeProjects}</strong><small>currently active</small></Card>
+        <Card><span className={styles.metricLabel}>Archived</span><strong className={styles.metricValue}>{archivedProjects}</strong><small>kept for history</small></Card>
+        <Card><span className={styles.metricLabel}>Workspace</span><strong className={styles.metricValue}>{selectedWorkspace?.name ?? 'Local'}</strong><small>private local mode</small></Card>
+      </div>
       <Card><div className={styles.toolbar}><label htmlFor="workspace-select">Workspace</label><select id="workspace-select" value={workspaceId} onChange={(event) => setWorkspaceId(event.target.value)}>{workspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></div>
         <form onSubmit={createProject} className={styles.form}><h3>Create project</h3><label htmlFor="project-name">Project name</label><Input id="project-name" value={projectName} onChange={(event) => setProjectName(event.target.value)} required /><label htmlFor="project-description">Description</label><Input id="project-description" value={projectDescription} onChange={(event) => setProjectDescription(event.target.value)} /><Button type="submit">Create Project</Button></form>
       </Card>

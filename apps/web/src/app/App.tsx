@@ -25,10 +25,22 @@ export function App() {
   }, []);
   function go(path: string) { setPaletteOpen(false); navigate(path); }
   return <div className={styles.app} data-testid="application-shell" data-theme={light ? 'light' : 'dark'}>
-    <header className={styles.topbar}><Link to="/" className={styles.brand}>FORGE <span>Org Tool</span></Link>
-      <nav aria-label="Primary"><Link to="/">Organization</Link>{import.meta.env.DEV && <Link to="/__components">Component host</Link>}<Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">Command palette</Button><Button variant="ghost" onClick={() => setLight((value) => !value)} aria-label={`Switch to ${light ? 'dark' : 'light'} theme`}>Theme: {light ? 'light' : 'dark'}</Button></nav>
-    </header>
-    <main id="main" className={styles.main}>
+    <div className={styles.shellGrid}>
+      <aside className={styles.sidebar}>
+        <Link to="/" className={styles.brand}><span className={styles.mark}>F</span> FORGE</Link>
+        <p className={styles.workspaceLabel}>Local Workspace</p>
+        <nav aria-label="Product navigation" className={styles.productNav}>
+          <Link to="/" aria-current="page">Workspace</Link>
+          {import.meta.env.DEV && <Link to="/__components">Component host</Link>}
+        </nav>
+        <div className={styles.localMode}><strong>LOCAL MODE</strong><span>Private workspace</span></div>
+      </aside>
+      <div className={styles.contentColumn}>
+        <header className={styles.topbar}>
+          <div className={styles.mobileBrand}><Link to="/" className={styles.brand}>FORGE <span>Org Tool</span></Link></div>
+          <nav aria-label="Primary"><Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">Command palette</Button><Button variant="ghost" onClick={() => setLight((value) => !value)} aria-label={`Switch to ${light ? 'dark' : 'light'} theme`}>Theme: {light ? 'light' : 'dark'}</Button></nav>
+        </header>
+        <main id="main" className={styles.main}>
       <Routes>
         <Route path="/" element={<OrganizationPage />} />
         <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
@@ -42,7 +54,9 @@ export function App() {
         {import.meta.env.DEV && <Route path="/__components" element={<ComponentGallery />} />}
         <Route path="*" element={<p>Page not found.</p>} />
       </Routes>
-    </main>
+        </main>
+      </div>
+    </div>
     {paletteOpen && <div className={styles.paletteBackdrop} role="presentation" onMouseDown={() => setPaletteOpen(false)}><div className={styles.palette} role="dialog" aria-modal="true" aria-label="Command palette" onMouseDown={(event) => event.stopPropagation()}><h2>Command palette</h2><Button variant="ghost" onClick={() => go('/')} aria-label="Go to Organization">Organization</Button>{import.meta.env.DEV && <Button variant="ghost" onClick={() => go('/__components')}>Component host</Button>}<p>Press Escape to close.</p></div></div>}
   </div>;
 }

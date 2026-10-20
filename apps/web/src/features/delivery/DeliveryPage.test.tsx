@@ -34,6 +34,8 @@ describe('DeliveryPage', () => {
     render(<MemoryRouter initialEntries={['/delivery/w1/p1']}><Routes><Route path="/delivery/:workspaceId/:projectId" element={<DeliveryPage />} /></Routes></MemoryRouter>);
 
     expect(await screen.findByText('Human report')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Delivery overview' })).toBeInTheDocument();
+    expect(screen.getAllByText('NOT_PUBLISHED').length).toBeGreaterThan(0);
     fireEvent.change(screen.getByRole('searchbox', { name: 'Evidence search' }), { target: { value: 'Human' } });
     fireEvent.click(screen.getByRole('button', { name: 'Apply evidence filters' }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/v1/workspaces/w1/projects/p1/evidence?search=Human&provenance=&status=', expect.objectContaining({ credentials: 'same-origin', signal: undefined })));

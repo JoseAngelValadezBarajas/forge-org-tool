@@ -7,12 +7,14 @@ request policy: relative `/api/v1` paths only, an explicit method set, and an
 loopback binding, LocalAppData database/log paths, and process cleanup. The
 React app receives neither the token nor the process handle.
 
-The Tauri host, packaged sidecar/installer, single-instance lock, and installed
-Windows smoke remain outstanding. The Rust policy and Python launch/security
-contracts are implemented but native compilation is not currently certified.
-No legacy desktop bundle is copied.
+The Tauri host bundles a Python sidecar executable supplied at build time by
+`package_sidecar.ps1`. The launcher uses a per-launch bearer token, waits for an
+authenticated health response, and stores the database, logs, and backups under
+the current user's `LocalAppData\\ForgeOrgTool` tree. Packaged and installed
+smoke tests use a disposable `LocalAppData` directory; no legacy desktop bundle
+or real user database is copied.
 
-`src-tauri` contains the pinned Tauri 2 host skeleton and a minimal
-`core:default` capability manifest. Bundling is intentionally disabled until
-the authenticated sidecar is wired into the native lifecycle and an installed
-Windows smoke can verify persistence and isolation.
+`src-tauri` contains the pinned Tauri 2 host and a minimal `core:default`
+capability manifest. Bundling is enabled for the authenticated sidecar. The
+installed Windows smoke verifies synthetic fresh-install isolation, restart
+persistence, and upgrade migration behavior before release review.

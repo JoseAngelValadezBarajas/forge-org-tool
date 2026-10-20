@@ -41,6 +41,33 @@ class SidecarLauncherTests(unittest.TestCase):
                     with self.assertRaisesRegex(RuntimeError, 'Sidecar exited before the sidecar became ready'):
                         start_sidecar()
 
+    def test_packaged_command_does_not_put_token_in_arguments(self) -> None:
+        from sidecar_launcher import sidecar_command
+
+        with patch.dict(
+            os.environ,
+            {'FORGE_SIDECAR_COMMAND': '["C:\\\\Forge\\\\forge-sidecar.exe"]'},
+            clear=False,
+        ):
+            command = sidecar_command(43123)
+
+        self.assertEqual(command, ['C:\\Forge\\forge-sidecar.exe', '--port', '43123'])
+        self.assertNotIn('FORGE_SIDECAR_TOKEN', ' '.join(command))
+
+    def test_start_waits_for_authenticated_health_readiness(self) -> None:
+        with TemporaryDirectory() as temporary_root:
+            with patch.dict(os.environ, {'LOCALAPPDATA': temporary_root}, clear=False):
+                with patch('sidecar_launcher.free_loopback_port', return_value=43123), patch(
+                    'sidecar_launcher.secrets.token_urlsafe', return_value='a' * 32
+                ), patch('sidecar_launcher.subprocess.Popen') as popen, patch(
+                    'sidecar_launcher.wait_for_readiness'
+                ) as wait_for_readiness:
+                    popen.return_value.poll.return_value = None
+                    session = start_sidecar()
+
+        wait_for_readiness.assert_called_once_with(43123, 'a' * 32)
+        self.assertEqual(session.base_url, 'http://127.0.0.1:43123')
+
 
 if __name__ == '__main__':
     unittest.main()

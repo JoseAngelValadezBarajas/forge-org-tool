@@ -27,6 +27,14 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('button', { name: /create workspace/i })).toBeEnabled();
   });
 
+  it('exposes the product shell hierarchy without inventing project routes', () => {
+    renderRoute('/');
+
+    expect(screen.getByRole('navigation', { name: 'Product navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Workspace' })).toHaveAttribute('href', '/');
+    expect(screen.getByText('LOCAL MODE')).toBeInTheDocument();
+  });
+
   it('exposes loading state and prevents native button interaction', () => {
     renderRoute('/__components');
 

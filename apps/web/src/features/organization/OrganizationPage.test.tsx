@@ -29,5 +29,7 @@ describe('OrganizationPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
     expect(screen.getByText('Map work')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument();
+    expect(screen.getByText('1 total')).toBeInTheDocument();
   });
 });

@@ -7,6 +7,7 @@ from typing import Any, cast
 from uuid import uuid4
 
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 
 from .migrations.v0002_metadata import VERSION as METADATA_MIGRATION_VERSION
 from .migrations.v0002_metadata import upgrade as upgrade_metadata
@@ -29,6 +30,7 @@ def connect() -> sqlite3.Connection:
     engine = create_engine(
         f"sqlite:///{path.as_posix()}",
         connect_args={"check_same_thread": False},
+        poolclass=NullPool,
     )
     raw_connection = engine.raw_connection()
     cast(sqlite3.Connection, raw_connection.driver_connection).row_factory = sqlite3.Row

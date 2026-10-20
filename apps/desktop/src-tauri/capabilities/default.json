@@ -3,5 +3,5 @@
   "identifier": "default",
   "description": "Minimal desktop capability; no shell, filesystem, or arbitrary HTTP permissions.",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": ["core:default", "shell:allow-execute"]
 }
