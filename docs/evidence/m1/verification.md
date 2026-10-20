@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Final public repository commit: pending focused audit commit.
+Focused audit implementation commit: `176f2fbd6f5605ace9ad7ef9c7e35a1095ce6563`.
 
 ## Local evidence
 
@@ -30,10 +30,10 @@ The final public repository was cloned into an isolated temporary directory. `np
 ## RED/GREEN notes
 
 - API scaffold tests were already meaningful and passed before implementation changes; no artificial RED was manufactured.
-- Frontend tests first failed because Testing Library was not installed, then ran with one isolation failure; explicit cleanup produced 3/3 GREEN.
-- E2E first exposed a WebKit device-selection mistake and an ambiguous theme locator; Chromium-only mobile configuration and a scoped locator produced 4/4 GREEN.
+- Focused Card contract tests first failed on the pre-existing `<section>` root; the typed neutral `div`/semantic option implementation produced 3/3 GREEN.
+- Isolated Chromium smoke produced 4/4 GREEN and retained dark/light desktop/mobile evidence; hover behavior was checked in the browser.
 - Clean-clone verification first exposed Windows line-ending sensitivity in token checks; `.gitattributes` fixed the repository-boundary defect and the fresh clone passed.
 
 ## Verdict
 
-`M1_READY_WITH_CHANGES` corrections are implemented and verified locally. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity. Final review commit and GitHub Quality result are recorded after publication.
+`M1_READY_FOR_REVIEW` for the focused audit corrections. GitHub Quality run `39375355053` passed for the implementation commit. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity.
