@@ -11,4 +11,4 @@
 | M1-TOOL-001 | Lockfile and quality command evidence | Verified: npm/uv locks committed; clean clone bootstrap passed |
 | M1-SEC-001 | Secret/data audit before publication | Verified: staged secret/path audit clean; no forbidden data files staged |
 
-This table is updated only with observed test results; manual planning state is not CI or deployment evidence. GitHub Actions Quality succeeded for final commit `152bda5e59fc24c69e170b504febfe64e29b5240`.
+This table is updated only with observed test results; manual planning state is not CI or deployment evidence. GitHub Actions Quality succeeded for the implementation commit `152bda5e59fc24c69e170b504febfe64e29b5240`; documentation is finalized in `786c58f7bdaacc9c130e4f84cd67210acb8b2528`.

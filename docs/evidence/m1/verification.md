@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Final public repository commit: `152bda5e59fc24c69e170b504febfe64e29b5240`.
+Final public repository commit: `786c58f7bdaacc9c130e4f84cd67210acb8b2528`.
 
 ## Local evidence
 
@@ -34,4 +34,3 @@ The final public repository was cloned into an isolated temporary directory. `np
 ## Verdict
 
 `M1_READY_FOR_REVIEW` for the scoped foundation. This does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity.
-
