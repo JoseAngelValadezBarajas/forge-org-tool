@@ -16,6 +16,8 @@ def test_reported_run_lifecycle_and_immutable_handoff(tmp_path: Path) -> None:
             feature = client.post(f'{root}/features', json={'title': 'Reported work', 'goal': 'Record human work'}).json()
             run = client.post(f'{root}/runs', json={'feature_id': feature['id'], 'title': 'Manual report', 'execution_mode': 'manual', 'executor_type': 'human'}).json()
             assert run['status'] == 'PLANNED'
+            assert client.get(f"{root}/runs/{run['id']}").json()['id'] == run['id']
+            assert client.get(f'{root}/runs?status=PLANNED&search=Manual').json()[0]['id'] == run['id']
             started = client.post(f"{root}/runs/{run['id']}/status", json={'status': 'IN_PROGRESS', 'expected_version': 1})
             assert started.status_code == 200
             event = client.post(f"{root}/runs/{run['id']}/events", json={'event_type': 'progress', 'title': 'Work reported', 'description': 'A human reported progress', 'expected_version': 2})

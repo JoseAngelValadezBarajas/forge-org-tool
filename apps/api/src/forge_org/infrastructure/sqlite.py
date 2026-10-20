@@ -536,8 +536,12 @@ class OrganizationRepository:
         assignments = ', '.join(f'{key} = ?' for key in values)
         self.connection.execute(f'UPDATE runs SET {assignments}, version = version + 1, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, run_id]); self.connection.commit(); return self.get_run(project_id, run_id)
 
-    def list_runs(self, project_id: str) -> list[dict[str, Any]]:
-        return [dict(row) for row in self.connection.execute('SELECT * FROM runs WHERE project_id = ? ORDER BY created_at DESC', (project_id,)).fetchall()]
+    def list_runs(self, project_id: str, feature_id: str | None = None, status: str | None = None, search: str | None = None) -> list[dict[str, Any]]:
+        clauses, params = ['project_id = ?'], [project_id]
+        if feature_id: clauses.append('feature_id = ?'); params.append(feature_id)
+        if status: clauses.append('status = ?'); params.append(status)
+        if search: clauses.append('(lower(title) LIKE ? OR lower(coalesce(description, \'\')) LIKE ?)'); term = f'%{search.strip().lower()}%'; params.extend([term, term])
+        return [dict(row) for row in self.connection.execute(f"SELECT * FROM runs WHERE {' AND '.join(clauses)} ORDER BY created_at DESC", params).fetchall()]
 
     def create_event(self, run_id: str, values: dict[str, Any]) -> dict[str, Any]:
         event_id = str(uuid4()); self.connection.execute('INSERT INTO run_events(id, run_id, event_type, title, description, occurred_at, supersedes_event_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (event_id, run_id, values['event_type'], values['title'], values.get('description'), values.get('occurred_at'), values.get('supersedes_event_id'), utc_now())); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM run_events WHERE id = ?', (event_id,)).fetchone()) or {}

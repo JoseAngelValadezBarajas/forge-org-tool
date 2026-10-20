@@ -457,8 +457,8 @@ def download_context_package(workspace_id: str, project_id: str, feature_id: str
     return Response(content=package['payload_json'], media_type='application/json')
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/runs', response_model=list[RunResponse])
-def list_runs(workspace_id: str, project_id: str, runs: RunService = Depends(run_service)) -> list[dict[str, Any]]:
-    try: return runs.list_runs(workspace_id, project_id)
+def list_runs(workspace_id: str, project_id: str, feature_id: str | None = None, status_filter: str | None = Query(default=None, alias='status'), search: str | None = Query(default=None, max_length=160), runs: RunService = Depends(run_service)) -> list[dict[str, Any]]:
+    try: return runs.list_runs(workspace_id, project_id, feature_id, status_filter, search)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/runs', response_model=RunResponse, status_code=201)
@@ -466,6 +466,11 @@ def create_run(workspace_id: str, project_id: str, payload: RunCreate, runs: Run
     try: return runs.create(workspace_id, project_id, payload.model_dump())
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}', response_model=RunResponse)
+def get_run(workspace_id: str, project_id: str, run_id: str, runs: RunService = Depends(run_service)) -> dict[str, Any]:
+    try: return runs.get(workspace_id, project_id, run_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/status', response_model=RunResponse)
 def update_run_status(workspace_id: str, project_id: str, run_id: str, payload: RunStatusUpdate, runs: RunService = Depends(run_service)) -> dict[str, Any]:

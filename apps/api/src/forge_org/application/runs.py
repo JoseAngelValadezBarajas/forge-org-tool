@@ -19,13 +19,15 @@ class RunService:
         self._project(workspace_id, project_id); item = self.repository.get_run(project_id, run_id)
         if item is None: raise LookupError('Run not found')
         return item
+    def get(self, workspace_id: str, project_id: str, run_id: str) -> dict[str, Any]:
+        return self._run(workspace_id, project_id, run_id)
     def create(self, workspace_id: str, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         project = self._project(workspace_id, project_id)
         if project['status'] != 'active': raise ValueError('Archived projects are read-only')
         if not values.get('title', '').strip(): raise ValueError('Title is required')
         return self.repository.create_run(project_id, values)
-    def list_runs(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]:
-        self._project(workspace_id, project_id); return self.repository.list_runs(project_id)
+    def list_runs(self, workspace_id: str, project_id: str, feature_id: str | None = None, status: str | None = None, search: str | None = None) -> list[dict[str, Any]]:
+        self._project(workspace_id, project_id); return self.repository.list_runs(project_id, feature_id, status, search)
     def change_status(self, workspace_id: str, project_id: str, run_id: str, status: str, expected_version: int) -> dict[str, Any]:
         project = self._project(workspace_id, project_id); item = self._run(workspace_id, project_id, run_id)
         if project['status'] != 'active': raise ValueError('Archived projects are read-only')
