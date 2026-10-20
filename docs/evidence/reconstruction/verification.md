@@ -11,7 +11,7 @@ Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
   architecture tests 5/5, and Vitest 9/9.
 - API Ruff and strict mypy: passed.
-- API pytest: 10/10 passed; one upstream Starlette/httpx deprecation warning.
+- API pytest: 11/11 passed; one upstream Starlette/httpx deprecation warning.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
 - Isolated Chromium: 6/6 passed across desktop/mobile. Playwright starts its
@@ -40,8 +40,9 @@ reference remain explicit review items.
 
 ORG-001 is verified for workspace/project persistence, selection, search,
 create, archive, restore, duplicate protection, and cross-workspace isolation.
-ORG-002 has API and frontend implementation tests for epic/feature creation,
-tasks, criteria, dependencies, and manual overview grouping, but remains
+ORG-002 has API coverage for epic/feature creation and updates, task creation,
+updates and reordering, acceptance criteria, dependency creation and removal,
+and manual overview grouping, plus frontend board navigation; it remains
 `IMPLEMENTED_NOT_REVIEWED` until browser evidence is complete. ORG-003 has
 API tests for revisioned decisions, invariant acknowledgements, deterministic
 R01–R06 evaluation, and stale saved history; it also remains

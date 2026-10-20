@@ -23,6 +23,16 @@ class PlanningService:
         if not title.strip(): raise ValueError('Title is required')
         return self.repository.create_epic(project_id, title.strip(), description)
 
+    def update_epic(self, workspace_id: str, project_id: str, epic_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        self._project(workspace_id, project_id)
+        if self.repository.get_epic(project_id, epic_id) is None:
+            raise LookupError('Epic not found')
+        if 'title' in values and not values['title'].strip():
+            raise ValueError('Title is required')
+        if 'title' in values:
+            values['title'] = values['title'].strip()
+        return self.repository.update_epic(project_id, epic_id, values) or {}
+
     def list_features(self, workspace_id: str, project_id: str, search: str | None, status: str | None, priority: str | None, epic_id: str | None) -> list[dict[str, Any]]:
         self._project(workspace_id, project_id)
         if epic_id and self.repository.get_epic(project_id, epic_id) is None: raise LookupError('Epic not found')
@@ -34,6 +44,19 @@ class PlanningService:
         if values.get('epic_id') and self.repository.get_epic(project_id, values['epic_id']) is None: raise LookupError('Epic not found')
         values['title'] = values['title'].strip()
         return self.repository.create_feature(project_id, values)
+
+    def update_feature(self, workspace_id: str, project_id: str, feature_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        self._project(workspace_id, project_id)
+        if self.repository.feature(project_id, feature_id) is None:
+            raise LookupError('Feature not found')
+        if values.pop('clear_epic', False):
+            values['epic_id'] = None
+        if values.get('epic_id') and self.repository.get_epic(project_id, values['epic_id']) is None:
+            raise LookupError('Epic not found')
+        if 'title' in values:
+            if not values['title'].strip(): raise ValueError('Title is required')
+            values['title'] = values['title'].strip()
+        return self.repository.update_feature(project_id, feature_id, values) or {}
 
     def overview(self, workspace_id: str, project_id: str) -> dict[str, Any]:
         epics = self.list_epics(workspace_id, project_id)
@@ -62,6 +85,19 @@ class PlanningService:
         self.feature(workspace_id, project_id, feature_id)
         return self.repository.list_tasks(feature_id)
 
+    def update_task(self, workspace_id: str, project_id: str, feature_id: str, task_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        self.feature(workspace_id, project_id, feature_id)
+        if 'title' in values:
+            if not values['title'].strip(): raise ValueError('Title is required')
+            values['title'] = values['title'].strip()
+        updated = self.repository.update_task(feature_id, task_id, values)
+        if updated is None: raise LookupError('Task not found')
+        return updated
+
+    def reorder_tasks(self, workspace_id: str, project_id: str, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
+        self.feature(workspace_id, project_id, feature_id)
+        return self.repository.reorder_tasks(feature_id, ids)
+
     def create_dependency(self, workspace_id: str, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         self._project(workspace_id, project_id)
         blocking, blocked = values.get('blocking_feature_id'), values.get('blocked_feature_id')
@@ -73,3 +109,8 @@ class PlanningService:
     def dependencies(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]:
         self._project(workspace_id, project_id)
         return self.repository.list_dependencies(project_id)
+
+    def delete_dependency(self, workspace_id: str, project_id: str, dependency_id: str) -> None:
+        self._project(workspace_id, project_id)
+        if not self.repository.delete_dependency(project_id, dependency_id):
+            raise LookupError('Dependency not found')

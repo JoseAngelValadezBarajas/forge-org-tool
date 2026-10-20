@@ -62,6 +62,11 @@ class EpicCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=4000)
 
+class EpicUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=4000)
+    status: str | None = Field(default=None, pattern='^(planned|in_progress|done)$')
+
 class EpicResponse(BaseModel):
     id: str
     project_id: str
@@ -78,6 +83,15 @@ class FeatureCreate(BaseModel):
     epic_id: str | None = None
     priority: str = Field(default='medium', pattern='^(low|medium|high|critical)$')
     status: str = Field(default='backlog', pattern='^(backlog|refining|ready|in_progress|verify|done)$')
+
+class FeatureUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=4000)
+    goal: str | None = Field(default=None, max_length=4000)
+    epic_id: str | None = None
+    clear_epic: bool = False
+    priority: str | None = Field(default=None, pattern='^(low|medium|high|critical)$')
+    status: str | None = Field(default=None, pattern='^(backlog|refining|ready|in_progress|verify|done)$')
 
 class FeatureResponse(BaseModel):
     id: str
@@ -96,6 +110,12 @@ class TaskCreate(BaseModel):
     description: str | None = None
     status: str = Field(default='todo', pattern='^(todo|in_progress|done)$')
     position: int = Field(default=0, ge=0)
+
+class TaskUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    status: str | None = Field(default=None, pattern='^(todo|in_progress|done)$')
+    position: int | None = Field(default=None, ge=0)
 
 class TaskResponse(BaseModel):
     id: str; feature_id: str; title: str; description: str | None; status: str; position: int; created_at: datetime; updated_at: datetime

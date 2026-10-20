@@ -7,5 +7,5 @@
 - [x] Render a board route with explicit manual status columns.
 - [x] Keep manual planning state distinct from delivery evidence.
 - [x] Tasks, acceptance criteria, and project-scoped dependencies.
-- [ ] Filtering, edit, reorder, and full board interactions.
+- [x] Filtering, epic/feature/task edits, task reorder, and dependency removal API contracts.
 - [ ] Chromium review of the planning route and responsive evidence.

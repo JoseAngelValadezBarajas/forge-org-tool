@@ -291,6 +291,13 @@ class OrganizationRepository:
         self.connection.commit()
         return self.get_epic(project_id, epic_id) or {}
 
+    def update_epic(self, project_id: str, epic_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
+        if not values: return self.get_epic(project_id, epic_id)
+        assignments = ', '.join(f'{key} = ?' for key in values)
+        self.connection.execute(f'UPDATE epics SET {assignments}, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, epic_id])
+        self.connection.commit()
+        return self.get_epic(project_id, epic_id)
+
     def list_features(self, project_id: str, search: str | None, status: str | None, priority: str | None, epic_id: str | None) -> list[dict[str, Any]]:
         clauses, params = ['project_id = ?'], [project_id]
         if search:
@@ -308,6 +315,13 @@ class OrganizationRepository:
 
     def feature(self, project_id: str, feature_id: str) -> dict[str, Any] | None:
         return row_dict(self.connection.execute('SELECT * FROM features WHERE project_id = ? AND id = ?', (project_id, feature_id)).fetchone())
+
+    def update_feature(self, project_id: str, feature_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
+        if not values: return self.feature(project_id, feature_id)
+        assignments = ', '.join(f'{key} = ?' for key in values)
+        self.connection.execute(f'UPDATE features SET {assignments}, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, feature_id])
+        self.connection.commit()
+        return self.feature(project_id, feature_id)
 
     def create_criterion(self, feature_id: str, description: str, position: int = 0) -> dict[str, Any]:
         now, criterion_id = utc_now(), str(uuid4())
@@ -333,6 +347,25 @@ class OrganizationRepository:
     def list_tasks(self, feature_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT * FROM tasks WHERE feature_id = ? ORDER BY position, created_at', (feature_id,)).fetchall()]
 
+    def update_task(self, feature_id: str, task_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
+        item = row_dict(self.connection.execute('SELECT * FROM tasks WHERE feature_id = ? AND id = ?', (feature_id, task_id)).fetchone())
+        if item is None: return None
+        if not values: return item
+        assignments = ', '.join(f'{key} = ?' for key in values)
+        self.connection.execute(f'UPDATE tasks SET {assignments}, updated_at = ? WHERE feature_id = ? AND id = ?', [*values.values(), utc_now(), feature_id, task_id])
+        self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM tasks WHERE id = ?', (task_id,)).fetchone())
+
+    def reorder_tasks(self, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
+        existing = [item['id'] for item in self.list_tasks(feature_id)]
+        if len(ids) != len(existing) or set(ids) != set(existing):
+            raise ValueError('Task reorder must include each task exactly once')
+        now = utc_now()
+        for position, task_id in enumerate(ids):
+            self.connection.execute('UPDATE tasks SET position = ?, updated_at = ? WHERE feature_id = ? AND id = ?', (position, now, feature_id, task_id))
+        self.connection.commit()
+        return self.list_tasks(feature_id)
+
     def create_dependency(self, project_id: str, blocking_feature_id: str, blocked_feature_id: str) -> dict[str, Any]:
         now, dependency_id = utc_now(), str(uuid4())
         self.connection.execute('INSERT INTO feature_dependencies(id, project_id, blocking_feature_id, blocked_feature_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', (dependency_id, project_id, blocking_feature_id, blocked_feature_id, now, now)); self.connection.commit()
@@ -340,6 +373,11 @@ class OrganizationRepository:
 
     def list_dependencies(self, project_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT * FROM feature_dependencies WHERE project_id = ? ORDER BY created_at', (project_id,)).fetchall()]
+
+    def delete_dependency(self, project_id: str, dependency_id: str) -> bool:
+        cursor = self.connection.execute('DELETE FROM feature_dependencies WHERE project_id = ? AND id = ?', (project_id, dependency_id))
+        self.connection.commit()
+        return cursor.rowcount == 1
 
     def create_decision(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         now, decision_id = utc_now(), str(uuid4())
