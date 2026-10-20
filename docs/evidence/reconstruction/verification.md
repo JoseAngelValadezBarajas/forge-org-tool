@@ -16,7 +16,10 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
   architecture tests 5/5, and Vitest 9/9.
 - API Ruff and strict mypy: passed.
-- API pytest: 11/11 passed; one upstream Starlette/httpx deprecation warning.
+- API pytest: 15/15 passed; one upstream Starlette/httpx deprecation warning.
+- Desktop launch policy: 2 Python unit tests passed; the authenticated sidecar
+  tests passed as part of the API suite. Native Rust/Tauri compilation remains
+  unavailable because `cargo`/`rustc` are not installed.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
 - Isolated Chromium: 6/6 passed across desktop/mobile. Playwright starts its
