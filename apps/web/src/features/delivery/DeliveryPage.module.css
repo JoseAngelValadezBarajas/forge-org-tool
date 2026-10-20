@@ -4,4 +4,11 @@
 .forms form { display: grid; gap: var(--forge-space-2); }
 .item { display: flex; justify-content: space-between; align-items: center; gap: var(--forge-space-3); border-top: 1px solid var(--forge-border); padding: var(--forge-space-3) 0; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--forge-space-2); margin-top: var(--forge-space-3); }
+.filters { display: flex; flex-wrap: wrap; gap: var(--forge-space-2); align-items: center; margin-bottom: var(--forge-space-3); }
+.filters input { flex: 1 1 220px; }
+.filters select, .stack select { min-height: 40px; padding: 0 var(--forge-space-2); background: var(--forge-surface); color: var(--forge-text); border: 1px solid var(--forge-border); border-radius: var(--forge-radius-sm); }
+.form { display: grid; gap: var(--forge-space-2); min-width: min(100%, 360px); }
+.result { margin-top: var(--forge-space-3); padding-top: var(--forge-space-3); border-top: 1px solid var(--forge-border); }
+.item > div { min-width: 0; }
+.item small { display: block; color: var(--forge-text-muted); overflow-wrap: anywhere; }
 @media (max-width: 720px) { .forms { grid-template-columns: 1fr; } }
