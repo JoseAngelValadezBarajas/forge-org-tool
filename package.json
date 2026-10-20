@@ -1,6 +1,7 @@
 {
   "name": "forge-org-tool",
   "version": "0.1.0-bootstrap",
+  "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "packageManager": "npm@11.6.2",

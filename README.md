@@ -6,6 +6,10 @@ A new, public, local-first organizational tool for software work, with a self-co
 
 **Figma:** https://www.figma.com/design/r10szKLgiIPVi2NBmbjTpm
 
+**License:** New FORGE Org Tool code and documentation are offered under
+[Apache-2.0](LICENSE). The original FORGE repository is a separate preserved
+source reference under its own license; see [reconstruction provenance](docs/reconstruction/functional-parity.md).
+
 ## Scope and architecture
 
 - `packages/tokens`: a single versioned design-token JSON and generated CSS, subject to explicit Figma reconciliation.
@@ -17,6 +21,10 @@ A new, public, local-first organizational tool for software work, with a self-co
 - `apps/desktop`: Tauri 2 runtime boundary **reserved**, not implemented in M1.
 
 See [architecture](docs/architecture/README.md), [client component contracts](docs/architecture/client-components.md), [migration checkpoints](docs/migration/plan.md), and [safety policy](SECURITY.md).
+
+The functional reconstruction inventory and staged implementation plan are in
+[`docs/reconstruction`](docs/reconstruction/functional-parity.md). Stage 1
+functionality remains subject to M1 review and explicit owner approval.
 
 ## Local bootstrap (Windows PowerShell)
 
