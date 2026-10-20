@@ -1,8 +1,9 @@
 ﻿import { defineConfig, devices } from '@playwright/test';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 const e2eDatabasePath = join(tmpdir(), `forge-org-e2e-${process.pid}-${Date.now()}.db`);
+const e2eRepositoryRoot = resolve(process.cwd(), '../..');
 
 export default defineConfig({
   testDir: './e2e',
@@ -28,6 +29,7 @@ export default defineConfig({
       reuseExistingServer: false,
       env: {
         FORGE_DATABASE_PATH: e2eDatabasePath,
+        FORGE_ALLOWED_REPOSITORY_ROOTS: JSON.stringify([e2eRepositoryRoot]),
       },
     },
   ],

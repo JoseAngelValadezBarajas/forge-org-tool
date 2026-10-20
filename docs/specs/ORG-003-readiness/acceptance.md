@@ -6,4 +6,5 @@
 - [x] Evaluate deterministic R01–R06 readiness results and blockers.
 - [x] Save immutable readiness results and report stale history after input changes.
 - [x] Keep readiness explicitly separate from delivery or technical verification.
-- [ ] Full browser review of decision/invariant/readiness interactions.
+- [x] Browser review of decision/invariant/readiness interactions with
+  deterministic truth-state evidence.

@@ -8,4 +8,4 @@
 - [x] Keep manual planning state distinct from delivery evidence.
 - [x] Tasks, acceptance criteria, and project-scoped dependencies.
 - [x] Filtering, epic/feature/task edits, task reorder, and dependency removal API contracts.
-- [ ] Chromium review of the planning route and responsive evidence.
+- [x] Chromium review of the planning route and responsive evidence.

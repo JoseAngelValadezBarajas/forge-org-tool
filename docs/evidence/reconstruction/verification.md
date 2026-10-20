@@ -22,7 +22,7 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
   unavailable because `cargo`/`rustc` are not installed.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
-- Isolated Chromium: 12/12 passed across desktop/mobile. Playwright starts its
+- Isolated Chromium: 14/14 passed across desktop/mobile. Playwright starts its
   own Vite and API processes with `reuseExistingServer: false`, one serialized
   worker, and a unique temporary API database; occupied ports and stale local
   data cannot silently attach to or contaminate the run.
@@ -34,6 +34,7 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 - Delivery verification: [desktop](../m1/desktop-delivery.png), [mobile](../m1/mobile-delivery.png); both show the explicit `NOT_PUBLISHED` boundary.
 - Workbench/handoff: [desktop](../m1/desktop-workbench.png), [mobile](../m1/mobile-workbench.png).
 - Project transfer: [desktop](../m1/desktop-transfer.png), [mobile](../m1/mobile-transfer.png); export and reviewed fingerprint remain planning-only.
+- Readiness/repository context: [desktop](../m1/desktop-context.png), [mobile](../m1/mobile-context.png); decisions, invariants, criteria, and metadata-only observation were exercised without source-content reads.
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
   [desktop light](../m1/desktop-component-host.png), [mobile dark](../m1/mobile-component-host-dark.png),
   and [mobile light](../m1/mobile-gallery-light.png).
@@ -51,16 +52,17 @@ reference remain explicit review items.
 
 ORG-001 is verified for workspace/project persistence, selection, search,
 create, archive, restore, duplicate protection, and cross-workspace isolation.
-ORG-002 has API coverage for epic/feature creation and updates, task creation,
+ORG-002 has API and browser coverage for epic/feature creation and updates, task creation,
 updates and reordering, acceptance criteria, dependency creation and removal,
 and manual overview grouping, plus frontend board navigation; it remains
-`IMPLEMENTED_NOT_REVIEWED` until browser evidence is complete. ORG-003 has
+`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-003 has
 API tests for revisioned decisions, invariant acknowledgements, deterministic
 R01–R06 evaluation, and stale saved history; it also remains
-`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-004 has API tests for
+`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-004 has API tests for
 allowlist rejection, canonical Git validation, metadata-only observations,
-feature links, and deduplicated `forge-context-v1` packages; it remains
-`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-005 has API coverage
+feature links, and deduplicated `forge-context-v1` packages, plus browser
+coverage for metadata-only repository observation; it remains
+`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-005 has API coverage
 for manual run transitions, append-only events, draft validation, immutable
 handoff revision and exact acknowledgement; browser coverage now includes
 reported runs and draft handoffs. ORG-006 has API coverage for

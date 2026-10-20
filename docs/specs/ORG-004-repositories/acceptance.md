@@ -7,4 +7,4 @@
 - [x] Link repositories to features within the owning project.
 - [x] Preview and deduplicate immutable `forge-context-v1` packages.
 - [x] List/remove feature links and retrieve/download saved packages.
-- [ ] Browser review of repository/context screens.
+- [x] Browser review of repository/context screens with metadata-only evidence.

@@ -105,3 +105,31 @@ test('project transfer is planning-only and exposes reviewed fingerprints', asyn
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-transfer.png' : 'desktop-transfer.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });
+
+test('readiness records explicit planning context and repository metadata only', async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  page.on('pageerror', (error) => consoleErrors.push(error.message));
+  const suffix = Date.now().toString();
+  const workspace = await (await page.request.post('/api/v1/workspaces', { data: { name: `Context ${suffix}` } })).json();
+  const project = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Review ${suffix}` } })).json();
+  const feature = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, { data: { title: `Context feature ${suffix}`, goal: 'Review context' } })).json();
+  await page.goto(`/readiness/${workspace.id}/${project.id}/${feature.id}`);
+  await expect(page.getByRole('heading', { name: 'Readiness' })).toBeVisible();
+  await page.getByLabel('Acceptance criterion').fill(`Criterion ${suffix}`);
+  await page.getByRole('button', { name: 'Add criterion' }).click();
+  await page.getByLabel('Decision title').fill(`Decision ${suffix}`);
+  await page.getByRole('button', { name: 'Link decision' }).click();
+  await page.getByLabel('Invariant title').fill(`Invariant ${suffix}`);
+  await page.getByRole('button', { name: 'Add invariant' }).click();
+  await expect(page.getByText(/NOT_READY|READY_TO_START/)).toBeVisible();
+  await page.goto(`/repositories/${workspace.id}/${project.id}`);
+  await page.getByLabel('Approved local Git root').fill(resolve(process.cwd(), '../..'));
+  await page.getByRole('button', { name: 'Connect Repository' }).click();
+  await expect(page.getByText(/connected/i)).toBeVisible();
+  await page.getByRole('button', { name: 'Observe metadata' }).click();
+  await expect(page.getByText(/never reads source content/i)).toBeVisible();
+  expect(consoleErrors).toEqual([]);
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-context.png' : 'desktop-context.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+});

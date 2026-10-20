@@ -58,6 +58,7 @@ async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promis
     const detail = await res.json().catch(() => undefined) as { detail?: string } | undefined;
     throw new Error(detail?.detail ?? `API HTTP ${res.status}`);
   }
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
