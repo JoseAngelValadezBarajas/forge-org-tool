@@ -87,6 +87,14 @@ test('workbench records reported runs and keeps handoffs human-owned', async ({ 
   await page.getByRole('button', { name: `Create handoff for Manual run ${suffix}` }).click();
   await expect(page.getByText(`Handoff for Manual run ${suffix}`)).toBeVisible();
   await expect(page.getByText('DRAFT', { exact: true })).toBeVisible();
+  await page.getByLabel(`Summary for Handoff for Manual run ${suffix}`).fill('Reported summary');
+  await page.getByLabel(`Next actions for Handoff for Manual run ${suffix}`).fill('Review manually');
+  await page.getByRole('button', { name: 'Save handoff details' }).click();
+  await page.getByRole('button', { name: 'Mark handoff ready' }).click();
+  await expect(page.getByText('READY', { exact: true })).toBeVisible();
+  await page.getByLabel(`Acknowledged by Handoff for Manual run ${suffix}`).fill('reviewer');
+  await page.getByRole('button', { name: 'Acknowledge revision' }).click();
+  await expect(page.getByText('ACKNOWLEDGED', { exact: true })).toBeVisible();
   await expect(page.getByText(/does not execute agents/i)).toBeVisible();
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-workbench.png' : 'desktop-workbench.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
