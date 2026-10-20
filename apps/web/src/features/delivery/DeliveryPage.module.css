@@ -1,0 +1,6 @@
+.stack { display: grid; gap: var(--forge-space-4); }
+.stack p { color: var(--forge-text-muted); line-height: 1.5; }
+.forms { display: grid; gap: var(--forge-space-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.forms form { display: grid; gap: var(--forge-space-2); }
+.item { display: flex; justify-content: space-between; align-items: center; gap: var(--forge-space-3); border-top: 1px solid var(--forge-border); padding: var(--forge-space-3) 0; }
+@media (max-width: 720px) { .forms { grid-template-columns: 1fr; } }

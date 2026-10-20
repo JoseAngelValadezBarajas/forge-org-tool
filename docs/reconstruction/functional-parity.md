@@ -28,7 +28,7 @@ code and assets are therefore not copied into this Apache-2.0 reconstruction.
 | ORG-006 | Evidence provenance, verification, release candidates, explainable gates, non-published manifests | `backend/app/application/delivery`; routers `evidence.py`, `verifications.py`, `releases.py`; FND-06 docs/tests | `IMPLEMENTED_NOT_REVIEWED` | `apps/api/src/forge_org/application/delivery.py`; explicit gate truth states |
 | ORG-007 | JSON project import/export with schema and route/contract tests | `docs/product/imp-01-project-import-export.md`; schema/examples; `backend/app/application/project_transfer.py`; IMP-01 branch | `IMPLEMENTED_NOT_REVIEWED` | `apps/api/src/forge_org/application/transfer.py`; versioned transfer contract |
 | ORG-008 | Windows desktop packaging and authenticated local sidecar bridge | `desktop/src-tauri`; `backend/desktop_sidecar.py`; DESK-01 docs/workflows | `SPECIFIED` | `apps/desktop`; Rust-owned process and route policy; packaging outstanding |
-| ORG-009 | Core shell, navigation, planning, readiness and delivery visual language | `frontend/src/features`; `docs/product/ui-rfx-01.md`; Figma pages 19/20 | `NOT_STARTED` | `app` shell, feature-owned presentation, `packages/ui`, `packages/tokens` |
+| ORG-009 | Core shell, navigation, planning, readiness and delivery visual language | `frontend/src/features`; `docs/product/ui-rfx-01.md`; Figma pages 19/20 | `IMPLEMENTED_NOT_REVIEWED` | `apps/web/src/features/{organization,planning,readiness,workbench,delivery}`, `packages/ui`, `packages/tokens` |
 
 ## What is validated versus assumed
 

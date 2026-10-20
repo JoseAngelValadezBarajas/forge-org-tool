@@ -1,4 +1,8 @@
 ﻿import { defineConfig, devices } from '@playwright/test';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+const e2eDatabasePath = join(tmpdir(), `forge-org-e2e-${process.pid}-${Date.now()}.db`);
 
 export default defineConfig({
   testDir: './e2e',
@@ -17,7 +21,11 @@ export default defineConfig({
     {
       command: 'uv run --project ../../apps/api uvicorn forge_org.main:app --host 127.0.0.1 --port 8000',
       url: 'http://127.0.0.1:8000/api/v1/health',
+      // Give every run a disposable database so stale local state cannot affect assertions.
       reuseExistingServer: false,
+      env: {
+        FORGE_DATABASE_PATH: e2eDatabasePath,
+      },
     },
   ],
   projects: [

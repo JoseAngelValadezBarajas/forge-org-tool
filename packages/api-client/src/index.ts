@@ -37,6 +37,10 @@ export type Repository = { id: string; project_id: string; root_path: string; st
 export type Observation = { id: string; repository_id: string; observed_at: string; head_sha: string | null; branch: string | null; detached: boolean; unborn: boolean; clean: boolean | null; tracked_modified_count: number; staged_count: number; untracked_count: number; observer_version: string; status: string; error_code: string | null; source_content_read: boolean };
 export type ContextPackage = { id: string; project_id: string; feature_id: string; schema_version: string; fingerprint: string; payload_json: string; markdown: string; created_at: string };
 export type ProjectTransferPreview = { schema_version: string; fingerprint: string; project: { name: string; description?: string | null }; counts: Record<string, number> };
+export type Run = { id: string; project_id: string; feature_id: string | null; title: string; description: string | null; execution_mode: string; executor_type: string; status: string; version: number; created_at: string; updated_at: string };
+export type Handoff = { id: string; project_id: string; feature_id: string | null; run_id: string; title: string; summary: string; next_actions: string; status: string; current_revision: number | null; version: number; created_at: string; updated_at: string };
+export type Evidence = { id: string; project_id: string; feature_id: string | null; title: string; summary: string; provenance: string; reference_kind: string; reference_value: string; status: string; created_at: string; updated_at: string };
+export type ReleaseCandidate = { id: string; project_id: string; title: string; summary: string; status: string; revision: number; fingerprint: string | null; created_at: string; updated_at: string };
 
 async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -83,4 +87,14 @@ export const organizationApi = {
   previewProjectImport: (workspaceId: string, document: unknown) => sendJson<ProjectTransferPreview>(`/api/v1/workspaces/${workspaceId}/projects/import/preview`, { method: 'POST', body: JSON.stringify(document) }),
   importProject: (workspaceId: string, document: unknown, expected_fingerprint: string) => sendJson<{ project_id: string; fingerprint: string }>(`/api/v1/workspaces/${workspaceId}/projects/import`, { method: 'POST', body: JSON.stringify({ document, expected_fingerprint }) }),
   exportProject: (workspaceId: string, projectId: string) => getApiJson<unknown>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export` }),
+  listRuns: (workspaceId: string, projectId: string) => getApiJson<Run[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs` }),
+  createRun: (workspaceId: string, projectId: string, title: string, feature_id?: string) => sendJson<Run>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs`, { method: 'POST', body: JSON.stringify({ title, feature_id, execution_mode: 'manual', executor_type: 'human' }) }),
+  listHandoffs: (workspaceId: string, projectId: string) => getApiJson<Handoff[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/handoffs` }),
+  createHandoff: (workspaceId: string, projectId: string, runId: string, title: string) => sendJson<Handoff>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}/handoffs`, { method: 'POST', body: JSON.stringify({ title }) }),
+  listEvidence: (workspaceId: string, projectId: string) => getApiJson<Evidence[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence` }),
+  createEvidence: (workspaceId: string, projectId: string, values: { title: string; summary: string; provenance: string; reference_kind: string; reference_value: string }) => sendJson<Evidence>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence`, { method: 'POST', body: JSON.stringify(values) }),
+  listCandidates: (workspaceId: string, projectId: string) => getApiJson<ReleaseCandidate[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates` }),
+  createCandidate: (workspaceId: string, projectId: string, title: string, summary: string) => sendJson<ReleaseCandidate>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates`, { method: 'POST', body: JSON.stringify({ title, summary }) }),
+  freezeCandidate: (workspaceId: string, projectId: string, candidateId: string, revision: number) => sendJson<ReleaseCandidate>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/freeze`, { method: 'POST', body: JSON.stringify({ expected_revision: revision }) }),
+  previewGates: (workspaceId: string, projectId: string, candidateId: string) => sendJson<{ outcome: string; blockers: string[] }>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/gates/preview`, { method: 'POST', body: '{}' }),
 };

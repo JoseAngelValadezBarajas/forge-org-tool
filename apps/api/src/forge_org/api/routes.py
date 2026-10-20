@@ -424,6 +424,11 @@ def create_handoff(workspace_id: str, project_id: str, run_id: str, payload: Han
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
 
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/handoffs', response_model=list[HandoffResponse])
+def list_handoffs(workspace_id: str, project_id: str, handoffs: HandoffService = Depends(handoff_service)) -> list[dict[str, Any]]:
+    try: return handoffs.list(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
 @router.patch('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}', response_model=HandoffResponse)
 def update_handoff(workspace_id: str, project_id: str, handoff_id: str, payload: HandoffUpdate, handoffs: HandoffService = Depends(handoff_service)) -> dict[str, Any]:
     try: return handoffs.update(workspace_id, project_id, handoff_id, payload.expected_version, payload.model_dump(exclude={'expected_version'}, exclude_unset=True))

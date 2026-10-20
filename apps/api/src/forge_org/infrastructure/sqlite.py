@@ -496,6 +496,7 @@ class OrganizationRepository:
 
     def get_handoff(self, project_id: str, handoff_id: str) -> dict[str, Any] | None:
         return row_dict(self.connection.execute('SELECT * FROM handoffs WHERE project_id = ? AND id = ?', (project_id, handoff_id)).fetchone())
+    def list_handoffs(self, project_id: str) -> list[dict[str, Any]]: return [dict(row) for row in self.connection.execute('SELECT * FROM handoffs WHERE project_id = ? ORDER BY updated_at DESC', (project_id,)).fetchall()]
 
     def update_handoff(self, project_id: str, handoff_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
         assignments = ', '.join(f'{key} = ?' for key in values); self.connection.execute(f'UPDATE handoffs SET {assignments}, version = version + 1, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, handoff_id]); self.connection.commit(); return self.get_handoff(project_id, handoff_id)

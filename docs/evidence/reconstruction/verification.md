@@ -1,7 +1,8 @@
 # Reconstruction verification
 
-This record covers the ORG-001 vertical slice. It does not certify Figma
-visual parity, desktop packaging, or the remaining ORG capabilities.
+This record covers the reconstructed ORG-001 through ORG-009 slices. It does
+not certify Figma visual parity, desktop packaging, or unimplemented legacy
+capabilities.
 
 Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
 
@@ -10,12 +11,13 @@ Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
   architecture tests 5/5, and Vitest 9/9.
 - API Ruff and strict mypy: passed.
-- API pytest: 3/3 passed; one upstream Starlette/httpx deprecation warning.
+- API pytest: 10/10 passed; one upstream Starlette/httpx deprecation warning.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
-- Isolated Chromium: 4/4 passed across desktop/mobile. Playwright starts its
-  own Vite and API processes with `reuseExistingServer: false`; occupied ports
-  fail in controlled isolation rather than attaching to an unknown process.
+- Isolated Chromium: 6/6 passed across desktop/mobile. Playwright starts its
+  own Vite and API processes with `reuseExistingServer: false` and a unique
+  temporary API database; occupied ports and stale local data cannot silently
+  attach to or contaminate the run.
 
 ## Retained browser evidence
 
@@ -55,6 +57,8 @@ browser evidence and fuller delivery rules. ORG-007 has API coverage for
 preview fingerprints, planning-only import, export, and stale-fingerprint
 rejection; it remains `IMPLEMENTED_NOT_REVIEWED` pending full schema-limit
 validation and browser evidence. ORG-008 has only the Rust policy scaffold;
-Cargo/Tauri and installed Windows smoke are not certified. ORG-009 remains not
-started. No legacy code/assets, private
+Cargo/Tauri and installed Windows smoke are not certified. ORG-009 has
+feature-owned organization, planning, readiness, workbench, and delivery
+surfaces with responsive browser evidence; it remains
+`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. No legacy code/assets, private
 bundles, real data migration, or desktop packaging were introduced.

@@ -50,6 +50,8 @@ class HandoffService:
         self._project(workspace_id, project_id); item = self.repository.get_handoff(project_id, handoff_id)
         if item is None: raise LookupError('Handoff not found')
         return item
+    def list(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]:
+        self._project(workspace_id, project_id); return self.repository.list_handoffs(project_id)
     def create(self, workspace_id: str, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         project = self._project(workspace_id, project_id)
         if project['status'] != 'active': raise ValueError('Archived projects are read-only')
