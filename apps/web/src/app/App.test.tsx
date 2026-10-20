@@ -24,7 +24,7 @@ describe('M1 application shell', () => {
   });
 
   it('exposes loading state and prevents native button interaction', () => {
-    renderRoute('/__component-gallery');
+    renderRoute('/__components');
 
     const loadingButton = screen.getByRole('button', { name: /working/i });
     expect(loadingButton).toBeDisabled();
@@ -32,9 +32,9 @@ describe('M1 application shell', () => {
   });
 
   it('supports gallery interaction and dark/light switching', () => {
-    renderRoute('/__component-gallery');
+    renderRoute('/__components');
 
-    const gallery = screen.getByText('Component Gallery').closest('[data-theme]');
+    const gallery = screen.getByRole('heading', { name: 'Component Host' }).closest('[data-theme]');
     expect(gallery).toHaveAttribute('data-theme', 'dark');
 
     fireEvent.click(screen.getByRole('button', { name: /increment 0/i }));
@@ -43,5 +43,21 @@ describe('M1 application shell', () => {
     fireEvent.click(screen.getByRole('button', { name: /switch to light/i }));
     expect(gallery).toHaveAttribute('data-theme', 'light');
     expect(screen.getByRole('button', { name: /switch to dark/i })).toBeInTheDocument();
+  });
+
+  it('provides searchable catalog sections and honest planned entries', () => {
+    renderRoute('/__components');
+
+    expect(screen.getByRole('navigation', { name: 'Component host sections' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Foundations and tokens' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Core UI primitives' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Product-specific components' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Icon library' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('NOT_IMPLEMENTED').length).toBeGreaterThan(0);
+
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search components' }), { target: { value: 'status' } });
+
+    expect(screen.getByRole('heading', { name: 'StatusChip' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Button' })).not.toBeInTheDocument();
   });
 });
