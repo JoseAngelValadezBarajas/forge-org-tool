@@ -62,3 +62,15 @@ test('planning and readiness remain manual truth states', async ({ page }) => {
   await expect(page.getByText(/never reads source content/i)).toBeVisible();
   expect(feature.id).toBeTruthy();
 });
+
+test('delivery exposes deterministic gates and non-published truth', async ({ page }) => {
+  const suffix = Date.now().toString();
+  const workspace = await (await page.request.post('/api/v1/workspaces', { data: { name: `Delivery ${suffix}` } })).json();
+  const project = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Release ${suffix}` } })).json();
+  await page.goto(`/delivery/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Delivery verification' })).toBeVisible();
+  await expect(page.getByText('NOT_PUBLISHED')).toBeVisible();
+  await expect(page.getByText(/not a deployment or publication/i)).toBeVisible();
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-delivery.png' : 'desktop-delivery.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+});

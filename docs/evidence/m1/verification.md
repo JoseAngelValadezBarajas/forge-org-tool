@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `e8a24b2ec31b78fb5d7009463d615abfce72b430`.
+Focused audit implementation commit: recorded after this verification pass.
 
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the
@@ -12,8 +12,8 @@ foundation audit record.
 - Python/uv: Python 3.12.10, uv 0.12.7.
 - `npm run test`: architecture boundaries passed, token check passed, typecheck passed, architecture tests 5/5, Vitest 9/9 across 3 files.
 - `npm run build`: Vite production build passed; the development-only `/__components` route was absent from `apps/web/dist`.
-- `npm run test:e2e`: isolated Chromium desktop/mobile smoke passed 6/6, including planning/readiness truth-state navigation; Component Host dark/light and representative feature screenshots are retained beside this file: `desktop-component-host-dark.png`, `desktop-component-host.png`, `mobile-component-host-dark.png`, `mobile-gallery-light.png`, `desktop-planning.png`, and `mobile-readiness.png`.
-- API: Ruff passed, strict mypy passed, pytest passed 10/10, OpenAPI check passed.
+- `npm run test:e2e`: isolated Chromium desktop/mobile smoke passed 8/8, including delivery verification truth-state navigation; Component Host dark/light and representative feature screenshots are retained beside this file: `desktop-component-host-dark.png`, `desktop-component-host.png`, `mobile-component-host-dark.png`, `mobile-gallery-light.png`, `desktop-planning.png`, `mobile-readiness.png`, `desktop-delivery.png`, and `mobile-delivery.png`.
+- API: Ruff passed, strict mypy passed, pytest passed 16/16, OpenAPI check passed.
 - Live API: `/api/v1/health` returned HTTP 200 with `scope=bootstrap-only`; fabricated `/api/v1/workspaces` returned HTTP 404.
 - Public-file audit: no credential patterns, machine-specific absolute paths, databases, keys, logs, backups, or attachments were staged.
 - Component Host: `/__components` renders public `@forge-org/ui` exports and the existing organization feature with deterministic local fixtures; it makes no backend calls.
@@ -35,9 +35,9 @@ The final public repository was cloned into an isolated temporary directory. `np
 
 - API scaffold tests were already meaningful and passed before implementation changes; no artificial RED was manufactured.
 - Focused Card contract tests first failed on the pre-existing `<section>` root; the typed neutral `div`/semantic option implementation produced 3/3 GREEN.
-- Isolated Chromium smoke produced 6/6 GREEN and retained dark/light desktop/mobile evidence; hover behavior was checked in the browser.
+- Isolated Chromium smoke produced 8/8 GREEN and retained dark/light desktop/mobile evidence plus delivery truth-state screenshots; hover behavior was checked in the browser.
 - Clean-clone verification first exposed Windows line-ending sensitivity in token checks; `.gitattributes` fixed the repository-boundary defect and the fresh clone passed.
 
 ## Verdict
 
-`M1_READY_FOR_REVIEW` for the focused audit corrections. GitHub Quality run `39375355053` passed for the implementation commit. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity.
+`M1_READY_FOR_REVIEW` for the focused audit corrections. The local verification pass is complete; GitHub Quality status for the final commit must be refreshed after push. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity.

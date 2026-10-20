@@ -16,13 +16,13 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
   architecture tests 5/5, and Vitest 9/9.
 - API Ruff and strict mypy: passed.
-- API pytest: 15/15 passed; one upstream Starlette/httpx deprecation warning.
+- API pytest: 16/16 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
   tests passed as part of the API suite. Native Rust/Tauri compilation remains
   unavailable because `cargo`/`rustc` are not installed.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
-- Isolated Chromium: 6/6 passed across desktop/mobile. Playwright starts its
+- Isolated Chromium: 8/8 passed across desktop/mobile. Playwright starts its
   own Vite and API processes with `reuseExistingServer: false` and a unique
   temporary API database; occupied ports and stale local data cannot silently
   attach to or contaminate the run.
@@ -31,6 +31,7 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 
 - Organization: [desktop](../m1/desktop-organization.png).
 - Planning/readiness/repository navigation: [desktop planning](../m1/desktop-planning.png), [mobile readiness](../m1/mobile-readiness.png); the same isolated Chromium journey also opens the repository metadata-only surface.
+- Delivery verification: [desktop](../m1/desktop-delivery.png), [mobile](../m1/mobile-delivery.png); both show the explicit `NOT_PUBLISHED` boundary.
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
   [desktop light](../m1/desktop-component-host.png), [mobile dark](../m1/mobile-component-host-dark.png),
   and [mobile light](../m1/mobile-gallery-light.png).
@@ -61,8 +62,11 @@ feature links, and deduplicated `forge-context-v1` packages; it remains
 for manual run transitions, append-only events, draft validation, immutable
 handoff revision and exact acknowledgement. ORG-006 has API coverage for
 provenance-labelled evidence, invalidation, frozen candidates, and blocked gate
-evaluations. ORG-005 and ORG-006 remain `IMPLEMENTED_NOT_REVIEWED` pending
-browser evidence and fuller delivery rules. ORG-007 has API coverage for
+evaluations. ORG-005 remains `IMPLEMENTED_NOT_REVIEWED` pending browser
+evidence. ORG-006 now has browser coverage for deterministic verification,
+blocked/pass gates, and non-published manifests; it remains
+`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-007 has API
+coverage for
 preview fingerprints, planning-only import, export, stale-fingerprint
 rejection, collection limits, and cycle rejection; it remains
 `IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-008 has an

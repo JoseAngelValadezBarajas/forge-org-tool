@@ -190,6 +190,10 @@ class VerificationRuleResponse(BaseModel):
     id: str; label: str; description: str
 class VerificationResponse(BaseModel):
     id: str | None = None; project_id: str; rule_id: str; candidate_id: str | None; outcome: str; input_fingerprint: str; blockers: list[str]; created_at: datetime | None = None; stale: bool = False
+class ManifestSaveRequest(BaseModel):
+    gate_evaluation_id: str
+class ManifestResponse(BaseModel):
+    id: str; candidate_id: str; gate_evaluation_id: str; schema_version: str; fingerprint: str; status: str; payload_json: str; markdown: str; created_at: datetime
 
 class ImportPreviewResponse(BaseModel):
     schema_version: str; fingerprint: str; project: dict[str, Any]; counts: dict[str, int]

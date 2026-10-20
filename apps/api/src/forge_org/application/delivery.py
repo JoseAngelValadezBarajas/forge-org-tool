@@ -12,6 +12,7 @@ class DeliveryService:
         {'id': 'verified-evidence-present', 'label': 'Verified evidence is present', 'description': 'At least one active evidence record has VERIFIED provenance.'},
         {'id': 'release-gate-passes', 'label': 'Release gate passes', 'description': 'The selected candidate has a stored PASS gate evaluation at its current revision.'},
     )
+    MANIFEST_SCHEMA = 'forge-release-manifest-v1'
     def _project(self, workspace_id: str, project_id: str) -> dict[str, Any]:
         project = self.repository.get_project(workspace_id, project_id)
         if project is None: raise LookupError('Project not found')
@@ -112,3 +113,22 @@ class DeliveryService:
         item = self.repository.get_verification(project_id, evaluation_id)
         if item is None: raise LookupError('Verification evaluation not found')
         return self._verification_response(item, workspace_id, project_id)
+
+    def manifest_save(self, workspace_id: str, project_id: str, candidate_id: str, gate_evaluation_id: str) -> dict[str, Any]:
+        project = self._project(workspace_id, project_id)
+        candidate = self.candidate_get(workspace_id, project_id, candidate_id)
+        if candidate['status'] != 'FROZEN': raise ValueError('Only frozen candidates can have manifests')
+        gate = next((item for item in self.repository.list_gates(candidate_id) if item['id'] == gate_evaluation_id), None)
+        if gate is None: raise LookupError('Gate evaluation not found')
+        if gate['outcome'] != 'PASS' or int(gate['candidate_revision']) != int(candidate['revision']): raise ValueError('Manifest requires a PASS gate for the current candidate revision')
+        evidence = [item for item in self.repository.list_evidence(project_id) if item['status'] == 'ACTIVE']
+        payload = {'schema_version': self.MANIFEST_SCHEMA, 'status': 'NOT_PUBLISHED', 'project_id': project['id'], 'candidate': {'id': candidate['id'], 'title': candidate['title'], 'summary': candidate['summary'], 'revision': candidate['revision'], 'fingerprint': candidate['fingerprint']}, 'gate_evaluation': {'id': gate['id'], 'outcome': gate['outcome'], 'input_fingerprint': gate['input_fingerprint']}, 'evidence': [{'id': item['id'], 'provenance': item['provenance'], 'reference_kind': item['reference_kind'], 'reference_value': item['reference_value']} for item in evidence]}
+        canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'), ensure_ascii=True)
+        values = {'candidate_id': candidate_id, 'gate_evaluation_id': gate_evaluation_id, 'schema_version': self.MANIFEST_SCHEMA, 'fingerprint': hashlib.sha256(canonical.encode()).hexdigest(), 'status': 'NOT_PUBLISHED', 'payload_json': canonical, 'markdown': f"# {candidate['title']}\n\nStatus: NOT_PUBLISHED\n\nThis manifest records a frozen candidate and PASS gate; it is not a publication or deployment."}
+        return self.repository.save_manifest(values)
+
+    def manifest_get(self, workspace_id: str, project_id: str, candidate_id: str, manifest_id: str | None = None) -> dict[str, Any]:
+        self.candidate_get(workspace_id, project_id, candidate_id)
+        item = self.repository.get_manifest(candidate_id, manifest_id)
+        if item is None: raise LookupError('Release manifest not found')
+        return item

@@ -46,6 +46,7 @@ export type Evidence = { id: string; project_id: string; feature_id: string | nu
 export type ReleaseCandidate = { id: string; project_id: string; title: string; summary: string; status: string; revision: number; fingerprint: string | null; created_at: string; updated_at: string };
 export type CandidateHistory = { id: string; candidate_id: string; revision: number; status: string; snapshot_json: string; fingerprint: string; created_at: string };
 export type Verification = { id: string | null; project_id: string; rule_id: string; candidate_id: string | null; outcome: string; input_fingerprint: string; blockers: string[]; created_at: string | null; stale: boolean };
+export type ReleaseManifest = { id: string; candidate_id: string; gate_evaluation_id: string; schema_version: string; fingerprint: string; status: string; payload_json: string; markdown: string; created_at: string };
 
 async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -122,5 +123,8 @@ export const organizationApi = {
   listCandidateRevisions: (workspaceId: string, projectId: string, candidateId: string) => getApiJson<CandidateHistory[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/revisions` }),
   freezeCandidate: (workspaceId: string, projectId: string, candidateId: string, revision: number) => sendJson<ReleaseCandidate>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/freeze`, { method: 'POST', body: JSON.stringify({ expected_revision: revision }) }),
   previewGates: (workspaceId: string, projectId: string, candidateId: string) => sendJson<{ outcome: string; blockers: string[] }>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/gates/preview`, { method: 'POST', body: '{}' }),
+  evaluateGates: (workspaceId: string, projectId: string, candidateId: string) => sendJson<{ id: string; outcome: string; blockers: string[] }>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/gates/evaluate`, { method: 'POST', body: '{}' }),
   listGateEvaluations: (workspaceId: string, projectId: string, candidateId: string) => getApiJson<Array<{ id: string; candidate_id: string; candidate_revision: number; outcome: string; input_fingerprint: string; blockers: string[] }>>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/gates` }),
+  getManifest: (workspaceId: string, projectId: string, candidateId: string) => getApiJson<ReleaseManifest>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/manifest` }),
+  saveManifest: (workspaceId: string, projectId: string, candidateId: string, gate_evaluation_id: string) => sendJson<ReleaseManifest>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${candidateId}/manifest`, { method: 'POST', body: JSON.stringify({ gate_evaluation_id }) }),
 };

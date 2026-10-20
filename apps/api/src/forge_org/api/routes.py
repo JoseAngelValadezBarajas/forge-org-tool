@@ -47,6 +47,8 @@ from forge_org.api.schemas import (
     InvariantResponse,
     InvariantRevisionResponse,
     InvariantUpdate,
+    ManifestResponse,
+    ManifestSaveRequest,
     ObservationResponse,
     ProjectCreate,
     ProjectResponse,
@@ -633,6 +635,25 @@ def list_candidate_revisions(workspace_id: str, project_id: str, candidate_id: s
 def list_candidate_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
     try: return delivery.candidate_gate_history(workspace_id, project_id, candidate_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/manifest', response_model=ManifestResponse)
+def get_manifest(workspace_id: str, project_id: str, candidate_id: str, manifest_id: str | None = Query(default=None), delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.manifest_get(workspace_id, project_id, candidate_id, manifest_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/manifest', response_model=ManifestResponse, status_code=201)
+def save_manifest(workspace_id: str, project_id: str, candidate_id: str, payload: ManifestSaveRequest, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.manifest_save(workspace_id, project_id, candidate_id, payload.gate_evaluation_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/manifest/download')
+def download_manifest(workspace_id: str, project_id: str, candidate_id: str, format: str = Query(default='json'), manifest_id: str | None = Query(default=None), delivery: DeliveryService = Depends(delivery_service)) -> Response:
+    if format not in {'json', 'markdown'}: raise service_error(InvalidInput('Format must be json or markdown'))
+    try: item = delivery.manifest_get(workspace_id, project_id, candidate_id, manifest_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    if format == 'markdown': return PlainTextResponse(item['markdown'], media_type='text/markdown')
+    return Response(content=item['payload_json'], media_type='application/json')
 
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/evaluate', response_model=GateEvaluationResponse, status_code=201)
 def evaluate_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:

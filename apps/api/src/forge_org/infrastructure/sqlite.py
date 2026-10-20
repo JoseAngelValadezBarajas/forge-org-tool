@@ -201,6 +201,13 @@ def migrate(connection: sqlite3.Connection) -> None:
             rule_id TEXT NOT NULL, candidate_id TEXT REFERENCES release_candidates(id) ON DELETE SET NULL,
             outcome TEXT NOT NULL, input_fingerprint TEXT NOT NULL, blockers TEXT NOT NULL, created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS release_manifests (
+            id TEXT PRIMARY KEY, candidate_id TEXT NOT NULL REFERENCES release_candidates(id) ON DELETE CASCADE,
+            gate_evaluation_id TEXT NOT NULL REFERENCES gate_evaluations(id) ON DELETE RESTRICT,
+            schema_version TEXT NOT NULL, fingerprint TEXT NOT NULL, status TEXT NOT NULL,
+            payload_json TEXT NOT NULL, markdown TEXT NOT NULL, created_at TEXT NOT NULL,
+            UNIQUE(candidate_id, gate_evaluation_id)
+        );
         INSERT OR IGNORE INTO schema_version(version) VALUES (1);
         """
     )
@@ -613,3 +620,16 @@ class OrganizationRepository:
 
     def get_verification(self, project_id: str, evaluation_id: str) -> dict[str, Any] | None:
         return row_dict(self.connection.execute('SELECT * FROM verification_evaluations WHERE project_id = ? AND id = ?', (project_id, evaluation_id)).fetchone())
+
+    def save_manifest(self, values: dict[str, Any]) -> dict[str, Any]:
+        existing = self.connection.execute('SELECT * FROM release_manifests WHERE candidate_id = ? AND gate_evaluation_id = ?', (values['candidate_id'], values['gate_evaluation_id'])).fetchone()
+        if existing is not None: return dict(existing)
+        item_id = str(uuid4())
+        self.connection.execute('INSERT INTO release_manifests(id, candidate_id, gate_evaluation_id, schema_version, fingerprint, status, payload_json, markdown, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (item_id, values['candidate_id'], values['gate_evaluation_id'], values['schema_version'], values['fingerprint'], values['status'], values['payload_json'], values['markdown'], utc_now()))
+        self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM release_manifests WHERE id = ?', (item_id,)).fetchone()) or {}
+
+    def get_manifest(self, candidate_id: str, manifest_id: str | None = None) -> dict[str, Any] | None:
+        if manifest_id:
+            return row_dict(self.connection.execute('SELECT m.* FROM release_manifests m JOIN release_candidates c ON c.id = m.candidate_id WHERE m.candidate_id = ? AND m.id = ?', (candidate_id, manifest_id)).fetchone())
+        return row_dict(self.connection.execute('SELECT * FROM release_manifests WHERE candidate_id = ? ORDER BY created_at DESC, id DESC LIMIT 1', (candidate_id,)).fetchone())

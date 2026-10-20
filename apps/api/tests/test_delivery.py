@@ -37,6 +37,12 @@ def test_delivery_keeps_reported_evidence_and_release_gates_explicit(tmp_path: P
             passed_verification = client.post(f'{root}/verifications/evaluate', json={'rule_id': 'verified-evidence-present', 'candidate_id': candidate['id']})
             assert passed_verification.status_code == 201 and passed_verification.json()['outcome'] == 'PASS'
             assert len(client.get(f'{root}/verifications').json()) == 1
+            passing_gate = client.post(f"{root}/release-candidates/{candidate['id']}/gates/evaluate")
+            assert passing_gate.json()['outcome'] == 'PASS'
+            manifest = client.post(f"{root}/release-candidates/{candidate['id']}/manifest", json={'gate_evaluation_id': passing_gate.json()['id']})
+            assert manifest.status_code == 201 and manifest.json()['status'] == 'NOT_PUBLISHED'
+            manifest_download = client.get(f"{root}/release-candidates/{candidate['id']}/manifest/download?format=json")
+            assert manifest_download.status_code == 200 and manifest_download.headers['content-type'].startswith('application/json')
             client.post(f"{root}/evidence/{verified['id']}/invalidate")
             assert client.get(f"{root}/verifications/{passed_verification.json()['id']}").json()['stale'] is True
     finally:
