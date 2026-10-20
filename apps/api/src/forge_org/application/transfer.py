@@ -6,6 +6,11 @@ from uuid import uuid4
 from forge_org.infrastructure.sqlite import utc_now
 
 SCHEMA_VERSION = 'forge-project-import-v1'
+MAX_EPICS = 100
+MAX_FEATURES = 500
+MAX_DEPENDENCIES = 5000
+MAX_TASKS = 2000
+MAX_CRITERIA = 2000
 
 class ProjectTransferService:
     def __init__(self, connection): self.connection = connection
@@ -15,6 +20,10 @@ class ProjectTransferService:
     def validate(self, document: dict[str, Any]) -> dict[str, Any]:
         if document.get('schema_version') != SCHEMA_VERSION: raise ValueError('Unsupported project import schema')
         project = document.get('project'); epics = document.get('epics', []); features = document.get('features', []); dependencies = document.get('dependencies', [])
+        if not all(isinstance(items, list) for items in (epics, features, dependencies)): raise ValueError('Import collections must be arrays')
+        if len(epics) > MAX_EPICS or len(features) > MAX_FEATURES or len(dependencies) > MAX_DEPENDENCIES: raise ValueError('Import document exceeds collection limits')
+        task_count = sum(len(feature.get('tasks', [])) for feature in features if isinstance(feature, dict)); criterion_count = sum(len(feature.get('acceptance_criteria', [])) for feature in features if isinstance(feature, dict))
+        if task_count > MAX_TASKS or criterion_count > MAX_CRITERIA: raise ValueError('Import document exceeds global task or criterion limits')
         if not isinstance(project, dict) or not str(project.get('name', '')).strip(): raise ValueError('Project name is required')
         refs: set[str] = set()
         for item in [*epics, *features, *[task for feature in features for task in feature.get('tasks', [])], *[criterion for feature in features for criterion in feature.get('acceptance_criteria', [])]]:
@@ -24,9 +33,21 @@ class ProjectTransferService:
         epic_refs = {item['ref'] for item in epics}
         feature_refs = {item['ref'] for item in features}
         for feature in features:
+            if not isinstance(feature.get('tasks', []), list) or not isinstance(feature.get('acceptance_criteria', []), list): raise TypeError('Feature child collections must be arrays')
+            if len(feature.get('tasks', [])) > MAX_TASKS or len(feature.get('acceptance_criteria', [])) > MAX_CRITERIA: raise ValueError('Feature exceeds task or criterion limits')
             if feature.get('epic_ref') and feature['epic_ref'] not in epic_refs: raise ValueError('Feature references an unknown epic')
+        graph: dict[str, set[str]] = {ref: set() for ref in feature_refs}
         for dependency in dependencies:
             if dependency.get('blocking_feature_ref') not in feature_refs or dependency.get('blocked_feature_ref') not in feature_refs: raise ValueError('Dependency references an unknown feature')
+            graph[dependency['blocking_feature_ref']].add(dependency['blocked_feature_ref'])
+        visiting: set[str] = set(); visited: set[str] = set()
+        def visit(node: str) -> None:
+            if node in visiting: raise ValueError('Dependency graph contains a cycle')
+            if node in visited: return
+            visiting.add(node)
+            for child in graph[node]: visit(child)
+            visiting.remove(node); visited.add(node)
+        for node in graph: visit(node)
         normalized = {'schema_version': SCHEMA_VERSION, 'project': {'name': project['name'].strip(), 'description': project.get('description')}, 'epics': epics, 'features': features, 'dependencies': dependencies}
         return normalized
     def preview(self, workspace_id: str, document: dict[str, Any]) -> dict[str, Any]:
@@ -57,6 +78,9 @@ class ProjectTransferService:
         if project is None: raise LookupError('Project not found')
         epics = [dict(row) for row in self.connection.execute('SELECT * FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)).fetchall()]; epic_refs = {item['id']: f"epic:{index + 1:03d}" for index, item in enumerate(epics)}
         features = []
+        feature_refs_by_id: dict[str, str] = {}
         for index, item in enumerate(self.connection.execute('SELECT * FROM features WHERE project_id = ? ORDER BY created_at', (project_id,)).fetchall()):
-            feature = dict(item); feature_ref = f'feature:{index + 1:03d}'; tasks = [dict(row) for row in self.connection.execute('SELECT * FROM tasks WHERE feature_id = ? ORDER BY position, id', (item['id'],)).fetchall()]; criteria = [dict(row) for row in self.connection.execute('SELECT * FROM acceptance_criteria WHERE feature_id = ? ORDER BY position, id', (item['id'],)).fetchall()]; features.append({'ref': feature_ref, 'title': feature['title'], 'description': feature['description'], 'goal': feature['goal'], 'priority': feature['priority'], 'status': feature['status'], 'epic_ref': epic_refs.get(feature['epic_id']), 'tasks': [{'ref': f'task:{task_index + 1:03d}', 'title': task['title'], 'description': task['description'], 'status': task['status'], 'position': task['position']} for task_index, task in enumerate(tasks)], 'acceptance_criteria': [{'ref': f'criterion:{criterion_index + 1:03d}', 'description': criterion['description'], 'satisfied': bool(criterion['satisfied']), 'position': criterion['position']} for criterion_index, criterion in enumerate(criteria)]})
-        return self.validate({'schema_version': SCHEMA_VERSION, 'project': {'name': project['name'], 'description': project['description']}, 'epics': [{'ref': epic_refs[item['id']], 'title': item['title'], 'description': item['description']} for item in epics], 'features': features, 'dependencies': []})
+            feature = dict(item); feature_ref = f'feature:{index + 1:03d}'; feature_refs_by_id[item['id']] = feature_ref; tasks = [dict(row) for row in self.connection.execute('SELECT * FROM tasks WHERE feature_id = ? ORDER BY position, id', (item['id'],)).fetchall()]; criteria = [dict(row) for row in self.connection.execute('SELECT * FROM acceptance_criteria WHERE feature_id = ? ORDER BY position, id', (item['id'],)).fetchall()]; features.append({'ref': feature_ref, 'title': feature['title'], 'description': feature['description'], 'goal': feature['goal'], 'priority': feature['priority'], 'status': feature['status'], 'epic_ref': epic_refs.get(feature['epic_id']), 'tasks': [{'ref': f'task:{task_index + 1:03d}', 'title': task['title'], 'description': task['description'], 'status': task['status'], 'position': task['position']} for task_index, task in enumerate(tasks)], 'acceptance_criteria': [{'ref': f'criterion:{criterion_index + 1:03d}', 'description': criterion['description'], 'satisfied': bool(criterion['satisfied']), 'position': criterion['position']} for criterion_index, criterion in enumerate(criteria)]})
+        dependencies = [dict(row) for row in self.connection.execute('SELECT blocking_feature_id, blocked_feature_id FROM feature_dependencies WHERE project_id = ? ORDER BY created_at, id', (project_id,)).fetchall()]
+        exported_dependencies = [{'blocking_feature_ref': feature_refs_by_id[item['blocking_feature_id']], 'blocked_feature_ref': feature_refs_by_id[item['blocked_feature_id']]} for item in dependencies]
+        return self.validate({'schema_version': SCHEMA_VERSION, 'project': {'name': project['name'], 'description': project['description']}, 'epics': [{'ref': epic_refs[item['id']], 'title': item['title'], 'description': item['description']} for item in epics], 'features': features, 'dependencies': exported_dependencies})

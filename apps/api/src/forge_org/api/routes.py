@@ -575,7 +575,7 @@ def evaluate_gates(workspace_id: str, project_id: str, candidate_id: str, delive
 def preview_import(workspace_id: str, payload: dict[str, Any], transfer: ProjectTransferService = Depends(transfer_service)) -> dict[str, Any]:
     try: return transfer.preview(workspace_id, payload)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except (ValueError, TypeError) as exc: raise service_error(InvalidInput(str(exc))) from exc
 
 @router.post('/workspaces/{workspace_id}/projects/import', response_model=ImportResponse, status_code=201)
 def import_project(workspace_id: str, payload: ImportCommitRequest, transfer: ProjectTransferService = Depends(transfer_service)) -> dict[str, Any]:
@@ -583,7 +583,7 @@ def import_project(workspace_id: str, payload: ImportCommitRequest, transfer: Pr
         result = transfer.import_project(workspace_id, payload.document, payload.expected_fingerprint)
         return {'schema_version': 'forge-project-import-v1', 'workspace_id': workspace_id, **result}
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except (ValueError, TypeError) as exc: raise service_error(InvalidInput(str(exc))) from exc
     except RuntimeError as exc: raise service_error(exc) from exc
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/export')

@@ -5,4 +5,5 @@
 - [x] Import creates new IDs without overwriting existing projects.
 - [x] Export returns the versioned planning document.
 - [x] Transfer is planning-only and does not import delivery truth.
-- [ ] Full schema limits, cycle validation, and browser import/export flow.
+- [x] Enforce collection limits and reject dependency cycles before writing.
+- [ ] Browser import/export flow.

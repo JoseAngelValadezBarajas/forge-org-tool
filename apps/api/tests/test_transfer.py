@@ -23,5 +23,9 @@ def test_project_transfer_previews_fingerprints_and_imports_planning_only(tmp_pa
             assert json.loads(exported.text)['schema_version'] == 'forge-project-import-v1'
             stale = client.post(f"/api/v1/workspaces/{workspace['id']}/projects/import", json={'document': document, 'expected_fingerprint': '0' * 64})
             assert stale.status_code == 409
+            cyclic = {**document, 'dependencies': [{'blocking_feature_ref': 'feature:one', 'blocked_feature_ref': 'feature:one'}]}
+            assert client.post(f"/api/v1/workspaces/{workspace['id']}/projects/import/preview", json=cyclic).status_code == 422
+            too_many = {**document, 'epics': [{'ref': f'epic:{index}', 'title': 'E'} for index in range(101)]}
+            assert client.post(f"/api/v1/workspaces/{workspace['id']}/projects/import/preview", json=too_many).status_code == 422
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
