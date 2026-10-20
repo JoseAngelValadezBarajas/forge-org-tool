@@ -20,6 +20,7 @@ Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
 ## Retained browser evidence
 
 - Organization: [desktop](../m1/desktop-organization.png).
+- Planning/readiness: [desktop planning](../m1/desktop-planning.png), [mobile readiness](../m1/mobile-readiness.png).
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
   [desktop light](../m1/desktop-component-host.png), [mobile dark](../m1/mobile-component-host-dark.png),
   and [mobile light](../m1/mobile-gallery-light.png).
@@ -50,6 +51,10 @@ for manual run transitions, append-only events, draft validation, immutable
 handoff revision and exact acknowledgement. ORG-006 has API coverage for
 provenance-labelled evidence, invalidation, frozen candidates, and blocked gate
 evaluations. ORG-005 and ORG-006 remain `IMPLEMENTED_NOT_REVIEWED` pending
-browser evidence and fuller delivery rules. ORG-007 through ORG-009 remain not
+browser evidence and fuller delivery rules. ORG-007 has API coverage for
+preview fingerprints, planning-only import, export, and stale-fingerprint
+rejection; it remains `IMPLEMENTED_NOT_REVIEWED` pending full schema-limit
+validation and browser evidence. ORG-008 has only the Rust policy scaffold;
+Cargo/Tauri and installed Windows smoke are not certified. ORG-009 remains not
 started. No legacy code/assets, private
 bundles, real data migration, or desktop packaging were introduced.

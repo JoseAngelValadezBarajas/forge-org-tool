@@ -36,6 +36,7 @@ export type Dependency = { id: string; project_id: string; blocking_feature_id: 
 export type Repository = { id: string; project_id: string; root_path: string; status: string; created_at: string; updated_at: string };
 export type Observation = { id: string; repository_id: string; observed_at: string; head_sha: string | null; branch: string | null; detached: boolean; unborn: boolean; clean: boolean | null; tracked_modified_count: number; staged_count: number; untracked_count: number; observer_version: string; status: string; error_code: string | null; source_content_read: boolean };
 export type ContextPackage = { id: string; project_id: string; feature_id: string; schema_version: string; fingerprint: string; payload_json: string; markdown: string; created_at: string };
+export type ProjectTransferPreview = { schema_version: string; fingerprint: string; project: { name: string; description?: string | null }; counts: Record<string, number> };
 
 async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -79,4 +80,7 @@ export const organizationApi = {
   observeRepository: (workspaceId: string, projectId: string, repositoryId: string) => sendJson<Observation>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/repositories/${repositoryId}/observe`, { method: 'POST', body: '{}' }),
   previewContext: (workspaceId: string, projectId: string, featureId: string) => sendJson<{ schema_version: string; fingerprint: string; payload: unknown; markdown: string }>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/context/preview`, { method: 'POST', body: '{}' }),
   saveContext: (workspaceId: string, projectId: string, featureId: string) => sendJson<ContextPackage>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/context/packages`, { method: 'POST', body: '{}' }),
+  previewProjectImport: (workspaceId: string, document: unknown) => sendJson<ProjectTransferPreview>(`/api/v1/workspaces/${workspaceId}/projects/import/preview`, { method: 'POST', body: JSON.stringify(document) }),
+  importProject: (workspaceId: string, document: unknown, expected_fingerprint: string) => sendJson<{ project_id: string; fingerprint: string }>(`/api/v1/workspaces/${workspaceId}/projects/import`, { method: 'POST', body: JSON.stringify({ document, expected_fingerprint }) }),
+  exportProject: (workspaceId: string, projectId: string) => getApiJson<unknown>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export` }),
 };

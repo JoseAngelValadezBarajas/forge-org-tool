@@ -39,3 +39,23 @@ test('mobile gallery switches from dark to light with no browser errors', async 
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-gallery-light.png' : 'desktop-component-host.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });
+
+test('planning and readiness remain manual truth states', async ({ page }) => {
+  const suffix = Date.now().toString();
+  const workspaceResponse = await page.request.post('/api/v1/workspaces', { data: { name: `Browser ${suffix}` } });
+  const workspace = await workspaceResponse.json();
+  const projectResponse = await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Planning ${suffix}` } });
+  const project = await projectResponse.json();
+  const featureResponse = await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, { data: { title: `Feature ${suffix}`, goal: 'Review manual readiness' } });
+  const feature = await featureResponse.json();
+  await page.goto(`/planning/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Planning' })).toBeVisible();
+  await expect(page.getByRole('link', { name: `Feature ${suffix}` })).toBeVisible();
+  await page.getByRole('link', { name: `Feature ${suffix}` }).click();
+  await expect(page.getByRole('heading', { name: 'Readiness' })).toBeVisible();
+  await expect(page.getByText('NOT_READY')).toBeVisible();
+  await expect(page.getByText(/not delivery, CI, deployment/i)).toBeVisible();
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-readiness.png' : 'desktop-planning.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+  expect(feature.id).toBeTruthy();
+});

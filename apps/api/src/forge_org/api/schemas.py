@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -155,6 +156,13 @@ class CandidateResponse(BaseModel):
     id: str; project_id: str; title: str; summary: str; status: str; revision: int; fingerprint: str | None; created_at: datetime; updated_at: datetime
 class GateEvaluationResponse(BaseModel):
     candidate_id: str; candidate_revision: int; outcome: str; input_fingerprint: str; blockers: list[str]
+
+class ImportPreviewResponse(BaseModel):
+    schema_version: str; fingerprint: str; project: dict[str, Any]; counts: dict[str, int]
+class ImportCommitRequest(BaseModel):
+    document: dict[str, Any]; expected_fingerprint: str
+class ImportResponse(BaseModel):
+    schema_version: str; workspace_id: str; project_id: str; fingerprint: str; references: list[dict[str, str]]; counts: dict[str, int]
 
 class CriterionCreate(BaseModel):
     description: str = Field(min_length=1, max_length=4000)

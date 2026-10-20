@@ -33,6 +33,9 @@ from forge_org.api.schemas import (
     HandoffResponse,
     HandoffUpdate,
     HandoffVersionRequest,
+    ImportCommitRequest,
+    ImportPreviewResponse,
+    ImportResponse,
     InvariantCreate,
     InvariantResponse,
     InvariantUpdate,
@@ -67,6 +70,7 @@ from forge_org.application.planning import PlanningService
 from forge_org.application.readiness import ReadinessService
 from forge_org.application.repositories import RepositoryService
 from forge_org.application.runs import HandoffService, RunService
+from forge_org.application.transfer import ProjectTransferService
 from forge_org.infrastructure.sqlite import connect
 
 router = APIRouter(prefix="/api/v1", tags=["organization"])
@@ -112,6 +116,9 @@ def handoff_service(connection: sqlite3.Connection = Depends(database)) -> Hando
 
 def delivery_service(connection: sqlite3.Connection = Depends(database)) -> DeliveryService:
     return DeliveryService(connection)
+
+def transfer_service(connection: sqlite3.Connection = Depends(database)) -> ProjectTransferService:
+    return ProjectTransferService(connection)
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/planning/overview')
 def planning_overview(workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)) -> dict[str, Any]:
@@ -479,4 +486,24 @@ def preview_gates(workspace_id: str, project_id: str, candidate_id: str, deliver
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/evaluate', response_model=GateEvaluationResponse, status_code=201)
 def evaluate_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
     try: return delivery.gate(workspace_id, project_id, candidate_id, save=True)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/import/preview', response_model=ImportPreviewResponse)
+def preview_import(workspace_id: str, payload: dict[str, Any], transfer: ProjectTransferService = Depends(transfer_service)) -> dict[str, Any]:
+    try: return transfer.preview(workspace_id, payload)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/import', response_model=ImportResponse, status_code=201)
+def import_project(workspace_id: str, payload: ImportCommitRequest, transfer: ProjectTransferService = Depends(transfer_service)) -> dict[str, Any]:
+    try:
+        result = transfer.import_project(workspace_id, payload.document, payload.expected_fingerprint)
+        return {'schema_version': 'forge-project-import-v1', 'workspace_id': workspace_id, **result}
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/export')
+def export_project(workspace_id: str, project_id: str, transfer: ProjectTransferService = Depends(transfer_service)) -> dict[str, Any]:
+    try: return transfer.export_project(workspace_id, project_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
