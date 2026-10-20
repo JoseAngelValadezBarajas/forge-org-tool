@@ -15,7 +15,9 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows
 resource icon), `13f7fc5` (isolated desktop CI frontend build), and `c519526`
 (ORG-002/003 vertical-slice verification, feature-scoped invariant listing,
-focused tests, and retained browser evidence).
+focused tests, and retained browser evidence). `548e21a` completes the
+ORG-004 repository/context vertical slice with feature links, context package
+preview/save/download, responsive browser evidence, and focused UI tests.
 
 ## Automated verification
 
@@ -41,6 +43,7 @@ focused tests, and retained browser evidence).
 - Workbench/handoff: [desktop](../m1/desktop-workbench.png), [mobile](../m1/mobile-workbench.png).
 - Project transfer: [desktop](../m1/desktop-transfer.png), [mobile](../m1/mobile-transfer.png); export and reviewed fingerprint remain planning-only.
 - Readiness/repository context: [desktop](../m1/desktop-context.png), [mobile](../m1/mobile-context.png); decisions, invariants, criteria, and metadata-only observation were exercised without source-content reads.
+- Feature context packages: [desktop](../m1/desktop-context-package.png), [mobile](../m1/mobile-context-package.png); feature repository linking, `forge-context-v1` preview/save, and JSON/Markdown download links were exercised. The mobile save action was keyboard-activated after Playwright pointer hit-testing encountered an ancestor overlap on the long responsive page.
 - Planning feature detail: [desktop](../m1/desktop-feature-detail.png), [mobile](../m1/mobile-feature-detail.png); task creation, acceptance criteria, and a manual task transition were exercised.
 - Application shell: command palette keyboard invocation, escape dismissal, and light-theme control were exercised in both viewport projects.
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
@@ -70,7 +73,7 @@ R01–R06 evaluation, and stale saved history; it also remains
 allowlist rejection, canonical Git validation, metadata-only observations,
 feature links, and deduplicated `forge-context-v1` packages, plus browser
 coverage for metadata-only repository observation; it remains
-`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-005 has API coverage
+`VERIFIED` for automated behavior. ORG-005 has API coverage
 for manual run transitions, append-only events, draft validation, immutable
 handoff revision and exact acknowledgement; browser coverage now includes
 reported runs and draft handoffs. ORG-006 has API coverage for
