@@ -20,12 +20,15 @@ ORG-004 repository/context vertical slice with feature links, context package
 preview/save/download, responsive browser evidence, and focused UI tests.
 `5f7ec95` completes the ORG-005 reported handoff lifecycle with focused UI
 tests, immutable revision history, acknowledgement state, and JSON/Markdown
-downloads.
+downloads. `f83e1a9` completes the ORG-006 delivery truth vertical slice with
+evidence filtering/invalidation, draft candidate revision and freeze controls,
+candidate and gate history, deterministic verification controls, blocked gate
+evaluation, and retained non-published manifest behavior.
 
 ## Automated verification
 
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
-  architecture tests 5/5, and Vitest 16/16 across 9 files.
+  architecture tests 5/5, and Vitest 17/17 across 10 files.
 - API Ruff and strict mypy: passed.
 - API pytest: 13/13 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
@@ -33,7 +36,11 @@ downloads.
   desktop launcher tests passed in [GitHub Quality run 39387177955](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39387177955).
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
-- Isolated Chromium: 18/18 passed across desktop/mobile. Playwright starts its
+- GitHub Quality run [39388716075](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39388716075) passed for implementation commit `f83e1a9`; web, API, and Windows desktop jobs completed successfully.
+- Isolated Chromium: 18/18 passed across desktop/mobile. The delivery journey
+  records and filters reported evidence, invalidates it without erasure, edits
+  and freezes a candidate, evaluates a blocked gate, and retains gate history.
+  Playwright starts its
   own Vite and API processes with `reuseExistingServer: false`, one serialized
   worker, and a unique temporary API database; occupied ports and stale local
   data cannot silently attach to or contaminate the run.
@@ -81,11 +88,13 @@ for manual run transitions, append-only events, draft validation, immutable
 handoff revision and exact acknowledgement; browser coverage now includes
 reported runs, draft editing, ready/acknowledged handoffs, immutable revision
 history, and JSON/Markdown downloads; it is `VERIFIED` for automated behavior.
-ORG-006 has API coverage for
-provenance-labelled evidence, invalidation, frozen candidates, and blocked gate
-evaluations. ORG-006 now has browser coverage for deterministic verification,
-blocked/pass gates, and non-published manifests; it remains
-`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-007 has API
+ORG-006 has API coverage for provenance-labelled evidence, invalidation,
+revisioned candidates, deterministic verification, frozen candidates, blocked
+gate evaluations, and non-published manifests. Its focused UI test and
+desktop/mobile browser journey cover evidence filtering/invalidation, draft
+candidate editing/freezing, candidate/gate history, and the blocked gate
+truth boundary. ORG-006 is `VERIFIED` for automated behavior; this does not
+certify Figma visual parity. ORG-007 has API
 coverage for
 preview fingerprints, planning-only import, export, stale-fingerprint
 rejection, collection limits, cycle rejection, and the browser transfer flow;

@@ -54,3 +54,6 @@ and [mobile light](../evidence/m1/mobile-gallery-light.png).
 The retained Figma captures document the reviewed references only. They do not
 change the review status to `PASS`; human parity certification remains a
 separate decision requiring side-by-side review of the Chromium evidence.
+
+The ORG-006 delivery implementation does not change these visual review
+statuses; its browser evidence is behavior evidence, not Figma certification.
