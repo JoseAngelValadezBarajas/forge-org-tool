@@ -5,9 +5,11 @@ from __future__ import annotations
 import os
 import secrets
 import socket
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 
 MIN_TOKEN_BYTES = 32
@@ -23,6 +25,17 @@ def app_data_root() -> Path:
 def local_paths() -> tuple[Path, Path]:
     root = app_data_root()
     return root / 'data' / 'forge.db', root / 'logs' / 'sidecar.log'
+
+
+def backup_database(database_path: Path) -> Path | None:
+    if not database_path.exists():
+        return None
+    backup_dir = app_data_root() / 'backups'
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')
+    backup_path = backup_dir / f'forge-{timestamp}-{secrets.token_hex(4)}.db'
+    shutil.copy2(database_path, backup_path)
+    return backup_path
 
 
 def free_loopback_port() -> int:
@@ -56,6 +69,7 @@ def start_sidecar() -> SidecarSession:
     database_path, log_path = local_paths()
     database_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.parent.mkdir(parents=True, exist_ok=True)
+    backup_database(database_path)
     token = secrets.token_urlsafe(MIN_TOKEN_BYTES)
     port = free_loopback_port()
     environment = {
