@@ -112,6 +112,7 @@ an
   Tauri host skeleton; automated Cargo/Tauri compilation is verified in CI, but
   packaging and installed Windows smoke are not certified. ORG-009 has
 feature-owned organization, planning, readiness, workbench, and delivery
-surfaces with responsive browser evidence; it remains
-`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. No legacy code/assets, private
+surfaces with responsive browser evidence and explicit manual/reported/blocked
+truth states. ORG-009 is `VERIFIED` for automated behavior; human Figma review
+and visual certification remain separate. No legacy code/assets, private
 bundles, real data migration, or desktop packaging were introduced.
