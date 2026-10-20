@@ -24,7 +24,7 @@ and `dc62a00` (refreshed screenshots).
   unavailable because `cargo`/`rustc` are not installed.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
-- Isolated Chromium: 14/14 passed across desktop/mobile. Playwright starts its
+- Isolated Chromium: 16/16 passed across desktop/mobile. Playwright starts its
   own Vite and API processes with `reuseExistingServer: false`, one serialized
   worker, and a unique temporary API database; occupied ports and stale local
   data cannot silently attach to or contaminate the run.
@@ -37,6 +37,7 @@ and `dc62a00` (refreshed screenshots).
 - Workbench/handoff: [desktop](../m1/desktop-workbench.png), [mobile](../m1/mobile-workbench.png).
 - Project transfer: [desktop](../m1/desktop-transfer.png), [mobile](../m1/mobile-transfer.png); export and reviewed fingerprint remain planning-only.
 - Readiness/repository context: [desktop](../m1/desktop-context.png), [mobile](../m1/mobile-context.png); decisions, invariants, criteria, and metadata-only observation were exercised without source-content reads.
+- Planning feature detail: [desktop](../m1/desktop-feature-detail.png), [mobile](../m1/mobile-feature-detail.png); task creation, acceptance criteria, and a manual task transition were exercised.
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
   [desktop light](../m1/desktop-component-host.png), [mobile dark](../m1/mobile-component-host-dark.png),
   and [mobile light](../m1/mobile-gallery-light.png).
@@ -56,7 +57,8 @@ ORG-001 is verified for workspace/project persistence, selection, search,
 create, archive, restore, duplicate protection, and cross-workspace isolation.
 ORG-002 has API and browser coverage for epic/feature creation and updates, task creation,
 updates and reordering, acceptance criteria, dependency creation and removal,
-and manual overview grouping, plus frontend board navigation; it remains
+and manual overview grouping, plus board and feature-detail browser navigation;
+it remains
 `IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-003 has
 API tests for revisioned decisions, invariant acknowledgements, deterministic
 R01–R06 evaluation, and stale saved history; it also remains

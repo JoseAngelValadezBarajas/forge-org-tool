@@ -1,6 +1,6 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { OrganizationPage } from '../features/organization';
-import { PlanningPage } from '../features/planning';
+import { FeatureDetailPage, PlanningPage } from '../features/planning';
 import { ReadinessPage } from '../features/readiness';
 import { WorkbenchPage } from '../features/workbench';
 import { DeliveryPage } from '../features/delivery';
@@ -17,6 +17,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<OrganizationPage />} />
         <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        <Route path="/planning/:workspaceId/:projectId/features/:featureId" element={<FeatureDetailPage />} />
         <Route path="/readiness/:workspaceId/:projectId/:featureId" element={<ReadinessPage />} />
         <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
         <Route path="/delivery/:workspaceId/:projectId" element={<DeliveryPage />} />

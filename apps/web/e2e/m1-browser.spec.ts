@@ -50,7 +50,7 @@ test('planning and readiness remain manual truth states', async ({ page }) => {
   await page.goto(`/planning/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Planning' })).toBeVisible();
   await expect(page.getByRole('link', { name: `Feature ${suffix}` })).toBeVisible();
-  await page.getByRole('link', { name: `Feature ${suffix}` }).click();
+  await page.getByRole('link', { name: 'Readiness' }).click();
   await expect(page.getByRole('heading', { name: 'Readiness' })).toBeVisible();
   await expect(page.getByText('NOT_READY')).toBeVisible();
   await expect(page.getByText(/not delivery, CI, deployment/i)).toBeVisible();
@@ -131,5 +131,24 @@ test('readiness records explicit planning context and repository metadata only',
   await expect(page.getByText(/never reads source content/i)).toBeVisible();
   expect(consoleErrors).toEqual([]);
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-context.png' : 'desktop-context.png';
+  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+});
+
+test('planning feature detail manages tasks and acceptance criteria', async ({ page }) => {
+  const suffix = Date.now().toString();
+  const workspace = await (await page.request.post('/api/v1/workspaces', { data: { name: `Plan detail ${suffix}` } })).json();
+  const project = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, { data: { name: `Tasks ${suffix}` } })).json();
+  const feature = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, { data: { title: `Feature ${suffix}`, goal: 'Manage planned work' } })).json();
+  await page.goto(`/planning/${workspace.id}/${project.id}/features/${feature.id}`);
+  await expect(page.getByRole('heading', { name: 'Feature detail' })).toBeVisible();
+  await page.getByLabel('Task title').fill(`Task ${suffix}`);
+  await page.getByRole('button', { name: 'Add task' }).click();
+  await page.getByLabel('Acceptance criterion').fill(`Criterion ${suffix}`);
+  await page.getByRole('button', { name: 'Add criterion' }).click();
+  await expect(page.getByText(`Task ${suffix}`)).toBeVisible();
+  await expect(page.getByText(`Criterion ${suffix}`)).toBeVisible();
+  await page.getByRole('combobox', { name: `Status for Task ${suffix}` }).selectOption('in_progress');
+  await expect(page.getByRole('combobox', { name: `Status for Task ${suffix}` })).toHaveValue('in_progress');
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-feature-detail.png' : 'desktop-feature-detail.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });
