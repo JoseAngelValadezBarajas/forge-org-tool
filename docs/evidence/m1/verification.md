@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits are `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), and `dc62a00` (refreshed screenshots).
+Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), and `5674f35` (refreshed evidence).
 
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the

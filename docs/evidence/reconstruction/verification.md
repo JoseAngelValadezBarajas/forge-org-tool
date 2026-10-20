@@ -11,7 +11,8 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 (latest retained browser evidence). Subsequent delivery/workbench commits are
 `4a1c5c9` (handoff revisions), `aecf36b` (release-candidate history),
 `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification),
-and `dc62a00` (refreshed screenshots).
+`ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a`
+(handoff lifecycle), and `5674f35` (refreshed evidence).
 
 ## Automated verification
 
