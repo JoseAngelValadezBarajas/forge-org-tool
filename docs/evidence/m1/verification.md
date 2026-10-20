@@ -1,6 +1,10 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `176f2fbd6f5605ace9ad7ef9c7e35a1095ce6563`.
+Focused audit implementation commit: `e8a24b2ec31b78fb5d7009463d615abfce72b430`.
+
+The subsequent ORG-001 reconstruction evidence is recorded in
+`docs/evidence/reconstruction/verification.md`; this M1 record remains the
+foundation audit record.
 
 ## Local evidence
 

@@ -11,7 +11,7 @@ test('desktop shell is truthful and has no horizontal overflow', async ({ page }
   await mkdir(evidenceDir, { recursive: true });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
-  await expect(page.getByText(/does not display fictitious project data/i)).toBeVisible();
+  await expect(page.getByText('No workspaces yet')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   expect(consoleErrors).toEqual([]);
   await page.screenshot({ path: resolve(evidenceDir, 'desktop-organization.png'), fullPage: true });

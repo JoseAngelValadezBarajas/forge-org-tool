@@ -1,0 +1,9 @@
+.stack { display: grid; gap: var(--forge-space-4); }
+.stack h3 { margin: var(--forge-space-3) 0 var(--forge-space-2); }
+.stack p { color: var(--forge-text-muted); line-height: 1.55; }
+.form { display: grid; gap: var(--forge-space-2); max-width: 520px; margin-top: var(--forge-space-4); }
+.toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: var(--forge-space-3); }
+.toolbar select { min-height: 40px; flex: 1; min-width: 180px; background: var(--forge-surface); color: var(--forge-text); border: 1px solid var(--forge-border); border-radius: var(--forge-radius-sm); padding: 0 var(--forge-space-3); }
+.toolbar input[aria-label="Search projects"] { max-width: 240px; }
+.projects { display: grid; gap: var(--forge-space-3); margin-top: var(--forge-space-4); }
+.project { display: flex; align-items: center; justify-content: space-between; gap: var(--forge-space-4); border-top: 1px solid var(--forge-border); padding-top: var(--forge-space-3); }

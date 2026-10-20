@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Card, SectionHeader, StatusChip } from '@forge-org/ui';
+import { Button, Card, Input, SectionHeader, StatusChip } from '@forge-org/ui';
 import { OrganizationEmptyState } from '../../features/organization';
 import styles from './ComponentGallery.module.css';
 
@@ -22,7 +22,8 @@ interface CatalogItem {
 const catalog: CatalogItem[] = [
   { id: 'tokens', name: 'Semantic tokens', section: 'Foundations and tokens', owner: '@forge-org/tokens', status: 'IMPLEMENTED_NOT_REVIEWED', figma: 'Page 02: Foundations and Tokens', variants: 'dark, light', states: 'theme selection', accessibility: 'Color is paired with text labels in previews.', deviations: 'Figma variable reconciliation is pending.' },
   { id: 'button', name: 'Button', section: 'Core UI primitives', owner: '@forge-org/ui', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '173:2 Core UI Components', variants: 'primary, secondary, ghost, danger', states: 'default, focus, disabled, loading', accessibility: 'Native button semantics; loading is disabled and aria-busy.', deviations: 'Visual review is pending.' },
-  { id: 'card', name: 'Card', section: 'Core UI primitives', owner: '@forge-org/ui', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '173:2 Core UI Components', variants: 'default', states: 'default', accessibility: 'Uses a semantic section element.', deviations: 'Visual review is pending.' },
+  { id: 'card', name: 'Card', section: 'Core UI primitives', owner: '@forge-org/ui', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '173:2 Core UI Components', variants: 'default; typed semantic root', states: 'default', accessibility: 'Neutral div root with typed semantic option.', deviations: 'Figma Elevated variant is not implemented; visual review is pending.' },
+  { id: 'input', name: 'Input', section: 'Core UI primitives', owner: '@forge-org/ui', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '173:2 Core UI Components', variants: 'text-compatible native input', states: 'default, focus-visible, disabled', accessibility: 'Native label and input semantics.', deviations: 'Visual review is pending.' },
   { id: 'status-chip', name: 'StatusChip', section: 'Core UI primitives', owner: '@forge-org/ui', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '173:2 Core UI Components', variants: 'neutral, accent, success, warning, danger', states: 'default', accessibility: 'Status text is always rendered; tone is supplementary.', deviations: 'Visual review is pending.' },
   { id: 'section-header', name: 'SectionHeader', section: 'Generic shared compositions', owner: '@forge-org/ui', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '173:2 Core UI Components', variants: 'eyebrow, action slot', states: 'default', accessibility: 'Uses a heading and named action region when supplied.', deviations: 'Visual review is pending.' },
   { id: 'organization-empty-state', name: 'OrganizationEmptyState', section: 'Product-specific components', owner: 'apps/web/src/features/organization', status: 'IMPLEMENTED_NOT_REVIEWED', figma: '229:2 Product Patterns', variants: 'empty state', states: 'not implemented', accessibility: 'Uses shared primitives and a disabled action with an explicit label.', deviations: 'Product behavior is intentionally not implemented in M1.' },
@@ -58,6 +59,7 @@ function ComponentPreview({ item, onIncrement, count }: { item: CatalogItem; onI
       <Button onClick={onIncrement}>Increment {count}</Button><Button variant="secondary">Secondary</Button><Button variant="ghost">Ghost</Button><Button variant="danger">Danger</Button><Button loading>Loading</Button><Button disabled>Disabled</Button>
     </div></Card>;
     case 'card': return <Card><strong>Actual Card preview</strong><p>Content is supplied by the host fixture, not a backend record.</p></Card>;
+    case 'input': return <Card><label htmlFor="host-input">Input preview</label><Input id="host-input" placeholder="Type a value" /></Card>;
     case 'status-chip': return <Card><div className={styles.previewRow}>
       <StatusChip>Neutral</StatusChip><StatusChip tone="accent">Accent</StatusChip><StatusChip tone="success">Success</StatusChip><StatusChip tone="warning">Warning</StatusChip><StatusChip tone="danger">Danger</StatusChip>
     </div></Card>;

@@ -20,7 +20,7 @@ code and assets are therefore not copied into this Apache-2.0 reconstruction.
 
 | ID | Original capability observed | Evidence locations in legacy refs | New status | Target boundary |
 | --- | --- | --- | --- | --- |
-| ORG-001 | Workspaces contain projects; project CRUD and selection | `backend/app/api/routers/workspaces.py`, `projects.py`; `backend/tests/test_workspace_projects.py`; `feature/fnd01-workspace-project-management` | `NOT_STARTED` | `features/workspaces`, `features/projects`, workspace/project application services |
+| ORG-001 | Workspaces contain projects; project CRUD and selection | `backend/app/api/routers/workspaces.py`, `projects.py`; `backend/tests/test_workspace_projects.py`; `feature/fnd01-workspace-project-management` | `VERIFIED` | `apps/api/src/forge_org/{domain,application,infrastructure,api}` and `apps/web/src/features/organization` |
 | ORG-002 | Epics, features, tasks, acceptance criteria, dependencies, board states | `backend/app/api/routers/planning.py`; `frontend/src/features/planning`; `backend/tests/test_planning.py`; FND-02 branch | `NOT_STARTED` | `features/planning`; domain planning aggregates |
 | ORG-003 | Decisions, invariants, revision-aware acknowledgements, readiness snapshots | routers `decisions.py`, `invariants.py`, `readiness.py`; `backend/tests/test_fnd03.py`; FND-03 branch | `NOT_STARTED` | `features/decisions`, `features/invariants`, `features/readiness`; immutable revisions |
 | ORG-004 | Read-only local Git observations and immutable `forge-context-v1` packages | `backend/app/application/git_context.py`, `context_packages.py`; `frontend/src/features/repositories`; FND-04 docs/tests | `NOT_STARTED` | `features/repositories`; infrastructure Git observer; package fingerprinting |
@@ -34,8 +34,8 @@ code and assets are therefore not copied into this Apache-2.0 reconstruction.
 
 Validated for the legacy source: the files, refs, migrations, tests, and
 acceptance documents named above exist in the local checkout. Validated for
-the new repository: M0 preservation and M1 bootstrap evidence in
-`docs/evidence/m1/verification.md`, not functional parity.
+the new repository: M0 preservation, M1 foundation, and the ORG-001
+API/frontend slice documented in `docs/evidence/m1/verification.md`.
 
 Assumptions requiring a slice-level contract before implementation include
 which legacy edge cases are user-critical, whether the desktop packaging is

@@ -1,7 +1,7 @@
 ﻿import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 
 function renderRoute(path: string) {
@@ -13,14 +13,18 @@ function renderRoute(path: string) {
 }
 
 describe('M1 application shell', () => {
-  afterEach(() => cleanup());
+  afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
-  it('shows a truthful empty organization state', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('[]', { status: 200 })));
+  });
+
+  it('shows an actionable empty organization state', async () => {
     renderRoute('/');
 
-    expect(screen.getByRole('heading', { name: 'Organization' })).toBeInTheDocument();
-    expect(screen.getByText(/does not display fictitious project data/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create workspace/i })).toBeDisabled();
+    expect(await screen.findByRole('heading', { name: 'Organization' })).toBeInTheDocument();
+    expect(screen.getByText('No workspaces yet')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create workspace/i })).toBeEnabled();
   });
 
   it('exposes loading state and prevents native button interaction', () => {

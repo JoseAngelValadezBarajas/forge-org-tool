@@ -1,5 +1,5 @@
 import { Link, Route, Routes } from 'react-router-dom';
-import { OrganizationEmptyState } from '../features/organization';
+import { OrganizationPage } from '../features/organization';
 import { ComponentGallery } from './component-gallery/ComponentGallery';
 import styles from './App.module.css';
 export function App() {
@@ -9,7 +9,7 @@ export function App() {
     </header>
     <main id="main" className={styles.main}>
       <Routes>
-        <Route path="/" element={<OrganizationEmptyState />} />
+        <Route path="/" element={<OrganizationPage />} />
         {import.meta.env.DEV && <Route path="/__components" element={<ComponentGallery />} />}
         <Route path="*" element={<p>Page not found.</p>} />
       </Routes>
