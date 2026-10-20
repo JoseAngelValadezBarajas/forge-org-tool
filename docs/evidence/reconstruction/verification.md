@@ -1,8 +1,8 @@
 # Reconstruction verification
 
 This record covers the reconstructed ORG-001 through ORG-009 slices. It does
-not certify Figma visual parity, desktop packaging, or unimplemented legacy
-capabilities.
+not certify Figma visual parity, human-installed Windows sign-off, or
+unimplemented legacy capabilities.
 
 Implementation commits include `6eca0da` (ORG-001), `e909ce9` (planning
 mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
@@ -27,16 +27,22 @@ evaluation, and retained non-published manifest behavior.
 `dcda574` completes ORG-007 transfer verification with reviewed import commit
 coverage, controlled duplicate-name rejection, focused UI tests, and retained
 desktop/mobile import evidence.
+`3221de0` adds versioned SQLAlchemy-backed SQLite migrations and synthetic
+fresh/upgrade/future-version safety tests. `159a930` adds the packaged desktop
+sidecar lifecycle and aligns the product hierarchy; `f6bfdce` disambiguates the
+delivery browser assertion; `8031914` orders sidecar packaging before Tauri
+compilation in CI.
 
 ## Automated verification
 
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
-  architecture tests 5/5, and Vitest 19/19 across 11 files.
+  architecture tests 5/5, and Vitest 20/20 across 11 files.
 - API Ruff and strict mypy: passed.
-- API pytest: 13/13 passed; one upstream Starlette/httpx deprecation warning.
-- Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
-  tests passed as part of the API suite. Native Rust/Tauri compilation and
-  desktop launcher tests passed in [GitHub Quality run 39387177955](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39387177955).
+- API pytest: 16/16 passed; one upstream Starlette/httpx deprecation warning.
+- Desktop Python suite: 9/9 passed, including sidecar command/readiness,
+  fresh/restart persistence, backup creation, and synthetic v1 upgrade smoke.
+  The PyInstaller sidecar package completed locally; Rust/Tauri compilation is
+  gated by the current GitHub Quality run.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
 - GitHub Quality run [39388716075](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39388716075) passed for implementation commit `f83e1a9`; web, API, and Windows desktop jobs completed successfully.
@@ -44,6 +50,7 @@ desktop/mobile import evidence.
 - GitHub Quality run [39390708097](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390708097) passed for final documentation commit `39b0421`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39391658113](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39391658113) passed for ORG-009 behavior-status commit `c112f2b`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality run [39392594672](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39392594672) passed for ORG-008 sidecar lifecycle commit `8ed6b3c`; web, API, and Windows desktop jobs completed successfully.
+- GitHub Quality run [39421568364](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39421568364) passed API and web but failed before desktop compilation because the packaged sidecar was created after Tauri resource validation; commit `8031914` corrects that ordering and a replacement run is required before certification.
 - Isolated Chromium: 18/18 passed across desktop/mobile. The delivery journey
   records and filters reported evidence, invalidates it without erasure, edits
   and freezes a candidate, evaluates a blocked gate, and retains gate history.
@@ -54,7 +61,7 @@ desktop/mobile import evidence.
 
 ## Retained browser evidence
 
-- Organization: [desktop](../m1/desktop-organization.png).
+- Organization: [desktop](../m1/desktop-organization.png), [mobile](../m1/mobile-organization.png).
 - Planning/readiness/repository navigation: [desktop planning](../m1/desktop-planning.png), [mobile readiness](../m1/mobile-readiness.png); the same isolated Chromium journey also opens the repository metadata-only surface.
 - Delivery verification: [desktop](../m1/desktop-delivery.png), [mobile](../m1/mobile-delivery.png); both show the explicit `NOT_PUBLISHED` boundary.
 - Workbench/handoff: [desktop](../m1/desktop-workbench.png), [mobile](../m1/mobile-workbench.png); reported run creation, draft editing, ready transition, immutable revision, acknowledgement, and JSON/Markdown downloads were exercised.
@@ -109,12 +116,11 @@ desktop/mobile browser journey cover export, edited-document preview, reviewed
 fingerprint commit, validation errors, and the `IMPORTED_PLANNING_ONLY` truth
 state. ORG-007 is `VERIFIED` for automated behavior; this does not certify
 Figma visual parity. ORG-008 has an authenticated sidecar boundary, desktop
-launch/path policy, restricted Tauri host skeleton, and a tested guard against
-returning a dead sidecar session; automated Cargo/Tauri compilation is
-verified in CI, but packaging, migration safety, and installed Windows smoke
-are not certified. ORG-009 has
+launch/path policy, restricted Tauri host skeleton, versioned migration safety,
+packaged sidecar, and synthetic isolated restart/backup smoke. Its installed
+Windows product smoke and human migration sign-off remain open. ORG-009 has
 feature-owned organization, planning, readiness, workbench, and delivery
 surfaces with responsive browser evidence and explicit manual/reported/blocked
 truth states. ORG-009 is `VERIFIED` for automated behavior; human Figma review
 and visual certification remain separate. No legacy code/assets, private
-bundles, real data migration, or desktop packaging were introduced.
+bundles, or real data migration were introduced.
