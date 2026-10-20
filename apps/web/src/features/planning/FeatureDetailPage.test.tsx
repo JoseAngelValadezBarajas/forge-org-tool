@@ -23,6 +23,7 @@ describe('FeatureDetailPage', () => {
     render(<MemoryRouter initialEntries={['/planning/w1/p1/features/f1']}><Routes><Route path="/planning/:workspaceId/:projectId/features/:featureId" element={<FeatureDetailPage />} /></Routes></MemoryRouter>);
 
     await screen.findByText('First');
+    expect(screen.getByRole('link', { name: 'Manage feature context' })).toHaveAttribute('href', '/context/w1/p1/f1');
     fireEvent.click(screen.getByRole('button', { name: 'Move First down' }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/v1/workspaces/w1/projects/p1/features/f1/tasks/reorder', expect.objectContaining({ method: 'POST', body: JSON.stringify({ ids: ['t2', 't1'] }) })));
     expect(screen.getByText(/planning records only/i)).toBeInTheDocument();

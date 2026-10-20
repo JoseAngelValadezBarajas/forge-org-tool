@@ -159,8 +159,22 @@ test('readiness records explicit planning context and repository metadata only',
   await expect(page.getByText(/connected/i)).toBeVisible();
   await page.getByRole('button', { name: 'Observe metadata' }).click();
   await expect(page.getByText(/never reads source content/i)).toBeVisible();
+  const approvedRoot = resolve(process.cwd(), '../..');
+  await expect(page.getByText(new RegExp(`Latest observation:.*source content: no`))).toBeVisible();
+  await page.goto(`/context/${workspace.id}/${project.id}/${feature.id}`);
+  await expect(page.getByRole('heading', { name: 'Feature context' })).toBeVisible();
+  await page.getByRole('button', { name: `Link ${approvedRoot}` }).click();
+  await expect(page.getByRole('button', { name: `Unlink ${approvedRoot}` })).toBeVisible();
+  await page.getByRole('button', { name: 'Preview context package' }).click();
+  await expect(page.locator('p').filter({ hasText: /Schema:.*forge-context-v1/ })).toBeVisible();
+  await expect(page.getByText(/source content/i).last()).toBeVisible();
+  const saveButton = page.getByRole('button', { name: 'Save context package' });
+  await saveButton.press('Enter');
+  await expect(page.getByRole('link', { name: 'JSON' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Markdown' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   expect(consoleErrors).toEqual([]);
-  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-context.png' : 'desktop-context.png';
+  const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-context-package.png' : 'desktop-context-package.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });
 
