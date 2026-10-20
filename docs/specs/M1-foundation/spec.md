@@ -18,13 +18,13 @@ Given M1 has no Organization/Planning persistence, when the OpenAPI contract is 
 
 Given the frontend is available, when the user opens `/`, then the application shell renders without runtime errors and shows an empty Organization state that does not claim persisted organizations or projects.
 
-### M1-UI-002 â€” Reusable component behavior
+### M1-UI-002 â€” Reusable component contracts and behavior
 
-Given the gallery renders a shared action component, when it is disabled or loading, then native interaction is prevented and accessible state is exposed through the DOM.
+Given the Component Host renders shared components, then Card defaults to a neutral `div` while allowing a narrow typed semantic root where justified, and Button preserves native attributes, ref forwarding, disabled/loading behavior, and accessible state exposure. Button hover and pressed treatments use semantic tokens without overriding focus-visible or disabled behavior.
 
-### M1-UI-003 â€” Development-only gallery and theme
+### M1-UI-003 â€” Development-only Component Host and theme
 
-Given a development build, when the user opens `/__component-gallery`, then real exports from `packages/ui` render, native interactions work, and the user can switch Dark/Light visibly. Given a production build, the route and gallery entry are absent.
+Given a development build, when the user opens `/__components`, then real public exports from `packages/ui` and implemented feature components render from deterministic local fixtures, the catalog is searchable, native interactions work, and the user can switch Dark/Light visibly. Given a production build, the route and Component Host entry are absent.
 
 ### M1-ARCH-001 â€” Enforced dependency boundaries
 

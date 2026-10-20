@@ -24,6 +24,13 @@ test('mobile gallery switches from dark to light with no browser errors', async 
   await page.goto('/__components');
   const gallery = page.locator('main [data-theme]').filter({ has: page.getByText('A development-only catalog of actual exported React components') });
   await expect(gallery).toHaveAttribute('data-theme', 'dark');
+  const prefix = test.info().project.name === 'chromium-mobile' ? 'mobile-component-host' : 'desktop-component-host';
+  await page.screenshot({ path: resolve(evidenceDir, `${prefix}-dark.png`), fullPage: true });
+  const primary = page.getByRole('button', { name: /increment 0/i });
+  const defaultBackground = await primary.evaluate((element) => getComputedStyle(element).backgroundColor);
+  await primary.hover();
+  const hoverBackground = await primary.evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(hoverBackground).not.toBe(defaultBackground);
   await page.getByRole('button', { name: /switch to light/i }).click();
   await expect(gallery).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('button', { name: /increment 0/i })).toBeVisible();

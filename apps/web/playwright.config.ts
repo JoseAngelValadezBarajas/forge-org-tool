@@ -10,7 +10,9 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',
-    reuseExistingServer: true,
+    // Never attach to an unrelated process already listening on the test port.
+    // Playwright fails with a controlled port-in-use error instead.
+    reuseExistingServer: false,
   },
   projects: [
     { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },

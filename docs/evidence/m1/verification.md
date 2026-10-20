@@ -1,18 +1,20 @@
 # M1 verification evidence
 
-Final public repository commit: `17e1c39ca9ca369ee7942e75accfdbdab62c8e10`.
+Final public repository commit: pending focused audit commit.
 
 ## Local evidence
 
 - Node/npm: Node 24.13.0, npm 11.6.2.
 - Python/uv: Python 3.12.10, uv 0.12.7.
-- `npm run test`: architecture boundaries passed, token check passed, typecheck passed, architecture tests 5/5, Vitest 4/4.
+- `npm run test`: architecture boundaries passed, token check passed, typecheck passed, architecture tests 5/5, Vitest 7/7 across 2 files.
 - `npm run build`: Vite production build passed; the development-only `/__components` route was absent from `apps/web/dist`.
-- `npm run test:e2e`: Chromium desktop/mobile smoke passed 4/4; Component Host screenshots are retained beside this file, including `desktop-component-host.png` and `mobile-gallery-light.png`.
+- `npm run test:e2e`: isolated Chromium desktop/mobile smoke passed 4/4; Component Host dark/light screenshots are retained beside this file: `desktop-component-host-dark.png`, `desktop-component-host.png`, `mobile-component-host-dark.png`, and `mobile-gallery-light.png`.
 - API: Ruff passed, strict mypy passed, pytest passed 2/2, OpenAPI check passed.
 - Live API: `/api/v1/health` returned HTTP 200 with `scope=bootstrap-only`; fabricated `/api/v1/workspaces` returned HTTP 404.
 - Public-file audit: no credential patterns, machine-specific absolute paths, databases, keys, logs, backups, or attachments were staged.
 - Component Host: `/__components` renders public `@forge-org/ui` exports and the existing organization feature with deterministic local fixtures; it makes no backend calls.
+- Playwright isolation: `reuseExistingServer: false`; the smoke starts its own server and does not silently attach to an occupied port.
+- Shared contracts: Card default `div` and typed semantic option passed; Button loading/disabled/pressed DOM contract passed. Button visual parity remains unreviewed, including the 40px implementation height versus the 36/38px Figma reference.
 
 ## Clean-clone evidence
 
@@ -34,4 +36,4 @@ The final public repository was cloned into an isolated temporary directory. `np
 
 ## Verdict
 
-`M1_READY_FOR_REVIEW` for the scoped foundation and Component Host. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity.
+`M1_READY_WITH_CHANGES` corrections are implemented and verified locally. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity. Final review commit and GitHub Quality result are recorded after publication.

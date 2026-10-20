@@ -42,7 +42,7 @@ uv run --project apps/api pytest apps/api/tests
 uv run --project apps/api python tooling/scripts/export-openapi.py --check
 ```
 
-Open Vite's local URL for the shell. In development only, `/__component-gallery` showcases the actual core UI primitives. The backend exposes `GET /api/v1/health`. It does not yet connect to SQLite.
+Open Vite's local URL for the shell. In development only, `/__components` showcases the actual core UI primitives and Component Host catalog. The backend exposes `GET /api/v1/health`. It does not yet connect to SQLite.
 
 **Before first public push:** generate and commit `package-lock.json` and `apps/api/uv.lock`; run the quality checks, review changes for secrets and personal data, and verify that local databases and backups are not tracked.
 
