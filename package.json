@@ -1,0 +1,21 @@
+{
+  "name": "forge-org-tool",
+  "version": "0.1.0-bootstrap",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.6.2",
+  "engines": {"node": ">=24 <25", "npm": ">=11 <12"},
+  "workspaces": ["apps/web", "packages/tokens", "packages/ui", "packages/api-client"],
+  "scripts": {
+    "dev": "npm run dev --workspace=@forge-org/web",
+    "build": "npm run build --workspace=@forge-org/web",
+    "typecheck": "npm run typecheck --workspace=@forge-org/web",
+    "check:architecture": "node tooling/scripts/check-boundaries.mjs",
+    "test:architecture": "node --test tooling/scripts/check-boundaries.test.mjs",
+    "generate:tokens": "node tooling/scripts/generate-tokens.mjs",
+    "check:tokens": "node tooling/scripts/generate-tokens.mjs --check",
+    "test": "npm run check:architecture && npm run check:tokens && npm run typecheck && npm run test:architecture && npm run test:ui",
+    "test:ui": "npm run test --workspace=@forge-org/web",
+    "test:e2e": "npm run test:e2e --workspace=@forge-org/web"
+  }
+}

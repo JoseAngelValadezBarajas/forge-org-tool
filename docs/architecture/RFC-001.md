@@ -1,0 +1,303 @@
+﻿# FORGE Org Tool
+
+## RFC-001 Â· Arquitectura, organizaciÃ³n y estrategia de migraciÃ³n
+
+**Estado:** propuesta para aprobaciÃ³n.
+**Fecha:** 20 de octubre de 2026.
+**Nuevo producto:** FORGE Org Tool.
+**Slug recomendado:** `forge-org-tool`.
+**Directorio local recomendado:** el directorio independiente elegido por el operador.
+**Referencia de diseÃ±o:** https://www.figma.com/design/r10szKLgiIPVi2NBmbjTpm
+
+> **Regla de seguridad de la transiciÃ³n:** el repositorio original `JoseAngelValadezBarajas/Forge` no se archiva hasta preservar el Ãºltimo estado de `main`, la rama Draft PR #30 y los contratos y datos que deban migrarse. Este documento no ejecuta modificaciones en GitHub.
+
+## 1. VisiÃ³n del producto
+
+**FORGE Org Tool** organiza el trabajo de una persona o equipo desde su definiciÃ³n hasta su seguimiento. La organizaciÃ³n es el nÃºcleo; los dominios de ingenierÃ­a, agentes y evidencia son capacidades especializadas que se conectan al nÃºcleo, no requisitos de todo Project.
+
+**Objetivos de producto**
+
+1. Organizar Workspaces, Projects, Epics, Features, Tasks, criterios, dependencias y vistas de trabajo.
+2. Registrar decisiones, invariantes, revisiones e historial de cambios.
+3. Calcular Readiness con reglas deterministas, entradas versionadas y diagnÃ³sticos explicables.
+4. Observar opcionalmente repositorios Git locales en modo lectura y generar paquetes de contexto reproducibles.
+5. Registrar Agent Runs, eventos declarados y Handoffs, sin afirmar que la aplicaciÃ³n ejecuta agentes.
+6. Vincular evidencia, verificaciones de alcance definido y candidatos de entrega sin afirmar publicaciÃ³n/deployment inexistentes.
+7. Funcionar local-first, sin cuentas, servicios externos ni conexiÃ³n de red obligatoria en el primer producto instalado.
+8. Exponer una interfaz fiel a las bibliotecas existentes de Figma, accesible, responsive y testeable.
+
+**No objetivos del primer corte:** SaaS, multi-tenancy hospedado, sincronizaciÃ³n entre equipos, ejecuciÃ³n automÃ¡tica de agentes, Git push/commit autÃ³nomo, publicaciÃ³n de releases, importaciÃ³n arbitraria de artefactos ejecutables, scraping del sistema de archivos, sistema universal de plugins o editor visual de flujos.
+
+## 2. Decisiones arquitectÃ³nicas propuestas
+
+| ADR | DecisiÃ³n | JustificaciÃ³n |
+|---|---|---|
+| 001 | Monorepo nuevo con historia Git independiente | Preserva trazabilidad del proyecto viejo y evita transportar refactors acumulados. |
+| 002 | Monolito modular en el servidor | Mantiene transacciones SQLite, pruebas y empaquetado simples. Nada de microservicios prematuros. |
+| 003 | Desktop Windows-first y desarrollo en navegador | Respeta el producto local-first ya validado con Tauri. Hosted Web queda para otra fase. |
+| 004 | React + TypeScript + Vite + React Router | Continuidad y reutilizaciÃ³n de UI, flujos y pruebas existentes. |
+| 005 | FastAPI + Pydantic + SQLAlchemy + Alembic + SQLite | Continuidad de reglas, contratos y persistencia determinista. |
+| 006 | Tauri 2/Rust con sidecar Python empaquetado | Conserva el modelo de seguridad y operaciÃ³n Windows ya diseÃ±ado y probado. |
+| 007 | Contratos OpenAPI versionados y cliente TS derivado de ellos | El servidor define el HTTP; el frontend no inventa DTOs divergentes. |
+| 008 | Design System separado del dominio | UI propia y semÃ¡ntica de negocio no deben mezclarse. |
+| 009 | Figma como contrato visual; tokens versionados como contrato ejecutable | No aceptar dos paletas divergentes sin una reconciliaciÃ³n explÃ­cita. |
+| 010 | Reglas de evidencia y confianza explÃ­citas | Manual/Reported no implica Observed; Observed no implica Verified. |
+| 011 | MigraciÃ³n incremental por vertical slices, sin reescritura a ciegas | Conserva comportamiento y permite comparar con la aplicaciÃ³n anterior. |
+| 012 | Todo estado duradero pasa por backend y migraciones | Nada de estado de negocio en localStorage; usarlo solo para preferencias locales. |
+
+## 3. Stack tÃ©cnico
+
+### UI y cliente
+
+- **React 19 + TypeScript 6 + Vite 8**, usando versiones efectivamente compatibles y fijadas en `package-lock.json`.
+- **React Router 7** para composiciÃ³n de rutas, nested layouts y error boundaries.
+- **npm workspaces** sobre **Node.js 24 / npm 11** para `apps/web`, `packages/ui`, `packages/tokens`, `packages/api-client`. No introducir pnpm/Turborepo/Nx hasta demostrar que aportan valor real.
+- **CSS variables + CSS Modules o estilos de componente con ownership explÃ­cito**. No depender de una cascada monolÃ­tica por orden de imports. Sin Tailwind como obligaciÃ³n.
+- **Primitivas nativas accesibles** primero. Radix headless para Dialog/Popover/Select solo cuando evite reconstruir comportamientos complejos. Apariencia propia definida por FORGE y Figma, no un kit visual genÃ©rico.
+- **Vitest + Testing Library + Playwright Chromium**: comportamiento, accesibilidad, estados, visual, Dark/Light, responsive.
+- Fetch HTTP tipado, con contratos OpenAPI generados y aislamiento del adaptador Tauri. No incorporar Redux global para datos duraderos.
+
+### API, datos y empaquetado
+
+- **Python 3.12** inicial, gestionado por **uv** con `uv.lock` comprometido.
+- **FastAPI + Pydantic 2 + SQLAlchemy 2 + Alembic + SQLite** (integridad referencial activa, Ã­ndices, transacciones y backups).
+- **Ruff, mypy strict, pytest, httpx**. Reglas de dominio puras sin acoplamiento a FastAPI/ORM.
+- **Rust + Tauri 2**, `Cargo.lock` y toolchain fijados, instalador Windows (NSIS). Sidecar con **PyInstaller** solo despuÃ©s de demostrar la ejecuciÃ³n local de API.
+- El IPC de escritorio usa comandos restringidos y manifest OpenAPI; no se expone shell, red arbitraria, acceso filesystem sin autorizaciÃ³n, ni sesiÃ³n HTTP a React.
+- Observabilidad mediante logs JSON estructurados con `correlation_id`, operaciones y duraciones; sin cuerpos sensibles, tokens, secretos, datos personales ni rutas innecesarias.
+
+### Decisiones de producto explÃ­citas
+
+- **Desktop** es el destino principal de la primera entrega. El modo web es entorno de desarrollo y acceso local deliberadamente restringido, **no SaaS**.
+- **SQLite** es la base de datos inicial, no PostgreSQL. Se diseÃ±an lÃ­mites claros para una futura persistencia hospedada, pero no se aÃ±ade ahora.
+- **Sin autenticaciÃ³n de cuentas** mientras la aplicaciÃ³n sea una herramienta local monousuario. Esto **no** reemplaza las medidas de protecciÃ³n del backend loopback y la frontera Tauri/Rust.
+- El idioma base de la interfaz, el soporte de traducciones y la polÃ­tica de nombres de negocio se deciden antes de implementar las pantallas. Se recomienda documentaciÃ³n espaÃ±ola y nombres de clases/API en inglÃ©s.
+
+## 4. Arquitectura lÃ³gica
+
+```text
+               FORGE Org Tool UI (React)
+                       |
+         apps/web: app shell + feature routes
+                       |
+        packages/ui + tokens + typed api client
+                       |
+     +-----------------+-----------------+
+     | Browser dev/local adapter | Tauri IPC adapter |
+     +-----------------+-----------------+
+                       |
+                 FastAPI /api/v1
+                       |
+        Bounded-context application use cases
+                       |
+       Pure domain rules + ports/interfaces
+                       |
+       SQLAlchemy repositories / Git observer
+                       |
+          SQLite + immutable snapshots
+```
+
+**Dependencias:** presentation/API adapters â†’ application â†’ domain. Infraestructura implementa puertos definidos por los mÃ³dulos y no importa componentes web. NingÃºn mÃ³dulo de UI compartida importa mÃ³dulos de producto. Cross-feature Ãºnicamente mediante superficies pÃºblicas o servicios explÃ­citos.
+
+### Bounded contexts
+
+1. **Organization:** Workspace, Project, configuraciÃ³n, membresÃ­a local futura, archivo/restauraciÃ³n.
+2. **Planning:** Epic, Feature, Task, Criterion, Dependency, board, filtros, prioridades y estados manuales.
+3. **Knowledge:** Decision, DecisionRevision, Invariant, InvariantRevision, acknowledgements.
+4. **Readiness:** reglas versionadas, evaluaciÃ³n, fingerprint, snapshot, stale, historial.
+5. **Repositories:** conexiones Git locales opcionales, read-only observations, ContextPackage y snapshots.
+6. **Agent Collaboration:** AgentRun, ActivityEvent, Handoff y HandoffRevision; el usuario declara eventos, FORGE no presume ejecuciÃ³n.
+7. **Evidence & Delivery:** Evidence, Provenance, Verification, CandidateRevision, ReleaseGate, Manifest. Estados verificados limitados al alcance de las reglas.
+8. **Project Transfer:** import/export versionado, previews con fingerprint, validaciones y ejecuciÃ³n atÃ³mica.
+9. **Desktop Runtime:** ciclo de vida, autenticaciÃ³n entre procesos, polÃ­ticas IPC, migraciones y directorios de datos.
+
+**Invariantes cruzadas:** todo registro de producto estÃ¡ acotado por Workspace/Project; los Projects archivados no admiten mutaciones; snapshots publicados son inmutables; preview/confirm de import usa el mismo fingerprint; los estados manuales no se convierten en evidencia verificada por una clase CSS ni por otro agregado.
+
+## 5. Estructura del repositorio
+
+```text
+forge-org-tool/
+â”œâ”€â”€ .github/
+â”‚   â”œâ”€â”€ workflows/
+â”‚   â”‚   â”œâ”€â”€ quality.yml
+â”‚   â”‚   â”œâ”€â”€ contracts.yml
+â”‚   â”‚   â”œâ”€â”€ e2e.yml
+â”‚   â”‚   â””â”€â”€ desktop-windows.yml
+â”‚   â””â”€â”€ CODEOWNERS
+â”œâ”€â”€ apps/
+â”‚   â”œâ”€â”€ web/
+â”‚   â”‚   â”œâ”€â”€ src/
+â”‚   â”‚   â”‚   â”œâ”€â”€ app/                  # providers, routing, navigation, shell
+â”‚   â”‚   â”‚   â”œâ”€â”€ features/             # organization, planning, knowledge, ...
+â”‚   â”‚   â”‚   â”œâ”€â”€ shared/               # non-domain utilities, transport adapters
+â”‚   â”‚   â”‚   â””â”€â”€ main.tsx
+â”‚   â”‚   â”œâ”€â”€ e2e/
+â”‚   â”‚   â””â”€â”€ package.json
+â”‚   â”œâ”€â”€ api/
+â”‚   â”‚   â”œâ”€â”€ src/forge_org/
+â”‚   â”‚   â”‚   â”œâ”€â”€ bootstrap/            # FastAPI composition, DI, runtime config
+â”‚   â”‚   â”‚   â”œâ”€â”€ modules/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ organization/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ planning/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ knowledge/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ readiness/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ repositories/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ collaboration/
+â”‚   â”‚   â”‚   â”‚   â”œâ”€â”€ delivery/
+â”‚   â”‚   â”‚   â”‚   â””â”€â”€ transfer/
+â”‚   â”‚   â”‚   â”œâ”€â”€ platform/            # database, logging, Git, security
+â”‚   â”‚   â”‚   â””â”€â”€ api/                 # router registry, error contracts
+â”‚   â”‚   â”œâ”€â”€ migrations/
+â”‚   â”‚   â”œâ”€â”€ tests/
+â”‚   â”‚   â”œâ”€â”€ pyproject.toml
+â”‚   â”‚   â””â”€â”€ uv.lock
+â”‚   â””â”€â”€ desktop/
+â”‚       â””â”€â”€ src-tauri/              # Rust host, sidecar, capabilities, bundle
+â”œâ”€â”€ packages/
+â”‚   â”œâ”€â”€ ui/                         # shared React UI components, gallery examples
+â”‚   â”œâ”€â”€ tokens/                     # versioned semantic JSON -> generated CSS/TS
+â”‚   â””â”€â”€ api-client/                 # generated OpenAPI types + one transport facade
+â”œâ”€â”€ contracts/
+â”‚   â”œâ”€â”€ openapi/                    # reviewed /api/v1 schema
+â”‚   â”œâ”€â”€ import-export/              # JSON Schemas with explicit versions
+â”‚   â””â”€â”€ fixtures/                   # canonicalization/fingerprint golden files
+â”œâ”€â”€ tests/
+â”‚   â”œâ”€â”€ e2e/
+â”‚   â”œâ”€â”€ contracts/
+â”‚   â”œâ”€â”€ architecture/
+â”‚   â”œâ”€â”€ security/
+â”‚   â””â”€â”€ migrations/
+â”œâ”€â”€ tooling/
+â”‚   â”œâ”€â”€ scripts/                    # local bootstrap, seed, verify, release
+â”‚   â””â”€â”€ config/                     # shared tooling configuration, only as needed
+â”œâ”€â”€ docs/
+â”‚   â”œâ”€â”€ product/                    # charter, glossary, workflows, acceptance
+â”‚   â”œâ”€â”€ architecture/               # ADRs, module contracts, deployment, data
+â”‚   â”œâ”€â”€ design/                     # Figma links, parity matrix, token decisions
+â”‚   â”œâ”€â”€ engineering/                # tests, standards, security, CI, release
+â”‚   â”œâ”€â”€ migration/                  # old-vs-new map, export/import, rollback
+â”‚   â””â”€â”€ user-guide/
+â”œâ”€â”€ .editorconfig
+â”œâ”€â”€ .gitignore
+â”œâ”€â”€ package.json                   # npm workspaces scripts
+â”œâ”€â”€ package-lock.json
+â”œâ”€â”€ README.md
+â”œâ”€â”€ CONTRIBUTING.md
+â”œâ”€â”€ SECURITY.md
+â””â”€â”€ AGENTS.md                      # Codex/agent constraints
+```
+
+**PatrÃ³n del backend por mÃ³dulo:** `domain/`, `application/`, `infrastructure/`, `api/`, `tests/`. Las transacciones se abren en application/unit-of-work; los repositorios concretos son infraestructura; schemas Pydantic son contratos de API, no entidades de dominio.
+
+**PatrÃ³n del frontend por mÃ³dulo:** `routes/`, `components/`, `hooks/`, `api/`, `model/`, `styles/`, `index.ts`. `packages/ui` solo contiene UI semÃ¡nticamente genÃ©rica. Los componentes de Readiness/Delivery de Figma se implementan en sus mÃ³dulos, componiendo los primitives.
+
+## 6. Design System y Figma
+
+**Archivo:** `r10szKLgiIPVi2NBmbjTpm`. Bibliotecas actuales:
+- PÃ¡gina 19: **37 familias de UI**, 129 variantes, 35 iconos vectoriales.
+- PÃ¡gina 20: **28 patrones del producto**, 84 variantes, mÃ¡s 16 originales enlazados por instancia.
+- `START HERE` conserva 11 pÃ¡ginas activas y 10 archivos/referencias.
+
+**Contrato de trabajo**
+- Figma define la composiciÃ³n, comportamiento visual esperado y estados de referencia.
+- `packages/tokens/tokens.json`, revisado y versionado, define los valores ejecutables.
+- React implementa comportamiento real, accesibilidad, responsive, feedback, errores y navegaciÃ³n.
+- Python es dueÃ±o de la verdad de negocio, resultados deterministas, permisos locales y procedencia.
+- Registrar explÃ­citamente cualquier diferencia Figma â†” tokens â†” React; no claim pixel-perfect sin evidencia Chromium.
+
+**Bloqueo antes de estabilizar `packages/ui`:** resolver las **23 diferencias de tokens** ya documentadas en Figma. La reconciliaciÃ³n debe elegir deliberadamente valores canÃ³nicos, actualizar las referencias y dejar pruebas sobre los tokens consumidos. No alterar variables globales a ciegas porque cambian pÃ¡ginas histÃ³ricas.
+
+## 7. Datos, migraciones y contratos
+
+- Una DB SQLite por perfil local. FK ON, WAL solo donde sea apropiado, checkpoints y backups antes de migraciones destructivas.
+- LocalAppData nuevo: `%LOCALAPPDATA%\ForgeOrgTool\...`. Nunca sobreescribir `%LOCALAPPDATA%\Forge\...`.
+- Migraciones Alembic incrementales, probadas desde DB vacÃ­a y versiones legacy soportadas.
+- Importadores explÃ­citos y reversibles: `forge-project-import-v1` para planeaciÃ³n, futuro `forge-org-transfer-v1` separado para datos adicionales. No afirmar que el contrato antiguo transporta historial, evidence o releases.
+- Snapshot canonical JSON + SHA-256 para integridad, **no** como firma de autenticidad.
+- API `v1` versionada y documentada. Pydantic/OpenAPI es la fuente del contrato; `packages/api-client` se regenera con verificaciÃ³n de drift en CI.
+- DTOs jamÃ¡s se copian manualmente entre front/back como fuente primaria. Los adaptadores son pruebas de compatibilidad, no una segunda fuente de verdad.
+- Datos sensibles: no exponer rutas locales completas, tokens ni credenciales en exports/logs; Git observer solo lectura con raÃ­ces validadas, protecciÃ³n de traversal/symlinks y lÃ­mites de tamaÃ±o.
+
+## 8. Seguridad de Desktop
+
+Conservar el threat model probado del FORGE original:
+- Una WebView local, recursos empaquetados, CSP restrictiva y sin orÃ­genes remotos.
+- Rust lanza y retiene **su propio** sidecar FastAPI; evita matar procesos ajenos; puertos loopback efÃ­meros.
+- Capability de sesiÃ³n por arranque solo Rust â†” sidecar. React **no** recibe bearer token ni puerto.
+- IPC limitado por mÃ©todo, ruta OpenAPI, query, tamaÃ±o, timeout y origen; sin shell, filesystem o HTTP arbitrarios.
+- DB, logs y backup por usuario; backup recuperable y rollback de migraciones de datos.
+- El hecho de que una peticiÃ³n a localhost sea loopback no autentica por sÃ­ mismo a un proceso ajeno.
+- Releases requieren **instalaciÃ³n real en Windows y smoke de producto instalado**; un `cargo build` no alcanza.
+
+## 9. Calidad y Definition of Done
+
+**Todo PR:** formatter/linter, tipado estricto, pruebas de unidad, contratos y checks de import-bounds; cambios de DB con prueba fresh/incremental; artefactos sin secretos; `git status` limpio; documentaciÃ³n relevante.
+
+**Flujos crÃ­ticos:** E2E Chromium con FastAPI y DB SQLite temporales; aislamiento comprobado para no escribir en servidores o DB de desarrollo; pantallas Dark/Light en 1440Ã—900 y 390Ã—844; focus/keyboard/empty/error/loading/read-only; actualizaciÃ³n de snapshots solo tras aprobaciÃ³n visual.
+
+**Desktop:** Windows CI con build reproducible + instalador + smoke del producto instalado, ciclo de vida sidecar y migraciÃ³n/backup con DB de prueba.
+
+**Entrega:** un PR no se bloquea por seguimientos P1/P2 ajenos a su alcance. Cada fase tiene entrada/salida y una certificaciÃ³n Ãºnica verificable. Evitar refactor/audit loops sin nuevos hallazgos.
+
+## 10. Plan de construcciÃ³n / traslado
+
+### M0. Congelar la referencia anterior
+- Identificar SHA de `main` y head de PR #30 en el momento de congelar; no reutilizar literales histÃ³ricos sin revalidaciÃ³n.
+- Guardar tags o refs inmutables; exportar matrices de APIs, migraciones, contratos, suites y resultados; conservar todo el historial Git.
+- Resolver quÃ© cÃ³digo de la PR #30 se toma como semilla; **no perder la biblioteca React no fusionada**.
+
+### M1. FundaciÃ³n repo/ADR/CI, sin port funcional
+- Crear `forge-org-tool` con nueva historia Git, README/charter, ADRs, tree, toolchains/locks, secret audit y quality gates.
+- Cargar solo el token catÃ¡logo aprobado y una galerÃ­a React dev-only con contraste y accesibilidad.
+- Ruta salud, DB temporal y CI backend/frontend verdes.
+
+### M2. NÃºcleo de organizaciÃ³n
+- Workspaces, Projects, estado de archivo, rutas, shell, Project Home, CRUD real.
+- ImportaciÃ³n incremental de datos legacy y rollback; E2E desktop/browser.
+
+### M3. Planning completo
+- Epics, Features, Tasks, Criteria, Dependencies, search/filters, Board, Details, export/import v1.
+- Tests deterministic Readiness inputs sin falsear estados.
+
+### M4. Knowledge + Readiness
+- Decisions/Revisions, Invariants/Acknowledgements, reglas versionadas, snapshot, stale.
+
+### M5. Repos + Collaboration
+- ConexiÃ³n Git local limitada y context packages; Agent Runs/Handoffs + provenance.
+
+### M6. Delivery y verificaciÃ³n
+- Evidencia, Verifications, Release Candidates, gates y manifests, con lÃ­mites explÃ­citos y trazabilidad.
+
+### M7. Desktop + migraciÃ³n end-to-end
+- Installer Windows, sidecar y IPC, migraciÃ³n/import de datos soportados, smoke real, documentaciÃ³n y recuperaciÃ³n.
+- No archivar FORGE viejo hasta nuevo repositorio inicial disponible y estrategia/artefactos de rescate certificados. La paridad funcional completa puede ser posterior al archivado **solo si** se declara quÃ© falta y se preserva una fuente de recuperaciÃ³n.
+
+## 11. Protocolo de repositorio y GitHub
+
+Nombre visible: **FORGE Org Tool**. Slug sugerido: **`forge-org-tool`** bajo el mismo propietario, nuevo repositorio **pÃºblico desde el primer commit** (confirmado por el usuario). DescripciÃ³n: `Local-first work organization and engineering delivery traceability`.
+
+Ramas: `main` protegida; cambios por `feature/<id>-<slug>`; PR Draft hasta pruebas y validaciÃ³n; squash merge para historia nueva legible; tags semÃ¡nticos para entregas. Branch protection: CI requerido, sin pushes directos, revisiÃ³n humana antes de releases.
+
+**Orden seguro:** crear nuevo repo â†’ preservar branch/commit PR #30 y main viejo â†’ bootstrap M1 y commits limpios â†’ confirmar respaldo y plan datos â†’ archivar repositorio `Forge` antiguo como read-only. No eliminarlo ni sobrescribirlo, y no cambiar el nombre de su URL mientras sus enlaces histÃ³ricos sigan siendo valiosos.
+
+## 12. Decisiones que necesitan confirmaciÃ³n
+
+1. **Visibilidad del nuevo repositorio:** PÃšBLICO DESDE EL INICIO (CONFIRMADO).
+2. **Alcance de producto:** organizaciÃ³n de proyectos de software primero, con arquitectura extensible a otras Ã¡reas, o plataforma de organizaciÃ³n genÃ©rica desde dÃ­a uno. RecomendaciÃ³n: primero organizaciÃ³n del trabajo de software, sin bloquear extensiones futuras.
+3. **MigraciÃ³n de datos locales:** preservar solamente contratos y cÃ³digo, o tambiÃ©n datos reales de la DB legacy (recomendado, con export explÃ­cito y consentimiento, sin exponerlos en GitHub).
+4. **Idioma de interfaz:** espaÃ±ol como primera UX y traducciÃ³n posterior, o interfaz bilingÃ¼e en V1; recomendaciÃ³n: elegir una polÃ­tica central desde el principio.
+
+**Estado de este RFC:** arquitectura base aprobada para bootstrap. La nueva estructura de cliente estÃ¡ concretada en ADR-0002 y la plantilla M1. GitHub antiguo no se ha archivado; crear y validar el nuevo repositorio pÃºblico sigue requiriendo GitHub CLI desde el entorno autorizado.
+
+
+## 13. Adenda aprobada, 20 de octubre de 2026: Cliente basado en componentes reutilizables
+
+**DecisiÃ³n:** `apps/web/src` no aloja una segunda biblioteca compartida. `packages/tokens` es el catÃ¡logo semÃ¡ntico ejecutable; `packages/ui` aloja primitivas React reutilizables y composiciones genÃ©ricas; `apps/web/src/app` contiene la composiciÃ³n de shell y rutas; `apps/web/src/features/<domain>/components` aloja patrones de negocio que consumen exclusivamente los componentes pÃºblicos de `@forge-org/ui`. `packages/api-client` es el Ãºnico transporte API, independiente de UI.
+
+**Reglas verificables:** no imports de API/app/features desde `packages/ui`; no deep imports internos de packages; no imports privados entre features; ausencia de componentes compartidos duplicados en features; CSS Modules de UI y tokens versionados; gallery dev-only; tests de accesibilidad/tema/responsive y parity Figma. Estos lÃ­mites se comprueban con `tooling/scripts/check-boundaries.mjs` desde M1; se ampliarÃ¡n a ESLint y pruebas del DOM al portar funcionalidades.
+
+**Biblioteca Figma:** PÃ¡gina 19 = primitivas/tokens e iconos. PÃ¡gina 20 = patrones de producto que pertenecen al dominio, no a `packages/ui`. Las 23 discrepancias histÃ³ricas de tokens estÃ¡n registradas y se resolverÃ¡n mediante ADR explÃ­cita. El catÃ¡logo M1 contiene solo algunos componentes reales, no finge haber portado las 37+28 familias.
+
+**PublicaciÃ³n:** repositorio `JoseAngelValadezBarajas/forge-org-tool`, visible pÃºblicamente desde el primer commit. NingÃºn dato SQLite legacy, backup, token, clave, ruta privada o .env se sube.
+
+**Artefactos:** plantilla de bootstrap en `forge-org-tool-bootstrap.zip`, scripts PowerShell de preservaciÃ³n/publicaciÃ³n y un script de archivado separado con aprobaciÃ³n explÃ­cita. La PR #30 permanece en el FORGE antiguo y sus refs se respaldan antes de archivarlo.

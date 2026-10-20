@@ -1,0 +1,7 @@
+{
+  "name": "@forge-org/tokens",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0-bootstrap",
+  "exports": {"./tokens.css": "./src/tokens.css", "./tokens.json": "./tokens.json"}
+}

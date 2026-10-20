@@ -1,0 +1,13 @@
+.button {
+  font: inherit; font-weight: 600; line-height: 1.25; min-height: 40px;
+  padding: var(--forge-space-2) var(--forge-space-4);
+  border: 1px solid var(--forge-border); border-radius: var(--forge-radius-sm);
+  cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease;
+}
+.button:focus-visible { outline: 2px solid var(--forge-accent); outline-offset: 3px; }
+.button:disabled { opacity: 0.55; cursor: not-allowed; }
+.primary { background: var(--forge-accent); color: var(--forge-accent-contrast); border-color: var(--forge-accent); }
+.secondary { background: var(--forge-surface-raised); color: var(--forge-text); }
+.ghost { background: transparent; color: var(--forge-text); border-color: transparent; }
+.danger { background: transparent; color: var(--forge-danger); border-color: var(--forge-danger); }
+@media (prefers-reduced-motion: reduce) { .button { transition: none; } }

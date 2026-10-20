@@ -1,0 +1,7 @@
+{
+  "name": "@forge-org/api-client",
+  "private": true,
+  "version": "0.1.0-bootstrap",
+  "type": "module",
+  "exports": {".": "./src/index.ts"}
+}

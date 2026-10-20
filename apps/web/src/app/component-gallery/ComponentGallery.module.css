@@ -1,0 +1,5 @@
+.gallery { color: var(--forge-text); background: var(--forge-bg); padding: var(--forge-space-5); border-radius: var(--forge-radius-lg); border: 1px solid var(--forge-border); }
+.gallery p { color: var(--forge-text-muted); line-height: 1.5; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--forge-space-4); margin-block: var(--forge-space-4); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--forge-space-2); }
+.caption { font-size: .85rem; }

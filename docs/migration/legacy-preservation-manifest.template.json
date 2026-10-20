@@ -1,0 +1,13 @@
+{
+  "source_repository": "JoseAngelValadezBarajas/Forge",
+  "source_default_branch": "main",
+  "source_main_sha": "FILL_AT_PRESERVATION_TIME",
+  "draft_pr": 30,
+  "source_draft_pr_head_sha": "FILL_AT_PRESERVATION_TIME",
+  "git_bundle_sha256": "FILL_FROM_OFFLINE_BACKUP",
+  "bundle_verify": "PENDING",
+  "local_data_backup": "NOT_REQUESTED_OR_LOCAL_ONLY",
+  "new_repository": "JoseAngelValadezBarajas/forge-org-tool",
+  "new_repo_public_clone_test": "PENDING",
+  "archive_approved_after_review": false
+}

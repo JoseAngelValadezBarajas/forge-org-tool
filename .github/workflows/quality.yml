@@ -1,0 +1,29 @@
+name: Quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run test
+      - run: npm run build
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.12'
+      - run: uv sync --project apps/api --locked --group dev
+      - run: uv run --project apps/api --locked ruff check apps/api/src apps/api/tests
+      - run: uv run --project apps/api --locked mypy apps/api/src
+      - run: uv run --project apps/api --locked pytest apps/api/tests
+      - run: uv run --project apps/api --locked python tooling/scripts/export-openapi.py --check

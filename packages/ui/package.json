@@ -1,0 +1,9 @@
+{
+  "name": "@forge-org/ui",
+  "private": true,
+  "version": "0.1.0-bootstrap",
+  "type": "module",
+  "exports": {".": "./src/index.ts"},
+  "dependencies": {"@forge-org/tokens": "*", "react": "^19.3.0"},
+  "peerDependencies": {"react": "^19.0.0"}
+}

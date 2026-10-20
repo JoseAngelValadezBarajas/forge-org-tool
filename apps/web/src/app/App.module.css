@@ -1,0 +1,7 @@
+.app { min-height: 100vh; background: var(--forge-bg); color: var(--forge-text); }
+.topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--forge-space-4); border-bottom: 1px solid var(--forge-border); padding: var(--forge-space-4) clamp(16px, 4vw, 64px); }
+.brand { font-size: 1.2rem; font-weight: 800; letter-spacing: .05em; color: var(--forge-text); text-decoration: none; }
+.brand span { font-weight: 400; color: var(--forge-accent); }
+.topbar nav { display: flex; gap: var(--forge-space-4); flex-wrap: wrap; }
+.topbar nav a { color: var(--forge-text-muted); }
+.main { width: min(1200px, calc(100% - 32px)); margin: var(--forge-space-8) auto; }
