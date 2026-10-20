@@ -11,7 +11,9 @@ from forge_org.api.schemas import (
     AcknowledgeResponse,
     CandidateCreate,
     CandidateFreezeRequest,
+    CandidateHistoryResponse,
     CandidateResponse,
+    CandidateUpdate,
     ContextPackageResponse,
     CriterionCreate,
     CriterionResponse,
@@ -569,6 +571,18 @@ def create_candidate(workspace_id: str, project_id: str, payload: CandidateCreat
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
 
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}', response_model=CandidateResponse)
+def get_candidate(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.candidate_get(workspace_id, project_id, candidate_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.patch('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}', response_model=CandidateResponse)
+def update_candidate(workspace_id: str, project_id: str, candidate_id: str, payload: CandidateUpdate, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try:
+        return delivery.candidate_update(workspace_id, project_id, candidate_id, payload.model_dump(exclude_unset=True))
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/freeze', response_model=CandidateResponse)
 def freeze_candidate(workspace_id: str, project_id: str, candidate_id: str, payload: CandidateFreezeRequest, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
     try: return delivery.freeze(workspace_id, project_id, candidate_id, payload.expected_revision)
@@ -578,6 +592,16 @@ def freeze_candidate(workspace_id: str, project_id: str, candidate_id: str, payl
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/preview', response_model=GateEvaluationResponse)
 def preview_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
     try: return delivery.gate(workspace_id, project_id, candidate_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/revisions', response_model=list[CandidateHistoryResponse])
+def list_candidate_revisions(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
+    try: return delivery.candidate_history(workspace_id, project_id, candidate_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates', response_model=list[GateEvaluationResponse])
+def list_candidate_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
+    try: return delivery.candidate_gate_history(workspace_id, project_id, candidate_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/evaluate', response_model=GateEvaluationResponse, status_code=201)

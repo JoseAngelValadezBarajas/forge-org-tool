@@ -33,6 +33,23 @@ class DeliveryService:
         if not values.get('title', '').strip() or not values.get('summary', '').strip(): raise ValueError('Candidate title and summary are required')
         return self.repository.create_candidate(project_id, values)
     def candidates(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]: self._project(workspace_id, project_id); return self.repository.list_candidates(project_id)
+    def candidate_get(self, workspace_id: str, project_id: str, candidate_id: str) -> dict[str, Any]:
+        self._project(workspace_id, project_id); item = self.repository.get_candidate(project_id, candidate_id)
+        if item is None: raise LookupError('Release candidate not found')
+        return item
+    def candidate_update(self, workspace_id: str, project_id: str, candidate_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        project = self._project(workspace_id, project_id); item = self.candidate_get(workspace_id, project_id, candidate_id)
+        if project['status'] != 'active': raise ValueError('Archived projects are read-only')
+        if item['status'] != 'DRAFT': raise ValueError('Only draft candidates can be edited')
+        if not values: return item
+        if 'title' in values and not values['title'].strip(): raise ValueError('Candidate title is required')
+        if 'summary' in values and not values['summary'].strip(): raise ValueError('Candidate summary is required')
+        return self.repository.update_candidate(project_id, candidate_id, values) or item
+    def candidate_history(self, workspace_id: str, project_id: str, candidate_id: str) -> list[dict[str, Any]]:
+        self.candidate_get(workspace_id, project_id, candidate_id); return self.repository.list_candidate_revisions(candidate_id)
+    def candidate_gate_history(self, workspace_id: str, project_id: str, candidate_id: str) -> list[dict[str, Any]]:
+        self.candidate_get(workspace_id, project_id, candidate_id)
+        return [{**item, 'blockers': json.loads(item['blockers'])} for item in self.repository.list_gates(candidate_id)]
     def freeze(self, workspace_id: str, project_id: str, candidate_id: str, expected_revision: int) -> dict[str, Any]:
         project = self._project(workspace_id, project_id); item = self.repository.get_candidate(project_id, candidate_id)
         if item is None: raise LookupError('Release candidate not found')

@@ -172,12 +172,17 @@ class EvidenceResponse(BaseModel):
     id: str; project_id: str; feature_id: str | None; title: str; summary: str; provenance: str; reference_kind: str; reference_value: str; status: str; created_at: datetime; updated_at: datetime
 class CandidateCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200); summary: str = Field(min_length=1, max_length=4000)
+class CandidateUpdate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    summary: str | None = Field(default=None, min_length=1, max_length=4000)
 class CandidateFreezeRequest(BaseModel):
     expected_revision: int = Field(ge=1)
 class CandidateResponse(BaseModel):
     id: str; project_id: str; title: str; summary: str; status: str; revision: int; fingerprint: str | None; created_at: datetime; updated_at: datetime
+class CandidateHistoryResponse(BaseModel):
+    id: str; candidate_id: str; revision: int; status: str; snapshot_json: str; fingerprint: str; created_at: datetime
 class GateEvaluationResponse(BaseModel):
-    candidate_id: str; candidate_revision: int; outcome: str; input_fingerprint: str; blockers: list[str]
+    id: str | None = None; candidate_id: str; candidate_revision: int; outcome: str; input_fingerprint: str; blockers: list[str]; created_at: datetime | None = None
 
 class ImportPreviewResponse(BaseModel):
     schema_version: str; fingerprint: str; project: dict[str, Any]; counts: dict[str, int]

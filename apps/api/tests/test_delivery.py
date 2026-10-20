@@ -22,9 +22,12 @@ def test_delivery_keeps_reported_evidence_and_release_gates_explicit(tmp_path: P
             candidate = client.post(f'{root}/release-candidates', json={'title': 'Alpha candidate', 'summary': 'Candidate summary'}).json()
             frozen = client.post(f"{root}/release-candidates/{candidate['id']}/freeze", json={'expected_revision': candidate['revision']})
             assert frozen.status_code == 200 and frozen.json()['status'] == 'FROZEN'
+            assert client.get(f"{root}/release-candidates/{candidate['id']}").json()['status'] == 'FROZEN'
+            assert len(client.get(f"{root}/release-candidates/{candidate['id']}/revisions").json()) == 1
             gates = client.post(f"{root}/release-candidates/{candidate['id']}/gates/preview")
             assert gates.status_code == 200 and gates.json()['outcome'] == 'BLOCKED'
             evaluated = client.post(f"{root}/release-candidates/{candidate['id']}/gates/evaluate")
             assert evaluated.status_code == 201
+            assert len(client.get(f"{root}/release-candidates/{candidate['id']}/gates").json()) == 1
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)

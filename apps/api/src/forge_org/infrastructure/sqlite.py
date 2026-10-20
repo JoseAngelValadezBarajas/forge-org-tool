@@ -590,5 +590,9 @@ class OrganizationRepository:
     def list_candidates(self, project_id: str) -> list[dict[str, Any]]: return [dict(row) for row in self.connection.execute('SELECT * FROM release_candidates WHERE project_id = ? ORDER BY updated_at DESC', (project_id,)).fetchall()]
     def save_candidate_revision(self, values: dict[str, Any]) -> dict[str, Any]:
         item_id = str(uuid4()); self.connection.execute('INSERT INTO release_candidate_revisions(id, candidate_id, revision, status, snapshot_json, fingerprint, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (item_id, values['candidate_id'], values['revision'], values['status'], values['snapshot_json'], values['fingerprint'], utc_now())); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM release_candidate_revisions WHERE id = ?', (item_id,)).fetchone()) or {}
+    def list_candidate_revisions(self, candidate_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM release_candidate_revisions WHERE candidate_id = ? ORDER BY revision', (candidate_id,)).fetchall()]
     def save_gate(self, values: dict[str, Any]) -> dict[str, Any]:
         item_id = str(uuid4()); self.connection.execute('INSERT INTO gate_evaluations(id, candidate_id, candidate_revision, outcome, input_fingerprint, blockers, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (item_id, values['candidate_id'], values['candidate_revision'], values['outcome'], values['input_fingerprint'], json.dumps(values['blockers'], sort_keys=True), utc_now())); self.connection.commit(); return {**values, 'id': item_id}
+    def list_gates(self, candidate_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM gate_evaluations WHERE candidate_id = ? ORDER BY created_at DESC', (candidate_id,)).fetchall()]

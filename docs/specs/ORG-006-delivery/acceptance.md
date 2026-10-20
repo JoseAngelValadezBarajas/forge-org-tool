@@ -6,3 +6,4 @@
 - [x] Persist gate evaluations without publishing or executing anything.
 - [ ] Full verification rules, manifests, and browser delivery screens.
 - [x] Retrieve and filter project evidence while preserving provenance/status.
+- [x] Retrieve/update draft release candidates, candidate revisions, and gate history.
