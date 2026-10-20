@@ -1,7 +1,8 @@
 # Functional reconstruction implementation plan
 
-This plan is subordinate to M0/M1. Stage 1 functionality is blocked until
-M1 passes owner review and continuation is explicitly approved.
+This plan is subordinate to the approved architecture and the full
+reconstruction directive. M1 is complete as a foundation review packet; the
+capability slices continue without a separate stage-approval stop.
 
 ## Delivery stages
 
@@ -26,7 +27,7 @@ M1 passes owner review and continuation is explicitly approved.
 8. **ORG-007 transfer slice.** Add versioned import/export only after the
    internal domain contract is stable; validate invalid fixtures and preserve
    provenance.
-9. **ORG-008 desktop slice.** Only after web/API parity evidence: implement
+9. **ORG-008 desktop slice.** After web/API parity evidence: implement
    the constrained Windows bridge and installed-product smoke.
 
 ## SDD/TDD loop for every slice
@@ -39,7 +40,7 @@ Manual planning notes are never acceptance evidence.
 
 ## Parallelization
 
-After ORG-001 contracts stabilize, independent tracks can work in parallel:
+After ORG-003 contracts stabilize, independent tracks can work in parallel:
 
 - API/domain contracts and migrations;
 - feature UI and browser tests;

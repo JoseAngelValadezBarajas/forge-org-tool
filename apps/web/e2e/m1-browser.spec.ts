@@ -47,10 +47,21 @@ test('planning and readiness remain manual truth states', async ({ page }) => {
   const project = await projectResponse.json();
   const featureResponse = await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, { data: { title: `Feature ${suffix}`, goal: 'Review manual readiness' } });
   const feature = await featureResponse.json();
+  const secondFeature = await (await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, { data: { title: `Second ${suffix}`, goal: 'Another manual item' } })).json();
   await page.goto(`/planning/${workspace.id}/${project.id}`);
-  await expect(page.getByRole('heading', { name: 'Planning' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: `Feature ${suffix}` })).toBeVisible();
-  await page.getByRole('link', { name: 'Readiness' }).click();
+  await page.getByRole('searchbox', { name: 'Search planning' }).fill(`Feature ${suffix}`);
+  await expect(page.getByRole('link', { name: `Feature ${suffix}` })).toBeVisible();
+  await expect(page.getByRole('link', { name: `Second ${suffix}` })).toBeHidden();
+  await page.getByRole('searchbox', { name: 'Search planning' }).fill('');
+  await page.getByRole('combobox', { name: `Priority for Feature ${suffix}` }).selectOption('critical');
+  await expect(page.getByRole('combobox', { name: `Priority for Feature ${suffix}` })).toHaveValue('critical');
+  await page.getByLabel('Blocking feature').selectOption(feature.id);
+  await page.getByLabel('Blocked feature').selectOption(secondFeature.id);
+  await page.getByRole('button', { name: 'Add dependency' }).click();
+  await expect(page.getByText(new RegExp(`Feature ${suffix} blocks Second ${suffix}`))).toBeVisible();
+  await page.getByRole('link', { name: 'Readiness' }).first().click();
   await expect(page.getByRole('heading', { name: 'Readiness' })).toBeVisible();
   await expect(page.getByText('NOT_READY')).toBeVisible();
   await expect(page.getByText(/not delivery, CI, deployment/i)).toBeVisible();
@@ -89,8 +100,14 @@ test('workbench records reported runs and keeps handoffs human-owned', async ({ 
   await expect(page.getByText('DRAFT', { exact: true })).toBeVisible();
   await page.getByLabel(`Summary for Handoff for Manual run ${suffix}`).fill('Reported summary');
   await page.getByLabel(`Next actions for Handoff for Manual run ${suffix}`).fill('Review manually');
-  await page.getByRole('button', { name: 'Save handoff details' }).click();
-  await page.getByRole('button', { name: 'Mark handoff ready' }).click();
+  await Promise.all([
+    page.waitForResponse((response) => response.request().method() === 'PATCH' && response.url().includes('/handoffs/')),
+    page.getByRole('button', { name: 'Save handoff details' }).click(),
+  ]);
+  await Promise.all([
+    page.waitForResponse((response) => response.request().method() === 'POST' && response.url().includes('/ready')),
+    page.getByRole('button', { name: 'Mark handoff ready' }).click(),
+  ]);
   await expect(page.getByText('READY', { exact: true })).toBeVisible();
   await page.getByLabel(`Acknowledged by Handoff for Manual run ${suffix}`).fill('reviewer');
   await page.getByRole('button', { name: 'Acknowledge revision' }).click();
@@ -128,8 +145,13 @@ test('readiness records explicit planning context and repository metadata only',
   await page.getByRole('button', { name: 'Add criterion' }).click();
   await page.getByLabel('Decision title').fill(`Decision ${suffix}`);
   await page.getByRole('button', { name: 'Link decision' }).click();
+  await expect(page.locator('strong').filter({ hasText: `Decision ${suffix}` })).toBeVisible();
   await page.getByLabel('Invariant title').fill(`Invariant ${suffix}`);
   await page.getByRole('button', { name: 'Add invariant' }).click();
+  await expect(page.locator('strong').filter({ hasText: `Decision ${suffix}` })).toBeVisible();
+  await expect(page.locator('strong').filter({ hasText: `Invariant ${suffix}` })).toBeVisible();
+  await page.getByRole('button', { name: `Acknowledge invariant Invariant ${suffix}` }).click();
+  await expect(page.getByText(/Acknowledged revision/)).toBeVisible();
   await expect(page.getByText(/NOT_READY|READY_TO_START/)).toBeVisible();
   await page.goto(`/repositories/${workspace.id}/${project.id}`);
   await page.getByLabel('Approved local Git root').fill(resolve(process.cwd(), '../..'));
@@ -151,12 +173,16 @@ test('planning feature detail manages tasks and acceptance criteria', async ({ p
   await expect(page.getByRole('heading', { name: 'Feature detail' })).toBeVisible();
   await page.getByLabel('Task title').fill(`Task ${suffix}`);
   await page.getByRole('button', { name: 'Add task' }).click();
+  await expect(page.getByText(`Task ${suffix}`)).toBeVisible();
+  await page.getByLabel('Task title').fill(`Second task ${suffix}`);
+  await page.getByRole('button', { name: 'Add task' }).click();
+  await expect(page.getByText(`Second task ${suffix}`)).toBeVisible();
   await page.getByLabel('Acceptance criterion').fill(`Criterion ${suffix}`);
   await page.getByRole('button', { name: 'Add criterion' }).click();
-  await expect(page.getByText(`Task ${suffix}`)).toBeVisible();
   await expect(page.getByText(`Criterion ${suffix}`)).toBeVisible();
   await page.getByRole('combobox', { name: `Status for Task ${suffix}` }).selectOption('in_progress');
   await expect(page.getByRole('combobox', { name: `Status for Task ${suffix}` })).toHaveValue('in_progress');
+  await page.getByRole('button', { name: `Move Second task ${suffix} up` }).click();
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-feature-detail.png' : 'desktop-feature-detail.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });

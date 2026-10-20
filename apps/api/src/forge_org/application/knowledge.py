@@ -45,8 +45,9 @@ class KnowledgeService:
         self.project(workspace_id, project_id); self.feature(workspace_id, project_id, feature_id)
         if self.repository.get_decision(project_id, decision_id) is None: raise LookupError('Decision not found')
         self.repository.link_decision(decision_id, feature_id)
-    def invariants(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]:
-        self.project(workspace_id, project_id); return self.repository.list_invariants(project_id)
+    def invariants(self, workspace_id: str, project_id: str, feature_id: str | None = None) -> list[dict[str, Any]]:
+        self.project(workspace_id, project_id)
+        return self.repository.feature_invariants(project_id, feature_id) if feature_id else self.repository.list_invariants(project_id)
     def create_invariant(self, workspace_id: str, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         project = self.project(workspace_id, project_id)
         if project['status'] != 'active': raise ValueError('Archived projects are read-only')

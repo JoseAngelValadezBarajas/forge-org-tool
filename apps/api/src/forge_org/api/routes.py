@@ -354,8 +354,8 @@ def create_invariant(workspace_id: str, project_id: str, payload: InvariantCreat
     except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/invariants', response_model=list[InvariantResponse])
-def list_invariants(workspace_id: str, project_id: str, knowledge: KnowledgeService = Depends(knowledge_service)) -> list[dict[str, Any]]:
-    try: return knowledge.invariants(workspace_id, project_id)
+def list_invariants(workspace_id: str, project_id: str, feature_id: str | None = None, knowledge: KnowledgeService = Depends(knowledge_service)) -> list[dict[str, Any]]:
+    try: return knowledge.invariants(workspace_id, project_id, feature_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.patch('/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}', response_model=InvariantResponse)

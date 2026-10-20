@@ -24,6 +24,8 @@ def test_revisioned_decisions_invariants_and_readiness_are_explicit(tmp_path: Pa
             assert {'R04', 'R05'} <= set(blocked['failed_checks'])
             assert client.post(f"{root}/decisions/{decision['id']}/accept").status_code == 200
             assert client.post(f"{root}/features/{feature['id']}/invariants/{invariant['id']}/acknowledge", json={'expected_revision': 1}).status_code == 200
+            listed = client.get(f"{root}/invariants", params={'feature_id': feature['id']}).json()
+            assert listed[0]['acknowledged_revision'] == 1
             ready = client.post(f"{root}/features/{feature['id']}/readiness/preview").json()
             assert ready['outcome'] == 'READY_TO_START'
             saved = client.post(f"{root}/features/{feature['id']}/readiness/evaluations")
