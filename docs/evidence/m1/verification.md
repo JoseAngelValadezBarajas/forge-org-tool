@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`).
+Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Final evidence-record commit: `af6f15d`.
 
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the
