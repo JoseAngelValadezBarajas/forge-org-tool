@@ -28,6 +28,10 @@ def test_reported_run_lifecycle_and_immutable_handoff(tmp_path: Path) -> None:
             draft = client.patch(f"{root}/handoffs/{handoff['id']}", json={'expected_version': handoff['version'], 'title': 'Ready handoff', 'summary': 'Reported summary', 'next_actions': 'Review manually'}).json()
             published = client.post(f"{root}/handoffs/{handoff['id']}/ready", json={'expected_version': draft['version']}).json()
             assert published['status'] == 'READY' and published['current_revision'] == 1
+            revisions = client.get(f"{root}/handoffs/{handoff['id']}/revisions")
+            assert revisions.status_code == 200 and revisions.json()[0]['revision'] == 1
+            download = client.get(f"{root}/handoffs/{handoff['id']}/revisions/1/download?format=markdown")
+            assert download.status_code == 200 and download.headers['content-type'].startswith('text/markdown')
             acknowledged = client.post(f"{root}/handoffs/{handoff['id']}/acknowledge", json={'expected_revision': 1, 'acknowledged_by': 'reviewer'})
             assert acknowledged.status_code == 200
             stale = client.post(f"{root}/handoffs/{handoff['id']}/acknowledge", json={'expected_revision': 1, 'acknowledged_by': 'reviewer'})

@@ -35,6 +35,7 @@ from forge_org.api.schemas import (
     HandoffAckRequest,
     HandoffCreate,
     HandoffResponse,
+    HandoffRevisionResponse,
     HandoffUpdate,
     HandoffVersionRequest,
     ImportCommitRequest,
@@ -499,7 +500,7 @@ def create_handoff(workspace_id: str, project_id: str, run_id: str, payload: Han
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/handoffs', response_model=list[HandoffResponse])
 def list_handoffs(workspace_id: str, project_id: str, handoffs: HandoffService = Depends(handoff_service)) -> list[dict[str, Any]]:
-    try: return handoffs.list(workspace_id, project_id)
+    try: return handoffs.list_handoffs(workspace_id, project_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.patch('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}', response_model=HandoffResponse)
@@ -522,6 +523,19 @@ def acknowledge_handoff(workspace_id: str, project_id: str, handoff_id: str, pay
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
     except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/revisions', response_model=list[HandoffRevisionResponse])
+def list_handoff_revisions(workspace_id: str, project_id: str, handoff_id: str, handoffs: HandoffService = Depends(handoff_service)) -> list[dict[str, Any]]:
+    try: return handoffs.revisions(workspace_id, project_id, handoff_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/revisions/{revision}/download')
+def download_handoff_revision(workspace_id: str, project_id: str, handoff_id: str, revision: int, format: str = Query(default='json'), handoffs: HandoffService = Depends(handoff_service)) -> Response:
+    if format not in {'json', 'markdown'}: raise service_error(InvalidInput('Format must be json or markdown'))
+    try: item = handoffs.get_revision(workspace_id, project_id, handoff_id, revision)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    if format == 'markdown': return PlainTextResponse(item['markdown'], media_type='text/markdown')
+    return Response(content=item['payload_json'], media_type='application/json')
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/evidence', response_model=list[EvidenceResponse])
 def list_evidence(workspace_id: str, project_id: str, search: str | None = Query(default=None, max_length=200), provenance: str | None = None, status_filter: str | None = Query(default=None, alias='status'), delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:

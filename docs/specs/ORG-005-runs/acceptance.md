@@ -7,3 +7,4 @@
 - [x] Keep reported work distinct from execution and delivery evidence.
 - [ ] Browser workbench and handoff review screens.
 - [x] Retrieve and filter project-scoped reported runs by status/search.
+- [x] Retrieve immutable handoff revisions and their JSON/Markdown representations.

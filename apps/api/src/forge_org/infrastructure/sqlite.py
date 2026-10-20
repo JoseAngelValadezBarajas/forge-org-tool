@@ -562,6 +562,12 @@ class OrganizationRepository:
     def create_handoff_revision(self, values: dict[str, Any]) -> dict[str, Any]:
         revision_id = str(uuid4()); self.connection.execute('INSERT INTO handoff_revisions(id, handoff_id, revision, title, summary, next_actions, schema_version, fingerprint, payload_json, markdown, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (revision_id, values['handoff_id'], values['revision'], values['title'], values['summary'], values['next_actions'], values['schema_version'], values['fingerprint'], values['payload_json'], values['markdown'], utc_now())); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM handoff_revisions WHERE id = ?', (revision_id,)).fetchone()) or {}
 
+    def list_handoff_revisions(self, handoff_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM handoff_revisions WHERE handoff_id = ? ORDER BY revision', (handoff_id,)).fetchall()]
+
+    def get_handoff_revision(self, handoff_id: str, revision: int) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM handoff_revisions WHERE handoff_id = ? AND revision = ?', (handoff_id, revision)).fetchone())
+
     def acknowledge_handoff(self, handoff_id: str, revision: int, acknowledged_by: str) -> dict[str, Any]:
         item = {'id': str(uuid4()), 'handoff_id': handoff_id, 'revision': revision, 'acknowledged_by': acknowledged_by, 'acknowledged_at': utc_now()}; self.connection.execute('INSERT INTO handoff_acknowledgements(id, handoff_id, revision, acknowledged_by, acknowledged_at) VALUES (?, ?, ?, ?, ?)', tuple(item.values())); self.connection.commit(); return item
 

@@ -41,6 +41,7 @@ export type ContextPackage = { id: string; project_id: string; feature_id: strin
 export type ProjectTransferPreview = { schema_version: string; fingerprint: string; project: { name: string; description?: string | null }; counts: Record<string, number> };
 export type Run = { id: string; project_id: string; feature_id: string | null; title: string; description: string | null; execution_mode: string; executor_type: string; status: string; version: number; created_at: string; updated_at: string };
 export type Handoff = { id: string; project_id: string; feature_id: string | null; run_id: string; title: string; summary: string; next_actions: string; status: string; current_revision: number | null; version: number; created_at: string; updated_at: string };
+export type HandoffRevision = { id: string; handoff_id: string; revision: number; title: string; summary: string; next_actions: string; schema_version: string; fingerprint: string; payload_json: string; markdown: string; created_at: string };
 export type Evidence = { id: string; project_id: string; feature_id: string | null; title: string; summary: string; provenance: string; reference_kind: string; reference_value: string; status: string; created_at: string; updated_at: string };
 export type ReleaseCandidate = { id: string; project_id: string; title: string; summary: string; status: string; revision: number; fingerprint: string | null; created_at: string; updated_at: string };
 
@@ -103,6 +104,7 @@ export const organizationApi = {
   getRun: (workspaceId: string, projectId: string, runId: string) => getApiJson<Run>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}` }),
   createRun: (workspaceId: string, projectId: string, title: string, feature_id?: string) => sendJson<Run>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs`, { method: 'POST', body: JSON.stringify({ title, feature_id, execution_mode: 'manual', executor_type: 'human' }) }),
   listHandoffs: (workspaceId: string, projectId: string) => getApiJson<Handoff[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/handoffs` }),
+  listHandoffRevisions: (workspaceId: string, projectId: string, handoffId: string) => getApiJson<HandoffRevision[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/handoffs/${handoffId}/revisions` }),
   createHandoff: (workspaceId: string, projectId: string, runId: string, title: string) => sendJson<Handoff>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}/handoffs`, { method: 'POST', body: JSON.stringify({ title }) }),
   listEvidence: (workspaceId: string, projectId: string, search = '', provenance = '', status = '') => getApiJson<Evidence[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence?search=${encodeURIComponent(search)}&provenance=${encodeURIComponent(provenance)}&status=${encodeURIComponent(status)}` as `/api/v1/${string}` }),
   getEvidence: (workspaceId: string, projectId: string, evidenceId: string) => getApiJson<Evidence>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/evidence/${evidenceId}` }),

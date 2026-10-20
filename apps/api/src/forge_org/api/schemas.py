@@ -163,6 +163,8 @@ class HandoffResponse(BaseModel):
     id: str; project_id: str; feature_id: str | None; run_id: str; context_package_id: str | None; title: str; summary: str; next_actions: str; status: str; current_revision: int | None; version: int; created_at: datetime; updated_at: datetime
 class HandoffAcknowledgementResponse(BaseModel):
     id: str; handoff_id: str; revision: int; acknowledged_by: str; acknowledged_at: datetime
+class HandoffRevisionResponse(BaseModel):
+    id: str; handoff_id: str; revision: int; title: str; summary: str; next_actions: str; schema_version: str; fingerprint: str; payload_json: str; markdown: str; created_at: datetime
 
 class EvidenceCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200); summary: str = Field(min_length=1, max_length=4000); provenance: str; reference_kind: str; reference_value: str; feature_id: str | None = None
