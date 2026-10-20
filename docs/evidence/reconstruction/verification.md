@@ -13,14 +13,16 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification),
   `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a`
 (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows
-resource icon), and `13f7fc5` (isolated desktop CI frontend build).
+resource icon), `13f7fc5` (isolated desktop CI frontend build), and `c519526`
+(ORG-002/003 vertical-slice verification, feature-scoped invariant listing,
+focused tests, and retained browser evidence).
 
 ## Automated verification
 
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
-  architecture tests 5/5, and Vitest 9/9.
+  architecture tests 5/5, and Vitest 13/13 across 6 files.
 - API Ruff and strict mypy: passed.
-- API pytest: 16/16 passed; one upstream Starlette/httpx deprecation warning.
+- API pytest: 13/13 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
   tests passed as part of the API suite. Native Rust/Tauri compilation and
   desktop launcher tests passed in [GitHub Quality run 39382267348](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382267348).
@@ -61,11 +63,10 @@ create, archive, restore, duplicate protection, and cross-workspace isolation.
 ORG-002 has API and browser coverage for epic/feature creation and updates, task creation,
 updates and reordering, acceptance criteria, dependency creation and removal,
 and manual overview grouping, plus board and feature-detail browser navigation;
-it remains
-`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-003 has
+it is `VERIFIED` for automated behavior. ORG-003 has
 API tests for revisioned decisions, invariant acknowledgements, deterministic
 R01–R06 evaluation, and stale saved history; it also remains
-`IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-004 has API tests for
+`VERIFIED` for automated behavior. ORG-004 has API tests for
 allowlist rejection, canonical Git validation, metadata-only observations,
 feature links, and deduplicated `forge-context-v1` packages, plus browser
 coverage for metadata-only repository observation; it remains
