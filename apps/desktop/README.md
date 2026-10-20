@@ -11,3 +11,8 @@ The Tauri host, packaged sidecar/installer, single-instance lock, and installed
 Windows smoke remain outstanding. The Rust policy and Python launch/security
 contracts are implemented but native compilation is not currently certified.
 No legacy desktop bundle is copied.
+
+`src-tauri` contains the pinned Tauri 2 host skeleton and a minimal
+`core:default` capability manifest. Bundling is intentionally disabled until
+the authenticated sidecar is wired into the native lifecycle and an installed
+Windows smoke can verify persistence and isolation.
