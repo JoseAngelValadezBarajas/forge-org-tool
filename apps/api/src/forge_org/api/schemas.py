@@ -56,3 +56,36 @@ class ProjectResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     archived_at: datetime | None
+
+class EpicCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=4000)
+
+class EpicResponse(BaseModel):
+    id: str
+    project_id: str
+    title: str
+    description: str | None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+class FeatureCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    description: str | None = Field(default=None, max_length=4000)
+    goal: str | None = Field(default=None, max_length=4000)
+    epic_id: str | None = None
+    priority: str = Field(default='medium', pattern='^(low|medium|high|critical)$')
+    status: str = Field(default='backlog', pattern='^(backlog|refining|ready|in_progress|verify|done)$')
+
+class FeatureResponse(BaseModel):
+    id: str
+    project_id: str
+    epic_id: str | None
+    title: str
+    description: str | None
+    goal: str | None
+    priority: str
+    status: str
+    created_at: datetime
+    updated_at: datetime

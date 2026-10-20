@@ -6,6 +6,10 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from forge_org.api.schemas import (
+    EpicCreate,
+    EpicResponse,
+    FeatureCreate,
+    FeatureResponse,
     ProjectCreate,
     ProjectResponse,
     ProjectUpdate,
@@ -19,6 +23,7 @@ from forge_org.application.organization import (
     NotFound,
     OrganizationService,
 )
+from forge_org.application.planning import PlanningService
 from forge_org.infrastructure.sqlite import connect
 
 router = APIRouter(prefix="/api/v1", tags=["organization"])
@@ -44,6 +49,34 @@ def service_error(exc: Exception) -> HTTPException:
     if isinstance(exc, InvalidInput):
         return HTTPException(status_code=422, detail=str(exc))
     return HTTPException(status_code=500, detail="Unexpected organization error")
+
+def planning_service(connection: sqlite3.Connection = Depends(database)) -> PlanningService:
+    return PlanningService(connection)
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/planning/overview')
+def planning_overview(workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)) -> dict[str, Any]:
+    try: return planning.overview(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/epics', response_model=list[EpicResponse])
+def list_epics(workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)) -> list[dict[str, Any]]:
+    try: return planning.list_epics(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/epics', response_model=EpicResponse, status_code=201)
+def create_epic(workspace_id: str, project_id: str, payload: EpicCreate, planning: PlanningService = Depends(planning_service)) -> dict[str, Any]:
+    try: return planning.create_epic(workspace_id, project_id, payload.title, payload.description)
+    except (LookupError, ValueError) as exc: raise service_error(NotFound(str(exc)) if isinstance(exc, LookupError) else InvalidInput(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/features', response_model=list[FeatureResponse])
+def list_features(workspace_id: str, project_id: str, search: str | None = None, status_filter: str | None = Query(default=None, alias='status'), priority: str | None = None, epic_id: str | None = None, planning: PlanningService = Depends(planning_service)) -> list[dict[str, Any]]:
+    try: return planning.list_features(workspace_id, project_id, search, status_filter, priority, epic_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/features', response_model=FeatureResponse, status_code=201)
+def create_feature(workspace_id: str, project_id: str, payload: FeatureCreate, planning: PlanningService = Depends(planning_service)) -> dict[str, Any]:
+    try: return planning.create_feature(workspace_id, project_id, payload.model_dump())
+    except (LookupError, ValueError) as exc: raise service_error(NotFound(str(exc)) if isinstance(exc, LookupError) else InvalidInput(str(exc))) from exc
 
 
 @router.get("/workspaces", response_model=list[WorkspaceResponse])

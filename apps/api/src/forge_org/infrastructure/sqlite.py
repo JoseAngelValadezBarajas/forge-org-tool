@@ -52,6 +52,18 @@ def migrate(connection: sqlite3.Connection) -> None:
         );
         CREATE UNIQUE INDEX IF NOT EXISTS uq_projects_workspace_name_ci
             ON projects(workspace_id, lower(name));
+        CREATE TABLE IF NOT EXISTS epics (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            title TEXT NOT NULL, description TEXT, status TEXT NOT NULL DEFAULT 'planning',
+            created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS features (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            epic_id TEXT REFERENCES epics(id) ON DELETE SET NULL, title TEXT NOT NULL,
+            description TEXT, goal TEXT, priority TEXT NOT NULL DEFAULT 'medium',
+            status TEXT NOT NULL DEFAULT 'backlog', created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS ix_features_project ON features(project_id, status, priority);
         INSERT OR IGNORE INTO schema_version(version) VALUES (1);
         """
     )
@@ -134,3 +146,30 @@ class OrganizationRepository:
         )
         self.connection.commit()
         return self.get_project(workspace_id, project_id)
+
+    def list_epics(self, project_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)).fetchall()]
+
+    def get_epic(self, project_id: str, epic_id: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM epics WHERE project_id = ? AND id = ?', (project_id, epic_id)).fetchone())
+
+    def create_epic(self, project_id: str, title: str, description: str | None) -> dict[str, Any]:
+        now, epic_id = utc_now(), str(uuid4())
+        self.connection.execute('INSERT INTO epics(id, project_id, title, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', (epic_id, project_id, title, description, now, now))
+        self.connection.commit()
+        return self.get_epic(project_id, epic_id) or {}
+
+    def list_features(self, project_id: str, search: str | None, status: str | None, priority: str | None, epic_id: str | None) -> list[dict[str, Any]]:
+        clauses, params = ['project_id = ?'], [project_id]
+        if search:
+            clauses.append('(lower(title) LIKE ? OR lower(coalesce(description, \'\')) LIKE ?)'); term = f'%{search.strip().lower()}%'; params.extend([term, term])
+        if status: clauses.append('status = ?'); params.append(status)
+        if priority: clauses.append('priority = ?'); params.append(priority)
+        if epic_id: clauses.append('epic_id = ?'); params.append(epic_id)
+        return [dict(row) for row in self.connection.execute(f"SELECT * FROM features WHERE {' AND '.join(clauses)} ORDER BY created_at", params).fetchall()]
+
+    def create_feature(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        now, feature_id = utc_now(), str(uuid4())
+        self.connection.execute('INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (feature_id, project_id, values.get('epic_id'), values['title'], values.get('description'), values.get('goal'), values.get('priority', 'medium'), values.get('status', 'backlog'), now, now))
+        self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM features WHERE id = ?', (feature_id,)).fetchone()) or {}

@@ -25,6 +25,10 @@ export type Project = {
   archived_at: string | null;
 };
 
+export type Epic = { id: string; project_id: string; title: string; description: string | null; status: 'planning' | 'archived'; created_at: string; updated_at: string };
+export type Feature = { id: string; project_id: string; epic_id: string | null; title: string; description: string | null; goal: string | null; priority: 'low' | 'medium' | 'high' | 'critical'; status: 'backlog' | 'refining' | 'ready' | 'in_progress' | 'verify' | 'done'; created_at: string; updated_at: string };
+export type PlanningOverview = { epics: Array<Epic & { features: Feature[] }>; unassigned_features: Feature[] };
+
 async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const res = await fetch(path, {
     ...init,
@@ -47,4 +51,7 @@ export const organizationApi = {
     sendJson<Project>(`/api/v1/workspaces/${workspaceId}/projects`, { method: 'POST', body: JSON.stringify({ name, description: description || null }) }),
   setProjectStatus: (workspaceId: string, projectId: string, status: 'active' | 'archived') =>
     sendJson<Project>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/${status === 'archived' ? 'archive' : 'restore'}`, { method: 'POST', body: '{}' }),
+  planningOverview: (workspaceId: string, projectId: string) => getApiJson<PlanningOverview>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/planning/overview` }),
+  createEpic: (workspaceId: string, projectId: string, title: string, description?: string) => sendJson<Epic>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/epics`, { method: 'POST', body: JSON.stringify({ title, description: description || null }) }),
+  createFeature: (workspaceId: string, projectId: string, title: string, epic_id?: string) => sendJson<Feature>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/features`, { method: 'POST', body: JSON.stringify({ title, epic_id: epic_id || null }) }),
 };

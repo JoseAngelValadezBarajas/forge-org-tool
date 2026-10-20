@@ -3,7 +3,7 @@
 This record covers the ORG-001 vertical slice. It does not certify Figma
 visual parity, desktop packaging, or the remaining ORG capabilities.
 
-Implementation commit: `b303bd8`.
+Implementation commits: `6eca0da` (ORG-001) and `443cb0d` (ORG-002).
 
 ## Automated verification
 
@@ -37,5 +37,8 @@ reference remain explicit review items.
 
 ORG-001 is verified for workspace/project persistence, selection, search,
 create, archive, restore, duplicate protection, and cross-workspace isolation.
-ORG-002 through ORG-009 remain not started. No legacy code/assets, private
+ORG-002 has API and frontend implementation tests for epic/feature creation and
+manual overview grouping, but remains `IMPLEMENTED_NOT_REVIEWED` until its
+remaining hierarchy interactions and browser evidence are complete. ORG-003
+through ORG-009 remain not started. No legacy code/assets, private
 bundles, real data migration, or desktop packaging were introduced.

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button, Card, Input, SectionHeader, StatusChip } from '@forge-org/ui';
 import { organizationApi, type Project, type Workspace } from '@forge-org/api-client';
 import styles from './OrganizationPage.module.css';
@@ -62,7 +63,7 @@ export function OrganizationPage() {
         <form onSubmit={createProject} className={styles.form}><h3>Create project</h3><label htmlFor="project-name">Project name</label><Input id="project-name" value={projectName} onChange={(event) => setProjectName(event.target.value)} required /><label htmlFor="project-description">Description</label><Input id="project-description" value={projectDescription} onChange={(event) => setProjectDescription(event.target.value)} /><Button type="submit">Create Project</Button></form>
       </Card>
       <Card><div className={styles.toolbar}><h3>Projects</h3><label htmlFor="project-search">Search</label><Input id="project-search" aria-label="Search projects" value={search} onChange={(event) => setSearch(event.target.value)} /><label><input type="checkbox" checked={showArchived} onChange={(event) => setShowArchived(event.target.checked)} /> Show archived</label></div>
-        {projects.length === 0 ? <p>No matching projects.</p> : <div className={styles.projects}>{projects.map((project) => <article key={project.id} className={styles.project}><div><StatusChip tone={project.status === 'active' ? 'success' : 'neutral'}>{project.status}</StatusChip><h3>{project.name}</h3>{project.description && <p>{project.description}</p>}</div><Button variant="secondary" onClick={() => void toggleProject(project)}>{project.status === 'active' ? 'Archive' : 'Restore'}</Button></article>)}</div>}
+        {projects.length === 0 ? <p>No matching projects.</p> : <div className={styles.projects}>{projects.map((project) => <article key={project.id} className={styles.project}><div><StatusChip tone={project.status === 'active' ? 'success' : 'neutral'}>{project.status}</StatusChip><h3><Link to={`/planning/${workspaceId}/${project.id}`}>{project.name}</Link></h3>{project.description && <p>{project.description}</p>}</div><Button variant="secondary" onClick={() => void toggleProject(project)}>{project.status === 'active' ? 'Archive' : 'Restore'}</Button></article>)}</div>}
       </Card>
     </>}
   </div>;
