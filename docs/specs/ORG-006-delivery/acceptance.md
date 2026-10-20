@@ -5,3 +5,4 @@
 - [x] Evaluate explicit blocked gates when active VERIFIED evidence is absent.
 - [x] Persist gate evaluations without publishing or executing anything.
 - [ ] Full verification rules, manifests, and browser delivery screens.
+- [x] Retrieve and filter project evidence while preserving provenance/status.

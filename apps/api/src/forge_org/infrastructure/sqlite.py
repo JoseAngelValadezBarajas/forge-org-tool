@@ -566,7 +566,12 @@ class OrganizationRepository:
     def get_evidence(self, project_id: str, evidence_id: str) -> dict[str, Any] | None: return row_dict(self.connection.execute('SELECT * FROM evidence WHERE project_id = ? AND id = ?', (project_id, evidence_id)).fetchone())
     def update_evidence(self, project_id: str, evidence_id: str, status: str) -> dict[str, Any] | None:
         self.connection.execute('UPDATE evidence SET status = ?, updated_at = ? WHERE project_id = ? AND id = ?', (status, utc_now(), project_id, evidence_id)); self.connection.commit(); return self.get_evidence(project_id, evidence_id)
-    def list_evidence(self, project_id: str) -> list[dict[str, Any]]: return [dict(row) for row in self.connection.execute('SELECT * FROM evidence WHERE project_id = ? ORDER BY created_at DESC', (project_id,)).fetchall()]
+    def list_evidence(self, project_id: str, search: str | None = None, provenance: str | None = None, status: str | None = None) -> list[dict[str, Any]]:
+        clauses, params = ['project_id = ?'], [project_id]
+        if search: clauses.append('(lower(title) LIKE ? OR lower(summary) LIKE ?)'); term = f'%{search.strip().lower()}%'; params.extend([term, term])
+        if provenance: clauses.append('provenance = ?'); params.append(provenance)
+        if status: clauses.append('status = ?'); params.append(status)
+        return [dict(row) for row in self.connection.execute(f"SELECT * FROM evidence WHERE {' AND '.join(clauses)} ORDER BY created_at DESC", params).fetchall()]
     def create_candidate(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
         now, item_id = utc_now(), str(uuid4()); self.connection.execute('INSERT INTO release_candidates(id, project_id, title, summary, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', (item_id, project_id, values['title'], values['summary'], now, now)); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM release_candidates WHERE id = ?', (item_id,)).fetchone()) or {}
     def get_candidate(self, project_id: str, candidate_id: str) -> dict[str, Any] | None: return row_dict(self.connection.execute('SELECT * FROM release_candidates WHERE project_id = ? AND id = ?', (project_id, candidate_id)).fetchone())

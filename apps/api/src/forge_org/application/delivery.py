@@ -18,7 +18,11 @@ class DeliveryService:
         if values['provenance'] not in {'REPORTED', 'OBSERVED', 'VERIFIED', 'UNKNOWN'}: raise ValueError('Unknown evidence provenance')
         if not values.get('title', '').strip() or not values.get('summary', '').strip(): raise ValueError('Evidence title and summary are required')
         return self.repository.create_evidence(project_id, values)
-    def evidence_list(self, workspace_id: str, project_id: str) -> list[dict[str, Any]]: self._project(workspace_id, project_id); return self.repository.list_evidence(project_id)
+    def evidence_list(self, workspace_id: str, project_id: str, search: str | None = None, provenance: str | None = None, status: str | None = None) -> list[dict[str, Any]]: self._project(workspace_id, project_id); return self.repository.list_evidence(project_id, search, provenance, status)
+    def evidence_get(self, workspace_id: str, project_id: str, evidence_id: str) -> dict[str, Any]:
+        self._project(workspace_id, project_id); item = self.repository.get_evidence(project_id, evidence_id)
+        if item is None: raise LookupError('Evidence not found')
+        return item
     def evidence_invalidate(self, workspace_id: str, project_id: str, evidence_id: str) -> dict[str, Any]:
         self._project(workspace_id, project_id); item = self.repository.get_evidence(project_id, evidence_id)
         if item is None: raise LookupError('Evidence not found')

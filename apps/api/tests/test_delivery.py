@@ -15,6 +15,8 @@ def test_delivery_keeps_reported_evidence_and_release_gates_explicit(tmp_path: P
             root = f"/api/v1/workspaces/{workspace['id']}/projects/{project['id']}"
             evidence = client.post(f'{root}/evidence', json={'title': 'Human report', 'summary': 'Reported manually', 'provenance': 'REPORTED', 'reference_kind': 'artifact', 'reference_value': 'report-1'}).json()
             assert evidence['status'] == 'ACTIVE' and evidence['provenance'] == 'REPORTED'
+            assert client.get(f'{root}/evidence/{evidence["id"]}').json()['title'] == 'Human report'
+            assert client.get(f'{root}/evidence?provenance=REPORTED').json()[0]['id'] == evidence['id']
             invalidated = client.post(f"{root}/evidence/{evidence['id']}/invalidate")
             assert invalidated.status_code == 200 and invalidated.json()['status'] == 'INVALIDATED'
             candidate = client.post(f'{root}/release-candidates', json={'title': 'Alpha candidate', 'summary': 'Candidate summary'}).json()

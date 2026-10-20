@@ -519,8 +519,8 @@ def acknowledge_handoff(workspace_id: str, project_id: str, handoff_id: str, pay
     except RuntimeError as exc: raise service_error(exc) from exc
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/evidence', response_model=list[EvidenceResponse])
-def list_evidence(workspace_id: str, project_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
-    try: return delivery.evidence_list(workspace_id, project_id)
+def list_evidence(workspace_id: str, project_id: str, search: str | None = Query(default=None, max_length=200), provenance: str | None = None, status_filter: str | None = Query(default=None, alias='status'), delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
+    try: return delivery.evidence_list(workspace_id, project_id, search, provenance, status_filter)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/evidence', response_model=EvidenceResponse, status_code=201)
@@ -532,6 +532,11 @@ def create_evidence(workspace_id: str, project_id: str, payload: EvidenceCreate,
 @router.post('/workspaces/{workspace_id}/projects/{project_id}/evidence/{evidence_id}/invalidate', response_model=EvidenceResponse)
 def invalidate_evidence(workspace_id: str, project_id: str, evidence_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
     try: return delivery.evidence_invalidate(workspace_id, project_id, evidence_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/evidence/{evidence_id}', response_model=EvidenceResponse)
+def get_evidence(workspace_id: str, project_id: str, evidence_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.evidence_get(workspace_id, project_id, evidence_id)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates', response_model=list[CandidateResponse])
