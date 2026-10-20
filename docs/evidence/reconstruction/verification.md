@@ -18,11 +18,14 @@ resource icon), `13f7fc5` (isolated desktop CI frontend build), and `c519526`
 focused tests, and retained browser evidence). `548e21a` completes the
 ORG-004 repository/context vertical slice with feature links, context package
 preview/save/download, responsive browser evidence, and focused UI tests.
+`5f7ec95` completes the ORG-005 reported handoff lifecycle with focused UI
+tests, immutable revision history, acknowledgement state, and JSON/Markdown
+downloads.
 
 ## Automated verification
 
 - Frontend `npm test`: architecture boundaries, token check, typecheck,
-  architecture tests 5/5, and Vitest 13/13 across 6 files.
+  architecture tests 5/5, and Vitest 16/16 across 9 files.
 - API Ruff and strict mypy: passed.
 - API pytest: 13/13 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
@@ -40,7 +43,7 @@ preview/save/download, responsive browser evidence, and focused UI tests.
 - Organization: [desktop](../m1/desktop-organization.png).
 - Planning/readiness/repository navigation: [desktop planning](../m1/desktop-planning.png), [mobile readiness](../m1/mobile-readiness.png); the same isolated Chromium journey also opens the repository metadata-only surface.
 - Delivery verification: [desktop](../m1/desktop-delivery.png), [mobile](../m1/mobile-delivery.png); both show the explicit `NOT_PUBLISHED` boundary.
-- Workbench/handoff: [desktop](../m1/desktop-workbench.png), [mobile](../m1/mobile-workbench.png).
+- Workbench/handoff: [desktop](../m1/desktop-workbench.png), [mobile](../m1/mobile-workbench.png); reported run creation, draft editing, ready transition, immutable revision, acknowledgement, and JSON/Markdown downloads were exercised.
 - Project transfer: [desktop](../m1/desktop-transfer.png), [mobile](../m1/mobile-transfer.png); export and reviewed fingerprint remain planning-only.
 - Readiness/repository context: [desktop](../m1/desktop-context.png), [mobile](../m1/mobile-context.png); decisions, invariants, criteria, and metadata-only observation were exercised without source-content reads.
 - Feature context packages: [desktop](../m1/desktop-context-package.png), [mobile](../m1/mobile-context-package.png); feature repository linking, `forge-context-v1` preview/save, and JSON/Markdown download links were exercised. The mobile save action was keyboard-activated after Playwright pointer hit-testing encountered an ancestor overlap on the long responsive page.
@@ -76,10 +79,11 @@ coverage for metadata-only repository observation; it remains
 `VERIFIED` for automated behavior. ORG-005 has API coverage
 for manual run transitions, append-only events, draft validation, immutable
 handoff revision and exact acknowledgement; browser coverage now includes
-reported runs and draft handoffs. ORG-006 has API coverage for
+reported runs, draft editing, ready/acknowledged handoffs, immutable revision
+history, and JSON/Markdown downloads; it is `VERIFIED` for automated behavior.
+ORG-006 has API coverage for
 provenance-labelled evidence, invalidation, frozen candidates, and blocked gate
-evaluations. ORG-005 remains `IMPLEMENTED_NOT_REVIEWED` pending human Figma
-review. ORG-006 now has browser coverage for deterministic verification,
+evaluations. ORG-006 now has browser coverage for deterministic verification,
 blocked/pass gates, and non-published manifests; it remains
 `IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-007 has API
 coverage for
