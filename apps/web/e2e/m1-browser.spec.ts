@@ -112,6 +112,9 @@ test('workbench records reported runs and keeps handoffs human-owned', async ({ 
   await page.getByLabel(`Acknowledged by Handoff for Manual run ${suffix}`).fill('reviewer');
   await page.getByRole('button', { name: 'Acknowledge revision' }).click();
   await expect(page.getByText('ACKNOWLEDGED', { exact: true })).toBeVisible();
+  await expect(page.getByText('Revision 1')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'JSON' })).toHaveAttribute('href', /\/handoffs\/.*\/revisions\/1\/download\?format=json/);
+  await expect(page.getByRole('link', { name: 'Markdown' })).toHaveAttribute('href', /\/handoffs\/.*\/revisions\/1\/download\?format=markdown/);
   await expect(page.getByText(/does not execute agents/i)).toBeVisible();
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-workbench.png' : 'desktop-workbench.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
