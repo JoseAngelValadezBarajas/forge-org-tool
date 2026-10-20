@@ -30,7 +30,7 @@ test('mobile gallery switches from dark to light with no browser errors', async 
   await primary.hover();
   const hoverBackground = await primary.evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(hoverBackground).not.toBe(defaultBackground);
-  await page.getByRole('button', { name: /switch to light/i }).click();
+  await page.getByRole('button', { name: 'Switch to light', exact: true }).click();
   await expect(gallery).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('button', { name: /increment 0/i })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
@@ -151,4 +151,16 @@ test('planning feature detail manages tasks and acceptance criteria', async ({ p
   await expect(page.getByRole('combobox', { name: `Status for Task ${suffix}` })).toHaveValue('in_progress');
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-feature-detail.png' : 'desktop-feature-detail.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+});
+
+test('application shell exposes command palette and theme control', async ({ page }) => {
+  await page.goto('/');
+  await page.keyboard.press('Control+K');
+  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Go to Organization' })).toBeVisible();
+  await page.getByRole('button', { name: 'Go to Organization' }).click();
+  await page.getByRole('button', { name: /switch to light theme/i }).click();
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'light');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden();
 });

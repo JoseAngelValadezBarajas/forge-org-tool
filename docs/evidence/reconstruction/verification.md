@@ -24,7 +24,7 @@ and `dc62a00` (refreshed screenshots).
   unavailable because `cargo`/`rustc` are not installed.
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
-- Isolated Chromium: 16/16 passed across desktop/mobile. Playwright starts its
+- Isolated Chromium: 18/18 passed across desktop/mobile. Playwright starts its
   own Vite and API processes with `reuseExistingServer: false`, one serialized
   worker, and a unique temporary API database; occupied ports and stale local
   data cannot silently attach to or contaminate the run.
@@ -38,6 +38,7 @@ and `dc62a00` (refreshed screenshots).
 - Project transfer: [desktop](../m1/desktop-transfer.png), [mobile](../m1/mobile-transfer.png); export and reviewed fingerprint remain planning-only.
 - Readiness/repository context: [desktop](../m1/desktop-context.png), [mobile](../m1/mobile-context.png); decisions, invariants, criteria, and metadata-only observation were exercised without source-content reads.
 - Planning feature detail: [desktop](../m1/desktop-feature-detail.png), [mobile](../m1/mobile-feature-detail.png); task creation, acceptance criteria, and a manual task transition were exercised.
+- Application shell: command palette keyboard invocation, escape dismissal, and light-theme control were exercised in both viewport projects.
 - Component Host dark/light: [desktop dark](../m1/desktop-component-host-dark.png),
   [desktop light](../m1/desktop-component-host.png), [mobile dark](../m1/mobile-component-host-dark.png),
   and [mobile light](../m1/mobile-gallery-light.png).

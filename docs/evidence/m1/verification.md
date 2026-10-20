@@ -12,7 +12,7 @@ foundation audit record.
 - Python/uv: Python 3.12.10, uv 0.12.7.
 - `npm run test`: architecture boundaries passed, token check passed, typecheck passed, architecture tests 5/5, Vitest 9/9 across 3 files.
 - `npm run build`: Vite production build passed; the development-only `/__components` route was absent from `apps/web/dist`.
-- `npm run test:e2e`: isolated Chromium desktop/mobile smoke passed 16/16, including planning feature detail, readiness/repository context, delivery, workbench/handoff, and transfer truth-state navigation; Component Host dark/light and representative feature screenshots are retained beside this file: `desktop-component-host-dark.png`, `desktop-component-host.png`, `mobile-component-host-dark.png`, `mobile-gallery-light.png`, `desktop-planning.png`, `mobile-readiness.png`, `desktop-delivery.png`, `mobile-delivery.png`, `desktop-workbench.png`, `mobile-workbench.png`, `desktop-transfer.png`, `mobile-transfer.png`, `desktop-context.png`, `mobile-context.png`, `desktop-feature-detail.png`, and `mobile-feature-detail.png`.
+- `npm run test:e2e`: isolated Chromium desktop/mobile smoke passed 18/18, including shell command-palette/theme behavior, planning feature detail, readiness/repository context, delivery, workbench/handoff, and transfer truth-state navigation; Component Host dark/light and representative feature screenshots are retained beside this file: `desktop-component-host-dark.png`, `desktop-component-host.png`, `mobile-component-host-dark.png`, `mobile-gallery-light.png`, `desktop-planning.png`, `mobile-readiness.png`, `desktop-delivery.png`, `mobile-delivery.png`, `desktop-workbench.png`, `mobile-workbench.png`, `desktop-transfer.png`, `mobile-transfer.png`, `desktop-context.png`, `mobile-context.png`, `desktop-feature-detail.png`, and `mobile-feature-detail.png`.
 - API: Ruff passed, strict mypy passed, pytest passed 16/16, OpenAPI check passed.
 - Live API: `/api/v1/health` returned HTTP 200 with `scope=bootstrap-only`; fabricated `/api/v1/workspaces` returned HTTP 404.
 - Public-file audit: no credential patterns, machine-specific absolute paths, databases, keys, logs, backups, or attachments were staged.
@@ -35,7 +35,7 @@ The final public repository was cloned into an isolated temporary directory. `np
 
 - API scaffold tests were already meaningful and passed before implementation changes; no artificial RED was manufactured.
 - Focused Card contract tests first failed on the pre-existing `<section>` root; the typed neutral `div`/semantic option implementation produced 3/3 GREEN.
-- Isolated Chromium smoke produced 16/16 GREEN and retained dark/light desktop/mobile evidence plus planning detail, readiness/repository, delivery, workbench, and transfer truth-state screenshots; hover behavior was checked in the browser.
+- Isolated Chromium smoke produced 18/18 GREEN and retained dark/light desktop/mobile evidence plus shell, planning detail, readiness/repository, delivery, workbench, and transfer truth-state coverage; hover behavior was checked in the browser.
 - Clean-clone verification first exposed Windows line-ending sensitivity in token checks; `.gitattributes` fixed the repository-boundary defect and the fresh clone passed.
 
 ## Verdict

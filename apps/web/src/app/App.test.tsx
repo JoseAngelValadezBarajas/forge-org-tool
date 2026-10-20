@@ -44,7 +44,7 @@ describe('M1 application shell', () => {
     fireEvent.click(screen.getByRole('button', { name: /increment 0/i }));
     expect(screen.getByRole('button', { name: /increment 1/i })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /switch to light/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^Switch to light$/ }));
     expect(gallery).toHaveAttribute('data-theme', 'light');
     expect(screen.getByRole('button', { name: /switch to dark/i })).toBeInTheDocument();
   });
