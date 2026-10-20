@@ -42,6 +42,14 @@ tasks, criteria, dependencies, and manual overview grouping, but remains
 `IMPLEMENTED_NOT_REVIEWED` until browser evidence is complete. ORG-003 has
 API tests for revisioned decisions, invariant acknowledgements, deterministic
 R01–R06 evaluation, and stale saved history; it also remains
-`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-004 through ORG-009
-remain not started. No legacy code/assets, private
+`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-004 has API tests for
+allowlist rejection, canonical Git validation, metadata-only observations,
+feature links, and deduplicated `forge-context-v1` packages; it remains
+`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-005 has API coverage
+for manual run transitions, append-only events, draft validation, immutable
+handoff revision and exact acknowledgement. ORG-006 has API coverage for
+provenance-labelled evidence, invalidation, frozen candidates, and blocked gate
+evaluations. ORG-005 and ORG-006 remain `IMPLEMENTED_NOT_REVIEWED` pending
+browser evidence and fuller delivery rules. ORG-007 through ORG-009 remain not
+started. No legacy code/assets, private
 bundles, real data migration, or desktop packaging were introduced.

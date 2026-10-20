@@ -33,6 +33,9 @@ export type Decision = { id: string; project_id: string; title: string; context:
 export type Invariant = { id: string; project_id: string; feature_id: string | null; title: string; statement: string; rationale: string; status: string; revision: number; acknowledged_revision?: number | null; created_at: string; updated_at: string };
 export type Task = { id: string; feature_id: string; title: string; description: string | null; status: 'todo' | 'in_progress' | 'done'; position: number; created_at: string; updated_at: string };
 export type Dependency = { id: string; project_id: string; blocking_feature_id: string; blocked_feature_id: string; created_at: string; updated_at: string };
+export type Repository = { id: string; project_id: string; root_path: string; status: string; created_at: string; updated_at: string };
+export type Observation = { id: string; repository_id: string; observed_at: string; head_sha: string | null; branch: string | null; detached: boolean; unborn: boolean; clean: boolean | null; tracked_modified_count: number; staged_count: number; untracked_count: number; observer_version: string; status: string; error_code: string | null; source_content_read: boolean };
+export type ContextPackage = { id: string; project_id: string; feature_id: string; schema_version: string; fingerprint: string; payload_json: string; markdown: string; created_at: string };
 
 async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -71,4 +74,9 @@ export const organizationApi = {
   listTasks: (workspaceId: string, projectId: string, featureId: string) => getApiJson<Task[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/tasks` }),
   createDependency: (workspaceId: string, projectId: string, blocking_feature_id: string, blocked_feature_id: string) => sendJson<Dependency>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/dependencies`, { method: 'POST', body: JSON.stringify({ blocking_feature_id, blocked_feature_id }) }),
   listDependencies: (workspaceId: string, projectId: string) => getApiJson<Dependency[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/dependencies` }),
+  listRepositories: (workspaceId: string, projectId: string) => getApiJson<Repository[]>({ path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/repositories` }),
+  connectRepository: (workspaceId: string, projectId: string, root_path: string) => sendJson<Repository>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/repositories`, { method: 'POST', body: JSON.stringify({ root_path }) }),
+  observeRepository: (workspaceId: string, projectId: string, repositoryId: string) => sendJson<Observation>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/repositories/${repositoryId}/observe`, { method: 'POST', body: '{}' }),
+  previewContext: (workspaceId: string, projectId: string, featureId: string) => sendJson<{ schema_version: string; fingerprint: string; payload: unknown; markdown: string }>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/context/preview`, { method: 'POST', body: '{}' }),
+  saveContext: (workspaceId: string, projectId: string, featureId: string) => sendJson<ContextPackage>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/context/packages`, { method: 'POST', body: '{}' }),
 };

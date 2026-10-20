@@ -108,6 +108,54 @@ class DependencyCreate(BaseModel):
 class DependencyResponse(BaseModel):
     id: str; project_id: str; blocking_feature_id: str; blocked_feature_id: str; created_at: datetime; updated_at: datetime
 
+class RepositoryCreate(BaseModel):
+    root_path: str = Field(min_length=1, max_length=1000)
+class RepositoryResponse(BaseModel):
+    id: str; project_id: str; root_path: str; status: str; created_at: datetime; updated_at: datetime
+class ObservationResponse(BaseModel):
+    id: str; repository_id: str; observed_at: datetime; head_sha: str | None; branch: str | None; detached: bool; unborn: bool; clean: bool | None; tracked_modified_count: int; staged_count: int; untracked_count: int; observer_version: str; status: str; error_code: str | None; source_content_read: bool
+
+class RepositoryLinkCreate(BaseModel):
+    repository_id: str
+class ContextPackageResponse(BaseModel):
+    id: str; project_id: str; feature_id: str; schema_version: str; fingerprint: str; payload_json: str; markdown: str; created_at: datetime
+
+class RunCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200); description: str | None = None; feature_id: str | None = None; context_package_id: str | None = None; execution_mode: str = 'manual'; executor_type: str = 'human'; executor_label: str | None = None
+class RunStatusUpdate(BaseModel):
+    status: str; expected_version: int = Field(ge=1)
+class RunEventCreate(BaseModel):
+    event_type: str; title: str = Field(min_length=1, max_length=200); description: str | None = None; expected_version: int = Field(ge=1); occurred_at: str | None = None; supersedes_event_id: str | None = None
+class RunResponse(BaseModel):
+    id: str; project_id: str; feature_id: str | None; context_package_id: str | None; title: str; description: str | None; execution_mode: str; executor_type: str; executor_label: str | None; status: str; version: int; created_at: datetime; updated_at: datetime
+class RunEventResponse(BaseModel):
+    id: str; run_id: str; event_type: str; title: str; description: str | None; origin: str; occurred_at: str | None; supersedes_event_id: str | None; created_at: datetime
+class HandoffCreate(BaseModel):
+    title: str = ''; feature_id: str | None = None; context_package_id: str | None = None
+class HandoffUpdate(BaseModel):
+    expected_version: int = Field(ge=1); title: str | None = None; summary: str | None = None; next_actions: str | None = None
+class HandoffVersionRequest(BaseModel):
+    expected_version: int = Field(ge=1)
+class HandoffAckRequest(BaseModel):
+    expected_revision: int = Field(ge=1); acknowledged_by: str = Field(min_length=1, max_length=200)
+class HandoffResponse(BaseModel):
+    id: str; project_id: str; feature_id: str | None; run_id: str; context_package_id: str | None; title: str; summary: str; next_actions: str; status: str; current_revision: int | None; version: int; created_at: datetime; updated_at: datetime
+class HandoffAcknowledgementResponse(BaseModel):
+    id: str; handoff_id: str; revision: int; acknowledged_by: str; acknowledged_at: datetime
+
+class EvidenceCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200); summary: str = Field(min_length=1, max_length=4000); provenance: str; reference_kind: str; reference_value: str; feature_id: str | None = None
+class EvidenceResponse(BaseModel):
+    id: str; project_id: str; feature_id: str | None; title: str; summary: str; provenance: str; reference_kind: str; reference_value: str; status: str; created_at: datetime; updated_at: datetime
+class CandidateCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200); summary: str = Field(min_length=1, max_length=4000)
+class CandidateFreezeRequest(BaseModel):
+    expected_revision: int = Field(ge=1)
+class CandidateResponse(BaseModel):
+    id: str; project_id: str; title: str; summary: str; status: str; revision: int; fingerprint: str | None; created_at: datetime; updated_at: datetime
+class GateEvaluationResponse(BaseModel):
+    candidate_id: str; candidate_revision: int; outcome: str; input_fingerprint: str; blockers: list[str]
+
 class CriterionCreate(BaseModel):
     description: str = Field(min_length=1, max_length=4000)
     position: int = Field(default=0, ge=0)

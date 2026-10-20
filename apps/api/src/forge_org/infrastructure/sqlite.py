@@ -1,3 +1,4 @@
+import json
 import os
 import sqlite3
 from datetime import UTC, datetime
@@ -120,6 +121,80 @@ def migrate(connection: sqlite3.Connection) -> None:
             evaluated_at TEXT NOT NULL, rule_set_version TEXT NOT NULL, input_fingerprint TEXT NOT NULL,
             outcome TEXT NOT NULL, passed_checks TEXT NOT NULL, failed_checks TEXT NOT NULL,
             blockers TEXT NOT NULL, results TEXT NOT NULL, input_snapshot TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS repositories (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            root_path TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'connected', created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+            UNIQUE(project_id, root_path)
+        );
+        CREATE TABLE IF NOT EXISTS git_observations (
+            id TEXT PRIMARY KEY, repository_id TEXT NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
+            observed_at TEXT NOT NULL, head_sha TEXT, branch TEXT, detached INTEGER NOT NULL DEFAULT 0,
+            unborn INTEGER NOT NULL DEFAULT 0, clean INTEGER, tracked_modified_count INTEGER NOT NULL DEFAULT 0,
+            staged_count INTEGER NOT NULL DEFAULT 0, untracked_count INTEGER NOT NULL DEFAULT 0,
+            observer_version TEXT NOT NULL, status TEXT NOT NULL, error_code TEXT, source_content_read INTEGER NOT NULL DEFAULT 0
+        );
+        CREATE TABLE IF NOT EXISTS feature_repository_links (
+            feature_id TEXT NOT NULL REFERENCES features(id) ON DELETE CASCADE,
+            repository_id TEXT NOT NULL REFERENCES repositories(id) ON DELETE CASCADE,
+            PRIMARY KEY(feature_id, repository_id)
+        );
+        CREATE TABLE IF NOT EXISTS context_packages (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            feature_id TEXT NOT NULL REFERENCES features(id) ON DELETE CASCADE,
+            schema_version TEXT NOT NULL, fingerprint TEXT NOT NULL, payload_json TEXT NOT NULL,
+            markdown TEXT NOT NULL, created_at TEXT NOT NULL,
+            UNIQUE(feature_id, schema_version, fingerprint)
+        );
+        CREATE TABLE IF NOT EXISTS runs (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            feature_id TEXT REFERENCES features(id) ON DELETE SET NULL, context_package_id TEXT,
+            title TEXT NOT NULL, description TEXT, execution_mode TEXT NOT NULL DEFAULT 'manual',
+            executor_type TEXT NOT NULL DEFAULT 'human', executor_label TEXT, status TEXT NOT NULL DEFAULT 'PLANNED',
+            version INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS run_events (
+            id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+            event_type TEXT NOT NULL, title TEXT NOT NULL, description TEXT, origin TEXT NOT NULL DEFAULT 'manual',
+            occurred_at TEXT, supersedes_event_id TEXT, created_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS handoffs (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            feature_id TEXT REFERENCES features(id) ON DELETE SET NULL, run_id TEXT NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+            context_package_id TEXT, title TEXT NOT NULL DEFAULT '', summary TEXT NOT NULL DEFAULT '', next_actions TEXT NOT NULL DEFAULT '',
+            status TEXT NOT NULL DEFAULT 'DRAFT', current_revision INTEGER, version INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS handoff_revisions (
+            id TEXT PRIMARY KEY, handoff_id TEXT NOT NULL REFERENCES handoffs(id) ON DELETE CASCADE,
+            revision INTEGER NOT NULL, title TEXT NOT NULL, summary TEXT NOT NULL, next_actions TEXT NOT NULL,
+            schema_version TEXT NOT NULL, fingerprint TEXT NOT NULL, payload_json TEXT NOT NULL, markdown TEXT NOT NULL, created_at TEXT NOT NULL,
+            UNIQUE(handoff_id, revision)
+        );
+        CREATE TABLE IF NOT EXISTS handoff_acknowledgements (
+            id TEXT PRIMARY KEY, handoff_id TEXT NOT NULL REFERENCES handoffs(id) ON DELETE CASCADE,
+            revision INTEGER NOT NULL, acknowledged_by TEXT NOT NULL, acknowledged_at TEXT NOT NULL,
+            UNIQUE(handoff_id, revision)
+        );
+        CREATE TABLE IF NOT EXISTS evidence (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            feature_id TEXT REFERENCES features(id) ON DELETE SET NULL, title TEXT NOT NULL, summary TEXT NOT NULL,
+            provenance TEXT NOT NULL, reference_kind TEXT NOT NULL, reference_value TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'ACTIVE', created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS release_candidates (
+            id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            title TEXT NOT NULL, summary TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'DRAFT', revision INTEGER NOT NULL DEFAULT 1,
+            fingerprint TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS release_candidate_revisions (
+            id TEXT PRIMARY KEY, candidate_id TEXT NOT NULL REFERENCES release_candidates(id) ON DELETE CASCADE,
+            revision INTEGER NOT NULL, status TEXT NOT NULL, snapshot_json TEXT NOT NULL, fingerprint TEXT NOT NULL, created_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS gate_evaluations (
+            id TEXT PRIMARY KEY, candidate_id TEXT NOT NULL REFERENCES release_candidates(id) ON DELETE CASCADE,
+            candidate_revision INTEGER NOT NULL, outcome TEXT NOT NULL, input_fingerprint TEXT NOT NULL,
+            blockers TEXT NOT NULL, created_at TEXT NOT NULL
         );
         INSERT OR IGNORE INTO schema_version(version) VALUES (1);
         """
@@ -350,3 +425,100 @@ class OrganizationRepository:
 
     def list_evaluations(self, feature_id: str) -> list[dict[str, Any]]:
         return [dict(row) for row in self.connection.execute('SELECT * FROM readiness_evaluations WHERE feature_id = ? ORDER BY evaluated_at DESC', (feature_id,)).fetchall()]
+
+    def create_repository(self, project_id: str, root_path: str) -> dict[str, Any]:
+        now, repository_id = utc_now(), str(uuid4())
+        self.connection.execute('INSERT INTO repositories(id, project_id, root_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?)', (repository_id, project_id, root_path, now, now)); self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM repositories WHERE id = ?', (repository_id,)).fetchone()) or {}
+
+    def list_repositories(self, project_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM repositories WHERE project_id = ? ORDER BY root_path', (project_id,)).fetchall()]
+
+    def get_repository(self, project_id: str, repository_id: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM repositories WHERE project_id = ? AND id = ?', (project_id, repository_id)).fetchone())
+
+    def disconnect_repository(self, project_id: str, repository_id: str) -> dict[str, Any] | None:
+        self.connection.execute("UPDATE repositories SET status = 'disconnected', updated_at = ? WHERE project_id = ? AND id = ?", (utc_now(), project_id, repository_id)); self.connection.commit(); return self.get_repository(project_id, repository_id)
+
+    def create_observation(self, values: dict[str, Any]) -> dict[str, Any]:
+        observation_id = str(uuid4())
+        self.connection.execute('INSERT INTO git_observations(id, repository_id, observed_at, head_sha, branch, detached, unborn, clean, tracked_modified_count, staged_count, untracked_count, observer_version, status, error_code, source_content_read) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (observation_id, values['repository_id'], values['observed_at'], values.get('head_sha'), values.get('branch'), values.get('detached', False), values.get('unborn', False), values.get('clean'), values.get('tracked_modified_count', 0), values.get('staged_count', 0), values.get('untracked_count', 0), values['observer_version'], values['status'], values.get('error_code'), False)); self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM git_observations WHERE id = ?', (observation_id,)).fetchone()) or {}
+
+    def list_observations(self, repository_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM git_observations WHERE repository_id = ? ORDER BY observed_at DESC, id DESC', (repository_id,)).fetchall()]
+
+    def link_repository(self, feature_id: str, repository_id: str) -> dict[str, Any]:
+        self.connection.execute('INSERT INTO feature_repository_links(feature_id, repository_id) VALUES (?, ?)', (feature_id, repository_id)); self.connection.commit()
+        return {'feature_id': feature_id, 'repository_id': repository_id}
+
+    def feature_repositories(self, feature_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT r.* FROM repositories r JOIN feature_repository_links l ON l.repository_id = r.id WHERE l.feature_id = ?', (feature_id,)).fetchall()]
+
+    def find_context_package(self, feature_id: str, schema_version: str, fingerprint: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM context_packages WHERE feature_id = ? AND schema_version = ? AND fingerprint = ?', (feature_id, schema_version, fingerprint)).fetchone())
+
+    def save_context_package(self, values: dict[str, Any]) -> dict[str, Any]:
+        existing = self.find_context_package(values['feature_id'], values['schema_version'], values['fingerprint'])
+        if existing is not None: return existing
+        package_id = str(uuid4())
+        self.connection.execute('INSERT INTO context_packages(id, project_id, feature_id, schema_version, fingerprint, payload_json, markdown, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (package_id, values['project_id'], values['feature_id'], values['schema_version'], values['fingerprint'], values['payload_json'], values['markdown'], utc_now())); self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM context_packages WHERE id = ?', (package_id,)).fetchone()) or {}
+
+    def list_context_packages(self, feature_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM context_packages WHERE feature_id = ? ORDER BY created_at DESC, id DESC', (feature_id,)).fetchall()]
+
+    def create_run(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        now, run_id = utc_now(), str(uuid4())
+        self.connection.execute('INSERT INTO runs(id, project_id, feature_id, context_package_id, title, description, execution_mode, executor_type, executor_label, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (run_id, project_id, values.get('feature_id'), values.get('context_package_id'), values['title'], values.get('description'), values.get('execution_mode', 'manual'), values.get('executor_type', 'human'), values.get('executor_label'), now, now)); self.connection.commit()
+        return row_dict(self.connection.execute('SELECT * FROM runs WHERE id = ?', (run_id,)).fetchone()) or {}
+
+    def get_run(self, project_id: str, run_id: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM runs WHERE project_id = ? AND id = ?', (project_id, run_id)).fetchone())
+
+    def update_run(self, project_id: str, run_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
+        if not values:
+            self.connection.execute('UPDATE runs SET version = version + 1, updated_at = ? WHERE project_id = ? AND id = ?', (utc_now(), project_id, run_id)); self.connection.commit(); return self.get_run(project_id, run_id)
+        assignments = ', '.join(f'{key} = ?' for key in values)
+        self.connection.execute(f'UPDATE runs SET {assignments}, version = version + 1, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, run_id]); self.connection.commit(); return self.get_run(project_id, run_id)
+
+    def list_runs(self, project_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM runs WHERE project_id = ? ORDER BY created_at DESC', (project_id,)).fetchall()]
+
+    def create_event(self, run_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        event_id = str(uuid4()); self.connection.execute('INSERT INTO run_events(id, run_id, event_type, title, description, occurred_at, supersedes_event_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (event_id, run_id, values['event_type'], values['title'], values.get('description'), values.get('occurred_at'), values.get('supersedes_event_id'), utc_now())); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM run_events WHERE id = ?', (event_id,)).fetchone()) or {}
+
+    def list_events(self, run_id: str) -> list[dict[str, Any]]:
+        return [dict(row) for row in self.connection.execute('SELECT * FROM run_events WHERE run_id = ? ORDER BY created_at', (run_id,)).fetchall()]
+
+    def create_handoff(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        now, handoff_id = utc_now(), str(uuid4()); self.connection.execute('INSERT INTO handoffs(id, project_id, feature_id, run_id, context_package_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (handoff_id, project_id, values.get('feature_id'), values['run_id'], values.get('context_package_id'), now, now)); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM handoffs WHERE id = ?', (handoff_id,)).fetchone()) or {}
+
+    def get_handoff(self, project_id: str, handoff_id: str) -> dict[str, Any] | None:
+        return row_dict(self.connection.execute('SELECT * FROM handoffs WHERE project_id = ? AND id = ?', (project_id, handoff_id)).fetchone())
+
+    def update_handoff(self, project_id: str, handoff_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
+        assignments = ', '.join(f'{key} = ?' for key in values); self.connection.execute(f'UPDATE handoffs SET {assignments}, version = version + 1, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, handoff_id]); self.connection.commit(); return self.get_handoff(project_id, handoff_id)
+
+    def create_handoff_revision(self, values: dict[str, Any]) -> dict[str, Any]:
+        revision_id = str(uuid4()); self.connection.execute('INSERT INTO handoff_revisions(id, handoff_id, revision, title, summary, next_actions, schema_version, fingerprint, payload_json, markdown, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (revision_id, values['handoff_id'], values['revision'], values['title'], values['summary'], values['next_actions'], values['schema_version'], values['fingerprint'], values['payload_json'], values['markdown'], utc_now())); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM handoff_revisions WHERE id = ?', (revision_id,)).fetchone()) or {}
+
+    def acknowledge_handoff(self, handoff_id: str, revision: int, acknowledged_by: str) -> dict[str, Any]:
+        item = {'id': str(uuid4()), 'handoff_id': handoff_id, 'revision': revision, 'acknowledged_by': acknowledged_by, 'acknowledged_at': utc_now()}; self.connection.execute('INSERT INTO handoff_acknowledgements(id, handoff_id, revision, acknowledged_by, acknowledged_at) VALUES (?, ?, ?, ?, ?)', tuple(item.values())); self.connection.commit(); return item
+
+    def create_evidence(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        now, item_id = utc_now(), str(uuid4()); self.connection.execute('INSERT INTO evidence(id, project_id, feature_id, title, summary, provenance, reference_kind, reference_value, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (item_id, project_id, values.get('feature_id'), values['title'], values['summary'], values['provenance'], values['reference_kind'], values['reference_value'], now, now)); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM evidence WHERE id = ?', (item_id,)).fetchone()) or {}
+    def get_evidence(self, project_id: str, evidence_id: str) -> dict[str, Any] | None: return row_dict(self.connection.execute('SELECT * FROM evidence WHERE project_id = ? AND id = ?', (project_id, evidence_id)).fetchone())
+    def update_evidence(self, project_id: str, evidence_id: str, status: str) -> dict[str, Any] | None:
+        self.connection.execute('UPDATE evidence SET status = ?, updated_at = ? WHERE project_id = ? AND id = ?', (status, utc_now(), project_id, evidence_id)); self.connection.commit(); return self.get_evidence(project_id, evidence_id)
+    def list_evidence(self, project_id: str) -> list[dict[str, Any]]: return [dict(row) for row in self.connection.execute('SELECT * FROM evidence WHERE project_id = ? ORDER BY created_at DESC', (project_id,)).fetchall()]
+    def create_candidate(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
+        now, item_id = utc_now(), str(uuid4()); self.connection.execute('INSERT INTO release_candidates(id, project_id, title, summary, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)', (item_id, project_id, values['title'], values['summary'], now, now)); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM release_candidates WHERE id = ?', (item_id,)).fetchone()) or {}
+    def get_candidate(self, project_id: str, candidate_id: str) -> dict[str, Any] | None: return row_dict(self.connection.execute('SELECT * FROM release_candidates WHERE project_id = ? AND id = ?', (project_id, candidate_id)).fetchone())
+    def update_candidate(self, project_id: str, candidate_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
+        assignments = ', '.join(f'{key} = ?' for key in values); self.connection.execute(f'UPDATE release_candidates SET {assignments}, revision = revision + 1, updated_at = ? WHERE project_id = ? AND id = ?', [*values.values(), utc_now(), project_id, candidate_id]); self.connection.commit(); return self.get_candidate(project_id, candidate_id)
+    def list_candidates(self, project_id: str) -> list[dict[str, Any]]: return [dict(row) for row in self.connection.execute('SELECT * FROM release_candidates WHERE project_id = ? ORDER BY updated_at DESC', (project_id,)).fetchall()]
+    def save_candidate_revision(self, values: dict[str, Any]) -> dict[str, Any]:
+        item_id = str(uuid4()); self.connection.execute('INSERT INTO release_candidate_revisions(id, candidate_id, revision, status, snapshot_json, fingerprint, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (item_id, values['candidate_id'], values['revision'], values['status'], values['snapshot_json'], values['fingerprint'], utc_now())); self.connection.commit(); return row_dict(self.connection.execute('SELECT * FROM release_candidate_revisions WHERE id = ?', (item_id,)).fetchone()) or {}
+    def save_gate(self, values: dict[str, Any]) -> dict[str, Any]:
+        item_id = str(uuid4()); self.connection.execute('INSERT INTO gate_evaluations(id, candidate_id, candidate_revision, outcome, input_fingerprint, blockers, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', (item_id, values['candidate_id'], values['candidate_revision'], values['outcome'], values['input_fingerprint'], json.dumps(values['blockers'], sort_keys=True), utc_now())); self.connection.commit(); return {**values, 'id': item_id}

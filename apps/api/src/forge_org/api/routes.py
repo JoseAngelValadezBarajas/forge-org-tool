@@ -8,6 +8,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from forge_org.api.schemas import (
     AcknowledgeRequest,
     AcknowledgeResponse,
+    CandidateCreate,
+    CandidateFreezeRequest,
+    CandidateResponse,
+    ContextPackageResponse,
     CriterionCreate,
     CriterionResponse,
     CriterionUpdate,
@@ -18,20 +22,40 @@ from forge_org.api.schemas import (
     DependencyResponse,
     EpicCreate,
     EpicResponse,
+    EvidenceCreate,
+    EvidenceResponse,
     FeatureCreate,
     FeatureResponse,
+    GateEvaluationResponse,
+    HandoffAcknowledgementResponse,
+    HandoffAckRequest,
+    HandoffCreate,
+    HandoffResponse,
+    HandoffUpdate,
+    HandoffVersionRequest,
     InvariantCreate,
     InvariantResponse,
     InvariantUpdate,
+    ObservationResponse,
     ProjectCreate,
     ProjectResponse,
     ProjectUpdate,
+    RepositoryCreate,
+    RepositoryLinkCreate,
+    RepositoryResponse,
+    RunCreate,
+    RunEventCreate,
+    RunEventResponse,
+    RunResponse,
+    RunStatusUpdate,
     TaskCreate,
     TaskResponse,
     WorkspaceCreate,
     WorkspaceResponse,
     WorkspaceUpdate,
 )
+from forge_org.application.context_packages import ContextPackageService
+from forge_org.application.delivery import DeliveryService
 from forge_org.application.knowledge import KnowledgeService
 from forge_org.application.organization import (
     DuplicateName,
@@ -41,6 +65,8 @@ from forge_org.application.organization import (
 )
 from forge_org.application.planning import PlanningService
 from forge_org.application.readiness import ReadinessService
+from forge_org.application.repositories import RepositoryService
+from forge_org.application.runs import HandoffService, RunService
 from forge_org.infrastructure.sqlite import connect
 
 router = APIRouter(prefix="/api/v1", tags=["organization"])
@@ -71,6 +97,21 @@ def service_error(exc: Exception) -> HTTPException:
 
 def planning_service(connection: sqlite3.Connection = Depends(database)) -> PlanningService:
     return PlanningService(connection)
+
+def repository_service(connection: sqlite3.Connection = Depends(database)) -> RepositoryService:
+    return RepositoryService(connection)
+
+def context_service(connection: sqlite3.Connection = Depends(database)) -> ContextPackageService:
+    return ContextPackageService(connection)
+
+def run_service(connection: sqlite3.Connection = Depends(database)) -> RunService:
+    return RunService(connection)
+
+def handoff_service(connection: sqlite3.Connection = Depends(database)) -> HandoffService:
+    return HandoffService(connection)
+
+def delivery_service(connection: sqlite3.Connection = Depends(database)) -> DeliveryService:
+    return DeliveryService(connection)
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/planning/overview')
 def planning_overview(workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)) -> dict[str, Any]:
@@ -289,4 +330,153 @@ def save_readiness(workspace_id: str, project_id: str, feature_id: str, readines
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/readiness/evaluations')
 def list_readiness(workspace_id: str, project_id: str, feature_id: str, readiness: ReadinessService = Depends(readiness_service)) -> list[dict[str, Any]]:
     try: return readiness.history(workspace_id, project_id, feature_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/repositories', response_model=list[RepositoryResponse])
+def list_repositories(workspace_id: str, project_id: str, repositories: RepositoryService = Depends(repository_service)) -> list[dict[str, Any]]:
+    try: return repositories.repositories(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/repositories', response_model=RepositoryResponse, status_code=201)
+def connect_repository(workspace_id: str, project_id: str, payload: RepositoryCreate, repositories: RepositoryService = Depends(repository_service)) -> dict[str, Any]:
+    try: return repositories.connect(workspace_id, project_id, payload.root_path)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/repositories/{repository_id}/observe', response_model=ObservationResponse, status_code=201)
+def observe_repository(workspace_id: str, project_id: str, repository_id: str, repositories: RepositoryService = Depends(repository_service)) -> dict[str, Any]:
+    try: return repositories.observe(workspace_id, project_id, repository_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/repositories/{repository_id}/observations', response_model=list[ObservationResponse])
+def list_observations(workspace_id: str, project_id: str, repository_id: str, repositories: RepositoryService = Depends(repository_service)) -> list[dict[str, Any]]:
+    try: return repositories.observations(workspace_id, project_id, repository_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/repositories/{repository_id}/disconnect', response_model=RepositoryResponse)
+def disconnect_repository(workspace_id: str, project_id: str, repository_id: str, repositories: RepositoryService = Depends(repository_service)) -> dict[str, Any]:
+    try: return repositories.disconnect(workspace_id, project_id, repository_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/repositories', status_code=201)
+def link_feature_repository(workspace_id: str, project_id: str, feature_id: str, payload: RepositoryLinkCreate, repositories: RepositoryService = Depends(repository_service)) -> dict[str, Any]:
+    try: return repositories.link_feature(workspace_id, project_id, feature_id, payload.repository_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except sqlite3.IntegrityError as exc: raise service_error(DuplicateName('Repository already linked')) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/preview')
+def preview_context(workspace_id: str, project_id: str, feature_id: str, context: ContextPackageService = Depends(context_service)) -> dict[str, Any]:
+    try: return context.preview(workspace_id, project_id, feature_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/packages', response_model=list[ContextPackageResponse])
+def list_context_packages(workspace_id: str, project_id: str, feature_id: str, context: ContextPackageService = Depends(context_service)) -> list[dict[str, Any]]:
+    try: return context.list(workspace_id, project_id, feature_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/packages', response_model=ContextPackageResponse, status_code=201)
+def save_context_package(workspace_id: str, project_id: str, feature_id: str, context: ContextPackageService = Depends(context_service)) -> dict[str, Any]:
+    try: return context.save(workspace_id, project_id, feature_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/runs', response_model=list[RunResponse])
+def list_runs(workspace_id: str, project_id: str, runs: RunService = Depends(run_service)) -> list[dict[str, Any]]:
+    try: return runs.list_runs(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/runs', response_model=RunResponse, status_code=201)
+def create_run(workspace_id: str, project_id: str, payload: RunCreate, runs: RunService = Depends(run_service)) -> dict[str, Any]:
+    try: return runs.create(workspace_id, project_id, payload.model_dump())
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/status', response_model=RunResponse)
+def update_run_status(workspace_id: str, project_id: str, run_id: str, payload: RunStatusUpdate, runs: RunService = Depends(run_service)) -> dict[str, Any]:
+    try: return runs.change_status(workspace_id, project_id, run_id, payload.status, payload.expected_version)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/events', response_model=list[RunEventResponse])
+def list_run_events(workspace_id: str, project_id: str, run_id: str, runs: RunService = Depends(run_service)) -> list[dict[str, Any]]:
+    try: return runs.events(workspace_id, project_id, run_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/events', response_model=RunEventResponse, status_code=201)
+def create_run_event(workspace_id: str, project_id: str, run_id: str, payload: RunEventCreate, runs: RunService = Depends(run_service)) -> dict[str, Any]:
+    try: return runs.add_event(workspace_id, project_id, run_id, payload.model_dump())
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/handoffs', response_model=HandoffResponse, status_code=201)
+def create_handoff(workspace_id: str, project_id: str, run_id: str, payload: HandoffCreate, handoffs: HandoffService = Depends(handoff_service)) -> dict[str, Any]:
+    try: return handoffs.create(workspace_id, project_id, {**payload.model_dump(), 'run_id': run_id})
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.patch('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}', response_model=HandoffResponse)
+def update_handoff(workspace_id: str, project_id: str, handoff_id: str, payload: HandoffUpdate, handoffs: HandoffService = Depends(handoff_service)) -> dict[str, Any]:
+    try: return handoffs.update(workspace_id, project_id, handoff_id, payload.expected_version, payload.model_dump(exclude={'expected_version'}, exclude_unset=True))
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/ready', response_model=HandoffResponse)
+def ready_handoff(workspace_id: str, project_id: str, handoff_id: str, payload: HandoffVersionRequest, handoffs: HandoffService = Depends(handoff_service)) -> dict[str, Any]:
+    try: return handoffs.ready(workspace_id, project_id, handoff_id, payload.expected_version)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/acknowledge', response_model=HandoffAcknowledgementResponse)
+def acknowledge_handoff(workspace_id: str, project_id: str, handoff_id: str, payload: HandoffAckRequest, handoffs: HandoffService = Depends(handoff_service)) -> dict[str, Any]:
+    try: return handoffs.acknowledge(workspace_id, project_id, handoff_id, payload.expected_revision, payload.acknowledged_by)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/evidence', response_model=list[EvidenceResponse])
+def list_evidence(workspace_id: str, project_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
+    try: return delivery.evidence_list(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/evidence', response_model=EvidenceResponse, status_code=201)
+def create_evidence(workspace_id: str, project_id: str, payload: EvidenceCreate, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.evidence_create(workspace_id, project_id, payload.model_dump())
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/evidence/{evidence_id}/invalidate', response_model=EvidenceResponse)
+def invalidate_evidence(workspace_id: str, project_id: str, evidence_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.evidence_invalidate(workspace_id, project_id, evidence_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.get('/workspaces/{workspace_id}/projects/{project_id}/release-candidates', response_model=list[CandidateResponse])
+def list_candidates(workspace_id: str, project_id: str, delivery: DeliveryService = Depends(delivery_service)) -> list[dict[str, Any]]:
+    try: return delivery.candidates(workspace_id, project_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates', response_model=CandidateResponse, status_code=201)
+def create_candidate(workspace_id: str, project_id: str, payload: CandidateCreate, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.candidate_create(workspace_id, project_id, payload.model_dump())
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/freeze', response_model=CandidateResponse)
+def freeze_candidate(workspace_id: str, project_id: str, candidate_id: str, payload: CandidateFreezeRequest, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.freeze(workspace_id, project_id, candidate_id, payload.expected_revision)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc: raise service_error(InvalidInput(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/preview', response_model=GateEvaluationResponse)
+def preview_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.gate(workspace_id, project_id, candidate_id)
+    except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
+
+@router.post('/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/evaluate', response_model=GateEvaluationResponse, status_code=201)
+def evaluate_gates(workspace_id: str, project_id: str, candidate_id: str, delivery: DeliveryService = Depends(delivery_service)) -> dict[str, Any]:
+    try: return delivery.gate(workspace_id, project_id, candidate_id, save=True)
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
