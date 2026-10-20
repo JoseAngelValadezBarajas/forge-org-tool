@@ -18,6 +18,9 @@ def test_project_transfer_previews_fingerprints_and_imports_planning_only(tmp_pa
             fingerprint = preview.json()['fingerprint']
             imported = client.post(f"/api/v1/workspaces/{workspace['id']}/projects/import", json={'document': document, 'expected_fingerprint': fingerprint})
             assert imported.status_code == 201
+            duplicate = client.post(f"/api/v1/workspaces/{workspace['id']}/projects/import", json={'document': document, 'expected_fingerprint': fingerprint})
+            assert duplicate.status_code == 409
+            assert duplicate.json()['detail'] == 'Project name already exists in this workspace'
             exported = client.get(f"/api/v1/workspaces/{workspace['id']}/projects/{imported.json()['project_id']}/export")
             assert exported.status_code == 200
             assert json.loads(exported.text)['schema_version'] == 'forge-project-import-v1'

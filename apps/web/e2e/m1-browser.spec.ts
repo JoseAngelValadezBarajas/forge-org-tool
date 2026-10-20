@@ -156,6 +156,15 @@ test('project transfer is planning-only and exposes reviewed fingerprints', asyn
   await page.getByRole('button', { name: 'Export project' }).click();
   await expect(page.getByText('forge-project-import-v1', { exact: true })).toBeVisible();
   await expect(page.getByText(/fingerprint/i)).toBeVisible();
+  const transferDocument = JSON.parse(await page.locator('textarea').inputValue()) as { project: { name: string } };
+  transferDocument.project.name = `Imported ${suffix}`;
+  await page.locator('textarea').fill(JSON.stringify(transferDocument, null, 2));
+  await page.getByRole('button', { name: 'Preview import' }).click();
+  await expect(page.getByRole('heading', { name: 'Reviewed import' })).toBeVisible();
+  await expect(page.getByText('FINGERPRINT_REQUIRED')).toBeVisible();
+  await page.getByRole('button', { name: 'Commit reviewed import' }).click();
+  await expect(page.getByText('IMPORTED_PLANNING_ONLY')).toBeVisible();
+  await expect(page.getByText(/Created project:/)).toBeVisible();
   const screenshotName = test.info().project.name === 'chromium-mobile' ? 'mobile-transfer.png' : 'desktop-transfer.png';
   await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
 });

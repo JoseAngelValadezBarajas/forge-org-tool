@@ -674,6 +674,7 @@ def import_project(workspace_id: str, payload: ImportCommitRequest, transfer: Pr
     except LookupError as exc: raise service_error(NotFound(str(exc))) from exc
     except (ValueError, TypeError) as exc: raise service_error(InvalidInput(str(exc))) from exc
     except RuntimeError as exc: raise service_error(exc) from exc
+    except sqlite3.IntegrityError as exc: raise service_error(DuplicateName('Project name already exists in this workspace')) from exc
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/export')
 def export_project(workspace_id: str, project_id: str, transfer: ProjectTransferService = Depends(transfer_service)) -> dict[str, Any]:
