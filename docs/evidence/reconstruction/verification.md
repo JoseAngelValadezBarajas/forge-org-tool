@@ -31,7 +31,8 @@ desktop/mobile import evidence.
 fresh/upgrade/future-version safety tests. `159a930` adds the packaged desktop
 sidecar lifecycle and aligns the product hierarchy; `f6bfdce` disambiguates the
 delivery browser assertion; `8031914` orders sidecar packaging before Tauri
-compilation in CI.
+compilation in CI. Final retained browser captures are in evidence commit
+`734c25a`.
 
 ## Automated verification
 
