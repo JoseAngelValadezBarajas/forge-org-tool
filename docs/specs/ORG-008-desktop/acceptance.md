@@ -6,5 +6,6 @@
 - [x] Add pinned Tauri host and restrictive capability/WebView configuration.
 - [x] Add authenticated per-launch sidecar startup and shutdown ownership policy.
 - [x] Add LocalAppData database/log/backup paths.
+- [x] Verify Rust/Tauri host compilation and desktop launcher tests in GitHub Quality CI.
 - [ ] Certify migration safety in the installed product.
 - [ ] Build and run an installed Windows smoke with persistence and isolation.

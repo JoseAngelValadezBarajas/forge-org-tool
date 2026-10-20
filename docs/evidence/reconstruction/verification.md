@@ -11,8 +11,9 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 (latest retained browser evidence). Subsequent delivery/workbench commits are
 `4a1c5c9` (handoff revisions), `aecf36b` (release-candidate history),
 `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification),
-`ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a`
-(handoff lifecycle), and `5674f35` (refreshed evidence).
+  `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a`
+(handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows
+resource icon), and `13f7fc5` (isolated desktop CI frontend build).
 
 ## Automated verification
 
@@ -21,8 +22,8 @@ mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 - API Ruff and strict mypy: passed.
 - API pytest: 16/16 passed; one upstream Starlette/httpx deprecation warning.
 - Desktop launch policy: 3 Python unit tests passed; the authenticated sidecar
-  tests passed as part of the API suite. Native Rust/Tauri compilation remains
-  unavailable because `cargo`/`rustc` are not installed.
+  tests passed as part of the API suite. Native Rust/Tauri compilation and
+  desktop launcher tests passed in [GitHub Quality run 39382267348](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382267348).
 - OpenAPI export check: passed.
 - Production build: passed; `/__components` is absent from `apps/web/dist`.
 - Isolated Chromium: 18/18 passed across desktop/mobile. Playwright starts its
@@ -82,9 +83,9 @@ preview fingerprints, planning-only import, export, stale-fingerprint
 rejection, collection limits, cycle rejection, and the browser transfer flow;
 it remains `IMPLEMENTED_NOT_REVIEWED` pending human Figma review. ORG-008 has
 an
-authenticated sidecar boundary, desktop launch/path policy, and restricted
-Tauri host skeleton; Cargo/Tauri compilation, packaging, and installed Windows
-smoke are not certified. ORG-009 has
+  authenticated sidecar boundary, desktop launch/path policy, and restricted
+  Tauri host skeleton; automated Cargo/Tauri compilation is verified in CI, but
+  packaging and installed Windows smoke are not certified. ORG-009 has
 feature-owned organization, planning, readiness, workbench, and delivery
 surfaces with responsive browser evidence; it remains
 `IMPLEMENTED_NOT_REVIEWED` pending human Figma review. No legacy code/assets, private

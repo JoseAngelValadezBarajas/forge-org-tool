@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), and `5674f35` (refreshed evidence).
+Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), and `13f7fc5` (isolated desktop CI frontend build).
 
 The subsequent ORG-001 reconstruction evidence is recorded in
 `docs/evidence/reconstruction/verification.md`; this M1 record remains the
@@ -29,7 +29,7 @@ The final public repository was cloned into an isolated temporary directory. `np
 - Repository: `https://github.com/JoseAngelValadezBarajas/forge-org-tool`
 - Visibility: public.
 - Default branch: `main`.
-- Quality workflow: success for the final commit.
+- Quality workflow: [run 39382267348](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39382267348) passed for final commit `13f7fc5f58ca7bc4d04d7b2b8f96cd7b535ae471`; web, API, Windows desktop Cargo/Tauri tests, and desktop launcher tests passed.
 
 ## RED/GREEN notes
 
@@ -40,4 +40,4 @@ The final public repository was cloned into an isolated temporary directory. `np
 
 ## Verdict
 
-`M1_READY_FOR_REVIEW` for the focused audit corrections. The local verification pass is complete; GitHub Quality status for the final commit must be refreshed after push. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, Tauri availability, feature parity, or Figma pixel parity.
+`M1_READY_FOR_REVIEW` for the focused audit corrections. Automated behavior and native-build verification are complete. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, an installed product smoke, feature parity, or Figma pixel parity.
