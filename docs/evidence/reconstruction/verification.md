@@ -63,10 +63,12 @@ handoff revision and exact acknowledgement. ORG-006 has API coverage for
 provenance-labelled evidence, invalidation, frozen candidates, and blocked gate
 evaluations. ORG-005 and ORG-006 remain `IMPLEMENTED_NOT_REVIEWED` pending
 browser evidence and fuller delivery rules. ORG-007 has API coverage for
-preview fingerprints, planning-only import, export, and stale-fingerprint
-rejection; it remains `IMPLEMENTED_NOT_REVIEWED` pending full schema-limit
-validation and browser evidence. ORG-008 has only the Rust policy scaffold;
-Cargo/Tauri and installed Windows smoke are not certified. ORG-009 has
+preview fingerprints, planning-only import, export, stale-fingerprint
+rejection, collection limits, and cycle rejection; it remains
+`IMPLEMENTED_NOT_REVIEWED` pending browser evidence. ORG-008 has an
+authenticated sidecar boundary, desktop launch/path policy, and restricted
+Tauri host skeleton; Cargo/Tauri compilation, packaging, and installed Windows
+smoke are not certified. ORG-009 has
 feature-owned organization, planning, readiness, workbench, and delivery
 surfaces with responsive browser evidence; it remains
 `IMPLEMENTED_NOT_REVIEWED` pending human Figma review. No legacy code/assets, private

@@ -4,6 +4,6 @@
 - [x] Require a per-launch bearer token for the loopback sidecar.
 - [x] Define LocalAppData database/log paths and sidecar process cleanup.
 - [x] Add pinned Tauri host and restrictive capability/WebView configuration.
-- [ ] Add authenticated per-launch sidecar startup and shutdown ownership.
+- [x] Add authenticated per-launch sidecar startup and shutdown ownership policy.
 - [ ] Add LocalAppData database/log/backup paths and migration safety.
 - [ ] Build and run an installed Windows smoke with persistence and isolation.
