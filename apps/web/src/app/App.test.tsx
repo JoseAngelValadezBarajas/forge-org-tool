@@ -61,7 +61,7 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('button', { name: /switch to dark/i })).toBeInTheDocument();
   });
 
-  it('provides searchable catalog sections and honest planned entries', () => {
+  it('provides searchable catalog sections and clearly labels review status', () => {
     renderRoute('/__components');
 
     expect(screen.getByRole('navigation', { name: 'Component host sections' })).toBeInTheDocument();
@@ -71,7 +71,8 @@ describe('M1 application shell', () => {
       screen.getByRole('heading', { name: 'Product-specific components' }),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'Icon library' }).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('NOT_IMPLEMENTED').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[data-component-id^="icon-"] svg')).toHaveLength(35);
+    expect(screen.getAllByText('IMPLEMENTED_NOT_REVIEWED').length).toBeGreaterThan(0);
 
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search components' }), {
       target: { value: 'status' },
@@ -90,6 +91,18 @@ describe('M1 application shell', () => {
 
     expect(available.length).toBeGreaterThan(0);
     for (const entry of available) {
+      expect(
+        document.querySelector(`[data-component-id="${entry.componentHost.id}"]`),
+      ).not.toBeNull();
+    }
+  });
+
+  it('previews every canonical icon export under its stable inventory ID', () => {
+    renderRoute('/__components');
+
+    const iconEntries = parity.inventory.filter((entry) => entry.category === 'icon');
+    expect(iconEntries).toHaveLength(35);
+    for (const entry of iconEntries) {
       expect(
         document.querySelector(`[data-component-id="${entry.componentHost.id}"]`),
       ).not.toBeNull();

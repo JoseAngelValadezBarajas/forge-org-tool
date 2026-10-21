@@ -19,6 +19,43 @@ import {
   Textarea,
 } from '@forge-org/ui';
 import { OrganizationEmptyState } from '../../features/organization';
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Bell,
+  Check,
+  CheckCircle,
+  Chevron,
+  ChevronDown,
+  ChevronRight,
+  Close,
+  Clock,
+  Download,
+  Edit,
+  Eye,
+  ExternalLink,
+  Filter,
+  Folder,
+  GitBranch,
+  GripVertical,
+  History,
+  Info,
+  Layers,
+  Link,
+  Lock,
+  Menu,
+  Minus,
+  Plus,
+  Refresh,
+  Search,
+  Settings,
+  Trash,
+  Upload,
+  XCircle,
+} from '@forge-org/icons';
 import styles from './ComponentGallery.module.css';
 
 type CatalogSection =
@@ -275,15 +312,72 @@ const catalog: CatalogItem[] = [
     id: 'icon-library',
     name: 'Icon library',
     section: 'Icon library',
-    owner: 'Not assigned',
-    status: 'NOT_IMPLEMENTED',
-    figma: '173:2 Core UI Components',
-    variants: 'planned',
-    states: 'unavailable',
-    accessibility: 'No icon is presented as available.',
-    deviations: 'Requires a design and licensing decision.',
+    owner: '@forge-org/icons',
+    status: 'IMPLEMENTED_NOT_REVIEWED',
+    figma: 'Page 19 / 35 icon masters',
+    variants: '35 named SVG exports, 24px default, configurable size and currentColor',
+    states: 'decorative by default; optional accessible title',
+    accessibility: 'Decorative icons are aria-hidden; titled icons expose an accessible name.',
+    deviations: 'Original SVG path geometry; human Figma visual review is pending.',
   },
 ];
+
+const icons = [
+  ['Plus', Plus],
+  ['Close', Close],
+  ['Chevron', Chevron],
+  ['Check', Check],
+  ['Minus', Minus],
+  ['Search', Search],
+  ['Menu', Menu],
+  ['Edit', Edit],
+  ['Trash', Trash],
+  ['Download', Download],
+  ['Upload', Upload],
+  ['Filter', Filter],
+  ['ArrowLeft', ArrowLeft],
+  ['ArrowRight', ArrowRight],
+  ['ArrowUp', ArrowUp],
+  ['ArrowDown', ArrowDown],
+  ['AlertTriangle', AlertTriangle],
+  ['Info', Info],
+  ['Clock', Clock],
+  ['Folder', Folder],
+  ['GitBranch', GitBranch],
+  ['Refresh', Refresh],
+  ['ExternalLink', ExternalLink],
+  ['Lock', Lock],
+  ['History', History],
+  ['CheckCircle', CheckCircle],
+  ['XCircle', XCircle],
+  ['Bell', Bell],
+  ['ChevronDown', ChevronDown],
+  ['ChevronRight', ChevronRight],
+  ['GripVertical', GripVertical],
+  ['Link', Link],
+  ['Eye', Eye],
+  ['Layers', Layers],
+  ['Settings', Settings],
+] as const;
+
+function IconCatalogPreview() {
+  return (
+    <Card>
+      <div className={styles.iconGrid}>
+        {icons.map(([name, Icon]) => (
+          <div
+            className={styles.iconItem}
+            data-component-id={`icon-${name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`}
+            key={name}
+          >
+            <Icon size={20} />
+            <span>{name}</span>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
 
 const sections: CatalogSection[] = [
   'Foundations and tokens',
@@ -490,12 +584,7 @@ function ComponentPreview({
         </div>
       );
     case 'icon-library':
-      return (
-        <Card>
-          <StatusChip tone="warning">NOT_IMPLEMENTED</StatusChip>
-          <p>No icon implementation is available for preview.</p>
-        </Card>
-      );
+      return <IconCatalogPreview />;
   }
 }
 

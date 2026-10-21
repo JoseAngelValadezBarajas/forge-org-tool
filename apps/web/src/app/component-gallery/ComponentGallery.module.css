@@ -117,6 +117,25 @@
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: var(--forge-space-3);
 }
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: var(--forge-space-2);
+}
+.iconItem {
+  display: flex;
+  align-items: center;
+  gap: var(--forge-space-2);
+  min-width: 0;
+  padding: var(--forge-space-2);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+  color: var(--forge-text);
+  font: 0.75rem/1.3 var(--forge-font-mono);
+}
+.iconItem span {
+  overflow-wrap: anywhere;
+}
 .token {
   display: flex;
   align-items: center;
