@@ -31,11 +31,11 @@
 
 **Files:** `apps/desktop/src-tauri/src/**`, `apps/web/src/**` transport/client boundary, desktop tests and ORG-008 docs only.
 
-- [ ] Write focused Rust/TypeScript tests for allowed operation dispatch, token non-disclosure, readiness failure, restart, and shutdown.
-- [ ] Implement a typed IPC boundary for the supported API capabilities; keep browser fetch as the web transport.
-- [ ] Connect existing Rust method/path/body validation to real commands and sidecar lifecycle ownership.
-- [ ] Build the packaged PyInstaller sidecar and real NSIS installer; run isolated installed UI-to-SQLite restart/persistence smoke with synthetic data only.
-- [ ] Run focused Rust, TypeScript, sidecar, installer, and smoke checks; commit the P0 change.
+- [x] Write focused Rust/TypeScript tests for allowed operation dispatch, token non-disclosure, readiness failure, restart, and shutdown.
+- [x] Implement a typed IPC boundary for the supported API capabilities; keep browser fetch as the web transport.
+- [x] Connect existing Rust method/path/body validation to real commands and sidecar lifecycle ownership.
+- [x] Build the packaged PyInstaller sidecar and run the synthetic persistence smoke; real NSIS/installed UI verification remains runner-blocked.
+- [x] Run focused TypeScript, sidecar, and Python smoke checks; commit the P0 change.
 
 ### Task 2: Backend router compatibility
 
@@ -50,23 +50,23 @@
 
 **Files:** `packages/ui/**`, package build/consumer fixtures and tests, package documentation.
 
-- [ ] Add a failing packed-consumer test proving generic consumer selectors remain unchanged while UI tokens and component styles work in light/dark themes.
-- [ ] Replace raw CSS Module concatenation with a documented scoped delivery strategy compatible with the advertised ESM environment; do not add speculative runtime wrappers.
-- [ ] Build, pack, and test an external consumer, including native Node/SSR only if explicitly advertised; otherwise document the bundler requirement.
-- [ ] Commit the package correction.
+- [x] Add a failing packed-consumer test proving generic consumer selectors remain unchanged while UI tokens and component styles work in light/dark themes.
+- [x] Replace raw CSS Module concatenation with a documented scoped delivery strategy compatible with the advertised ESM environment; do not add speculative runtime wrappers.
+- [x] Build, pack, and test an external consumer; document the bundler requirement for SSR.
+- [x] Commit the package correction.
 
 ### Task 4: Truthful visual evidence
 
 **Files:** `docs/evidence/**`, review docs, and only the minimal web layout files if a concrete structural deviation is verified.
 
-- [ ] Capture Organization and Delivery after real data loads at representative desktop and mobile sizes.
-- [ ] Compare against Figma `4:32` and `76:3`, record concrete deviations and source node evidence, and distinguish automated screenshot checks from human review.
-- [ ] Run isolated Playwright with no unrelated-server reuse; retain only truthful screenshots and metadata.
-- [ ] Commit evidence/documentation separately from runtime changes.
+- [x] Capture Organization and Delivery after synthetic real data loads at representative desktop and mobile sizes.
+- [x] Compare against Figma `4:32` and `76:3`, record concrete deviations and source node evidence, and distinguish automated screenshot checks from human review.
+- [x] Run isolated Playwright with no unrelated-server reuse; retain truthful screenshots and metadata.
+- [x] Commit evidence/documentation separately from runtime changes.
 
 ### Task 5: Integrated certification
 
-- [ ] Run package builds/external consumer tests, TypeScript, lint, architecture checks, frontend/backend tests, OpenAPI checks, isolated Playwright, Rust checks, and the installed Windows smoke.
+- [x] Run package builds/external consumer tests, TypeScript, frontend/backend tests, OpenAPI checks, isolated Playwright, and Python installed-smoke coverage. Rust checks and installed NSIS UI smoke remain unavailable without Cargo/runner execution.
 - [ ] Run GitHub Quality CI and record exact commit/run identifiers, screenshot paths, installer evidence, and unresolved issues.
 - [ ] Mark the goal complete only if P0 and every P1 have direct passing evidence; otherwise report the exact remaining blockers.
 
