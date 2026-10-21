@@ -4,14 +4,23 @@ import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const sourceRoots = ['packages/ui/src', 'packages/api-client/src', 'packages/tokens/src', 'apps/web/src'];
+const sourceRoots = [
+  'packages/ui/src',
+  'packages/api-client/src',
+  'packages/tokens/src',
+  'apps/web/src',
+];
 const sourceExtensions = ['.ts', '.tsx'];
 const normalize = (file) => relative(root, file).split(sep).join('/');
 
 function filesIn(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
-    return entry.isDirectory() ? filesIn(path) : sourceExtensions.includes(extname(path)) ? [path] : [];
+    return entry.isDirectory()
+      ? filesIn(path)
+      : sourceExtensions.includes(extname(path))
+        ? [path]
+        : [];
   });
 }
 
@@ -21,14 +30,23 @@ const known = new Set(files);
 function resolveLocal(from, specifier) {
   if (!specifier.startsWith('.')) return null;
   const base = resolve(dirname(from), specifier);
-  for (const candidate of [base, ...sourceExtensions.map((extension) => `${base}${extension}`), ...sourceExtensions.map((extension) => join(base, `index${extension}`))]) {
+  for (const candidate of [
+    base,
+    ...sourceExtensions.map((extension) => `${base}${extension}`),
+    ...sourceExtensions.map((extension) => join(base, `index${extension}`)),
+  ]) {
     if (known.has(candidate)) return candidate;
   }
   return null;
 }
 
 function dependencies(file) {
-  const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+  const source = ts.createSourceFile(
+    file,
+    readFileSync(file, 'utf8'),
+    ts.ScriptTarget.Latest,
+    true,
+  );
   const result = [];
   function visit(node) {
     if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
@@ -37,7 +55,10 @@ function dependencies(file) {
         const target = resolveLocal(file, value.text);
         if (target) result.push(target);
       }
-    } else if (ts.isImportEqualsDeclaration(node) && ts.isExternalModuleReference(node.moduleReference)) {
+    } else if (
+      ts.isImportEqualsDeclaration(node) &&
+      ts.isExternalModuleReference(node.moduleReference)
+    ) {
       const value = node.moduleReference.expression;
       if (value && ts.isStringLiteral(value)) {
         const target = resolveLocal(file, value.text);
