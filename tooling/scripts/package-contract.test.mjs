@@ -17,7 +17,10 @@ test('root package tooling has one dependency definition and concrete Rust targe
     prettier: '^3.9.10',
     'typescript-eslint': '^8.72.0',
   });
-  assert.match(packageJson.scripts['lint:fix'], /cargo fmt --manifest-path apps\/desktop\/Cargo\.toml/);
+  assert.match(
+    packageJson.scripts['lint:fix'],
+    /cargo fmt --manifest-path apps\/desktop\/Cargo\.toml/,
+  );
   assert.match(
     packageJson.scripts['lint:fix'],
     /cargo fmt --manifest-path apps\/desktop\/src-tauri\/Cargo\.toml/,

@@ -1,0 +1,53 @@
+"""Versioned migration runner for the local SQLite database."""
+
+import sqlite3
+
+from ..connection import utc_now
+from ..sqlite import _apply_legacy_schema
+from .v0002_metadata import VERSION as METADATA_MIGRATION_VERSION
+from .v0002_metadata import upgrade as upgrade_metadata
+
+CURRENT_SCHEMA_VERSION = METADATA_MIGRATION_VERSION
+
+
+def migrate(connection: sqlite3.Connection) -> None:
+    """Apply compatibility-preserving, versioned local schema migrations."""
+    existing_version = (
+        connection.execute('SELECT max(version) FROM schema_version').fetchone()[0]
+        if connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_version'"
+        ).fetchone()
+        else 0
+    )
+    if existing_version > CURRENT_SCHEMA_VERSION:
+        raise RuntimeError(f'unsupported database schema version: {existing_version}')
+
+    _apply_legacy_schema(connection)
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS schema_migrations (
+            version INTEGER PRIMARY KEY,
+            applied_at TEXT NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        'INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)',
+        (1, utc_now()),
+    )
+
+    applied = {
+        row[0] for row in connection.execute('SELECT version FROM schema_migrations').fetchall()
+    }
+    if 2 not in applied:
+        upgrade_metadata(connection)
+        connection.execute(
+            'INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)',
+            (2, utc_now()),
+        )
+    connection.execute(
+        'INSERT OR IGNORE INTO schema_version(version) VALUES (?)',
+        (CURRENT_SCHEMA_VERSION,),
+    )
+    connection.execute(f'PRAGMA user_version = {CURRENT_SCHEMA_VERSION}')
+    connection.commit()

@@ -31,8 +31,8 @@ def connect() -> sqlite3.Connection:
     cast(sqlite3.Connection, raw_connection.driver_connection).row_factory = sqlite3.Row
     connection = cast(sqlite3.Connection, raw_connection)
     connection.execute('PRAGMA foreign_keys = ON')
-    # Import lazily to avoid a cycle: migrations live with the persistence store.
-    from .sqlite import migrate
+    # Import lazily to avoid a cycle with the legacy schema compatibility store.
+    from .migrations.runner import migrate
 
     migrate(connection)
     return connection

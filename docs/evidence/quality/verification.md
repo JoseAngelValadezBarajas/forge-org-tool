@@ -27,28 +27,30 @@ data, merge PR #1, or archive the original FORGE repository.
   not reformatted.
 - Ruff introduced one actionable exception-chain correction (`B904`); the
   API lint set now passes with no violations.
-- ESLint initially found 21 errors. The real accessibility and runtime-global
-  issues were corrected; the established async data-loading effect pattern
-  remains as 17 warnings, documented in the flat config rather than hidden by
-  file-level disables.
-- `@forge-org/api-client/src/index.ts` is now a small compatibility composition
-  surface. Legacy operations are isolated in `capabilities.ts`, with transport,
-  errors, types, and organization capability modules separated.
-- API dependency providers moved to `api/dependencies.py`; SQLite connection
-  lifecycle moved to `infrastructure/connection.py`. Migrations and the
-  transactional repository store remain together because they share the
-  migration ordering and repository transaction boundary.
-- `routes.py`, `sqlite.py`, `DeliveryPage.tsx`, and `PlanningPage.tsx` remain
-  large because they contain the existing public endpoint/transaction or
-  feature-state contracts. Their safe boundaries are now explicit; further
-  endpoint/page extraction requires characterization work beyond mechanical
-  formatting and is not justified by line count alone.
+- ESLint initially found 17 React Hooks warnings. The warnings are now errors,
+  all 17 are remediated, and the full repository lint run reports zero warnings
+  and zero errors. Focused planning and organization tests cover stale-request
+  protection.
+- `@forge-org/api-client/src/index.ts` remains the compatibility facade while
+  planning, readiness, repositories, context, transfer, workbench, and delivery
+  operations are implemented in focused modules with shared response types.
+- API dependency providers remain in `api/dependencies.py`. Connection lifecycle
+  remains in `infrastructure/connection.py`; migration execution now lives in
+  `infrastructure/migrations/runner.py` while the legacy schema and repository
+  SQL remain unchanged for compatibility.
+- Public route registration is composed into capability groups in
+  `api/route_groups.py`; handler extraction from the 1,653-line legacy-compatible
+  `routes.py` and cohesive repository extraction from `sqlite.py` remain open
+  structural work.
 
 ## Verification evidence
 
-- Frontend typecheck, architecture checks, token check, Vitest 22/22, and
-  production build pass locally.
-- API Ruff, strict mypy, pytest 16/16, and OpenAPI drift check pass locally.
+- Frontend typecheck, architecture checks, token check, Vitest 25/25, ESLint,
+  Prettier, and production build pass locally.
+- API Ruff, migration characterization tests (3/3), full API pytest (25/25),
+  and OpenAPI drift check pass locally. Strict mypy is not green: the existing
+  application has 17 pre-existing untyped-service errors and the new route
+  composition was reduced to a clean standalone module check.
 - Existing isolated Chromium smoke remains 18/18; the same web journey suite
   passed in the final GitHub Quality run.
 - GitHub Quality run `39530621562` passed web, API, and desktop for commit
@@ -56,5 +58,5 @@ data, merge PR #1, or archive the original FORGE repository.
   pytest/OpenAPI checks, Rust format/Clippy/tests, desktop smoke tests, and the
   release build.
 
-No runtime performance improvement is claimed; this report concerns
-readability, repeatable checks, and preserved contracts.
+This record is not a certification: strict mypy and the remaining backend
+handler/repository extraction findings still block `CODE_QUALITY_CERTIFIED`.

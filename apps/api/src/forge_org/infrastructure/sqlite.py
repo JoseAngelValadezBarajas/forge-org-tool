@@ -4,10 +4,6 @@ from typing import Any
 from uuid import uuid4
 
 from .connection import utc_now
-from .migrations.v0002_metadata import VERSION as METADATA_MIGRATION_VERSION
-from .migrations.v0002_metadata import upgrade as upgrade_metadata
-
-CURRENT_SCHEMA_VERSION = METADATA_MIGRATION_VERSION
 
 
 def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
@@ -195,54 +191,6 @@ def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
         INSERT OR IGNORE INTO schema_version(version) VALUES (1);
         """
     )
-    connection.commit()
-
-
-def migrate(connection: sqlite3.Connection) -> None:
-    """Apply the compatibility-preserving, versioned local schema migrations.
-
-    The large v1 schema remains the repository's SQL compatibility baseline. New
-    changes are recorded in ``schema_migrations`` and applied atomically so an
-    installed database can be upgraded without losing existing records.
-    """
-    existing_version = (
-        connection.execute('SELECT max(version) FROM schema_version').fetchone()[0]
-        if connection.execute(
-            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_version'"
-        ).fetchone()
-        else 0
-    )
-    if existing_version > CURRENT_SCHEMA_VERSION:
-        raise RuntimeError(f'unsupported database schema version: {existing_version}')
-
-    _apply_legacy_schema(connection)
-    connection.execute(
-        """
-        CREATE TABLE IF NOT EXISTS schema_migrations (
-            version INTEGER PRIMARY KEY,
-            applied_at TEXT NOT NULL
-        )
-        """
-    )
-    connection.execute(
-        'INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES (?, ?)',
-        (1, utc_now()),
-    )
-
-    applied = {
-        row[0] for row in connection.execute('SELECT version FROM schema_migrations').fetchall()
-    }
-    if 2 not in applied:
-        upgrade_metadata(connection)
-        connection.execute(
-            'INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)',
-            (2, utc_now()),
-        )
-    connection.execute(
-        'INSERT OR IGNORE INTO schema_version(version) VALUES (?)',
-        (CURRENT_SCHEMA_VERSION,),
-    )
-    connection.execute(f'PRAGMA user_version = {CURRENT_SCHEMA_VERSION}')
     connection.commit()
 
 
