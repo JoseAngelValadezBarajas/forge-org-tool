@@ -1,11 +1,23 @@
 # ruff: noqa: B008
 import sqlite3
-from collections.abc import Iterator
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from fastapi.responses import PlainTextResponse
 
+from forge_org.api.dependencies import (
+    context_service,
+    delivery_service,
+    handoff_service,
+    knowledge_service,
+    planning_service,
+    readiness_service,
+    repository_service,
+    run_service,
+    service,
+    service_error,
+    transfer_service,
+)
 from forge_org.api.schemas import (
     AcknowledgeRequest,
     AcknowledgeResponse,
@@ -85,61 +97,8 @@ from forge_org.application.readiness import ReadinessService
 from forge_org.application.repositories import RepositoryService
 from forge_org.application.runs import HandoffService, RunService
 from forge_org.application.transfer import ProjectTransferService
-from forge_org.infrastructure.sqlite import connect
 
 router = APIRouter(prefix='/api/v1', tags=['organization'])
-
-
-def database() -> Iterator[sqlite3.Connection]:
-    connection = connect()
-    try:
-        yield connection
-    finally:
-        connection.close()
-
-
-def service(connection: sqlite3.Connection = Depends(database)) -> OrganizationService:
-    return OrganizationService(connection)
-
-
-def service_error(exc: Exception) -> HTTPException:
-    if isinstance(exc, NotFound):
-        return HTTPException(status_code=404, detail=str(exc))
-    if isinstance(exc, DuplicateName):
-        return HTTPException(status_code=409, detail=str(exc))
-    if isinstance(exc, InvalidInput):
-        return HTTPException(status_code=422, detail=str(exc))
-    if isinstance(exc, RuntimeError):
-        return HTTPException(status_code=409, detail=str(exc))
-    return HTTPException(status_code=500, detail='Unexpected organization error')
-
-
-def planning_service(connection: sqlite3.Connection = Depends(database)) -> PlanningService:
-    return PlanningService(connection)
-
-
-def repository_service(connection: sqlite3.Connection = Depends(database)) -> RepositoryService:
-    return RepositoryService(connection)
-
-
-def context_service(connection: sqlite3.Connection = Depends(database)) -> ContextPackageService:
-    return ContextPackageService(connection)
-
-
-def run_service(connection: sqlite3.Connection = Depends(database)) -> RunService:
-    return RunService(connection)
-
-
-def handoff_service(connection: sqlite3.Connection = Depends(database)) -> HandoffService:
-    return HandoffService(connection)
-
-
-def delivery_service(connection: sqlite3.Connection = Depends(database)) -> DeliveryService:
-    return DeliveryService(connection)
-
-
-def transfer_service(connection: sqlite3.Connection = Depends(database)) -> ProjectTransferService:
-    return ProjectTransferService(connection)
 
 
 @router.get('/workspaces/{workspace_id}/projects/{project_id}/planning/overview')
@@ -525,14 +484,6 @@ def delete_dependency(
         planning.delete_dependency(workspace_id, project_id, dependency_id)
     except LookupError as exc:
         raise service_error(NotFound(str(exc))) from exc
-
-
-def knowledge_service(connection: sqlite3.Connection = Depends(database)) -> KnowledgeService:
-    return KnowledgeService(connection)
-
-
-def readiness_service(connection: sqlite3.Connection = Depends(database)) -> ReadinessService:
-    return ReadinessService(connection)
 
 
 @router.get(
