@@ -52,7 +52,8 @@ fn http_request(
     path: &str,
     body: &[u8],
 ) -> Result<(u16, String), String> {
-    validate_request(method, path, body.len()).map_err(|error| format!("request rejected: {error:?}"))?;
+    validate_request(method, path, body.len())
+        .map_err(|error| format!("request rejected: {error:?}"))?;
     let address = format!("127.0.0.1:{port}")
         .parse()
         .map_err(|error| format!("sidecar address is invalid: {error}"))?;
@@ -130,15 +131,28 @@ fn desktop_request(
         .lock()
         .map_err(|_| "desktop transport token is unavailable".to_string())?
         .clone();
-    let (status, response_body) = match http_request(port, &token, &method, &path, body.as_bytes()) {
+    let (status, response_body) = match http_request(port, &token, &method, &path, body.as_bytes())
+    {
         Ok(response) => response,
         Err(first_error) => {
             stop_sidecar(&state);
-            let (next_port, next_token, next_child) = start_sidecar(&app)
-                .map_err(|restart| format!("desktop request failed: {first_error}; restart failed: {restart}"))?;
-            *state.port.lock().map_err(|_| "desktop transport port is unavailable".to_string())? = next_port;
-            *state.token.lock().map_err(|_| "desktop transport token is unavailable".to_string())? = next_token.clone();
-            *state.child.lock().map_err(|_| "desktop transport child is unavailable".to_string())? = Some(next_child);
+            let (next_port, next_token, next_child) = start_sidecar(&app).map_err(|restart| {
+                format!("desktop request failed: {first_error}; restart failed: {restart}")
+            })?;
+            *state
+                .port
+                .lock()
+                .map_err(|_| "desktop transport port is unavailable".to_string())? = next_port;
+            *state
+                .token
+                .lock()
+                .map_err(|_| "desktop transport token is unavailable".to_string())? =
+                next_token.clone();
+            *state
+                .child
+                .lock()
+                .map_err(|_| "desktop transport child is unavailable".to_string())? =
+                Some(next_child);
             http_request(next_port, &next_token, &method, &path, body.as_bytes())
                 .map_err(|error| format!("desktop request failed after restart: {error}"))?
         }
@@ -159,7 +173,8 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![desktop_request])
         .setup(|app| {
-            let (port, token, child) = start_sidecar(app.handle()).map_err(std::io::Error::other)?;
+            let (port, token, child) =
+                start_sidecar(app.handle()).map_err(std::io::Error::other)?;
             app.manage(DesktopTransport {
                 port: Mutex::new(port),
                 token: Mutex::new(token),
