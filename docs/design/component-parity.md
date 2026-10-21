@@ -1,5 +1,88 @@
 # Component parity register
 
+## Canonical inventory and provenance (Task 1)
+
+[design-system-parity.json](design-system-parity.json) is the canonical inventory:
+**100 rows: 37 core families, 35 individual icon masters, 28 product patterns**.
+Figma file `r10szKLgiIPVi2NBmbjTpm`, page 19 (`173:2`), owns core
+contracts/icons; page 20 (`229:2`) owns feature patterns. All 100 exact brief
+IDs were located in read-only page metadata on 2026-10-20.
+
+The code snapshot is `3c7bd9b6ef618236c0ee0a1055d937032d771e4a`.
+Coverage is 1 IMPLEMENTED, 40 PARTIAL and 59 NOT_IMPLEMENTED. MetricCard has
+the existing label/value/detail contract. Partial rows identify missing
+variants/composition or inline business behavior awaiting a named component.
+These labels do not certify appearance or completion of directory migration.
+All 100 visual statuses are NOT_HUMAN_REVIEWED.
+There are 14 AVAILABLE canonical host fixtures and 86 PLANNED preview IDs.
+
+### Registry schema
+
+| Field                                          | Interpretation                                                                                                                                                |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `category`, `figmaNodeId`, `figmaName`         | Frozen brief identity. Categories are core, icon, product.                                                                                                    |
+| `sourceName`, `source`                         | Exact Figma source name, file/page, bounds and review method. Brief aliases such as TextInput and Tab/Tabs retain their identity.                             |
+| `owner`                                        | Concrete intended directory; existence is not implied.                                                                                                        |
+| `component`                                    | Name, target file and current implementation paths.                                                                                                           |
+| `publicApi`, `styles`, `tests`                 | Target and current mappings. Empty current arrays mean absent mappings. Current suite paths are behavior evidence locations, not complete variant tests.      |
+| `componentHost`                                | Unique non-empty catalog ID, AVAILABLE or PLANNED, and current gallery source only for available fixtures. These are catalog IDs, not guaranteed DOM anchors. |
+| `variants`                                     | Exact specimen node IDs, source names, width and height; a single master retains its own bounds.                                                              |
+| `states`                                       | Exact State-axis values. Tone, Style, Kind and Size remain in variant names. Empty means no State axis enumerated.                                            |
+| `implementationStatus`                         | IMPLEMENTED, PARTIAL or NOT_IMPLEMENTED, independent of human visual review.                                                                                  |
+| `visualReviewStatus`                           | NOT_HUMAN_REVIEWED for every entry.                                                                                                                           |
+| `implementationNotes`, `relatedImplementation` | Deviations and existing inline/related behavior; related code is not a completed named export.                                                                |
+
+Core targets use `packages/ui/src/components/<category>/<Component>/`.
+Icons target `packages/icons/src/icons/<Icon>/`; no icon package or geometry
+is created here. Figma references do not grant redistribution rights. Future
+geometry requires documented rights or original authorship.
+
+Product targets preserve shell and feature ownership. Decisions and Invariants
+belong to readiness. ContextPackageCard's source name is Repositories /
+ContextPackageCard, while its intended owner is the context feature.
+
+ButtonSize `206:690` maps to Button's directory and the intended
+`ButtonProps.size` API, with `integration.implemented: false`. The prop is
+absent, so its status is NOT_IMPLEMENTED; no separate ButtonSize export is
+planned. Figma describes these as size reference specimens pending promotion.
+Both metadata and context report Small/Medium/Large specimen heights of 100px.
+Those bounds are not interpreted as approved production button heights.
+Button `173:27` has 36/38px default specimens, 40px Focused specimens and a
+current 40px implementation minimum.
+
+Concrete design contexts inspected: Button `173:27`, ButtonSize `206:690`,
+StatusChip `173:40`, Card `173:65`, MetricCard `173:66`,
+SectionHeader master `177:183`, ContextPackageCard `229:426`,
+VerificationSummary `229:515`, Settings `237:926`. The other variant
+names/dimensions come from exact master metadata. No generated code or assets
+were copied. StatePanel's related code does not implement its full Kind API.
+
+### Existing code-only reusable compositions
+
+These five entries are separate from the 100 Figma rows in
+`codeOnlyComponents`. Page entry points and private gallery helpers are
+excluded from the reusable inventory; tokens remain foundation evidence.
+
+| Component              | Existing source                                                            | Relationship                                                     |
+| ---------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| EmptyState             | `packages/ui/src/components/EmptyState.tsx`                                | Related to StatePanel.                                           |
+| LoadingState           | `packages/ui/src/components/LoadingState.tsx`                              | Related to StatePanel.                                           |
+| ErrorState             | `packages/ui/src/components/ErrorState.tsx`                                | Related to StatePanel.                                           |
+| OrganizationEmptyState | `apps/web/src/features/organization/components/OrganizationEmptyState.tsx` | Closest product screen `4:32`; exact page-20 master unconfirmed. |
+| DeliverySummary        | `apps/web/src/features/delivery/DeliverySummary.tsx`                       | Count summary, not VerificationSummary or ReleaseGate.           |
+
+Validate with `node tooling/scripts/validate-design-system-parity.mjs` and
+`node --test tooling/scripts/validate-design-system-parity.test.mjs`.
+The validator freezes exact IDs/names/categories, mappings, statuses, unique
+preview IDs and ButtonSize integration without requiring future source files.
+
+## Historical M1 evidence
+
+The following M1 notes retain their behavior/screenshot evidence. Their legacy
+review labels do not supersede the canonical NOT_HUMAN_REVIEWED statuses.
+SectionHeader `178:191` below is a gallery instance; its canonical master is
+`177:183`.
+
 The Component Host at `/__components` is development-only and renders the
 actual public React exports. This register tracks implementation and review
 separately. Automated tests do not produce visual `PASS` status.

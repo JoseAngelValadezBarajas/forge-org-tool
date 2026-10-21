@@ -1,0 +1,6141 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+    "pages": {
+      "core": "173:2",
+      "icon": "173:2",
+      "product": "229:2"
+    },
+    "inspectedAt": "2026-10-20",
+    "implementationSnapshot": "3c7bd9b6ef618236c0ee0a1055d937032d771e4a",
+    "method": "Read-only Figma page metadata for all 100 exact nodes; concrete design contexts recorded per row. Dimensions are source specimen bounds, not responsive CSS requirements."
+  },
+  "inventory": [
+    {
+      "category": "core",
+      "figmaNodeId": "173:27",
+      "figmaName": "Button",
+      "sourceName": "Actions / Button",
+      "owner": "packages/ui/src/components/actions/Button/",
+      "component": {
+        "name": "Button",
+        "target": "packages/ui/src/components/actions/Button/Button.tsx",
+        "current": ["packages/ui/src/primitives/Button.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Button",
+        "current": ["packages/ui/src/index.ts#Button"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/actions/Button/Button.module.css",
+        "current": ["packages/ui/src/primitives/Button.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/actions/Button/Button.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "button",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:3",
+          "name": "Style=Primary, State=Default",
+          "width": 65,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "173:5",
+          "name": "Style=Primary, State=Hover",
+          "width": 65,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "173:7",
+          "name": "Style=Primary, State=Disabled",
+          "width": 65,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "173:9",
+          "name": "Style=Secondary, State=Default",
+          "width": 67,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "173:11",
+          "name": "Style=Secondary, State=Hover",
+          "width": 67,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "173:13",
+          "name": "Style=Secondary, State=Disabled",
+          "width": 67,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "173:15",
+          "name": "Style=Ghost, State=Default",
+          "width": 67,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "173:17",
+          "name": "Style=Ghost, State=Hover",
+          "width": 67,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "173:19",
+          "name": "Style=Ghost, State=Disabled",
+          "width": 67,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "173:21",
+          "name": "Style=Danger, State=Default",
+          "width": 65,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "173:23",
+          "name": "Style=Danger, State=Hover",
+          "width": 65,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "173:25",
+          "name": "Style=Danger, State=Disabled",
+          "width": 65,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "190:432",
+          "name": "Style=Primary, State=Focused",
+          "width": 104,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "190:434",
+          "name": "Style=Primary, State=Pressed",
+          "width": 100,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "190:436",
+          "name": "Style=Primary, State=Loading",
+          "width": 130,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "190:439",
+          "name": "Style=Secondary, State=Focused",
+          "width": 101,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "190:441",
+          "name": "Style=Secondary, State=Pressed",
+          "width": 99,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "190:443",
+          "name": "Style=Secondary, State=Loading",
+          "width": 129,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "190:446",
+          "name": "Style=Ghost, State=Focused",
+          "width": 72,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "190:448",
+          "name": "Style=Ghost, State=Pressed",
+          "width": 70,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "190:450",
+          "name": "Style=Ghost, State=Loading",
+          "width": 100,
+          "height": 38
+        },
+        {
+          "figmaNodeId": "190:453",
+          "name": "Style=Danger, State=Focused",
+          "width": 106,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "190:455",
+          "name": "Style=Danger, State=Pressed",
+          "width": 102,
+          "height": 36
+        },
+        {
+          "figmaNodeId": "190:457",
+          "name": "Style=Danger, State=Loading",
+          "width": 132,
+          "height": 36
+        }
+      ],
+      "states": ["Default", "Hover", "Disabled", "Focused", "Pressed", "Loading"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1001,
+        "height": 288,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Four styles and interaction behavior exist; current 40px minimum height differs from 36/38px default specimens (Focused specimens are 40px). No size prop exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:690",
+      "figmaName": "ButtonSize",
+      "sourceName": "Actions / ButtonSize",
+      "owner": "packages/ui/src/components/actions/Button/",
+      "component": {
+        "name": "Button",
+        "target": "packages/ui/src/components/actions/Button/Button.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#ButtonProps.size",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/actions/Button/Button.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/actions/Button/Button.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "button-size",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:684",
+          "name": "Size=Small",
+          "width": 67,
+          "height": 100
+        },
+        {
+          "figmaNodeId": "206:686",
+          "name": "Size=Medium",
+          "width": 79,
+          "height": 100
+        },
+        {
+          "figmaNodeId": "206:688",
+          "name": "Size=Large",
+          "width": 96,
+          "height": 100
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 646,
+        "height": 387,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Integrated target is ButtonProps.size, not a standalone export. Size API is absent. Figma description calls these reference specimens requiring later approval; metadata and context report 100px specimen heights, not approved production button heights.",
+      "relatedImplementation": [],
+      "integration": {
+        "component": "Button",
+        "prop": "size",
+        "implemented": false
+      }
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:150",
+      "figmaName": "IconButton",
+      "sourceName": "Actions / IconButton",
+      "owner": "packages/ui/src/components/actions/IconButton/",
+      "component": {
+        "name": "IconButton",
+        "target": "packages/ui/src/components/actions/IconButton/IconButton.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#IconButton",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/actions/IconButton/IconButton.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/actions/IconButton/IconButton.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-button",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:146",
+          "name": "State=Default",
+          "width": 43,
+          "height": 43
+        },
+        {
+          "figmaNodeId": "177:148",
+          "name": "State=Disabled",
+          "width": 43,
+          "height": 43
+        },
+        {
+          "figmaNodeId": "191:450",
+          "name": "State=Focused",
+          "width": 43,
+          "height": 43
+        },
+        {
+          "figmaNodeId": "191:452",
+          "name": "State=Loading",
+          "width": 43,
+          "height": 43
+        }
+      ],
+      "states": ["Default", "Disabled", "Focused", "Loading"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 359,
+        "height": 89,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:47",
+      "figmaName": "TextInput",
+      "sourceName": "Forms / TextInput",
+      "owner": "packages/ui/src/components/forms/TextInput/",
+      "component": {
+        "name": "Input",
+        "target": "packages/ui/src/components/forms/TextInput/TextInput.tsx",
+        "current": ["packages/ui/src/primitives/Input.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Input",
+        "current": ["packages/ui/src/index.ts#Input"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/TextInput/TextInput.module.css",
+        "current": ["packages/ui/src/primitives/Input.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/TextInput/TextInput.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "input",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:41",
+          "name": "State=Default",
+          "width": 320,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "173:43",
+          "name": "State=Focused",
+          "width": 320,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "173:45",
+          "name": "State=Disabled",
+          "width": 320,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "191:432",
+          "name": "State=Error",
+          "width": 320,
+          "height": 40
+        },
+        {
+          "figmaNodeId": "191:434",
+          "name": "State=ReadOnly",
+          "width": 320,
+          "height": 40
+        }
+      ],
+      "states": ["Default", "Focused", "Disabled", "Error", "ReadOnly"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1076,
+        "height": 172,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Current public export is Input. Native readOnly/disabled supported; explicit Figma Error treatment is not provided.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:58",
+      "figmaName": "Checkbox",
+      "sourceName": "Forms / Checkbox",
+      "owner": "packages/ui/src/components/forms/Checkbox/",
+      "component": {
+        "name": "Checkbox",
+        "target": "packages/ui/src/components/forms/Checkbox/Checkbox.tsx",
+        "current": ["packages/ui/src/primitives/Checkbox.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Checkbox",
+        "current": ["packages/ui/src/index.ts#Checkbox"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/Checkbox/Checkbox.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/Checkbox/Checkbox.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "checkbox",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:48",
+          "name": "State=Unchecked",
+          "width": 290,
+          "height": 46
+        },
+        {
+          "figmaNodeId": "173:51",
+          "name": "State=Checked",
+          "width": 290,
+          "height": 46
+        },
+        {
+          "figmaNodeId": "173:55",
+          "name": "State=Disabled",
+          "width": 290,
+          "height": 46
+        },
+        {
+          "figmaNodeId": "191:436",
+          "name": "State=Focused",
+          "width": 290,
+          "height": 46
+        },
+        {
+          "figmaNodeId": "191:439",
+          "name": "State=Indeterminate",
+          "width": 290,
+          "height": 46
+        }
+      ],
+      "states": ["Unchecked", "Checked", "Disabled", "Focused", "Indeterminate"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1016,
+        "height": 177,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Native checked/disabled supported; no public indeterminate prop or full label composition.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:160",
+      "figmaName": "Select",
+      "sourceName": "Forms / Select",
+      "owner": "packages/ui/src/components/forms/Select/",
+      "component": {
+        "name": "Select",
+        "target": "packages/ui/src/components/forms/Select/Select.tsx",
+        "current": ["packages/ui/src/primitives/Select.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Select",
+        "current": ["packages/ui/src/index.ts#Select"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/Select/Select.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/Select/Select.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "select",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:151",
+          "name": "State=Default",
+          "width": 294,
+          "height": 42
+        },
+        {
+          "figmaNodeId": "177:154",
+          "name": "State=Focused",
+          "width": 294,
+          "height": 42
+        },
+        {
+          "figmaNodeId": "177:157",
+          "name": "State=Disabled",
+          "width": 294,
+          "height": 42
+        },
+        {
+          "figmaNodeId": "191:443",
+          "name": "State=Error",
+          "width": 294,
+          "height": 42
+        }
+      ],
+      "states": ["Default", "Focused", "Disabled", "Error"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 670,
+        "height": 170,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Native select exists; explicit Figma Error treatment is outstanding.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:165",
+      "figmaName": "Textarea",
+      "sourceName": "Forms / Textarea",
+      "owner": "packages/ui/src/components/forms/Textarea/",
+      "component": {
+        "name": "Textarea",
+        "target": "packages/ui/src/components/forms/Textarea/Textarea.tsx",
+        "current": ["packages/ui/src/primitives/Textarea.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Textarea",
+        "current": ["packages/ui/src/index.ts#Textarea"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/Textarea/Textarea.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/Textarea/Textarea.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "textarea",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:161",
+          "name": "State=Default",
+          "width": 360,
+          "height": 112
+        },
+        {
+          "figmaNodeId": "177:163",
+          "name": "State=Disabled",
+          "width": 360,
+          "height": 112
+        },
+        {
+          "figmaNodeId": "191:446",
+          "name": "State=Focused",
+          "width": 360,
+          "height": 112
+        },
+        {
+          "figmaNodeId": "191:448",
+          "name": "State=Error",
+          "width": 360,
+          "height": 112
+        }
+      ],
+      "states": ["Default", "Disabled", "Focused", "Error"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 816,
+        "height": 310,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Native textarea exists; explicit Figma Error treatment is outstanding.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:223",
+      "figmaName": "FormField",
+      "sourceName": "Forms / FormField",
+      "owner": "packages/ui/src/components/forms/FormField/",
+      "component": {
+        "name": "FormField",
+        "target": "packages/ui/src/components/forms/FormField/FormField.tsx",
+        "current": ["packages/ui/src/primitives/FormField.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#FormField",
+        "current": ["packages/ui/src/index.ts#FormField"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/FormField/FormField.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/FormField/FormField.test.tsx",
+        "current": ["packages/ui/src/FormField.test.tsx"]
+      },
+      "componentHost": {
+        "id": "form-field",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:198",
+          "name": "State=Default",
+          "width": 342,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "181:204",
+          "name": "State=Required",
+          "width": 342,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "181:211",
+          "name": "State=Error",
+          "width": 342,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "181:217",
+          "name": "State=Disabled",
+          "width": 342,
+          "height": 128
+        }
+      ],
+      "states": ["Default", "Required", "Error", "Disabled"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 770,
+        "height": 334,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Label, hint and error associations exist; no required/disabled composition API.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:234",
+      "figmaName": "SearchField",
+      "sourceName": "Forms / SearchField",
+      "owner": "packages/ui/src/components/forms/SearchField/",
+      "component": {
+        "name": "SearchField",
+        "target": "packages/ui/src/components/forms/SearchField/SearchField.tsx",
+        "current": ["packages/ui/src/primitives/SearchField.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#SearchField",
+        "current": ["packages/ui/src/index.ts#SearchField"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/SearchField/SearchField.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/SearchField/SearchField.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "search-field",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:224",
+          "name": "State=Empty",
+          "width": 400,
+          "height": 52
+        },
+        {
+          "figmaNodeId": "181:227",
+          "name": "State=With query",
+          "width": 400,
+          "height": 52
+        },
+        {
+          "figmaNodeId": "181:231",
+          "name": "State=Disabled",
+          "width": 400,
+          "height": 52
+        }
+      ],
+      "states": ["Empty", "With query", "Disabled"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 883,
+        "height": 175,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Native search input exists; Figma composed query control differs.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:312",
+      "figmaName": "MultiSelect",
+      "sourceName": "Forms / MultiSelect",
+      "owner": "packages/ui/src/components/forms/MultiSelect/",
+      "component": {
+        "name": "MultiSelect",
+        "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#MultiSelect",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "multi-select",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:301",
+          "name": "State=Some selected",
+          "width": 430,
+          "height": 125
+        },
+        {
+          "figmaNodeId": "181:309",
+          "name": "State=None available",
+          "width": 430,
+          "height": 125
+        }
+      ],
+      "states": ["Some selected", "None available"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 938,
+        "height": 173,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:606",
+      "figmaName": "FilePicker",
+      "sourceName": "Forms / FilePicker",
+      "owner": "packages/ui/src/components/forms/FilePicker/",
+      "component": {
+        "name": "FilePicker",
+        "target": "packages/ui/src/components/forms/FilePicker/FilePicker.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#FilePicker",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/FilePicker/FilePicker.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/FilePicker/FilePicker.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "file-picker",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:594",
+          "name": "State=Empty",
+          "width": 425,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "206:598",
+          "name": "State=Selected",
+          "width": 425,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "206:602",
+          "name": "State=Error",
+          "width": 425,
+          "height": 128
+        }
+      ],
+      "states": ["Empty", "Selected", "Error"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 992,
+        "height": 415,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:616",
+      "figmaName": "FormActions",
+      "sourceName": "Forms / FormActions",
+      "owner": "packages/ui/src/components/forms/FormActions/",
+      "component": {
+        "name": "FormActions",
+        "target": "packages/ui/src/components/forms/FormActions/FormActions.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#FormActions",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/FormActions/FormActions.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/FormActions/FormActions.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "form-actions",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:607",
+          "name": "State=Default",
+          "width": 375,
+          "height": 61
+        },
+        {
+          "figmaNodeId": "206:610",
+          "name": "State=Saving",
+          "width": 375,
+          "height": 61
+        },
+        {
+          "figmaNodeId": "206:613",
+          "name": "State=ReadOnly",
+          "width": 375,
+          "height": 61
+        }
+      ],
+      "states": ["Default", "Saving", "ReadOnly"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 942,
+        "height": 348,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:670",
+      "figmaName": "Radio",
+      "sourceName": "Forms / Radio",
+      "owner": "packages/ui/src/components/forms/Radio/",
+      "component": {
+        "name": "Radio",
+        "target": "packages/ui/src/components/forms/Radio/Radio.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Radio",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/Radio/Radio.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/Radio/Radio.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "radio",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:661",
+          "name": "State=Unchecked",
+          "width": 255,
+          "height": 46
+        },
+        {
+          "figmaNodeId": "206:664",
+          "name": "State=Checked",
+          "width": 255,
+          "height": 46
+        },
+        {
+          "figmaNodeId": "206:667",
+          "name": "State=Disabled",
+          "width": 255,
+          "height": 46
+        }
+      ],
+      "states": ["Unchecked", "Checked", "Disabled"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 822,
+        "height": 333,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:683",
+      "figmaName": "Switch",
+      "sourceName": "Forms / Switch",
+      "owner": "packages/ui/src/components/forms/Switch/",
+      "component": {
+        "name": "Switch",
+        "target": "packages/ui/src/components/forms/Switch/Switch.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Switch",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/forms/Switch/Switch.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/forms/Switch/Switch.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "switch",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:671",
+          "name": "State=Off",
+          "width": 240,
+          "height": 48
+        },
+        {
+          "figmaNodeId": "206:675",
+          "name": "State=On",
+          "width": 240,
+          "height": 48
+        },
+        {
+          "figmaNodeId": "206:679",
+          "name": "State=Disabled",
+          "width": 240,
+          "height": 48
+        }
+      ],
+      "states": ["Off", "On", "Disabled"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 807,
+        "height": 335,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:87",
+      "figmaName": "Tab/Tabs",
+      "sourceName": "Navigation / Tab",
+      "owner": "packages/ui/src/components/navigation/Tabs/",
+      "component": {
+        "name": "Tabs",
+        "target": "packages/ui/src/components/navigation/Tabs/Tabs.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Tabs",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/navigation/Tabs/Tabs.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/navigation/Tabs/Tabs.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "tabs",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:83",
+          "name": "State=Selected",
+          "width": 44,
+          "height": 30
+        },
+        {
+          "figmaNodeId": "173:85",
+          "name": "State=Idle",
+          "width": 44,
+          "height": 30
+        },
+        {
+          "figmaNodeId": "191:454",
+          "name": "State=Focused",
+          "width": 73,
+          "height": 34
+        },
+        {
+          "figmaNodeId": "191:456",
+          "name": "State=Disabled",
+          "width": 69,
+          "height": 30
+        }
+      ],
+      "states": ["Selected", "Idle", "Focused", "Disabled"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 610,
+        "height": 80,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:186",
+      "figmaName": "Breadcrumbs",
+      "sourceName": "Breadcrumbs",
+      "owner": "packages/ui/src/components/navigation/Breadcrumbs/",
+      "component": {
+        "name": "Breadcrumbs",
+        "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Breadcrumbs",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "breadcrumbs",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:186",
+          "name": "Breadcrumbs",
+          "width": 430,
+          "height": 43
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 430,
+        "height": 43,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:242",
+      "figmaName": "MenuItem",
+      "sourceName": "Navigation / MenuItem",
+      "owner": "packages/ui/src/components/navigation/MenuItem/",
+      "component": {
+        "name": "MenuItem",
+        "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#MenuItem",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "menu-item",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:235",
+          "name": "State=Default",
+          "width": 320,
+          "height": 42
+        },
+        {
+          "figmaNodeId": "181:237",
+          "name": "State=Selected",
+          "width": 320,
+          "height": 42
+        },
+        {
+          "figmaNodeId": "181:240",
+          "name": "State=Disabled",
+          "width": 320,
+          "height": 42
+        }
+      ],
+      "states": ["Default", "Selected", "Disabled"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 718,
+        "height": 160,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:255",
+      "figmaName": "StepperStep",
+      "sourceName": "Navigation / StepperStep",
+      "owner": "packages/ui/src/components/navigation/StepperStep/",
+      "component": {
+        "name": "StepperStep",
+        "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#StepperStep",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "stepper-step",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:243",
+          "name": "State=Complete",
+          "width": 310,
+          "height": 55
+        },
+        {
+          "figmaNodeId": "181:247",
+          "name": "State=Current",
+          "width": 310,
+          "height": 55
+        },
+        {
+          "figmaNodeId": "181:251",
+          "name": "State=Upcoming",
+          "width": 310,
+          "height": 55
+        }
+      ],
+      "states": ["Complete", "Current", "Upcoming"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 713,
+        "height": 188,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:65",
+      "figmaName": "Card",
+      "sourceName": "Surfaces / Card",
+      "owner": "packages/ui/src/components/surfaces/Card/",
+      "component": {
+        "name": "Card",
+        "target": "packages/ui/src/components/surfaces/Card/Card.tsx",
+        "current": ["packages/ui/src/primitives/Card.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Card",
+        "current": ["packages/ui/src/index.ts#Card"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/surfaces/Card/Card.module.css",
+        "current": ["packages/ui/src/primitives/Card.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/surfaces/Card/Card.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "card",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:59",
+          "name": "Style=Default",
+          "width": 300,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "173:62",
+          "name": "Style=Elevated",
+          "width": 300,
+          "height": 128
+        }
+      ],
+      "states": [],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 696,
+        "height": 176,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Neutral div and typed semantic roots exist; Elevated is absent.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:66",
+      "figmaName": "MetricCard",
+      "sourceName": "MetricCard",
+      "owner": "packages/ui/src/components/surfaces/MetricCard/",
+      "component": {
+        "name": "MetricCard",
+        "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.tsx",
+        "current": ["packages/ui/src/components/MetricCard.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#MetricCard",
+        "current": ["packages/ui/src/index.ts#MetricCard"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "metric-card",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:66",
+          "name": "MetricCard",
+          "width": 300,
+          "height": 132
+        }
+      ],
+      "states": [],
+      "implementationStatus": "IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 300,
+        "height": 132,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Label, value and detail composition exists. Dimensions and tokens remain visually unreviewed.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:40",
+      "figmaName": "StatusChip",
+      "sourceName": "Status / StatusChip",
+      "owner": "packages/ui/src/components/status/StatusChip/",
+      "component": {
+        "name": "StatusChip",
+        "target": "packages/ui/src/components/status/StatusChip/StatusChip.tsx",
+        "current": ["packages/ui/src/primitives/StatusChip.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#StatusChip",
+        "current": ["packages/ui/src/index.ts#StatusChip"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/status/StatusChip/StatusChip.module.css",
+        "current": ["packages/ui/src/primitives/StatusChip.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/status/StatusChip/StatusChip.test.tsx",
+        "current": ["apps/web/src/app/App.test.tsx"]
+      },
+      "componentHost": {
+        "id": "status-chip",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:28",
+          "name": "Tone=Neutral",
+          "width": 62,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "173:30",
+          "name": "Tone=Success",
+          "width": 62,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "173:32",
+          "name": "Tone=Warning",
+          "width": 62,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "173:34",
+          "name": "Tone=Danger",
+          "width": 62,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "173:36",
+          "name": "Tone=Info",
+          "width": 62,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "173:38",
+          "name": "Tone=Reported",
+          "width": 62,
+          "height": 26
+        }
+      ],
+      "states": [],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 555,
+        "height": 134,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Current neutral/accent/success/warning/danger API; Figma Info and Reported are absent. Accent is not an alias for either.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:172",
+      "figmaName": "Badge",
+      "sourceName": "Status / Badge",
+      "owner": "packages/ui/src/components/status/Badge/",
+      "component": {
+        "name": "Badge",
+        "target": "packages/ui/src/components/status/Badge/Badge.tsx",
+        "current": ["packages/ui/src/components/Badge.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Badge",
+        "current": ["packages/ui/src/index.ts#Badge"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/status/Badge/Badge.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/status/Badge/Badge.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "badge",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:166",
+          "name": "Tone=Neutral",
+          "width": 64,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "177:168",
+          "name": "Tone=Accent",
+          "width": 64,
+          "height": 26
+        },
+        {
+          "figmaNodeId": "177:170",
+          "name": "Tone=Info",
+          "width": 64,
+          "height": 26
+        }
+      ],
+      "states": [],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 368,
+        "height": 70,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Current neutral/accent/success/warning/danger API lacks Figma Info.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "173:82",
+      "figmaName": "Alert",
+      "sourceName": "Feedback / Alert",
+      "owner": "packages/ui/src/components/feedback/Alert/",
+      "component": {
+        "name": "Alert",
+        "target": "packages/ui/src/components/feedback/Alert/Alert.tsx",
+        "current": ["packages/ui/src/components/Alert.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Alert",
+        "current": ["packages/ui/src/index.ts#Alert"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/feedback/Alert/Alert.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/feedback/Alert/Alert.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "alert",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "173:70",
+          "name": "Tone=Info",
+          "width": 360,
+          "height": 82
+        },
+        {
+          "figmaNodeId": "173:73",
+          "name": "Tone=Warning",
+          "width": 360,
+          "height": 82
+        },
+        {
+          "figmaNodeId": "173:76",
+          "name": "Tone=Error",
+          "width": 360,
+          "height": 82
+        },
+        {
+          "figmaNodeId": "173:79",
+          "name": "Tone=Success",
+          "width": 360,
+          "height": 82
+        }
+      ],
+      "states": [],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 820,
+        "height": 250,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Current info/success/warning/danger API; Figma Error naming and 360x82 composition differ.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:182",
+      "figmaName": "StatePanel",
+      "sourceName": "Feedback / StatePanel",
+      "owner": "packages/ui/src/components/feedback/StatePanel/",
+      "component": {
+        "name": "StatePanel",
+        "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#StatePanel",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "state-panel",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:173",
+          "name": "Kind=Loading",
+          "width": 410,
+          "height": 130
+        },
+        {
+          "figmaNodeId": "177:176",
+          "name": "Kind=Empty",
+          "width": 410,
+          "height": 130
+        },
+        {
+          "figmaNodeId": "177:179",
+          "name": "Kind=Read only",
+          "width": 410,
+          "height": 130
+        },
+        {
+          "figmaNodeId": "222:826",
+          "name": "Kind=Error",
+          "width": 410,
+          "height": 130
+        }
+      ],
+      "states": [],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 906,
+        "height": 342,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No StatePanel export. Related EmptyState, LoadingState and ErrorState exist separately; Read only composition is absent.",
+      "relatedImplementation": [
+        {
+          "path": "packages/ui/src/components/EmptyState.tsx",
+          "kind": "RELATED_COMPONENT"
+        },
+        {
+          "path": "packages/ui/src/components/LoadingState.tsx",
+          "kind": "RELATED_COMPONENT"
+        },
+        {
+          "path": "packages/ui/src/components/ErrorState.tsx",
+          "kind": "RELATED_COMPONENT"
+        }
+      ]
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:300",
+      "figmaName": "Progress",
+      "sourceName": "Feedback / Progress",
+      "owner": "packages/ui/src/components/feedback/Progress/",
+      "component": {
+        "name": "Progress",
+        "target": "packages/ui/src/components/feedback/Progress/Progress.tsx",
+        "current": ["packages/ui/src/components/Progress.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Progress",
+        "current": ["packages/ui/src/index.ts#Progress"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/feedback/Progress/Progress.module.css",
+        "current": ["packages/ui/src/primitives/Shared.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/feedback/Progress/Progress.test.tsx",
+        "current": ["apps/web/src/ui-contracts.test.tsx"]
+      },
+      "componentHost": {
+        "id": "progress",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:279",
+          "name": "State=Starting",
+          "width": 390,
+          "height": 102
+        },
+        {
+          "figmaNodeId": "181:286",
+          "name": "State=In progress",
+          "width": 390,
+          "height": 102
+        },
+        {
+          "figmaNodeId": "181:293",
+          "name": "State=Complete",
+          "width": 390,
+          "height": 102
+        }
+      ],
+      "states": ["Starting", "In progress", "Complete"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 858,
+        "height": 282,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Current native progress element lacks the Figma labeled 390x102 panel composition.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:641",
+      "figmaName": "Tooltip",
+      "sourceName": "Feedback / Tooltip",
+      "owner": "packages/ui/src/components/feedback/Tooltip/",
+      "component": {
+        "name": "Tooltip",
+        "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Tooltip",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "tooltip",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:637",
+          "name": "State=Default",
+          "width": 260,
+          "height": 54
+        },
+        {
+          "figmaNodeId": "206:639",
+          "name": "State=Long",
+          "width": 260,
+          "height": 80
+        }
+      ],
+      "states": ["Default", "Long"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 827,
+        "height": 127,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:650",
+      "figmaName": "Skeleton",
+      "sourceName": "Feedback / Skeleton",
+      "owner": "packages/ui/src/components/feedback/Skeleton/",
+      "component": {
+        "name": "Skeleton",
+        "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Skeleton",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "skeleton",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:642",
+          "name": "Kind=Card",
+          "width": 370,
+          "height": 128
+        },
+        {
+          "figmaNodeId": "206:646",
+          "name": "Kind=List",
+          "width": 370,
+          "height": 128
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 937,
+        "height": 175,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:660",
+      "figmaName": "Toast",
+      "sourceName": "Feedback / Toast",
+      "owner": "packages/ui/src/components/feedback/Toast/",
+      "component": {
+        "name": "Toast",
+        "target": "packages/ui/src/components/feedback/Toast/Toast.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Toast",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/feedback/Toast/Toast.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/feedback/Toast/Toast.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "toast",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:651",
+          "name": "Tone=Success",
+          "width": 398,
+          "height": 72
+        },
+        {
+          "figmaNodeId": "206:654",
+          "name": "Tone=Error",
+          "width": 398,
+          "height": 72
+        },
+        {
+          "figmaNodeId": "206:657",
+          "name": "Tone=Info",
+          "width": 398,
+          "height": 72
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 965,
+        "height": 359,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:271",
+      "figmaName": "RecordRow",
+      "sourceName": "Data / RecordRow",
+      "owner": "packages/ui/src/components/data/RecordRow/",
+      "component": {
+        "name": "RecordRow",
+        "target": "packages/ui/src/components/data/RecordRow/RecordRow.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#RecordRow",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/data/RecordRow/RecordRow.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/data/RecordRow/RecordRow.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "record-row",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:256",
+          "name": "State=Default",
+          "width": 615,
+          "height": 81
+        },
+        {
+          "figmaNodeId": "181:261",
+          "name": "State=Selected",
+          "width": 615,
+          "height": 81
+        },
+        {
+          "figmaNodeId": "181:266",
+          "name": "State=Read only",
+          "width": 615,
+          "height": 81
+        }
+      ],
+      "states": ["Default", "Selected", "Read only"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1328,
+        "height": 237,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:278",
+      "figmaName": "KeyValueRow",
+      "sourceName": "Data / KeyValueRow",
+      "owner": "packages/ui/src/components/data/KeyValueRow/",
+      "component": {
+        "name": "KeyValueRow",
+        "target": "packages/ui/src/components/data/KeyValueRow/KeyValueRow.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#KeyValueRow",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/data/KeyValueRow/KeyValueRow.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/data/KeyValueRow/KeyValueRow.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "key-value-row",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:272",
+          "name": "State=Default",
+          "width": 480,
+          "height": 56
+        },
+        {
+          "figmaNodeId": "181:275",
+          "name": "State=Muted",
+          "width": 480,
+          "height": 56
+        }
+      ],
+      "states": ["Default", "Muted"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1038,
+        "height": 104,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:334",
+      "figmaName": "TableRow",
+      "sourceName": "Data / TableRow",
+      "owner": "packages/ui/src/components/data/TableRow/",
+      "component": {
+        "name": "TableRow",
+        "target": "packages/ui/src/components/data/TableRow/TableRow.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#TableRow",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/data/TableRow/TableRow.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/data/TableRow/TableRow.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "table-row",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:313",
+          "name": "State=Header",
+          "width": 680,
+          "height": 50
+        },
+        {
+          "figmaNodeId": "181:320",
+          "name": "State=Regular",
+          "width": 680,
+          "height": 50
+        },
+        {
+          "figmaNodeId": "181:327",
+          "name": "State=Warning",
+          "width": 680,
+          "height": 50
+        }
+      ],
+      "states": ["Header", "Regular", "Warning"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 728,
+        "height": 246,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:636",
+      "figmaName": "Table",
+      "sourceName": "Data / Table",
+      "owner": "packages/ui/src/components/data/Table/",
+      "component": {
+        "name": "Table",
+        "target": "packages/ui/src/components/data/Table/Table.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Table",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/data/Table/Table.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/data/Table/Table.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "table",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:617",
+          "name": "State=Populated",
+          "width": 480,
+          "height": 190
+        },
+        {
+          "figmaNodeId": "206:630",
+          "name": "State=Empty",
+          "width": 480,
+          "height": 190
+        }
+      ],
+      "states": ["Populated", "Empty"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1047,
+        "height": 237,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:580",
+      "figmaName": "Dialog",
+      "sourceName": "Overlays / Dialog",
+      "owner": "packages/ui/src/components/overlays/Dialog/",
+      "component": {
+        "name": "Dialog",
+        "target": "packages/ui/src/components/overlays/Dialog/Dialog.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Dialog",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/overlays/Dialog/Dialog.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/overlays/Dialog/Dialog.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "dialog",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:562",
+          "name": "Variant=Confirm",
+          "width": 440,
+          "height": 210
+        },
+        {
+          "figmaNodeId": "206:568",
+          "name": "Variant=Destructive",
+          "width": 440,
+          "height": 210
+        },
+        {
+          "figmaNodeId": "206:574",
+          "name": "Variant=Busy",
+          "width": 440,
+          "height": 210
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 1007,
+        "height": 497,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "206:593",
+      "figmaName": "Popover",
+      "sourceName": "Overlays / Popover",
+      "owner": "packages/ui/src/components/overlays/Popover/",
+      "component": {
+        "name": "Popover",
+        "target": "packages/ui/src/components/overlays/Popover/Popover.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Popover",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/overlays/Popover/Popover.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/overlays/Popover/Popover.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "popover",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "206:581",
+          "name": "State=Closed",
+          "width": 360,
+          "height": 54
+        },
+        {
+          "figmaNodeId": "206:585",
+          "name": "State=Open",
+          "width": 360,
+          "height": 169
+        }
+      ],
+      "states": ["Closed", "Open"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 927,
+        "height": 216,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "177:183",
+      "figmaName": "SectionHeader",
+      "sourceName": "SectionHeader",
+      "owner": "packages/ui/src/components/layout/SectionHeader/",
+      "component": {
+        "name": "SectionHeader",
+        "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.tsx",
+        "current": ["packages/ui/src/components/SectionHeader.tsx"]
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#SectionHeader",
+        "current": ["packages/ui/src/index.ts#SectionHeader"]
+      },
+      "styles": {
+        "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.module.css",
+        "current": ["packages/ui/src/components/SectionHeader.module.css"]
+      },
+      "tests": {
+        "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.test.tsx",
+        "current": ["apps/web/src/app/App.test.tsx"]
+      },
+      "componentHost": {
+        "id": "section-header",
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+      },
+      "variants": [
+        {
+          "figmaNodeId": "177:183",
+          "name": "SectionHeader",
+          "width": 370,
+          "height": 49
+        }
+      ],
+      "states": [],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 370,
+        "height": 49,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Title, eyebrow and actions exist; Figma count composition is absent.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:335",
+      "figmaName": "Divider",
+      "sourceName": "Divider",
+      "owner": "packages/ui/src/components/layout/Divider/",
+      "component": {
+        "name": "Divider",
+        "target": "packages/ui/src/components/layout/Divider/Divider.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#Divider",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/layout/Divider/Divider.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/layout/Divider/Divider.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "divider",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:335",
+          "name": "Divider",
+          "width": 440,
+          "height": 20
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 440,
+        "height": 20,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "core",
+      "figmaNodeId": "181:337",
+      "figmaName": "CodeLabel",
+      "sourceName": "Technical / CodeLabel",
+      "owner": "packages/ui/src/components/technical/CodeLabel/",
+      "component": {
+        "name": "CodeLabel",
+        "target": "packages/ui/src/components/technical/CodeLabel/CodeLabel.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/ui#CodeLabel",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/ui/src/components/technical/CodeLabel/CodeLabel.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/ui/src/components/technical/CodeLabel/CodeLabel.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "code-label",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "181:337",
+          "name": "Technical / CodeLabel",
+          "width": 172,
+          "height": 100
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 172,
+        "height": 100,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "208:740",
+      "figmaName": "Plus",
+      "sourceName": "Icon / Plus",
+      "owner": "packages/icons/src/icons/Plus/",
+      "component": {
+        "name": "Plus",
+        "target": "packages/icons/src/icons/Plus/Plus.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Plus",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Plus/Plus.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Plus/Plus.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-plus",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "208:740",
+          "name": "Icon / Plus",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 20,
+        "height": 20,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "208:743",
+      "figmaName": "Close",
+      "sourceName": "Icon / Close",
+      "owner": "packages/icons/src/icons/Close/",
+      "component": {
+        "name": "Close",
+        "target": "packages/icons/src/icons/Close/Close.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Close",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Close/Close.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Close/Close.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-close",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "208:743",
+          "name": "Icon / Close",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 20,
+        "height": 20,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "208:746",
+      "figmaName": "Chevron",
+      "sourceName": "Icon / Chevron",
+      "owner": "packages/icons/src/icons/Chevron/",
+      "component": {
+        "name": "Chevron",
+        "target": "packages/icons/src/icons/Chevron/Chevron.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Chevron",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Chevron/Chevron.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Chevron/Chevron.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-chevron",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "208:746",
+          "name": "Icon / Chevron",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 20,
+        "height": 20,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "208:749",
+      "figmaName": "Check",
+      "sourceName": "Icon / Check",
+      "owner": "packages/icons/src/icons/Check/",
+      "component": {
+        "name": "Check",
+        "target": "packages/icons/src/icons/Check/Check.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Check",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Check/Check.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Check/Check.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-check",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "208:749",
+          "name": "Icon / Check",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 20,
+        "height": 20,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "208:752",
+      "figmaName": "Minus",
+      "sourceName": "Icon / Minus",
+      "owner": "packages/icons/src/icons/Minus/",
+      "component": {
+        "name": "Minus",
+        "target": "packages/icons/src/icons/Minus/Minus.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Minus",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Minus/Minus.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Minus/Minus.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-minus",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "208:752",
+          "name": "Icon / Minus",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 20,
+        "height": 20,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "236:2225",
+      "figmaName": "Search",
+      "sourceName": "Icon / Search",
+      "owner": "packages/icons/src/icons/Search/",
+      "component": {
+        "name": "Search",
+        "target": "packages/icons/src/icons/Search/Search.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Search",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Search/Search.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Search/Search.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-search",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "236:2225",
+          "name": "Icon / Search",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:826",
+      "figmaName": "Menu",
+      "sourceName": "Icon / Menu",
+      "owner": "packages/icons/src/icons/Menu/",
+      "component": {
+        "name": "Menu",
+        "target": "packages/icons/src/icons/Menu/Menu.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Menu",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Menu/Menu.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Menu/Menu.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-menu",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:826",
+          "name": "Icon / Menu",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:829",
+      "figmaName": "Edit",
+      "sourceName": "Icon / Edit",
+      "owner": "packages/icons/src/icons/Edit/",
+      "component": {
+        "name": "Edit",
+        "target": "packages/icons/src/icons/Edit/Edit.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Edit",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Edit/Edit.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Edit/Edit.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-edit",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:829",
+          "name": "Icon / Edit",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:833",
+      "figmaName": "Trash",
+      "sourceName": "Icon / Trash",
+      "owner": "packages/icons/src/icons/Trash/",
+      "component": {
+        "name": "Trash",
+        "target": "packages/icons/src/icons/Trash/Trash.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Trash",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Trash/Trash.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Trash/Trash.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-trash",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:833",
+          "name": "Icon / Trash",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:836",
+      "figmaName": "Download",
+      "sourceName": "Icon / Download",
+      "owner": "packages/icons/src/icons/Download/",
+      "component": {
+        "name": "Download",
+        "target": "packages/icons/src/icons/Download/Download.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Download",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Download/Download.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Download/Download.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-download",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:836",
+          "name": "Icon / Download",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:839",
+      "figmaName": "Upload",
+      "sourceName": "Icon / Upload",
+      "owner": "packages/icons/src/icons/Upload/",
+      "component": {
+        "name": "Upload",
+        "target": "packages/icons/src/icons/Upload/Upload.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Upload",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Upload/Upload.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Upload/Upload.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-upload",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:839",
+          "name": "Icon / Upload",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:842",
+      "figmaName": "Filter",
+      "sourceName": "Icon / Filter",
+      "owner": "packages/icons/src/icons/Filter/",
+      "component": {
+        "name": "Filter",
+        "target": "packages/icons/src/icons/Filter/Filter.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Filter",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Filter/Filter.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Filter/Filter.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-filter",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:842",
+          "name": "Icon / Filter",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:845",
+      "figmaName": "ArrowLeft",
+      "sourceName": "Icon / ArrowLeft",
+      "owner": "packages/icons/src/icons/ArrowLeft/",
+      "component": {
+        "name": "ArrowLeft",
+        "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ArrowLeft",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-arrow-left",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:845",
+          "name": "Icon / ArrowLeft",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:848",
+      "figmaName": "ArrowRight",
+      "sourceName": "Icon / ArrowRight",
+      "owner": "packages/icons/src/icons/ArrowRight/",
+      "component": {
+        "name": "ArrowRight",
+        "target": "packages/icons/src/icons/ArrowRight/ArrowRight.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ArrowRight",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ArrowRight/ArrowRight.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ArrowRight/ArrowRight.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-arrow-right",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:848",
+          "name": "Icon / ArrowRight",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:851",
+      "figmaName": "ArrowUp",
+      "sourceName": "Icon / ArrowUp",
+      "owner": "packages/icons/src/icons/ArrowUp/",
+      "component": {
+        "name": "ArrowUp",
+        "target": "packages/icons/src/icons/ArrowUp/ArrowUp.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ArrowUp",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ArrowUp/ArrowUp.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ArrowUp/ArrowUp.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-arrow-up",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:851",
+          "name": "Icon / ArrowUp",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:854",
+      "figmaName": "ArrowDown",
+      "sourceName": "Icon / ArrowDown",
+      "owner": "packages/icons/src/icons/ArrowDown/",
+      "component": {
+        "name": "ArrowDown",
+        "target": "packages/icons/src/icons/ArrowDown/ArrowDown.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ArrowDown",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ArrowDown/ArrowDown.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ArrowDown/ArrowDown.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-arrow-down",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:854",
+          "name": "Icon / ArrowDown",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:857",
+      "figmaName": "AlertTriangle",
+      "sourceName": "Icon / AlertTriangle",
+      "owner": "packages/icons/src/icons/AlertTriangle/",
+      "component": {
+        "name": "AlertTriangle",
+        "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#AlertTriangle",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-alert-triangle",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:857",
+          "name": "Icon / AlertTriangle",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:861",
+      "figmaName": "Info",
+      "sourceName": "Icon / Info",
+      "owner": "packages/icons/src/icons/Info/",
+      "component": {
+        "name": "Info",
+        "target": "packages/icons/src/icons/Info/Info.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Info",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Info/Info.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Info/Info.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-info",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:861",
+          "name": "Icon / Info",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:865",
+      "figmaName": "Clock",
+      "sourceName": "Icon / Clock",
+      "owner": "packages/icons/src/icons/Clock/",
+      "component": {
+        "name": "Clock",
+        "target": "packages/icons/src/icons/Clock/Clock.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Clock",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Clock/Clock.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Clock/Clock.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-clock",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:865",
+          "name": "Icon / Clock",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:869",
+      "figmaName": "Folder",
+      "sourceName": "Icon / Folder",
+      "owner": "packages/icons/src/icons/Folder/",
+      "component": {
+        "name": "Folder",
+        "target": "packages/icons/src/icons/Folder/Folder.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Folder",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Folder/Folder.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Folder/Folder.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-folder",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:869",
+          "name": "Icon / Folder",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:872",
+      "figmaName": "GitBranch",
+      "sourceName": "Icon / GitBranch",
+      "owner": "packages/icons/src/icons/GitBranch/",
+      "component": {
+        "name": "GitBranch",
+        "target": "packages/icons/src/icons/GitBranch/GitBranch.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#GitBranch",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/GitBranch/GitBranch.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/GitBranch/GitBranch.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-git-branch",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:872",
+          "name": "Icon / GitBranch",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:878",
+      "figmaName": "Refresh",
+      "sourceName": "Icon / Refresh",
+      "owner": "packages/icons/src/icons/Refresh/",
+      "component": {
+        "name": "Refresh",
+        "target": "packages/icons/src/icons/Refresh/Refresh.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Refresh",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Refresh/Refresh.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Refresh/Refresh.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-refresh",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:878",
+          "name": "Icon / Refresh",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:881",
+      "figmaName": "ExternalLink",
+      "sourceName": "Icon / ExternalLink",
+      "owner": "packages/icons/src/icons/ExternalLink/",
+      "component": {
+        "name": "ExternalLink",
+        "target": "packages/icons/src/icons/ExternalLink/ExternalLink.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ExternalLink",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ExternalLink/ExternalLink.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ExternalLink/ExternalLink.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-external-link",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:881",
+          "name": "Icon / ExternalLink",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:884",
+      "figmaName": "Lock",
+      "sourceName": "Icon / Lock",
+      "owner": "packages/icons/src/icons/Lock/",
+      "component": {
+        "name": "Lock",
+        "target": "packages/icons/src/icons/Lock/Lock.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Lock",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Lock/Lock.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Lock/Lock.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-lock",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:884",
+          "name": "Icon / Lock",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:888",
+      "figmaName": "History",
+      "sourceName": "Icon / History",
+      "owner": "packages/icons/src/icons/History/",
+      "component": {
+        "name": "History",
+        "target": "packages/icons/src/icons/History/History.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#History",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/History/History.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/History/History.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-history",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:888",
+          "name": "Icon / History",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:891",
+      "figmaName": "CheckCircle",
+      "sourceName": "Icon / CheckCircle",
+      "owner": "packages/icons/src/icons/CheckCircle/",
+      "component": {
+        "name": "CheckCircle",
+        "target": "packages/icons/src/icons/CheckCircle/CheckCircle.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#CheckCircle",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/CheckCircle/CheckCircle.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/CheckCircle/CheckCircle.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-check-circle",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:891",
+          "name": "Icon / CheckCircle",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:895",
+      "figmaName": "XCircle",
+      "sourceName": "Icon / XCircle",
+      "owner": "packages/icons/src/icons/XCircle/",
+      "component": {
+        "name": "XCircle",
+        "target": "packages/icons/src/icons/XCircle/XCircle.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#XCircle",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/XCircle/XCircle.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/XCircle/XCircle.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-xcircle",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:895",
+          "name": "Icon / XCircle",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:899",
+      "figmaName": "Bell",
+      "sourceName": "Icon / Bell",
+      "owner": "packages/icons/src/icons/Bell/",
+      "component": {
+        "name": "Bell",
+        "target": "packages/icons/src/icons/Bell/Bell.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Bell",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Bell/Bell.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Bell/Bell.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-bell",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:899",
+          "name": "Icon / Bell",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:902",
+      "figmaName": "ChevronDown",
+      "sourceName": "Icon / ChevronDown",
+      "owner": "packages/icons/src/icons/ChevronDown/",
+      "component": {
+        "name": "ChevronDown",
+        "target": "packages/icons/src/icons/ChevronDown/ChevronDown.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ChevronDown",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ChevronDown/ChevronDown.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ChevronDown/ChevronDown.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-chevron-down",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:902",
+          "name": "Icon / ChevronDown",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:905",
+      "figmaName": "ChevronRight",
+      "sourceName": "Icon / ChevronRight",
+      "owner": "packages/icons/src/icons/ChevronRight/",
+      "component": {
+        "name": "ChevronRight",
+        "target": "packages/icons/src/icons/ChevronRight/ChevronRight.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#ChevronRight",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/ChevronRight/ChevronRight.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/ChevronRight/ChevronRight.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-chevron-right",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:905",
+          "name": "Icon / ChevronRight",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:908",
+      "figmaName": "GripVertical",
+      "sourceName": "Icon / GripVertical",
+      "owner": "packages/icons/src/icons/GripVertical/",
+      "component": {
+        "name": "GripVertical",
+        "target": "packages/icons/src/icons/GripVertical/GripVertical.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#GripVertical",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/GripVertical/GripVertical.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/GripVertical/GripVertical.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-grip-vertical",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:908",
+          "name": "Icon / GripVertical",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:916",
+      "figmaName": "Link",
+      "sourceName": "Icon / Link",
+      "owner": "packages/icons/src/icons/Link/",
+      "component": {
+        "name": "Link",
+        "target": "packages/icons/src/icons/Link/Link.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Link",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Link/Link.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Link/Link.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-link",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:916",
+          "name": "Icon / Link",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:919",
+      "figmaName": "Eye",
+      "sourceName": "Icon / Eye",
+      "owner": "packages/icons/src/icons/Eye/",
+      "component": {
+        "name": "Eye",
+        "target": "packages/icons/src/icons/Eye/Eye.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Eye",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Eye/Eye.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Eye/Eye.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-eye",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:919",
+          "name": "Icon / Eye",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:923",
+      "figmaName": "Layers",
+      "sourceName": "Icon / Layers",
+      "owner": "packages/icons/src/icons/Layers/",
+      "component": {
+        "name": "Layers",
+        "target": "packages/icons/src/icons/Layers/Layers.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Layers",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Layers/Layers.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Layers/Layers.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-layers",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:923",
+          "name": "Icon / Layers",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "icon",
+      "figmaNodeId": "237:926",
+      "figmaName": "Settings",
+      "sourceName": "Icon / Settings",
+      "owner": "packages/icons/src/icons/Settings/",
+      "component": {
+        "name": "Settings",
+        "target": "packages/icons/src/icons/Settings/Settings.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "@forge-org/icons#Settings",
+        "current": []
+      },
+      "styles": {
+        "target": "packages/icons/src/icons/Settings/Settings.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "packages/icons/src/icons/Settings/Settings.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "icon-settings",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "237:926",
+          "name": "Icon / Settings",
+          "width": 24,
+          "height": 24
+        }
+      ],
+      "states": [],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "173:2",
+        "width": 24,
+        "height": 24,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "No icon package or named implementation exists. Figma reference is not redistribution permission; rights or original authored geometry must be recorded before implementation.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:21",
+      "figmaName": "PageHeader",
+      "sourceName": "Shell / PageHeader",
+      "owner": "apps/web/src/app/shell/components/",
+      "component": {
+        "name": "PageHeader",
+        "target": "apps/web/src/app/shell/components/PageHeader.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/app/shell/components/index.ts#PageHeader",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/app/shell/components/PageHeader.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/app/shell/components/PageHeader.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "page-header",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:3",
+          "name": "State=Default",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:9",
+          "name": "State=Breadcrumbs",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:15",
+          "name": "State=WithCommand",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Default", "Breadcrumbs", "WithCommand"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/app/App.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/app/App.test.tsx",
+          "styles": "apps/web/src/app/App.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:40",
+      "figmaName": "WorkspaceSwitcher",
+      "sourceName": "Shell / WorkspaceSwitcher",
+      "owner": "apps/web/src/app/shell/components/",
+      "component": {
+        "name": "WorkspaceSwitcher",
+        "target": "apps/web/src/app/shell/components/WorkspaceSwitcher.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/app/shell/components/index.ts#WorkspaceSwitcher",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/app/shell/components/WorkspaceSwitcher.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/app/shell/components/WorkspaceSwitcher.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "workspace-switcher",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:22",
+          "name": "State=Idle",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:28",
+          "name": "State=Expanded",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:34",
+          "name": "State=ReadOnly",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Idle", "Expanded", "ReadOnly"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:59",
+      "figmaName": "CommandPalette",
+      "sourceName": "Shell / CommandPalette",
+      "owner": "apps/web/src/app/shell/components/",
+      "component": {
+        "name": "CommandPalette",
+        "target": "apps/web/src/app/shell/components/CommandPalette.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/app/shell/components/index.ts#CommandPalette",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/app/shell/components/CommandPalette.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/app/shell/components/CommandPalette.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "command-palette",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:41",
+          "name": "State=Idle",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:47",
+          "name": "State=Results",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:53",
+          "name": "State=NoResults",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Idle", "Results", "NoResults"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Keyboard Ctrl/Cmd+K, Escape and dialog navigation exist inline in App. Search/results/no-results variants and a named component/preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/app/App.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/app/App.test.tsx",
+          "styles": "apps/web/src/app/App.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:78",
+      "figmaName": "NavigationItem",
+      "sourceName": "Shell / NavigationItem",
+      "owner": "apps/web/src/app/shell/components/",
+      "component": {
+        "name": "NavigationItem",
+        "target": "apps/web/src/app/shell/components/NavigationItem.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/app/shell/components/index.ts#NavigationItem",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/app/shell/components/NavigationItem.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/app/shell/components/NavigationItem.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "navigation-item",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:60",
+          "name": "State=Default",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:66",
+          "name": "State=Selected",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:72",
+          "name": "State=Disabled",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Default", "Selected", "Disabled"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/app/App.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/app/App.test.tsx",
+          "styles": "apps/web/src/app/App.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:91",
+      "figmaName": "ProjectCard",
+      "sourceName": "Planning / ProjectCard",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "ProjectCard",
+        "target": "apps/web/src/features/planning/components/ProjectCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#ProjectCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/ProjectCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/ProjectCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "project-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:79",
+          "name": "State=Active",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:85",
+          "name": "State=Archived",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Active", "Archived"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 276,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/organization/OrganizationPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/organization/OrganizationPage.test.tsx",
+          "styles": "apps/web/src/features/organization/OrganizationPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:110",
+      "figmaName": "EpicCard",
+      "sourceName": "Planning / EpicCard",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "EpicCard",
+        "target": "apps/web/src/features/planning/components/EpicCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#EpicCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/EpicCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/EpicCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "epic-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:92",
+          "name": "State=Backlog",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:98",
+          "name": "State=InProgress",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:104",
+          "name": "State=Done",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Backlog", "InProgress", "Done"],
+      "implementationStatus": "NOT_IMPLEMENTED",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "relatedImplementation": []
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:135",
+      "figmaName": "FeatureCard",
+      "sourceName": "Planning / FeatureCard",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "FeatureCard",
+        "target": "apps/web/src/features/planning/components/FeatureCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#FeatureCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/FeatureCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/FeatureCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "feature-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:111",
+          "name": "State=Backlog",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:117",
+          "name": "State=InProgress",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:123",
+          "name": "State=Done",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:129",
+          "name": "State=ReadOnly",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Backlog", "InProgress", "Done", "ReadOnly"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/PlanningPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/PlanningPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:148",
+      "figmaName": "KanbanColumn",
+      "sourceName": "Planning / KanbanColumn",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "KanbanColumn",
+        "target": "apps/web/src/features/planning/components/KanbanColumn.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#KanbanColumn",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/KanbanColumn.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/KanbanColumn.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "kanban-column",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:136",
+          "name": "State=HasCards",
+          "width": 330,
+          "height": 222
+        },
+        {
+          "figmaNodeId": "229:142",
+          "name": "State=Empty",
+          "width": 330,
+          "height": 222
+        }
+      ],
+      "states": ["HasCards", "Empty"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 848,
+        "height": 270,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/PlanningPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/PlanningPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:179",
+      "figmaName": "TaskItem",
+      "sourceName": "Planning / TaskItem",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "TaskItem",
+        "target": "apps/web/src/features/planning/components/TaskItem.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#TaskItem",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/TaskItem.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/TaskItem.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "task-item",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:149",
+          "name": "State=Todo",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:155",
+          "name": "State=InProgress",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:161",
+          "name": "State=Done",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:167",
+          "name": "State=Editing",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:173",
+          "name": "State=Archived",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Todo", "InProgress", "Done", "Editing", "Archived"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 816,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/FeatureDetailPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:204",
+      "figmaName": "CriterionItem",
+      "sourceName": "Planning / CriterionItem",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "CriterionItem",
+        "target": "apps/web/src/features/planning/components/CriterionItem.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#CriterionItem",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/CriterionItem.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/CriterionItem.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "criterion-item",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:180",
+          "name": "State=Pending",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:186",
+          "name": "State=Satisfied",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:192",
+          "name": "State=Editing",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:198",
+          "name": "State=Archived",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Pending", "Satisfied", "Editing", "Archived"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/FeatureDetailPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:223",
+      "figmaName": "DependencyGroup",
+      "sourceName": "Planning / DependencyGroup",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "DependencyGroup",
+        "target": "apps/web/src/features/planning/components/DependencyGroup.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#DependencyGroup",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/DependencyGroup.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/DependencyGroup.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "dependency-group",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:205",
+          "name": "State=Blocked",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:211",
+          "name": "State=Clear",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:217",
+          "name": "State=Archived",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Blocked", "Clear", "Archived"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/PlanningPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/PlanningPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:242",
+      "figmaName": "FilterBar",
+      "sourceName": "Planning / FilterBar",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "FilterBar",
+        "target": "apps/web/src/features/planning/components/FilterBar.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#FilterBar",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/FilterBar.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/FilterBar.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "filter-bar",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:224",
+          "name": "State=Default",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:230",
+          "name": "State=Filtered",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:236",
+          "name": "State=NoResults",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Default", "Filtered", "NoResults"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/PlanningPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/PlanningPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:261",
+      "figmaName": "FeatureOverview",
+      "sourceName": "Planning / FeatureOverview",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "FeatureOverview",
+        "target": "apps/web/src/features/planning/components/FeatureOverview.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#FeatureOverview",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/FeatureOverview.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/FeatureOverview.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "feature-overview",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:243",
+          "name": "State=Ready",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:249",
+          "name": "State=Blocked",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:255",
+          "name": "State=Unavailable",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Ready", "Blocked", "Unavailable"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/FeatureDetailPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:280",
+      "figmaName": "ProjectPlanningHome",
+      "sourceName": "Planning / ProjectPlanningHome",
+      "owner": "apps/web/src/features/planning/components/",
+      "component": {
+        "name": "ProjectPlanningHome",
+        "target": "apps/web/src/features/planning/components/ProjectPlanningHome.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/planning/components/index.ts#ProjectPlanningHome",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/planning/components/ProjectPlanningHome.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/planning/components/ProjectPlanningHome.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "project-planning-home",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:262",
+          "name": "State=Default",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:268",
+          "name": "State=Empty",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:274",
+          "name": "State=Archived",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Default", "Empty", "Archived"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/planning/PlanningPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/planning/PlanningPage.test.tsx",
+          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:299",
+      "figmaName": "RuleCard",
+      "sourceName": "Readiness / RuleCard",
+      "owner": "apps/web/src/features/readiness/components/",
+      "component": {
+        "name": "RuleCard",
+        "target": "apps/web/src/features/readiness/components/RuleCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/readiness/components/index.ts#RuleCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/readiness/components/RuleCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/readiness/components/RuleCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "rule-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:281",
+          "name": "State=Passed",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:287",
+          "name": "State=Blocked",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:293",
+          "name": "State=Unavailable",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Passed", "Blocked", "Unavailable"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
+          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:318",
+      "figmaName": "EvaluationSnapshot",
+      "sourceName": "Readiness / EvaluationSnapshot",
+      "owner": "apps/web/src/features/readiness/components/",
+      "component": {
+        "name": "EvaluationSnapshot",
+        "target": "apps/web/src/features/readiness/components/EvaluationSnapshot.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/readiness/components/index.ts#EvaluationSnapshot",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/readiness/components/EvaluationSnapshot.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/readiness/components/EvaluationSnapshot.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "evaluation-snapshot",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:300",
+          "name": "State=Preview",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:306",
+          "name": "State=Saved",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:312",
+          "name": "State=Stale",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Preview", "Saved", "Stale"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
+          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:337",
+      "figmaName": "RuleAction",
+      "sourceName": "Readiness / RuleAction",
+      "owner": "apps/web/src/features/readiness/components/",
+      "component": {
+        "name": "RuleAction",
+        "target": "apps/web/src/features/readiness/components/RuleAction.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/readiness/components/index.ts#RuleAction",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/readiness/components/RuleAction.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/readiness/components/RuleAction.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "rule-action",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:319",
+          "name": "State=Available",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:325",
+          "name": "State=ReadOnly",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:331",
+          "name": "State=Unavailable",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Available", "ReadOnly", "Unavailable"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
+          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:356",
+      "figmaName": "DecisionCard",
+      "sourceName": "Decisions / DecisionCard",
+      "owner": "apps/web/src/features/readiness/components/",
+      "component": {
+        "name": "DecisionCard",
+        "target": "apps/web/src/features/readiness/components/DecisionCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/readiness/components/index.ts#DecisionCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/readiness/components/DecisionCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/readiness/components/DecisionCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "decision-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:338",
+          "name": "State=Proposed",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:344",
+          "name": "State=Accepted",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:350",
+          "name": "State=Superseded",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Proposed", "Accepted", "Superseded"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
+          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:369",
+      "figmaName": "RevisionHistory",
+      "sourceName": "Decisions / RevisionHistory",
+      "owner": "apps/web/src/features/readiness/components/",
+      "component": {
+        "name": "RevisionHistory",
+        "target": "apps/web/src/features/readiness/components/RevisionHistory.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/readiness/components/index.ts#RevisionHistory",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/readiness/components/RevisionHistory.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/readiness/components/RevisionHistory.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "revision-history",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:357",
+          "name": "State=Current",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:363",
+          "name": "State=Superseded",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Current", "Superseded"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 208,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
+          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:388",
+      "figmaName": "InvariantCard",
+      "sourceName": "Invariants / InvariantCard",
+      "owner": "apps/web/src/features/readiness/components/",
+      "component": {
+        "name": "InvariantCard",
+        "target": "apps/web/src/features/readiness/components/InvariantCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/readiness/components/index.ts#InvariantCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/readiness/components/InvariantCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/readiness/components/InvariantCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "invariant-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:370",
+          "name": "State=Current",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:376",
+          "name": "State=Acknowledged",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:382",
+          "name": "State=Stale",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Current", "Acknowledged", "Stale"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
+          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:407",
+      "figmaName": "RepositoryCard",
+      "sourceName": "Repositories / RepositoryCard",
+      "owner": "apps/web/src/features/repositories/components/",
+      "component": {
+        "name": "RepositoryCard",
+        "target": "apps/web/src/features/repositories/components/RepositoryCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/repositories/components/index.ts#RepositoryCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/repositories/components/RepositoryCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/repositories/components/RepositoryCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "repository-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:389",
+          "name": "State=Connected",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:395",
+          "name": "State=Observed",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:401",
+          "name": "State=Unavailable",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Connected", "Observed", "Unavailable"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/repositories/RepositoriesPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/repositories/RepositoriesPage.test.tsx",
+          "styles": "apps/web/src/features/repositories/RepositoriesPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:426",
+      "figmaName": "ContextPackageCard",
+      "sourceName": "Repositories / ContextPackageCard",
+      "owner": "apps/web/src/features/context/components/",
+      "component": {
+        "name": "ContextPackageCard",
+        "target": "apps/web/src/features/context/components/ContextPackageCard.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/context/components/index.ts#ContextPackageCard",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/context/components/ContextPackageCard.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/context/components/ContextPackageCard.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "context-package-card",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:408",
+          "name": "State=Fresh",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:414",
+          "name": "State=Stale",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:420",
+          "name": "State=Unavailable",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Fresh", "Stale", "Unavailable"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/context/ContextPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/context/ContextPage.test.tsx",
+          "styles": "apps/web/src/features/context/ContextPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:439",
+      "figmaName": "ReportField",
+      "sourceName": "Workbench / ReportField",
+      "owner": "apps/web/src/features/workbench/components/",
+      "component": {
+        "name": "ReportField",
+        "target": "apps/web/src/features/workbench/components/ReportField.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/workbench/components/index.ts#ReportField",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/workbench/components/ReportField.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/workbench/components/ReportField.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "report-field",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:427",
+          "name": "State=HasValue",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:433",
+          "name": "State=Empty",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["HasValue", "Empty"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 208,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/workbench/WorkbenchPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/workbench/WorkbenchPage.test.tsx",
+          "styles": "apps/web/src/features/workbench/WorkbenchPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:458",
+      "figmaName": "ProvenanceNotice",
+      "sourceName": "Workbench / ProvenanceNotice",
+      "owner": "apps/web/src/features/workbench/components/",
+      "component": {
+        "name": "ProvenanceNotice",
+        "target": "apps/web/src/features/workbench/components/ProvenanceNotice.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/workbench/components/index.ts#ProvenanceNotice",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/workbench/components/ProvenanceNotice.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/workbench/components/ProvenanceNotice.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "provenance-notice",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:440",
+          "name": "State=Reported",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:446",
+          "name": "State=Observed",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:452",
+          "name": "State=Unknown",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Reported", "Observed", "Unknown"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 403,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/workbench/WorkbenchPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/workbench/WorkbenchPage.test.tsx",
+          "styles": "apps/web/src/features/workbench/WorkbenchPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:471",
+      "figmaName": "TrustDisclosure",
+      "sourceName": "Delivery / TrustDisclosure",
+      "owner": "apps/web/src/features/delivery/components/",
+      "component": {
+        "name": "TrustDisclosure",
+        "target": "apps/web/src/features/delivery/components/TrustDisclosure.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/delivery/components/index.ts#TrustDisclosure",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/delivery/components/TrustDisclosure.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/delivery/components/TrustDisclosure.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "trust-disclosure",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:459",
+          "name": "State=Default",
+          "width": 430,
+          "height": 160
+        },
+        {
+          "figmaNodeId": "229:465",
+          "name": "State=Expanded",
+          "width": 430,
+          "height": 160
+        }
+      ],
+      "states": ["Default", "Expanded"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 948,
+        "height": 208,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
+          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:490",
+      "figmaName": "DownloadAction",
+      "sourceName": "Delivery / DownloadAction",
+      "owner": "apps/web/src/features/delivery/components/",
+      "component": {
+        "name": "DownloadAction",
+        "target": "apps/web/src/features/delivery/components/DownloadAction.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/delivery/components/index.ts#DownloadAction",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/delivery/components/DownloadAction.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/delivery/components/DownloadAction.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "download-action",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:472",
+          "name": "State=Ready",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:478",
+          "name": "State=Downloading",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:484",
+          "name": "State=Failed",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Ready", "Downloading", "Failed"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
+          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:515",
+      "figmaName": "VerificationSummary",
+      "sourceName": "Delivery / VerificationSummary",
+      "owner": "apps/web/src/features/delivery/components/",
+      "component": {
+        "name": "VerificationSummary",
+        "target": "apps/web/src/features/delivery/components/VerificationSummary.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/delivery/components/index.ts#VerificationSummary",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/delivery/components/VerificationSummary.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/delivery/components/VerificationSummary.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "verification-summary",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:491",
+          "name": "State=NotRun",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:497",
+          "name": "State=PassedScoped",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:503",
+          "name": "State=Failed",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:509",
+          "name": "State=Stale",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["NotRun", "PassedScoped", "Failed", "Stale"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": true
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
+          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
+        }
+      ]
+    },
+    {
+      "category": "product",
+      "figmaNodeId": "229:534",
+      "figmaName": "ReleaseGate",
+      "sourceName": "Delivery / ReleaseGate",
+      "owner": "apps/web/src/features/delivery/components/",
+      "component": {
+        "name": "ReleaseGate",
+        "target": "apps/web/src/features/delivery/components/ReleaseGate.tsx",
+        "current": []
+      },
+      "publicApi": {
+        "target": "apps/web/src/features/delivery/components/index.ts#ReleaseGate",
+        "current": []
+      },
+      "styles": {
+        "target": "apps/web/src/features/delivery/components/ReleaseGate.module.css",
+        "current": []
+      },
+      "tests": {
+        "target": "apps/web/src/features/delivery/components/ReleaseGate.test.tsx",
+        "current": []
+      },
+      "componentHost": {
+        "id": "release-gate",
+        "status": "PLANNED",
+        "source": null
+      },
+      "variants": [
+        {
+          "figmaNodeId": "229:516",
+          "name": "State=Blocked",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:522",
+          "name": "State=NotReady",
+          "width": 430,
+          "height": 224
+        },
+        {
+          "figmaNodeId": "229:528",
+          "name": "State=ScopedPass",
+          "width": 430,
+          "height": 224
+        }
+      ],
+      "states": ["Blocked", "NotReady", "ScopedPass"],
+      "implementationStatus": "PARTIAL",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED",
+      "source": {
+        "fileKey": "r10szKLgiIPVi2NBmbjTpm",
+        "pageNodeId": "229:2",
+        "width": 952,
+        "height": 546,
+        "metadataReviewed": true,
+        "designContextReviewed": false
+      },
+      "implementationNotes": "Related behavior is inline in the existing page; the named component, full Figma state contract and dedicated host preview are absent.",
+      "relatedImplementation": [
+        {
+          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
+          "kind": "INLINE_BEHAVIOR",
+          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
+          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
+        }
+      ]
+    }
+  ],
+  "codeOnlyComponents": [
+    {
+      "name": "EmptyState",
+      "source": "packages/ui/src/components/EmptyState.tsx",
+      "publicApi": "@forge-org/ui#EmptyState",
+      "relationship": "Related to StatePanel; not an additional canonical Figma row.",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED"
+    },
+    {
+      "name": "LoadingState",
+      "source": "packages/ui/src/components/LoadingState.tsx",
+      "publicApi": "@forge-org/ui#LoadingState",
+      "relationship": "Related to StatePanel; not an additional canonical Figma row.",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED"
+    },
+    {
+      "name": "ErrorState",
+      "source": "packages/ui/src/components/ErrorState.tsx",
+      "publicApi": "@forge-org/ui#ErrorState",
+      "relationship": "Related to StatePanel; not an additional canonical Figma row.",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED"
+    },
+    {
+      "name": "OrganizationEmptyState",
+      "source": "apps/web/src/features/organization/components/OrganizationEmptyState.tsx",
+      "publicApi": "apps/web/src/features/organization/index.ts#OrganizationEmptyState",
+      "relationship": "Closest reference is product screen 4:32; no exact page-20 master confirmed.",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED"
+    },
+    {
+      "name": "DeliverySummary",
+      "source": "apps/web/src/features/delivery/DeliverySummary.tsx",
+      "publicApi": "Feature-local named export",
+      "relationship": "Counts summary; not an alias for VerificationSummary or ReleaseGate.",
+      "visualReviewStatus": "NOT_HUMAN_REVIEWED"
+    }
+  ]
+}
