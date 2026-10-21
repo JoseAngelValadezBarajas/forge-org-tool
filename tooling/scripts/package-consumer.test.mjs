@@ -111,11 +111,17 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
   run(npm, ['run', 'build'], consumer);
 
   const port = 4173 + Math.floor(Math.random() * 300);
-  const server = spawn(
-    process.env.ComSpec ?? 'cmd.exe',
-    ['/d', '/s', '/c', `npm exec -- vite --host 127.0.0.1 --port ${port}`],
-    { cwd: consumer, stdio: 'ignore' },
-  );
+  const server =
+    process.platform === 'win32'
+      ? spawn(
+          process.env.ComSpec ?? 'cmd.exe',
+          ['/d', '/s', '/c', `npm exec -- vite --host 127.0.0.1 --port ${port}`],
+          { cwd: consumer, stdio: 'ignore' },
+        )
+      : spawn('npm', ['exec', '--', 'vite', '--host', '127.0.0.1', '--port', String(port)], {
+          cwd: consumer,
+          stdio: 'ignore',
+        });
   try {
     let ready = false;
     for (let attempt = 0; attempt < 30; attempt += 1) {
