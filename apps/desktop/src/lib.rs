@@ -60,10 +60,7 @@ mod tests {
     use super::*;
     #[test]
     fn accepts_relative_api_route() {
-        assert_eq!(
-            validate_request("GET", "/api/v1/workspaces", 0),
-            Ok(())
-        );
+        assert_eq!(validate_request("GET", "/api/v1/workspaces", 0), Ok(()));
     }
 
     #[test]
@@ -92,10 +89,7 @@ mod tests {
 
     #[test]
     fn only_accepts_loopback_sidecar_urls_and_strong_tokens() {
-        assert_eq!(
-            validate_loopback_base_url("http://127.0.0.1:43123"),
-            Ok(())
-        );
+        assert_eq!(validate_loopback_base_url("http://127.0.0.1:43123"), Ok(()));
         assert_eq!(
             validate_loopback_base_url("http://localhost:43123"),
             Err(PolicyError::InvalidPath)
