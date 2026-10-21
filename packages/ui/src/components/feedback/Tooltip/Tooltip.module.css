@@ -16,7 +16,7 @@
   border-radius: var(--forge-radius-sm);
   background: var(--forge-surface-raised);
   color: var(--forge-text-primary);
-  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+  box-shadow: var(--forge-shadow-tooltip);
   font-size: 0.78rem;
   opacity: 0;
   visibility: hidden;

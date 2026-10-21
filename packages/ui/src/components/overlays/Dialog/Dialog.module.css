@@ -8,7 +8,7 @@
   color: var(--forge-text-primary);
 }
 .dialog::backdrop {
-  background: rgb(0 0 0 / 55%);
+  background: var(--forge-overlay);
 }
 .dialog h2 {
   margin: 0 0 0.6rem;
