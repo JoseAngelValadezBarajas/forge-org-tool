@@ -11,8 +11,18 @@ test('desktop shell is truthful and has no horizontal overflow', async ({ page }
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
   await mkdir(evidenceDir, { recursive: true });
+  const suffix = Date.now().toString();
+  const workspace = await (
+    await page.request.post('/api/v1/workspaces', { data: { name: `Evidence ${suffix}` } })
+  ).json();
+  await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
+    data: { name: `Loaded project ${suffix}`, description: 'Synthetic browser evidence' },
+  });
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
+  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+  await expect(page.getByLabel('Workspace summary').getByText(`Evidence ${suffix}`)).toBeVisible();
+  await expect(page.getByRole('link', { name: `Loaded project ${suffix}` })).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,

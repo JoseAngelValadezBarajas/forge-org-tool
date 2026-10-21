@@ -15,7 +15,7 @@ certification and human visual review are complete.
   surface and adds non-vacuous characterization/OpenAPI assertions. `uv run
   pytest tests -q` passed with 23 tests; one pre-existing Starlette/httpx
   deprecation warning remains.
-- UI CSS distribution: the aggregate stylesheet now excludes CSS Module files;
+- UI CSS distribution: commit `ae3e1b2` makes the aggregate stylesheet exclude CSS Module files;
   packed-consumer checks verify the installed package, generic selector
   isolation, theme behavior, and ESM consumer build. Native CSS-unaware Node
   execution is not advertised; bundler CSS extraction is required for SSR.
@@ -34,6 +34,13 @@ exited before producing valid evidence.
 - Rust `cargo check`, rustfmt, and Clippy in the supported Windows toolchain.
 - Real NSIS installer build and isolated installed UI -> Tauri IPC -> sidecar ->
   SQLite smoke, including restart and persistence.
-- Isolated Chromium journeys with retained loaded Organization and Delivery
-  desktop/mobile evidence.
 - GitHub Quality CI on the integrated commits.
+
+The readiness browser race found during the first full run was fixed in commit
+`3103772` with a generation guard and a focused regression test. The complete
+isolated Chromium suite subsequently passed 18/18 on desktop and mobile.
+
+The Organization evidence journey now creates synthetic workspace/project data,
+selects that workspace explicitly, and captures loaded desktop/mobile screens;
+the Delivery journey already captures real loaded synthetic evidence. These are
+automated browser artifacts, not human Figma certification.
