@@ -14,6 +14,8 @@ jobs:
           cache: npm
       - uses: astral-sh/setup-uv@v6
       - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint:frontend
       - run: npm run test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
@@ -26,6 +28,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: uv sync --project apps/api --locked --group dev
+      - run: uv run --project apps/api --locked ruff format --check apps/api/src apps/api/tests
       - run: uv run --project apps/api --locked ruff check apps/api/src apps/api/tests
       - run: uv run --project apps/api --locked mypy apps/api/src
       - run: uv run --project apps/api --locked pytest apps/api/tests
@@ -39,6 +42,10 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: cargo fmt --manifest-path apps/desktop/Cargo.toml -- --check
+      - run: cargo fmt --manifest-path apps/desktop/src-tauri/Cargo.toml -- --check
+      - run: cargo clippy --all-targets --manifest-path apps/desktop/Cargo.toml -- -D warnings
+      - run: cargo clippy --all-targets --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings
       - run: npm run build
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-python@v5

@@ -33,11 +33,9 @@ test('mobile gallery switches from dark to light with no browser errors', async 
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
   await page.goto('/__components');
-  const gallery = page
-    .locator('main [data-theme]')
-    .filter({
-      has: page.getByText('A development-only catalog of actual exported React components'),
-    });
+  const gallery = page.locator('main [data-theme]').filter({
+    has: page.getByText('A development-only catalog of actual exported React components'),
+  });
   await expect(gallery).toHaveAttribute('data-theme', 'dark');
   const prefix =
     test.info().project.name === 'chromium-mobile'
