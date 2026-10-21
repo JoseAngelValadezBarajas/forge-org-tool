@@ -50,4 +50,19 @@
   --forge-radius-lg: 14px;
   --forge-font-ui: Geist, Inter, system-ui, sans-serif;
   --forge-font-mono: IBM Plex Mono, ui-monospace, Consolas, monospace;
+  --forge-font-weight-regular: 400;
+  --forge-font-weight-medium: 500;
+  --forge-font-weight-semibold: 600;
+  --forge-font-weight-bold: 700;
+  --forge-shadow-sm: 0 1px 2px rgb(0 0 0 / 12%);
+  --forge-shadow-md: 0 8px 24px rgb(0 0 0 / 16%);
+  --forge-motion-fast: 120ms;
+  --forge-motion-normal: 200ms;
+  --forge-motion-reduced: 0ms;
+  --forge-breakpoint-sm: 640px;
+  --forge-breakpoint-md: 768px;
+  --forge-breakpoint-lg: 1024px;
+  --forge-breakpoint-xl: 1280px;
+  --forge-border-default: 1px;
+  --forge-border-focus: 2px;
 }

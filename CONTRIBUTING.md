@@ -17,6 +17,11 @@ Individual checks are available through `npm run format`,
 `npm run build`. `npm run build:packages` validates the distributable outputs
 for tokens, UI, and API client before the web build.
 
+The API client response types are generated from
+`contracts/openapi/forge-org-v1.json`. Run `npm run check:api-types` after
+backend contract changes; a non-empty diff means the generated client contract
+must be reviewed and committed with the API change.
+
 Python formatting/linting uses `uv run --project apps/api --locked ruff
 format` and `ruff check`; Rust uses `cargo fmt` and `cargo clippy` against
 both desktop manifests. CI runs the check variants and the existing browser,

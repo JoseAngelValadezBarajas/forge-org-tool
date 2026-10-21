@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import test from 'node:test';
 import { tmpdir } from 'node:os';
 
@@ -34,7 +34,7 @@ function pack(packageDirectory, destination) {
   return join(destination, output.trim().split(/\r?\n/).at(-1));
 }
 
-test('packed UI, tokens, and API client work in an external React consumer', () => {
+test('packed UI, tokens, and API client work in an external React consumer', async () => {
   const consumer = mkdtempSync(join(tmpdir(), 'forge-package-consumer-'));
   const artifacts = join(consumer, 'artifacts');
   const ui = resolve(root, 'packages/ui');
@@ -82,7 +82,7 @@ test('packed UI, tokens, and API client work in an external React consumer', () 
   mkdirSync(join(consumer, 'src'), { recursive: true });
   writeFileSync(
     join(consumer, 'src/main.tsx'),
-    `import React from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Button, FormField, Input } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\ncreateRoot(document.getElementById('root')!).render(<FormField label="Name"><Input /></FormField>);\nexport function ConsumerButton() { return <Button onClick={() => undefined}>Save</Button>; }\n`,
+    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Button, FormField, Input } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light'>('dark');\n  return <main data-theme={theme}><button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Theme</button><FormField label="Name"><Input /></FormField><Button onClick={() => setCount(count + 1)}>Save {count}</Button></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
   );
   writeFileSync(
     join(consumer, 'vite.config.ts'),
@@ -109,6 +109,54 @@ test('packed UI, tokens, and API client work in an external React consumer', () 
   run(npm, ['install', '--ignore-scripts', '--no-audit', '--no-fund'], consumer);
   run(npm, ['run', 'typecheck'], consumer);
   run(npm, ['run', 'build'], consumer);
+
+  const port = 4173 + Math.floor(Math.random() * 300);
+  const server = spawn(
+    process.env.ComSpec ?? 'cmd.exe',
+    ['/d', '/s', '/c', `npm exec -- vite --host 127.0.0.1 --port ${port}`],
+    { cwd: consumer, stdio: 'ignore' },
+  );
+  try {
+    let ready = false;
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      try {
+        const response = await globalThis.fetch(`http://127.0.0.1:${port}`);
+        if (response.ok) {
+          ready = true;
+          break;
+        }
+      } catch {
+        await new Promise((resolve) => globalThis.setTimeout(resolve, 200));
+      }
+    }
+    assert.equal(ready, true, 'external Vite consumer did not start');
+    const { chromium } = await import('@playwright/test');
+    const browser = await chromium.launch({ headless: true });
+    try {
+      const page = await browser.newPage();
+      await page.goto(`http://127.0.0.1:${port}`);
+      assert.equal(await page.getByLabel('Name').isVisible(), true);
+      await page.getByRole('button', { name: 'Save 0' }).click();
+      assert.equal(await page.getByRole('button', { name: 'Save 1' }).isVisible(), true);
+      const before = await page
+        .getByLabel('Name')
+        .evaluate((element) => globalThis.getComputedStyle(element).backgroundColor);
+      await page.getByRole('button', { name: 'Theme' }).click();
+      assert.equal(await page.locator('main').getAttribute('data-theme'), 'light');
+      const after = await page
+        .getByLabel('Name')
+        .evaluate((element) => globalThis.getComputedStyle(element).backgroundColor);
+      assert.notEqual(before, after);
+    } finally {
+      await browser.close();
+    }
+  } finally {
+    if (process.platform === 'win32') {
+      spawnSync('taskkill.exe', ['/PID', String(server.pid), '/T', '/F'], { stdio: 'ignore' });
+    } else {
+      server.kill();
+    }
+  }
 
   assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/dist/index.js')), true);
   assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/dist/styles.css')), true);

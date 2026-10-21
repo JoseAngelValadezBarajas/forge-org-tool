@@ -294,7 +294,7 @@ export function DeliveryPage() {
               </StatusChip>
               <p>Input fingerprint: {verification.input_fingerprint}</p>
               {verification.stale && <p>STALE evaluation: referenced inputs changed.</p>}
-              {verification.blockers.map((blocker) => (
+              {verification.blockers.map((blocker: string) => (
                 <p key={blocker}>{blocker}</p>
               ))}
             </div>

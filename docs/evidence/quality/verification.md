@@ -37,9 +37,10 @@ data, merge PR #1, or archive the original FORGE repository.
 - API dependency providers remain in `api/dependencies.py`. Connection lifecycle
   remains in `infrastructure/connection.py`; migration execution lives in
   `infrastructure/migrations/runner.py`, legacy schema creation in
-  `infrastructure/migrations/legacy_schema.py`, and the repository implementation
-  in `infrastructure/persistence/organization.py`. `sqlite.py` and `routes.py`
-  are now compatibility surfaces rather than storage locations for handlers or
+  `infrastructure/migrations/legacy_schema.py`, and persistence is split into
+  cohesive organization/planning, repository/context, workbench, and delivery
+  modules behind the `OrganizationRepository` facade. `sqlite.py` and `routes.py`
+  are compatibility surfaces rather than storage locations for handlers or
   persistence implementation.
 - Delivery state/mutations are coordinated by
   `features/delivery/useDeliveryController.ts`, with metrics in
@@ -48,21 +49,23 @@ data, merge PR #1, or archive the original FORGE repository.
   reference check runs in architecture verification.
 - Tokens, UI, and API client each produce package artifacts with declarations and
   export maps. A disposable external React/Vite consumer installs packed
-  artifacts and verifies TypeScript, runtime bundling, CSS, and React deduplication.
+  artifacts and verifies TypeScript, runtime bundling, CSS, React deduplication,
+  theme switching, and a rendered interaction.
 
 ## Verification evidence
 
-- Frontend typecheck, architecture checks (6/6), token checks, Vitest 26/26,
+- Frontend typecheck, AST dependency/boundary checks, token checks, Vitest 26/26,
   ESLint with zero warnings, Prettier, package builds, external consumer test,
   and production build pass locally.
-- API Ruff, strict mypy (46 source files), migration/boundary characterization,
-  full API pytest (19/19), and OpenAPI drift check pass locally.
+- API Ruff, strict mypy (51 source files), migration/boundary characterization,
+  full API pytest (21/21), and OpenAPI drift check pass locally.
 - Isolated Chromium smoke remains 18/18 across desktop and mobile, with a
   disposable API database and `reuseExistingServer: false`.
-- GitHub Quality run `39530621562` passed web, API, and desktop for commit
-  `2178531`, including frontend format/lint/test/build/e2e, API Ruff/mypy/
-  pytest/OpenAPI checks, Rust format/Clippy/tests, desktop smoke tests, and the
-  release build.
+- GitHub Quality run `39534793241` passed the API and web jobs for commit
+  `f907ad8`; the Windows desktop release build was still running when this
+  record was drafted. The completed jobs include frontend format/lint/test/
+  build/e2e and API Ruff/mypy/pytest/OpenAPI checks. A final CI run will be
+  recorded after the follow-up architecture and persistence changes are pushed.
 
 Rustfmt, Clippy, and desktop tests require the Rust toolchain and are verified
 in Windows CI; they were not runnable in the current environment because

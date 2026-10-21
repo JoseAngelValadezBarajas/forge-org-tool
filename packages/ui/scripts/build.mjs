@@ -46,3 +46,7 @@ await collectCss(dist);
 const uniqueCss = [...new Set(cssFiles)];
 const contents = await Promise.all(uniqueCss.map((file) => readFile(file, 'utf8')));
 await writeFile(join(dist, 'styles.css'), contents.join('\n'));
+await writeFile(
+  join(dist, 'styles.css.d.ts'),
+  'declare const stylesheet: string;\nexport default stylesheet;\n',
+);
