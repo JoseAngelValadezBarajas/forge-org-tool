@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Button,
@@ -52,25 +52,35 @@ export function DeliveryPage() {
   const [manifest, setManifest] = useState<ReleaseManifest | null>(null);
   const [error, setError] = useState('');
 
-  async function load() {
-    try {
-      const [nextEvidence, nextCandidates, nextRules, nextVerifications] = await Promise.all([
-        organizationApi.listEvidence(workspaceId, projectId, search, provenance, status),
-        organizationApi.listCandidates(workspaceId, projectId),
-        organizationApi.listVerificationRules(workspaceId, projectId),
-        organizationApi.listVerifications(workspaceId, projectId),
-      ]);
-      setEvidence(nextEvidence);
-      setCandidates(nextCandidates);
-      setRules(nextRules);
-      setVerifications(nextVerifications);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load delivery records.');
-    }
-  }
+  const load = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const [nextEvidence, nextCandidates, nextRules, nextVerifications] = await Promise.all([
+          organizationApi.listEvidence(workspaceId, projectId, search, provenance, status),
+          organizationApi.listCandidates(workspaceId, projectId),
+          organizationApi.listVerificationRules(workspaceId, projectId),
+          organizationApi.listVerifications(workspaceId, projectId),
+        ]);
+        if (!isCurrent()) return;
+        setEvidence(nextEvidence);
+        setCandidates(nextCandidates);
+        setRules(nextRules);
+        setVerifications(nextVerifications);
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load delivery records.');
+        }
+      }
+    },
+    [projectId, search, provenance, status, workspaceId],
+  );
   useEffect(() => {
-    void load();
-  }, [workspaceId, projectId]);
+    let current = true;
+    queueMicrotask(() => void load(() => current));
+    return () => {
+      current = false;
+    };
+  }, [load]);
 
   async function addEvidence(event: FormEvent) {
     event.preventDefault();

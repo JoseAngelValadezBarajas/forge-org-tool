@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Card, SectionHeader, StatusChip } from '@forge-org/ui';
 import { organizationApi, type ContextPackage, type Repository } from '@forge-org/api-client';
@@ -19,23 +19,33 @@ export function ContextPage() {
   const [preview, setPreview] = useState<ContextPreview | null>(null);
   const [error, setError] = useState('');
 
-  async function load() {
-    try {
-      const [nextRepositories, nextLinked, nextPackages] = await Promise.all([
-        organizationApi.listRepositories(workspaceId, projectId),
-        organizationApi.listFeatureRepositories(workspaceId, projectId, featureId),
-        organizationApi.listContextPackages(workspaceId, projectId, featureId),
-      ]);
-      setRepositories(nextRepositories);
-      setLinkedRepositories(nextLinked);
-      setPackages(nextPackages);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load feature context.');
-    }
-  }
+  const load = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const [nextRepositories, nextLinked, nextPackages] = await Promise.all([
+          organizationApi.listRepositories(workspaceId, projectId),
+          organizationApi.listFeatureRepositories(workspaceId, projectId, featureId),
+          organizationApi.listContextPackages(workspaceId, projectId, featureId),
+        ]);
+        if (!isCurrent()) return;
+        setRepositories(nextRepositories);
+        setLinkedRepositories(nextLinked);
+        setPackages(nextPackages);
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load feature context.');
+        }
+      }
+    },
+    [featureId, projectId, workspaceId],
+  );
   useEffect(() => {
-    void load();
-  }, [workspaceId, projectId, featureId]);
+    let current = true;
+    queueMicrotask(() => void load(() => current));
+    return () => {
+      current = false;
+    };
+  }, [load]);
 
   async function link(repository: Repository) {
     try {

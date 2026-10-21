@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -29,40 +29,61 @@ export function OrganizationPage() {
   const activeProjects = projects.filter((item) => item.status === 'active').length;
   const archivedProjects = projects.filter((item) => item.status !== 'active').length;
 
-  async function loadWorkspaces() {
+  const loadWorkspaces = useCallback(async (isCurrent: () => boolean = () => true) => {
     setLoading(true);
     setError('');
     try {
       const next = await organizationApi.listWorkspaces();
+      if (!isCurrent()) return;
       setWorkspaces(next);
       setWorkspaceId((current) =>
         next.some((item) => item.id === current) ? current : (next[0]?.id ?? ''),
       );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load workspaces.');
+      if (isCurrent()) {
+        setError(cause instanceof Error ? cause.message : 'Unable to load workspaces.');
+      }
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }
-
-  async function loadProjects(id: string) {
-    if (!id) {
-      setProjects([]);
-      return;
-    }
-    try {
-      setProjects(await organizationApi.listProjects(id, search, showArchived ? 'all' : 'active'));
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load projects.');
-    }
-  }
-
-  useEffect(() => {
-    void loadWorkspaces();
   }, []);
+
+  const loadProjects = useCallback(
+    async (id: string, isCurrent: () => boolean = () => true) => {
+      if (!id) {
+        if (isCurrent()) setProjects([]);
+        return;
+      }
+      try {
+        const next = await organizationApi.listProjects(
+          id,
+          search,
+          showArchived ? 'all' : 'active',
+        );
+        if (isCurrent()) setProjects(next);
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load projects.');
+        }
+      }
+    },
+    [search, showArchived],
+  );
+
   useEffect(() => {
-    void loadProjects(workspaceId);
-  }, [workspaceId, search, showArchived]);
+    let current = true;
+    queueMicrotask(() => void loadWorkspaces(() => current));
+    return () => {
+      current = false;
+    };
+  }, [loadWorkspaces]);
+  useEffect(() => {
+    let current = true;
+    queueMicrotask(() => void loadProjects(workspaceId, () => current));
+    return () => {
+      current = false;
+    };
+  }, [loadProjects, workspaceId]);
 
   async function createWorkspace(event: React.FormEvent) {
     event.preventDefault();

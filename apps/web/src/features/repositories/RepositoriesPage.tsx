@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, FormField, Input, SectionHeader, StatusChip } from '@forge-org/ui';
 import { organizationApi, type Observation, type Repository } from '@forge-org/api-client';
@@ -10,27 +10,37 @@ export function RepositoriesPage() {
   const [observations, setObservations] = useState<Record<string, Observation[]>>({});
   const [rootPath, setRootPath] = useState('');
   const [error, setError] = useState('');
-  async function load() {
-    try {
-      const nextRepositories = await organizationApi.listRepositories(workspaceId, projectId);
-      const nextObservations = await Promise.all(
-        nextRepositories.map(
-          async (repository) =>
-            [
-              repository.id,
-              await organizationApi.listObservations(workspaceId, projectId, repository.id),
-            ] as const,
-        ),
-      );
-      setRepositories(nextRepositories);
-      setObservations(Object.fromEntries(nextObservations));
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load repositories.');
-    }
-  }
+  const load = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const nextRepositories = await organizationApi.listRepositories(workspaceId, projectId);
+        const nextObservations = await Promise.all(
+          nextRepositories.map(
+            async (repository) =>
+              [
+                repository.id,
+                await organizationApi.listObservations(workspaceId, projectId, repository.id),
+              ] as const,
+          ),
+        );
+        if (!isCurrent()) return;
+        setRepositories(nextRepositories);
+        setObservations(Object.fromEntries(nextObservations));
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load repositories.');
+        }
+      }
+    },
+    [projectId, workspaceId],
+  );
   useEffect(() => {
-    void load();
-  }, [workspaceId, projectId]);
+    let current = true;
+    queueMicrotask(() => void load(() => current));
+    return () => {
+      current = false;
+    };
+  }, [load]);
   async function connect(event: React.FormEvent) {
     event.preventDefault();
     if (!rootPath.trim()) return;

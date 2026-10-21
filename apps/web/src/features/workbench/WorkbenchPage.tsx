@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, FormField, Input, SectionHeader, StatusChip, Textarea } from '@forge-org/ui';
 import {
@@ -18,31 +18,41 @@ export function WorkbenchPage() {
   const [error, setError] = useState('');
   const [busyHandoffId, setBusyHandoffId] = useState<string | null>(null);
 
-  async function load() {
-    try {
-      const [nextRuns, nextHandoffs] = await Promise.all([
-        organizationApi.listRuns(workspaceId, projectId),
-        organizationApi.listHandoffs(workspaceId, projectId),
-      ]);
-      const nextRevisions = await Promise.all(
-        nextHandoffs.map(
-          async (handoff) =>
-            [
-              handoff.id,
-              await organizationApi.listHandoffRevisions(workspaceId, projectId, handoff.id),
-            ] as const,
-        ),
-      );
-      setRuns(nextRuns);
-      setHandoffs(nextHandoffs);
-      setRevisions(Object.fromEntries(nextRevisions));
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load reported work.');
-    }
-  }
+  const load = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const [nextRuns, nextHandoffs] = await Promise.all([
+          organizationApi.listRuns(workspaceId, projectId),
+          organizationApi.listHandoffs(workspaceId, projectId),
+        ]);
+        const nextRevisions = await Promise.all(
+          nextHandoffs.map(
+            async (handoff) =>
+              [
+                handoff.id,
+                await organizationApi.listHandoffRevisions(workspaceId, projectId, handoff.id),
+              ] as const,
+          ),
+        );
+        if (!isCurrent()) return;
+        setRuns(nextRuns);
+        setHandoffs(nextHandoffs);
+        setRevisions(Object.fromEntries(nextRevisions));
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load reported work.');
+        }
+      }
+    },
+    [projectId, workspaceId],
+  );
   useEffect(() => {
-    void load();
-  }, [workspaceId, projectId]);
+    let current = true;
+    queueMicrotask(() => void load(() => current));
+    return () => {
+      current = false;
+    };
+  }, [load]);
   async function createRun(event: FormEvent) {
     event.preventDefault();
     if (!title.trim()) return;

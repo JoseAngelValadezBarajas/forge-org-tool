@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   Button,
@@ -53,21 +53,31 @@ export function PlanningPage() {
         (epicFilter === 'unassigned' && feature.epic_id === null))
     );
   });
-  async function load() {
-    try {
-      const [nextOverview, nextDependencies] = await Promise.all([
-        organizationApi.planningOverview(workspaceId, projectId),
-        organizationApi.listDependencies(workspaceId, projectId),
-      ]);
-      setOverview(nextOverview);
-      setDependencies(nextDependencies);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load planning.');
-    }
-  }
+  const load = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const [nextOverview, nextDependencies] = await Promise.all([
+          organizationApi.planningOverview(workspaceId, projectId),
+          organizationApi.listDependencies(workspaceId, projectId),
+        ]);
+        if (!isCurrent()) return;
+        setOverview(nextOverview);
+        setDependencies(nextDependencies);
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load planning.');
+        }
+      }
+    },
+    [projectId, workspaceId],
+  );
   useEffect(() => {
-    void load();
-  }, [workspaceId, projectId]);
+    let current = true;
+    queueMicrotask(() => void load(() => current));
+    return () => {
+      current = false;
+    };
+  }, [load]);
   async function createEpic(event: React.FormEvent) {
     event.preventDefault();
     if (!title.trim()) return;

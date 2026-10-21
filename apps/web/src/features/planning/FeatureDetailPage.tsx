@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Card, Input, SectionHeader, StatusChip } from '@forge-org/ui';
 import { organizationApi, type Criterion, type Dependency, type Task } from '@forge-org/api-client';
@@ -13,23 +13,33 @@ export function FeatureDetailPage() {
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
 
-  async function load() {
-    try {
-      const [nextTasks, nextCriteria, nextDependencies] = await Promise.all([
-        organizationApi.listTasks(workspaceId, projectId, featureId),
-        organizationApi.listCriteria(workspaceId, projectId, featureId),
-        organizationApi.listDependencies(workspaceId, projectId),
-      ]);
-      setTasks(nextTasks);
-      setCriteria(nextCriteria);
-      setDependencies(nextDependencies);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to load feature detail.');
-    }
-  }
+  const load = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const [nextTasks, nextCriteria, nextDependencies] = await Promise.all([
+          organizationApi.listTasks(workspaceId, projectId, featureId),
+          organizationApi.listCriteria(workspaceId, projectId, featureId),
+          organizationApi.listDependencies(workspaceId, projectId),
+        ]);
+        if (!isCurrent()) return;
+        setTasks(nextTasks);
+        setCriteria(nextCriteria);
+        setDependencies(nextDependencies);
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to load feature detail.');
+        }
+      }
+    },
+    [featureId, projectId, workspaceId],
+  );
   useEffect(() => {
-    void load();
-  }, [workspaceId, projectId, featureId]);
+    let current = true;
+    queueMicrotask(() => void load(() => current));
+    return () => {
+      current = false;
+    };
+  }, [load]);
   async function addTask(event: FormEvent) {
     event.preventDefault();
     if (!taskTitle.trim()) return;

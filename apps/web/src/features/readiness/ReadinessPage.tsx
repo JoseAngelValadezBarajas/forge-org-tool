@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, Input, SectionHeader, StatusChip } from '@forge-org/ui';
 import {
@@ -23,23 +23,33 @@ export function ReadinessPage() {
   const [invariantTitle, setInvariantTitle] = useState('');
   const [error, setError] = useState('');
 
-  async function refresh() {
-    try {
-      const [nextReadiness, nextDecisions, nextInvariants] = await Promise.all([
-        organizationApi.previewReadiness(workspaceId, projectId, featureId),
-        organizationApi.listDecisions(workspaceId, projectId),
-        organizationApi.listInvariants(workspaceId, projectId, featureId),
-      ]);
-      setResult(nextReadiness);
-      setDecisions(nextDecisions);
-      setInvariants(nextInvariants);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to evaluate readiness.');
-    }
-  }
+  const refresh = useCallback(
+    async (isCurrent: () => boolean = () => true) => {
+      try {
+        const [nextReadiness, nextDecisions, nextInvariants] = await Promise.all([
+          organizationApi.previewReadiness(workspaceId, projectId, featureId),
+          organizationApi.listDecisions(workspaceId, projectId),
+          organizationApi.listInvariants(workspaceId, projectId, featureId),
+        ]);
+        if (!isCurrent()) return;
+        setResult(nextReadiness);
+        setDecisions(nextDecisions);
+        setInvariants(nextInvariants);
+      } catch (cause) {
+        if (isCurrent()) {
+          setError(cause instanceof Error ? cause.message : 'Unable to evaluate readiness.');
+        }
+      }
+    },
+    [featureId, projectId, workspaceId],
+  );
   useEffect(() => {
-    void refresh();
-  }, [workspaceId, projectId, featureId]);
+    let current = true;
+    queueMicrotask(() => void refresh(() => current));
+    return () => {
+      current = false;
+    };
+  }, [refresh]);
 
   async function addCriterion(event: React.FormEvent) {
     event.preventDefault();
