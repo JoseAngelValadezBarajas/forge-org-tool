@@ -1,7 +1,8 @@
 # External architecture review evidence
 
-Status: `ARCHITECTURE_NEEDS_CHANGES` remains open until installed Windows
-certification and human visual review are complete.
+Status: `ARCHITECTURE_NEEDS_CHANGES` remains open until the installed Windows
+UI -> IPC -> sidecar -> SQLite persistence journey and human visual review are
+complete.
 
 ## Verified corrections
 
@@ -9,8 +10,11 @@ certification and human visual review are complete.
   Rust-owned sidecar token/port/lifecycle, authenticated loopback requests,
   restart recovery, shutdown cleanup, and the web bridge. Browser fetch remains
   the fallback outside Tauri. Web bridge tests, web typecheck/build, and the
-  Python desktop tests passed. Rust and installed NSIS execution remain to be
-  verified in a Windows toolchain/runner.
+  Python desktop tests passed. Rust formatting, Clippy, host tests, release
+  build, NSIS bundling, temporary installation, and installed application /
+  packaged-sidecar launch smoke passed in GitHub Quality run
+  [39544672180](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39544672180)
+  for commit `29368f4`. The run retained the `forge-org-tool-nsis` artifact.
 - Backend compatibility: commit `37479d8` restores the complete legacy router
   surface and adds non-vacuous characterization/OpenAPI assertions. `uv run
   pytest tests -q` passed with 23 tests; one pre-existing Starlette/httpx
@@ -23,18 +27,18 @@ certification and human visual review are complete.
 ## Visual evidence boundaries
 
 `figma-delivery-76-3.png` is retained as a Figma reference capture for node
-`76:3`. The existing Organization desktop capture remains a loading state, so
-it is not evidence of loaded-content parity. Current Delivery differs materially
-from the Figma composition; no human visual certification is claimed. A fresh
-loaded-content capture was not retained because the isolated browser server
-exited before producing valid evidence.
+`76:3`. The loaded Organization and Delivery desktop/mobile captures are
+automated synthetic-data evidence only. Current Delivery differs materially
+from the Figma composition; no human visual certification is claimed.
 
 ## Remaining required verification
 
-- Rust `cargo check`, rustfmt, and Clippy in the supported Windows toolchain.
-- Real NSIS installer build and isolated installed UI -> Tauri IPC -> sidecar ->
-  SQLite smoke, including restart and persistence.
-- GitHub Quality CI on the integrated commits.
+- Direct installed UI -> Tauri IPC -> sidecar -> SQLite exercise, including
+  restart and persistence. The CI smoke currently proves NSIS installation,
+  installed application launch, and packaged-sidecar startup; the existing
+  SQLite restart/persistence evidence is synthetic Python coverage, not that
+  end-to-end UI journey.
+- External human Figma review for the retained screenshots.
 
 The readiness browser race found during the first full run was fixed in commit
 `3103772` with a generation guard and a focused regression test. The complete
@@ -42,5 +46,5 @@ isolated Chromium suite subsequently passed 18/18 on desktop and mobile.
 
 The Organization evidence journey now creates synthetic workspace/project data,
 selects that workspace explicitly, and captures loaded desktop/mobile screens;
-the Delivery journey already captures real loaded synthetic evidence. These are
-automated browser artifacts, not human Figma certification.
+the Delivery journey captures loaded synthetic evidence. These are automated
+browser artifacts, not human Figma certification.

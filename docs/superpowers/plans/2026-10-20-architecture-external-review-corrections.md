@@ -34,7 +34,7 @@
 - [x] Write focused Rust/TypeScript tests for allowed operation dispatch, token non-disclosure, readiness failure, restart, and shutdown.
 - [x] Implement a typed IPC boundary for the supported API capabilities; keep browser fetch as the web transport.
 - [x] Connect existing Rust method/path/body validation to real commands and sidecar lifecycle ownership.
-- [x] Build the packaged PyInstaller sidecar and run the synthetic persistence smoke; real NSIS/installed UI verification remains runner-blocked.
+- [x] Build the packaged PyInstaller sidecar and run the synthetic persistence smoke; GitHub now also builds, installs, and launches the NSIS product with its packaged sidecar.
 - [x] Run focused TypeScript, sidecar, and Python smoke checks; commit the P0 change.
 
 ### Task 2: Backend router compatibility
@@ -66,8 +66,8 @@
 
 ### Task 5: Integrated certification
 
-- [x] Run package builds/external consumer tests, TypeScript, frontend/backend tests, OpenAPI checks, isolated Playwright, and Python installed-smoke coverage. Rust checks and installed NSIS UI smoke remain unavailable without Cargo/runner execution.
-- [ ] Run GitHub Quality CI and record exact commit/run identifiers, screenshot paths, installer evidence, and unresolved issues.
+- [x] Run package builds/external consumer tests, TypeScript, frontend/backend tests, OpenAPI checks, isolated Playwright, Python installed-smoke coverage, Rust checks, release build, NSIS build, and installed launch smoke.
+- [x] Run GitHub Quality CI and record exact commit/run identifiers, screenshot paths, installer evidence, and unresolved issues: commit `29368f4`, run `39544672180`, artifact `forge-org-tool-nsis`.
 - [ ] Mark the goal complete only if P0 and every P1 have direct passing evidence; otherwise report the exact remaining blockers.
 
 ## Self-Review
