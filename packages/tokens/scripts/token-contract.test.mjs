@@ -69,6 +69,7 @@ test('token source defines complete dark and light semantic interaction coverage
     'border',
     'borderSubtle',
     'borderStrong',
+    'accentSoft',
     'statusNeutralBg',
     'focusRing',
     'accent',
@@ -133,9 +134,15 @@ test('semantic foreground tokens meet WCAG AA contrast on their paired surfaces'
   for (const mode of ['dark', 'light']) {
     for (const [foreground, background] of [
       ['textPrimary', 'bg'],
+      ['textPrimary', 'accentSoft'],
+      ['textPrimary', 'surfaceActive'],
       ['textSecondary', 'bg'],
+      ['textSecondary', 'surface'],
+      ['textSecondary', 'surfaceRaised'],
       ['textDisabled', 'bg'],
       ['textSecondary', 'statusNeutralBg'],
+      ['accentContrast', 'accent'],
+      ['surface', 'danger'],
       ['accent', 'surface'],
       ['success', 'surface'],
       ['warning', 'surface'],

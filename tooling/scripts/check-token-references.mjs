@@ -47,9 +47,15 @@ const luminance = (hex) => {
 };
 const contrastPairs = [
   ['textPrimary', 'bg'],
+  ['textPrimary', 'accentSoft'],
+  ['textPrimary', 'surfaceActive'],
   ['textSecondary', 'bg'],
+  ['textSecondary', 'surface'],
+  ['textSecondary', 'surfaceRaised'],
   ['textDisabled', 'bg'],
   ['textSecondary', 'statusNeutralBg'],
+  ['accentContrast', 'accent'],
+  ['surface', 'danger'],
   ['accent', 'surface'],
   ['success', 'surface'],
   ['warning', 'surface'],
@@ -77,6 +83,7 @@ const requiredSemantic = [
   'border',
   'borderSubtle',
   'borderStrong',
+  'accentSoft',
   'statusNeutralBg',
   'focusRing',
   'accent',
@@ -118,4 +125,4 @@ if (lowContrast.length) {
   process.exit(1);
 }
 console.log(`Design token references resolved (${files.length} CSS files)`);
-console.log('Semantic text and status contrast passes WCAG AA (4.5:1)');
+console.log('Checked semantic, action, and status foreground contrast passes WCAG AA (4.5:1)');
