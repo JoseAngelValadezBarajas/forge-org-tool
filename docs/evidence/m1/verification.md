@@ -48,7 +48,8 @@ The final public repository was cloned into an isolated temporary directory. `np
 - `npm run lint:frontend` (zero warnings), `npm run format:check:web`, `npm run typecheck`, `npm run build`, isolated `npm run test:e2e` (Chromium desktop/mobile 18/18), Python Ruff, architecture checks and production `/__components` exclusion scan passed.
 - The current screenshots include desktop and mobile Component Host in Dark and Light plus representative product journeys. They are automated browser evidence, not human visual certification. All 100 `visualReviewStatus` values remain `NOT_HUMAN_REVIEWED`.
 - The independent reviewer found and the implementation fixed a Tabs disabled-first keyboard trap, with regression tests observed RED then GREEN. The parity registry validator now also checks code-only component paths.
-- This entry records local verification for implementation commit `6c0de88cac8a5601a2266a0e64edf75e19f9ea84`; GitHub Quality CI for that commit is pending. Rust formatting/Clippy/tests are not available locally because Cargo is absent.
+- Clean-install verification: `npm ci` succeeds and the root `postinstall` builds tokens, icons, UI and API-client sequentially. GitHub Quality run [39562317882](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39562317882) exposed the prior parallel workspace-prepare race (`@forge-org/ui` tried to typecheck `@forge-org/icons` before generated declarations existed); that initial run failed in Web/Desktop at `npm ci` while API passed. The fix removes package-level parallel prepare builds, adds the ordered root build and a lifecycle-order regression test, and consolidates the duplicate root `@tauri-apps/cli` entry.
+- Latest implementation snapshot: `67d15095cabd1b22958f931e971925ee45d44d05`; final GitHub Quality CI for this commit is pending. Rust formatting/Clippy/tests are not available locally because Cargo is absent.
 
 ## RED/GREEN notes
 

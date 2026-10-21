@@ -8,7 +8,7 @@
       "product": "229:2"
     },
     "inspectedAt": "2026-10-21",
-    "implementationSnapshot": "6c0de88cac8a5601a2266a0e64edf75e19f9ea84",
+    "implementationSnapshot": "67d15095cabd1b22958f931e971925ee45d44d05",
     "method": "Read-only Figma page metadata for all 100 exact nodes; concrete design contexts recorded per row. Dimensions are source specimen bounds, not responsive CSS requirements."
   },
   "inventory": [
