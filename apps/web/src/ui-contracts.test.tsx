@@ -2,7 +2,7 @@ import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { describe, expect, it } from 'vitest';
-import { Button, Card } from '@forge-org/ui';
+import { Alert, Badge, Checkbox, EmptyState, ErrorState, FormField, Input, LoadingState, MetricCard, Progress, SearchField, Select, Textarea, Button, Card } from '@forge-org/ui';
 
 describe('public shared component contracts', () => {
   it('renders Card as a neutral div by default and forwards native props and refs', () => {
@@ -30,5 +30,43 @@ describe('public shared component contracts', () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
     expect(button).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('forwards native form contracts through shared controls', () => {
+    render(<form>
+      <FormField label="Workspace name" hint="Required">
+        <Input name="workspace" defaultValue="Forge" />
+      </FormField>
+      <Select aria-label="Status" defaultValue="active"><option value="active">Active</option></Select>
+      <Textarea aria-label="Description" defaultValue="Local first" />
+      <Checkbox aria-label="Show archived" defaultChecked />
+      <SearchField aria-label="Search projects" defaultValue="alpha" />
+    </form>);
+
+    expect(screen.getByLabelText('Workspace name')).toHaveValue('Forge');
+    expect(screen.getByRole('combobox', { name: 'Status' })).toHaveValue('active');
+    expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue('Local first');
+    expect(screen.getByRole('checkbox', { name: 'Show archived' })).toBeChecked();
+    expect(screen.getByRole('searchbox', { name: 'Search projects' })).toHaveValue('alpha');
+    expect(screen.getByText('Required')).toBeInTheDocument();
+  });
+
+  it('renders generic metric and state compositions with accessible status', () => {
+    render(<>
+      <MetricCard label="Projects" value="4" detail="Active" />
+      <Badge tone="success">Ready</Badge>
+      <Alert tone="warning">Review required</Alert>
+      <EmptyState title="No projects" description="Create a project to begin." />
+      <LoadingState label="Loading projects" />
+      <ErrorState title="Unable to load" description="Try again." />
+      <Progress value={40} max={100} label="Completion" />
+    </>);
+
+    expect(screen.getByText('Projects')).toBeInTheDocument();
+    expect(screen.getByText('4')).toBeInTheDocument();
+    expect(screen.getByText('Ready')).toBeInTheDocument();
+    expect(screen.getByText('Review required')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading projects' })).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'Completion' })).toHaveValue(40);
   });
 });
