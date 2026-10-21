@@ -20,7 +20,7 @@ from forge_org.application.readiness import ReadinessService
 from forge_org.application.repositories import RepositoryService
 from forge_org.application.runs import HandoffService, RunService
 from forge_org.application.transfer import ProjectTransferService
-from forge_org.infrastructure.sqlite import connect
+from forge_org.infrastructure.connection import connect
 
 
 def database() -> Iterator[sqlite3.Connection]:

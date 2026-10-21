@@ -3,7 +3,7 @@ import json
 from typing import Any
 from uuid import uuid4
 
-from forge_org.infrastructure.sqlite import utc_now
+from forge_org.infrastructure.connection import utc_now
 
 SCHEMA_VERSION = 'forge-project-import-v1'
 MAX_EPICS = 100

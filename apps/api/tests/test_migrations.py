@@ -4,7 +4,7 @@ import sqlite3
 
 import pytest
 
-from forge_org.infrastructure.sqlite import connect
+from forge_org.infrastructure.connection import connect
 
 
 def test_fresh_database_records_explicit_migration_versions(tmp_path, monkeypatch):

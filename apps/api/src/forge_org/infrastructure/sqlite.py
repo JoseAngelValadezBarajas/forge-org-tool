@@ -1,43 +1,13 @@
 import json
-import os
 import sqlite3
-from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any, cast
+from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import create_engine
-from sqlalchemy.pool import NullPool
-
+from .connection import utc_now
 from .migrations.v0002_metadata import VERSION as METADATA_MIGRATION_VERSION
 from .migrations.v0002_metadata import upgrade as upgrade_metadata
 
 CURRENT_SCHEMA_VERSION = METADATA_MIGRATION_VERSION
-
-
-def utc_now() -> str:
-    return datetime.now(UTC).isoformat()
-
-
-def database_path() -> Path:
-    configured = os.environ.get('FORGE_DATABASE_PATH')
-    return Path(configured) if configured else Path.cwd() / '.forge' / 'forge.db'
-
-
-def connect() -> sqlite3.Connection:
-    path = database_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    engine = create_engine(
-        f'sqlite:///{path.as_posix()}',
-        connect_args={'check_same_thread': False},
-        poolclass=NullPool,
-    )
-    raw_connection = engine.raw_connection()
-    cast(sqlite3.Connection, raw_connection.driver_connection).row_factory = sqlite3.Row
-    connection = cast(sqlite3.Connection, raw_connection)
-    connection.execute('PRAGMA foreign_keys = ON')
-    migrate(connection)
-    return connection
 
 
 def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
