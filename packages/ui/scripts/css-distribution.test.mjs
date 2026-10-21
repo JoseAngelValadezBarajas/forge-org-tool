@@ -29,6 +29,11 @@ test('aggregate UI CSS does not leak CSS Module selectors globally', () => {
   for (const selector of selectors) {
     assert.doesNotMatch(aggregate, new RegExp(`\\.${selector}(?=[\\s,{:#>+~.])`));
   }
-  assert.equal(existsSync(resolve(dist, 'primitives/Button.module.css')), true);
-  assert.equal(existsSync(resolve(dist, 'primitives/Shared.module.css')), true);
+  for (const path of [
+    'components/actions/Button/Button.module.css',
+    'components/forms/FormField/FormField.module.css',
+    'components/surfaces/Card/Card.module.css',
+  ]) {
+    assert.equal(existsSync(resolve(dist, path)), true, `${path} should be distributed`);
+  }
 });

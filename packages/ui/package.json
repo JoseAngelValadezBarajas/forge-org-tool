@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "vitest run --config vitest.config.ts"
+    "test": "vitest run --config vitest.config.ts && npm run build && node scripts/css-distribution.test.mjs && node scripts/component-architecture.test.mjs"
   },
   "dependencies": {
     "@forge-org/icons": "0.1.0-bootstrap",
