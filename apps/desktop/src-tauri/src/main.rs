@@ -2,7 +2,6 @@
 
 use rand::{distr::Alphanumeric, Rng};
 use std::net::TcpListener;
-use tauri::Manager;
 use tauri_plugin_shell::ShellExt;
 
 fn main() {
@@ -24,17 +23,8 @@ fn main() {
             tauri::async_runtime::spawn(
                 async move { while let Some(_event) = events.recv().await {} },
             );
-            app.manage(SidecarAddress {
-                base_url: format!("http://127.0.0.1:{port}"),
-                token,
-            });
             Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running FORGE Org Tool desktop host");
-}
-
-struct SidecarAddress {
-    base_url: String,
-    token: String,
 }
