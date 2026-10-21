@@ -81,6 +81,7 @@ describe('ReadinessPage', () => {
     );
 
     expect((await screen.findAllByText('Use SQLite')).length).toBeGreaterThan(0);
+    expect(screen.getByText('PREVIEW')).toBeInTheDocument();
     expect(screen.getByText(/revision 1/i)).toBeInTheDocument();
     expect(screen.getByText('No fabrication')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Show decision revisions for Use SQLite' }));

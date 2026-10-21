@@ -2,8 +2,7 @@ import '@forge-org/tokens/tokens.css';
 
 // Actions
 export { Button } from './components/actions/Button';
-export type { ButtonProps } from './components/actions/Button';
-export type ButtonSize = NonNullable<import('./components/actions/Button').ButtonProps['size']>;
+export type { ButtonProps, ButtonSize } from './components/actions/Button';
 export { IconButton } from './components/actions/IconButton';
 export type { IconButtonProps } from './components/actions/IconButton';
 
@@ -24,11 +23,11 @@ export type { FormFieldProps } from './components/forms/FormField';
 export { SearchField } from './components/forms/SearchField';
 export type { SearchFieldProps } from './components/forms/SearchField';
 export { MultiSelect } from './components/forms/MultiSelect';
-export type { MultiSelectProps } from './components/forms/MultiSelect';
+export type { MultiSelectOption, MultiSelectProps } from './components/forms/MultiSelect';
 export { FilePicker } from './components/forms/FilePicker';
-export type { FilePickerProps } from './components/forms/FilePicker';
+export type { FilePickerProps, FilePickerState } from './components/forms/FilePicker';
 export { FormActions } from './components/forms/FormActions';
-export type { FormActionsProps } from './components/forms/FormActions';
+export type { FormActionsProps, FormActionsState } from './components/forms/FormActions';
 export { Radio } from './components/forms/Radio';
 export type { RadioProps } from './components/forms/Radio';
 export { Switch } from './components/forms/Switch';
@@ -67,6 +66,12 @@ export { Skeleton } from './components/feedback/Skeleton';
 export type { SkeletonProps } from './components/feedback/Skeleton';
 export { Toast } from './components/feedback/Toast';
 export type { ToastProps } from './components/feedback/Toast';
+export { EmptyState } from './components/feedback/EmptyState';
+export type { EmptyStateProps } from './components/feedback/EmptyState';
+export { LoadingState } from './components/feedback/LoadingState';
+export type { LoadingStateProps } from './components/feedback/LoadingState';
+export { ErrorState } from './components/feedback/ErrorState';
+export type { ErrorStateProps } from './components/feedback/ErrorState';
 
 // Data display
 export { RecordRow } from './components/data-display/RecordRow';
@@ -91,11 +96,3 @@ export { Divider } from './components/layout/Divider';
 export type { DividerProps } from './components/layout/Divider';
 export { CodeLabel } from './components/layout/CodeLabel';
 export type { CodeLabelProps } from './components/layout/CodeLabel';
-
-// Existing code-only shared components remain public during migration.
-export { EmptyState } from './components/EmptyState';
-export type { EmptyStateProps } from './components/EmptyState';
-export { LoadingState } from './components/LoadingState';
-export type { LoadingStateProps } from './components/LoadingState';
-export { ErrorState } from './components/ErrorState';
-export type { ErrorStateProps } from './components/ErrorState';

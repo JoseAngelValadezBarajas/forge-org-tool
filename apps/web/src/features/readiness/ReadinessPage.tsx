@@ -46,7 +46,7 @@ export function ReadinessPage() {
         <EvaluationSnapshot
           fingerprint={result.input_fingerprint}
           evaluatedAt={result.evaluated_at}
-          stale={result.stale}
+          state={result.stale ? 'Stale' : 'Preview'}
         >
           <p>Outcome: {result.outcome}</p>
           <p>Rules passed: {result.passed_checks.join(', ') || 'none'}</p>

@@ -13,30 +13,35 @@ export interface TabsProps {
   onChange?: (id: string) => void;
 }
 export function Tabs({ tabs, defaultValue, label = 'Tabs', onChange }: TabsProps) {
-  const initial = Math.max(
-    0,
-    tabs.findIndex((tab) => tab.id === defaultValue && !tab.disabled),
-  );
+  const requested = tabs.findIndex((tab) => tab.id === defaultValue && !tab.disabled);
+  const firstEnabled = tabs.findIndex((tab) => !tab.disabled);
+  const initial = requested >= 0 ? requested : firstEnabled;
   const [active, setActive] = useState(initial);
+  const activeIndex = tabs[active] && !tabs[active].disabled ? active : firstEnabled;
   const refs = useRef<Array<HTMLButtonElement | null>>([]);
   const select = (index: number) => {
+    const tab = tabs[index];
+    if (!tab || tab.disabled) return;
     setActive(index);
-    onChange?.(tabs[index]!.id);
+    onChange?.(tab.id);
   };
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const delta = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     if (delta === 0) return;
     event.preventDefault();
+    if (firstEnabled < 0) return;
     let next = index;
     for (let tries = 0; tries < tabs.length; tries += 1) {
       next = (next + delta + tabs.length) % tabs.length;
-      if (!tabs[next]!.disabled) break;
+      if (!tabs[next]!.disabled) {
+        select(next);
+        refs.current[next]?.focus();
+        return;
+      }
     }
-    select(next);
-    refs.current[next]?.focus();
   };
-  const current = tabs[active];
-  if (!current) return null;
+  const current = tabs[activeIndex];
+  if (tabs.length === 0) return null;
   return (
     <div className={styles.root}>
       <div role="tablist" aria-label={label} className={styles.list}>
@@ -49,9 +54,9 @@ export function Tabs({ tabs, defaultValue, label = 'Tabs', onChange }: TabsProps
             id={`${tab.id}-tab`}
             type="button"
             role="tab"
-            aria-selected={index === active}
+            aria-selected={index === activeIndex}
             aria-controls={`${tab.id}-panel`}
-            tabIndex={index === active ? 0 : -1}
+            tabIndex={index === activeIndex ? 0 : -1}
             disabled={tab.disabled}
             onClick={() => select(index)}
             onKeyDown={(event) => onKeyDown(event, index)}
@@ -61,15 +66,17 @@ export function Tabs({ tabs, defaultValue, label = 'Tabs', onChange }: TabsProps
           </button>
         ))}
       </div>
-      <div
-        id={`${current.id}-panel`}
-        role="tabpanel"
-        aria-labelledby={`${current.id}-tab`}
-        tabIndex={0}
-        className={styles.panel}
-      >
-        {current.content}
-      </div>
+      {current && (
+        <div
+          id={`${current.id}-panel`}
+          role="tabpanel"
+          aria-labelledby={`${current.id}-tab`}
+          tabIndex={0}
+          className={styles.panel}
+        >
+          {current.content}
+        </div>
+      )}
     </div>
   );
 }

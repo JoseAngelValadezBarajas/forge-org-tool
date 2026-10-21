@@ -33,22 +33,29 @@ statuses remain `NOT_HUMAN_REVIEWED`.
 | `implementationNotes`, `relatedImplementation` | Deviations and existing inline/related behavior; related code is not a completed named export.                                                                |
 
 Core targets use `packages/ui/src/components/<category>/<Component>/`.
-Icons target `packages/icons/src/icons/<Icon>/`; no icon package or geometry
-is created here. Figma references do not grant redistribution rights. Future
-geometry requires documented rights or original authorship.
+Icons are implemented as independently authored SVG React components in
+`packages/icons/src/icons/<Icon>/`, with package-level exports and tests for
+all 35 masters. Figma references do not grant redistribution rights; the
+registry records original authorship and no copied Figma geometry.
+
+Every component exported from the `@forge-org/ui` entrypoint resolves to a
+category/component directory with colocated implementation, CSS Module, tests,
+and barrel. The architecture regression test enforces this mapping. Code-only
+EmptyState, ErrorState, and LoadingState now own separate feedback directories
+and styles instead of sharing the legacy `Shared.module.css`.
 
 Product targets preserve shell and feature ownership. Decisions and Invariants
 belong to readiness. ContextPackageCard's source name is Repositories /
 ContextPackageCard, while its intended owner is the context feature.
 
-ButtonSize `206:690` maps to Button's directory and the intended
-`ButtonProps.size` API, with `integration.implemented: false`. The prop is
-absent, so its status is NOT_IMPLEMENTED; no separate ButtonSize export is
-planned. Figma describes these as size reference specimens pending promotion.
-Both metadata and context report Small/Medium/Large specimen heights of 100px.
-Those bounds are not interpreted as approved production button heights.
-Button `173:27` has 36/38px default specimens, 40px Focused specimens and a
-current 40px implementation minimum.
+ButtonSize `206:690` maps to Button's directory and is integrated into the
+public `ButtonProps.size` API (`small | medium | large`); it is not a separate
+component export. The host previews all three sizes. Figma describes these as
+size reference specimens pending promotion, and its 100px specimen bounds are
+not interpreted as approved production button heights. Button `173:27` has
+36/38px default specimens, 40px Focused specimens and a current 40px
+implementation minimum. The discrepancy is documented, not silently
+normalized; human visual review remains pending.
 
 Concrete design contexts inspected: Button `173:27`, ButtonSize `206:690`,
 StatusChip `173:40`, Card `173:65`, MetricCard `173:66`,
@@ -56,6 +63,14 @@ SectionHeader master `177:183`, ContextPackageCard `229:426`,
 VerificationSummary `229:515`, Settings `237:926`. The other variant
 names/dimensions come from exact master metadata. No generated code or assets
 were copied. StatePanel's related code does not implement its full Kind API.
+
+On 2026-10-21, live Figma metadata for page 19 (`173:2`) and page 20 (`229:2`)
+was re-read against the registry: all 100 canonical master IDs and every
+mapped variant ID were present, and all recorded master/variant dimensions
+matched the live metadata. Page 19 contains 35 unique icon names shown in Dark
+and Light galleries (70 themed specimens). This is structural metadata
+verification, not a human visual-parity review; all 100 visual statuses remain
+`NOT_HUMAN_REVIEWED`.
 
 ### Existing code-only reusable compositions
 
@@ -65,9 +80,9 @@ excluded from the reusable inventory; tokens remain foundation evidence.
 
 | Component              | Existing source                                                            | Relationship                                                     |
 | ---------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| EmptyState             | `packages/ui/src/components/EmptyState.tsx`                                | Related to StatePanel.                                           |
-| LoadingState           | `packages/ui/src/components/LoadingState.tsx`                              | Related to StatePanel.                                           |
-| ErrorState             | `packages/ui/src/components/ErrorState.tsx`                                | Related to StatePanel.                                           |
+| EmptyState             | `packages/ui/src/components/feedback/EmptyState/EmptyState.tsx`            | Related to StatePanel.                                           |
+| LoadingState           | `packages/ui/src/components/feedback/LoadingState/LoadingState.tsx`        | Related to StatePanel.                                           |
+| ErrorState             | `packages/ui/src/components/feedback/ErrorState/ErrorState.tsx`            | Related to StatePanel.                                           |
 | OrganizationEmptyState | `apps/web/src/features/organization/components/OrganizationEmptyState.tsx` | Closest product screen `4:32`; exact page-20 master unconfirmed. |
 | DeliverySummary        | `apps/web/src/features/delivery/DeliverySummary.tsx`                       | Count summary, not VerificationSummary or ReleaseGate.           |
 
@@ -90,22 +105,22 @@ separately. Automated tests do not produce visual `PASS` status.
 Review states: `NOT_IMPLEMENTED`, `IMPLEMENTED_NOT_REVIEWED`, `PASS`,
 `NEEDS_CHANGES`, `BLOCKED`.
 
-| Component                                                                | Source/export                                              | Figma reference                                                                                                                  | Variants and states                                                                                                                                                                                                                 | Tests                                               | Screenshot                                                                                                                                                        | Review                     |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Semantic tokens                                                          | `packages/tokens`                                          | Page 02: Foundations and Tokens                                                                                                  | light, dark                                                                                                                                                                                                                         | host render and theme interaction                   | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| Button                                                                   | `packages/ui`, public barrel                               | `173:27` Actions / Button                                                                                                        | API supports primary, secondary, ghost, danger; implementation covers default, hover, pressed, focus-visible, disabled, loading. Figma also contains explicit 36/38px size variants; current implementation is 40px minimum height. | focused public-contract test                        | [Figma](../evidence/m1/figma-button-173-27.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)          | `IMPLEMENTED_NOT_REVIEWED` |
-| Card                                                                     | `packages/ui`, public barrel                               | `173:65` Surfaces / Card                                                                                                         | neutral `div` by default; typed semantic roots; Default and Elevated variants are implemented and previewed                                                                                                                         | focused public-contract test                        | [Figma](../evidence/m1/figma-card-173-65.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)            | `IMPLEMENTED_NOT_REVIEWED` |
-| Input                                                                    | `packages/ui`, public barrel                               | `173:2` Core UI Components                                                                                                       | native text-compatible input; default, focus-visible, disabled                                                                                                                                                                      | organization and host render tests                  | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| Select                                                                   | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native select; default, focus-visible, disabled                                                                                                                                                                                     | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| Textarea                                                                 | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native textarea; default, focus-visible, disabled                                                                                                                                                                                   | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| Checkbox                                                                 | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native checkbox; default, focus-visible, disabled                                                                                                                                                                                   | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| SearchField                                                              | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native search input; default, focus-visible, disabled                                                                                                                                                                               | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| FormField                                                                | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | label, hint, error                                                                                                                                                                                                                  | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| MetricCard, Badge, Alert, EmptyState, LoadingState, ErrorState, Progress | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | Badge supports Figma Neutral/Accent/Info; Alert supports Info/Warning/Error/Success and heading/message; Progress's full labeled panel remains outstanding                                                                          | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
-| StatusChip                                                               | `packages/ui`, public barrel                               | `173:40` Status / StatusChip                                                                                                     | Figma Neutral/Success/Warning/Danger/Info/Reported implemented; `Accent` remains an additional API tone, not a mapping for Info or Reported                                                                                         | focused tone contract and host tests                | [Figma](../evidence/m1/figma-status-chip-173-40.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)     | `IMPLEMENTED_NOT_REVIEWED` |
-| SectionHeader                                                            | `packages/ui`, public barrel                               | `177:183` SectionHeader                                                                                                          | title, eyebrow, actions and counter composition are implemented and previewed                                                                                                                                                       | focused public-contract and host tests              | [Figma](../evidence/m1/figma-section-header-178-191.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
-| OrganizationEmptyState                                                   | `apps/web/src/features/organization`, public feature index | closest product reference: Workspace Home `4:32`; this is a product screen, not a confirmed native empty-state master on page 20 | backend-free host fixture; real organization empty state is in `OrganizationPage`                                                                                                                                                   | application shell and host tests                    | [Figma](../evidence/m1/figma-workspace-home-4-32.png), [desktop](../evidence/m1/desktop-organization.png), [mobile](../evidence/m1/mobile-gallery-light.png)      | `IMPLEMENTED_NOT_REVIEWED` |
-| Icon library                                                             | `@forge-org/icons`, public package barrel                  | Page 19 / 35 icon masters                                                                                                        | 35 independently authored SVG exports, currentColor, decorative hidden semantics or optional accessible title; no Figma asset copied                                                                                                | 35 icon suites, export map and packed consumer test | [desktop](../evidence/m1/desktop-component-host-dark.png), [mobile](../evidence/m1/mobile-component-host-dark.png)                                                | `IMPLEMENTED_NOT_REVIEWED` |
+| Component                                                                | Source/export                                              | Figma reference                                                                                                                  | Variants and states                                                                                                                                                                        | Tests                                               | Screenshot                                                                                                                                                        | Review                     |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Semantic tokens                                                          | `packages/tokens`                                          | Page 02: Foundations and Tokens                                                                                                  | light, dark                                                                                                                                                                                | host render and theme interaction                   | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| Button                                                                   | `packages/ui`, public barrel                               | `173:27` Actions / Button                                                                                                        | Supported: primary, secondary, ghost, danger; hover, pressed, focus-visible, disabled and loading. Outstanding: Figma's 36/38px size variants; implementation remains 40px minimum height. | focused public-contract test                        | [Figma](../evidence/m1/figma-button-173-27.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)          | `PARTIAL_NOT_REVIEWED`     |
+| Card                                                                     | `packages/ui`, public barrel                               | `173:65` Surfaces / Card                                                                                                         | neutral `div` by default; typed semantic roots; Default and Elevated variants are implemented and previewed                                                                                | focused public-contract test                        | [Figma](../evidence/m1/figma-card-173-65.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)            | `IMPLEMENTED_NOT_REVIEWED` |
+| Input                                                                    | `packages/ui`, public barrel                               | `173:2` Core UI Components                                                                                                       | native text-compatible input; default, focus-visible, disabled                                                                                                                             | organization and host render tests                  | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| Select                                                                   | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native select; default, focus-visible, disabled and invalid/error treatment                                                                                                                | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| Textarea                                                                 | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native textarea; default, focus-visible, disabled and invalid/error treatment                                                                                                              | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| Checkbox                                                                 | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | native checked, unchecked, indeterminate, disabled and focus-visible states                                                                                                                | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| SearchField                                                              | `packages/ui`, public barrel                               | `181:234` Forms / SearchField                                                                                                    | composed search icon and input; Empty, With query (optional clear), Disabled; filtering/debounce remain feature-owned                                                                      | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| FormField                                                                | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | label, hint, error                                                                                                                                                                         | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| MetricCard, Badge, Alert, EmptyState, LoadingState, ErrorState, Progress | `packages/ui`, public barrel                               | Page 19 shared UI contract                                                                                                       | Badge supports Figma Neutral/Accent/Info; Alert supports Info/Warning/Error/Success and heading/message; Progress supports the labeled panel with count, bar, note and progress states     | focused UI contract and host render tests           | [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)                                                           | `IMPLEMENTED_NOT_REVIEWED` |
+| StatusChip                                                               | `packages/ui`, public barrel                               | `173:40` Status / StatusChip                                                                                                     | Figma Neutral/Success/Warning/Danger/Info/Reported implemented; `Accent` remains an additional API tone, not a mapping for Info or Reported                                                | focused tone contract and host tests                | [Figma](../evidence/m1/figma-status-chip-173-40.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png)     | `IMPLEMENTED_NOT_REVIEWED` |
+| SectionHeader                                                            | `packages/ui`, public barrel                               | `177:183` SectionHeader                                                                                                          | title, eyebrow, actions and counter composition are implemented and previewed                                                                                                              | focused public-contract and host tests              | [Figma](../evidence/m1/figma-section-header-178-191.png), [desktop](../evidence/m1/desktop-component-host.png), [mobile](../evidence/m1/mobile-gallery-light.png) | `IMPLEMENTED_NOT_REVIEWED` |
+| OrganizationEmptyState                                                   | `apps/web/src/features/organization`, public feature index | closest product reference: Workspace Home `4:32`; this is a product screen, not a confirmed native empty-state master on page 20 | backend-free host fixture; real organization empty state is in `OrganizationPage`                                                                                                          | application shell and host tests                    | [Figma](../evidence/m1/figma-workspace-home-4-32.png), [desktop](../evidence/m1/desktop-organization.png), [mobile](../evidence/m1/mobile-gallery-light.png)      | `IMPLEMENTED_NOT_REVIEWED` |
+| Icon library                                                             | `@forge-org/icons`, public package barrel                  | Page 19 / 35 icon masters                                                                                                        | 35 independently authored SVG exports, currentColor, decorative hidden semantics or optional accessible title; no Figma asset copied                                                       | 35 icon suites, export map and packed consumer test | [desktop](../evidence/m1/desktop-component-host-dark.png), [mobile](../evidence/m1/mobile-component-host-dark.png)                                                | `IMPLEMENTED_NOT_REVIEWED` |
 
 The Figma file is the visual reference; page 19 defines shared UI contracts and page 20 defines feature-owned product patterns. The supplied primary
 component references are not a license to copy legacy code or assets. A
@@ -140,15 +155,50 @@ and [mobile light](../evidence/m1/mobile-gallery-light.png).
 - Figma Alert `173:70`/`173:76` establishes the title/message composition and
   info/error semantic colors. The implementation supports this composition
   while retaining children and the native `title` attribute for compatibility.
-- The current core inventory status is 25 IMPLEMENTED and 12 PARTIAL. The
-  partial items are concrete behavior/variant gaps, not absent package
-  components: Button (documented 40px vs 36/38px specimen height), Checkbox
-  (indeterminate), Select and Textarea (error visual state), FormField
-  (required/disabled composition), MultiSelect (Figma checklist instead of a
-  native multi-select), FilePicker (drop/browse and selected/error composition),
-  FormActions (saving/read-only states), MenuItem (selected state), Progress
-  (labeled panel composition), Skeleton (List kind), and RecordRow (read-only
-  state).
+- The current core inventory status is 36 IMPLEMENTED and 1 PARTIAL. Button
+  remains PARTIAL only for the documented 40px implementation height versus
+  the Figma 36/38px specimens; global sizing has not been silently changed.
+  All implemented components still have `NOT_HUMAN_REVIEWED` visual status.
+- The page-20 product inventory now has 28 IMPLEMENTED and 0 PARTIAL entries.
+  PageHeader supports Default, Breadcrumbs (`229:9`), and WithCommand via the
+  shared Breadcrumbs primitive, and the host previews both default/action and
+  breadcrumb compositions. All 28 host entries are available, but availability
+  does not imply visual certification.
+- ProjectPlanningHome exposes static Default, Empty, and Archived specimens;
+  omitting its state retains the existing planning-page wrapper behavior.
+  EvaluationSnapshot previews Preview, Saved, and Stale, while the live
+  Readiness consumer only labels states supported by its returned data.
+  RevisionHistory marks current and superseded entries; InvariantCard derives
+  stale acknowledgement from revision numbers. These are product patterns,
+  not evidence of backend verification. TrustDisclosure shows the Figma
+  Default/Expanded static variants without inventing an interactive disclosure.
+  All four remain `NOT_HUMAN_REVIEWED` for visual parity.
+- ReportField now derives and visibly renders Figma `HasValue` and `Empty`
+  states, omits a blank value row, and preserves its reported/no-assumed-proof
+  disclosure. The canonical 9px footnote is mapped to the existing semantic
+  secondary-text token; review that visual difference in the external pass.
+- NavigationItem previews Default, Selected, and Disabled. Disabled is a
+  non-link with `aria-disabled` and no tab stop, so it cannot navigate.
+- DependencyGroup exposes Blocked, Clear, and Archived text states while
+  preserving the existing relationship and consumer-owned action slot. Its
+  legacy `archived` prop remains a backward-compatible override. PlanningPage
+  marks the relation Clear only when its blocker is done; otherwise it remains
+  Blocked.
+- ProvenanceNotice exposes Reported, Observed, and Unknown, preserving the
+  existing Reported copy and preventing an observation or unknown source from
+  implying verification. The Observed/Unknown descriptions are more explicit
+  than the shared Figma description; human visual review remains pending.
+- MultiSelect now supports the canonical checkbox-list fieldset and
+  Some-selected/None-available states while preserving its prior native
+  multiple-select API. The option inventory remains feature-owned.
+- FilePicker now renders Empty, Selected and Error panel states around a
+  keyboard-accessible native file input. It intentionally does not implement
+  drag-and-drop: Figma marks that affordance illustrative unless a feature
+  provides it. File limits, accepted types and error copy remain feature-owned.
+- Checkbox indeterminate, Select/Textarea invalid styling, FormField
+  required/disabled composition, FormActions saving/read-only, MenuItem
+  selected, Progress panel, Skeleton List and RecordRow read-only states are
+  implemented and covered by focused tests.
 - All 37 core registry rows now point to colocated implementation, stylesheet
   and test paths; all have an AVAILABLE Component Host entry. AVAILABLE means a
   real preview renders, not that every Figma state is demonstrated or visually

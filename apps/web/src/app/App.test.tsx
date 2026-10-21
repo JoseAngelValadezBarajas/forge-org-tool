@@ -1,5 +1,6 @@
 ﻿import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import parity from '../../../../docs/design/design-system-parity.json';
@@ -45,6 +46,85 @@ describe('M1 application shell', () => {
     const loadingButton = screen.getByRole('button', { name: /working/i });
     expect(loadingButton).toBeDisabled();
     expect(loadingButton).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('gives host form controls accessible names from their visible labels', () => {
+    renderRoute('/__components');
+
+    expect(screen.getByRole('checkbox', { name: 'Unchecked' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Read only' })).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'Off' })).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'On' })).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'Disabled' })).toBeDisabled();
+  });
+
+  it('previews the canonical PageHeader breadcrumb composition', () => {
+    renderRoute('/__components');
+
+    expect(
+      screen.getByText('Feature detail', { selector: '[aria-current="page"]' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Planning$/ })).toHaveAttribute(
+      'href',
+      '/planning/preview',
+    );
+  });
+
+  it('previews Disabled navigation and every DependencyGroup state', () => {
+    renderRoute('/__components');
+
+    const disabledItem = document.querySelector(
+      '[data-product-pattern="navigation-item"] [aria-disabled="true"]',
+    );
+    expect(disabledItem).toHaveTextContent('Unavailable');
+    expect(disabledItem?.closest('a')).toBeNull();
+
+    const dependencies = document.querySelector('[data-product-pattern="dependency-group"]');
+    expect(within(dependencies as HTMLElement).getByText('BLOCKED')).toBeInTheDocument();
+    expect(within(dependencies as HTMLElement).getByText('CLEAR')).toBeInTheDocument();
+    expect(within(dependencies as HTMLElement).getByText('ARCHIVED')).toBeInTheDocument();
+  });
+
+  it('previews Reported, Observed, and Unknown provenance without certifying verification', () => {
+    renderRoute('/__components');
+
+    const provenance = document.querySelector('[data-product-pattern="provenance-notice"]');
+    expect(within(provenance as HTMLElement).getByText('REPORTED')).toBeInTheDocument();
+    expect(within(provenance as HTMLElement).getByText('OBSERVED')).toBeInTheDocument();
+    expect(within(provenance as HTMLElement).getByText('UNKNOWN')).toBeInTheDocument();
+    expect(
+      within(provenance as HTMLElement).getAllByText(/not.*verification/i).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('previews both canonical TrustDisclosure variants as static compositions', () => {
+    renderRoute('/__components');
+
+    const trustDisclosure = document.querySelector('[data-product-pattern="trust-disclosure"]');
+    expect(within(trustDisclosure as HTMLElement).getByText('DEFAULT')).toBeInTheDocument();
+    expect(within(trustDisclosure as HTMLElement).getByText('EXPANDED')).toBeInTheDocument();
+    expect(trustDisclosure).not.toHaveAttribute('aria-expanded');
+  });
+
+  it('previews each supported product state from the feature-owned components', () => {
+    renderRoute('/__components');
+
+    const planning = document.querySelector('[data-product-pattern="project-planning-home"]');
+    expect(within(planning as HTMLElement).getByText('DEFAULT')).toBeInTheDocument();
+    expect(within(planning as HTMLElement).getByText('EMPTY')).toBeInTheDocument();
+    expect(within(planning as HTMLElement).getByText('ARCHIVED')).toBeInTheDocument();
+
+    const snapshots = document.querySelector('[data-product-pattern="evaluation-snapshot"]');
+    expect(within(snapshots as HTMLElement).getByText('PREVIEW')).toBeInTheDocument();
+    expect(within(snapshots as HTMLElement).getByText('SAVED')).toBeInTheDocument();
+    expect(within(snapshots as HTMLElement).getByText('STALE')).toBeInTheDocument();
+
+    const invariants = document.querySelector('[data-product-pattern="invariant-card"]');
+    expect(within(invariants as HTMLElement).getByText('STALE')).toBeInTheDocument();
+
+    const revisions = document.querySelector('[data-product-pattern="revision-history"]');
+    expect(within(revisions as HTMLElement).getByText('CURRENT')).toBeInTheDocument();
+    expect(within(revisions as HTMLElement).getByText('SUPERSEDED')).toBeInTheDocument();
   });
 
   it('supports gallery interaction and dark/light switching', () => {
@@ -102,6 +182,30 @@ describe('M1 application shell', () => {
     }
   });
 
+  it('renders a real feature-owned preview for every page-20 product pattern', () => {
+    const productEntries = parity.inventory.filter((entry) => entry.category === 'product');
+
+    renderRoute('/__components');
+
+    expect(productEntries).toHaveLength(28);
+    for (const entry of productEntries) {
+      const hostId = entry.componentHost.id;
+      expect(entry.componentHost.status, `${entry.figmaName} host coverage`).toBe('AVAILABLE');
+      expect(entry.visualReviewStatus, `${entry.figmaName} visual review`).toBe(
+        'NOT_HUMAN_REVIEWED',
+      );
+      const preview = document.querySelector(`[data-product-pattern="${hostId}"]`);
+      expect(preview, `${entry.figmaName} must have a product preview`).not.toBeNull();
+      expect(
+        preview?.childElementCount,
+        `${entry.figmaName} must render its owned export`,
+      ).toBeGreaterThan(0);
+      expect(document.querySelector(`[data-component-id="${hostId}"]`)).toHaveTextContent(
+        'AVAILABLE',
+      );
+    }
+  });
+
   it('previews the reconciled canonical Card and status variants', () => {
     renderRoute('/__components');
 
@@ -122,11 +226,42 @@ describe('M1 application shell', () => {
     ).not.toBeNull();
   });
 
+  it('previews the canonical MultiSelect and FilePicker state compositions', () => {
+    renderRoute('/__components');
+
+    expect(
+      document.querySelectorAll('[data-component-preview="multi-select"] fieldset'),
+    ).toHaveLength(2);
+    expect(
+      document.querySelector('[data-component-preview="file-picker"] [data-state="empty"]'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('[data-component-preview="file-picker"] [data-state="selected"]'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('[data-component-preview="file-picker"] [data-state="error"]'),
+    ).not.toBeNull();
+  });
+
+  it('keeps modal previews closed until explicitly opened and lets the preview close', async () => {
+    renderRoute('/__components');
+    const dialogPreview = document.querySelector(
+      '[data-component-preview="dialog"]',
+    ) as HTMLElement;
+    const view = within(dialogPreview);
+
+    expect(dialogPreview.querySelector('dialog[open]')).toBeNull();
+    fireEvent.click(view.getByRole('button', { name: 'Preview confirm dialog' }));
+    expect(await view.findByRole('dialog', { name: 'Confirm transfer' })).toBeInTheDocument();
+    fireEvent.click(view.getByRole('button', { name: 'Close preview' }));
+    await waitFor(() => expect(view.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('distinguishes implementation gaps from implementations awaiting visual review', () => {
     renderRoute('/__components');
 
     expect(document.querySelector('[data-component-id="checkbox"]')).toHaveTextContent(
-      'PARTIAL_NOT_REVIEWED',
+      'IMPLEMENTED_NOT_REVIEWED',
     );
     expect(document.querySelector('[data-component-id="card"]')).toHaveTextContent(
       'IMPLEMENTED_NOT_REVIEWED',

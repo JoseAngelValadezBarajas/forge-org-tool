@@ -8,4 +8,13 @@ describe('Popover', () => {
     expect(container.querySelector('summary')).toHaveTextContent('Actions');
     expect(screen.getByText('Rename')).toBeInTheDocument();
   });
+
+  it('supports an explicitly open native details state', () => {
+    const { container } = render(
+      <Popover open trigger="Expanded details">
+        Additional details
+      </Popover>,
+    );
+    expect(container.querySelector('details')).toHaveAttribute('open');
+  });
 });

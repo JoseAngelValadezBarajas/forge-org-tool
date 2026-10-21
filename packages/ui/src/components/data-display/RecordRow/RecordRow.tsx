@@ -5,6 +5,7 @@ export interface RecordRowProps {
   metadata?: ReactNode;
   status?: ReactNode;
   selected?: boolean;
+  readOnly?: boolean;
   className?: string;
 }
 export function RecordRow({
@@ -12,11 +13,13 @@ export function RecordRow({
   metadata,
   status,
   selected = false,
+  readOnly = false,
   className,
 }: RecordRowProps) {
   return (
     <tr
       data-selected={selected || undefined}
+      data-read-only={readOnly || undefined}
       className={[styles.row, className].filter(Boolean).join(' ')}
     >
       <th scope="row" className={styles.primary}>

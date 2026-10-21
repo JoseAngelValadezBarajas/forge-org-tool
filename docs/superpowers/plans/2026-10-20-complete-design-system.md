@@ -35,41 +35,41 @@
 
 - [x] Extract the 37 generic family list and 28 product master IDs, variants/states, and dimensions from page 19/20 metadata; Figma contexts now work when queried against concrete master nodes (for example `173:27` and `229:135`). The exact 35 icon node list still needs extraction.
 - [x] Record all 100 inventory rows with owner, public API, stylesheet, tests, Component Host, and review state; explicitly list code-only components.
-- [ ] Add a validator that rejects missing/duplicate inventory rows and nonexistent source owners/host entries.
+- [x] Add a validator that rejects missing/duplicate inventory rows and nonexistent source owners/host entries, including code-only source paths.
 
 ### Task 2: Generic UI components
 
 **Files:** `packages/ui/src/components/**`, stable facade `packages/ui/src/index.ts` (coordinator-owned), focused tests.
 
-- [ ] Move/implement every generic family under a category/component directory with colocated implementation, CSS Module, tests, and barrel.
-- [ ] Preserve compatibility by re-exporting old public names through the package facade and preserving existing consumer contracts.
-- [ ] Cover semantic, keyboard, controlled/uncontrolled, loading/disabled, validation, responsive, reduced-motion, and theme behavior where relevant.
+- [x] Move/implement every generic family under a category/component directory with colocated implementation, CSS Module, tests, and barrel.
+- [x] Preserve compatibility by re-exporting old public names through the package facade and preserving existing consumer contracts.
+- [x] Cover semantic, keyboard, controlled/uncontrolled, loading/disabled, validation, responsive, reduced-motion, and theme behavior where relevant.
 
 ### Task 3: Icons
 
 **Files:** Create `packages/icons/**`, root npm workspace/package consumer checks, icon inventory rows.
 
-- [ ] Verify all icon names and intended shapes from Figma metadata/context; author original currentColor SVG React components with typed size/title semantics.
-- [ ] Add individual tree-shakeable exports, package build, accessibility tests, light/dark previews, and external packed-consumer coverage.
+- [x] Verify all icon names and intended shapes from Figma metadata/context; author original currentColor SVG React components with typed size/title semantics.
+- [x] Add individual tree-shakeable exports, package build, accessibility tests, light/dark previews, and external packed-consumer coverage.
 
 ### Task 4: Feature-owned product patterns
 
 **Files:** `apps/web/src/features/{organization,planning,readiness,repositories,context,workbench,delivery,transfer}/components/**` and owned feature consumers/tests.
 
-- [ ] Implement the 28 canonical page 20 compositions in owning features, composing generic UI primitives and preserving current business behavior.
-- [ ] Add focused state/interaction tests and adopt patterns in existing screens where their contracts fit.
-- [ ] Document screen-only code patterns without inventing canonical masters.
+- [x] Implement the 28 canonical page 20 compositions in owning features, composing generic UI primitives and preserving current business behavior.
+- [x] Add focused state/interaction tests and adopt patterns in existing screens where their contracts fit.
+- [x] Document screen-only code patterns without inventing canonical masters.
 
 ### Task 5: Component Host and package validation
 
 **Files:** `apps/web/src/app/component-gallery/**`, `packages/ui/scripts/**`, `tooling/scripts/package-consumer.test.mjs`.
 
-- [ ] Render every public generic export and every icon family from the actual package exports with variants, states, keyboard notes, Figma references, implementation status, and responsive/light/dark previews.
-- [ ] Validate packed UI and icon packages in an isolated React + TypeScript + bundler consumer; assert CSS Modules do not alter generic consumer classes and no application-only dependency is required.
-- [ ] Keep screenshots automated evidence; record visual review as pending until independently reviewed.
+- [x] Render every public generic export and every icon family from the actual package exports with variants, states, keyboard notes, Figma references, implementation status, and responsive/light/dark previews.
+- [x] Validate packed UI and icon packages in an isolated React + TypeScript + bundler consumer; assert CSS Modules do not alter generic consumer classes and no application-only dependency is required.
+- [x] Keep screenshots automated evidence; record visual review as pending until independently reviewed.
 
 ### Task 6: Integrated verification and independent review
 
 - [ ] Run format/lint/typecheck, architecture checks, package builds, focused accessibility tests, full frontend tests, isolated Playwright, production route exclusion, and GitHub Quality CI.
-- [ ] Ask an independent reviewer subagent to inspect the integrated source, inventory completeness, package isolation, feature behavior, and evidence; resolve findings.
+- [x] Ask an independent reviewer subagent to inspect the integrated source, inventory completeness, package isolation, feature behavior, and evidence; resolve findings.
 - [ ] Record exact commits, CI run, screenshot paths, inventory counts, and unresolved human visual review items.

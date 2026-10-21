@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   Alert,
   Badge,
@@ -42,6 +42,47 @@ import {
   Tooltip,
 } from '@forge-org/ui';
 import { OrganizationEmptyState } from '../../features/organization';
+import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from '../shell';
+import {
+  CriterionItem,
+  DependencyGroup,
+  EpicCard,
+  FeatureCard,
+  FeatureOverview,
+  FilterBar,
+  KanbanColumn,
+  ProjectCard,
+  ProjectPlanningHome,
+  TaskItem,
+} from '../../features/planning';
+import {
+  DecisionCard,
+  EvaluationSnapshot,
+  InvariantCard,
+  RevisionHistory,
+  RuleAction,
+  RuleCard,
+} from '../../features/readiness';
+import { RepositoryCard } from '../../features/repositories';
+import { ContextPackageCard } from '../../features/context';
+import { ProvenanceNotice, ReportField } from '../../features/workbench';
+import {
+  DownloadAction,
+  ReleaseGate,
+  TrustDisclosure,
+  VerificationSummary,
+} from '../../features/delivery';
+import type {
+  ContextPackage,
+  Criterion,
+  Epic,
+  Feature,
+  Observation,
+  Project,
+  ReadinessResult,
+  Repository,
+  Task,
+} from '@forge-org/api-client';
 import {
   AlertTriangle,
   ArrowDown,
@@ -101,6 +142,7 @@ interface CatalogItem {
   states: string;
   accessibility: string;
   deviations: string;
+  hostStatus?: 'AVAILABLE';
 }
 
 const catalog: CatalogItem[] = [
@@ -440,6 +482,72 @@ catalog.push(
     })),
 );
 
+const productAccessibility: Record<string, string> = {
+  'page-header':
+    'Uses a named header landmark; breadcrumbs retain their own labeled navigation landmark.',
+  'workspace-switcher':
+    'The editable state uses a labeled native select; read-only state is announced as status.',
+  'command-palette':
+    'The open palette is a labeled modal dialog with search, Escape close, and focus restoration.',
+  'navigation-item':
+    'Enabled entries use NavLink semantics and aria-current; Disabled is a non-link aria-disabled item.',
+  'project-card': 'Project title remains a real route link; status is paired with text.',
+  'epic-card': 'Progress is presented with a text status, not color alone.',
+  'feature-card': 'Feature title is a route link; status and priority retain text labels.',
+  'kanban-column': 'Each column is a labeled section with an explicit empty state.',
+  'task-item': 'Status and movement controls have task-specific accessible names.',
+  'criterion-item': 'Criterion state is conveyed by a text status chip.',
+  'dependency-group':
+    'The directed dependency is a labeled group with explicit text for its state.',
+  'filter-bar': 'The filter region is labeled and result counts are announced politely.',
+  'feature-overview': 'Readiness outcome and stale evaluation are conveyed with text.',
+  'project-planning-home': 'Composes child content within a named project-planning section.',
+  'rule-card': 'Rule identifier, result, and explanation remain text content.',
+  'evaluation-snapshot': 'Fingerprint and timestamp are grouped with an explicit freshness label.',
+  'rule-action': 'Uses a native button and disables it for archived/unavailable cases.',
+  'decision-card': 'Decision title, revision, and status are grouped semantically.',
+  'revision-history': 'Revision entries are presented as an ordered list.',
+  'invariant-card': 'Acknowledgement and current revision are stated in text.',
+  'repository-card':
+    'Repository metadata uses definition-list semantics and explicit source-content disclosure.',
+  'context-package-card': 'Snapshot metadata is in a definition list; freshness is labeled.',
+  'report-field':
+    'A labeled group distinguishes HAS VALUE from EMPTY and states that reported data is not proof.',
+  'provenance-notice':
+    'Reported, Observed, and Unknown provenance are labeled explicitly; none implies verification by itself.',
+  'trust-disclosure':
+    'Disclosure is announced as a note and does not imply a release or deployment.',
+  'download-action':
+    'Ready downloads are links; pending and failed outcomes use status/alert roles.',
+  'verification-summary': 'Outcome, fingerprint, stale state, and blockers are visible as text.',
+  'release-gate': 'Gate outcome is visible text; status is not represented by color alone.',
+};
+
+catalog.push(
+  ...parity.inventory
+    .filter((entry) => entry.category === 'product')
+    .map((entry) => ({
+      id: entry.componentHost.id,
+      name: entry.figmaName,
+      section: 'Product-specific components' as const,
+      owner: entry.owner,
+      status:
+        entry.implementationStatus === 'IMPLEMENTED'
+          ? ('IMPLEMENTED_NOT_REVIEWED' as const)
+          : entry.implementationStatus === 'PARTIAL'
+            ? ('PARTIAL_NOT_REVIEWED' as const)
+            : ('NOT_IMPLEMENTED' as const),
+      figma: entry.figmaNodeId,
+      variants: entry.variants.map((variant) => variant.name).join('; ') || 'Default contract',
+      states: entry.states.join(', ') || 'No state axis documented',
+      accessibility:
+        productAccessibility[entry.componentHost.id] ??
+        'See feature-owned public component contract.',
+      deviations: `${entry.implementationNotes} Human visual review remains NOT_HUMAN_REVIEWED.`,
+      hostStatus: 'AVAILABLE' as const,
+    })),
+);
+
 const icons = [
   ['Plus', Plus],
   ['Close', Close],
@@ -521,6 +629,12 @@ function CatalogMeta({ item }: { item: CatalogItem }) {
           </StatusChip>
         </dd>
       </div>
+      {item.hostStatus && (
+        <div>
+          <dt>Host preview</dt>
+          <dd>{item.hostStatus}</dd>
+        </div>
+      )}
       <div>
         <dt>Figma</dt>
         <dd>{item.figma}</dd>
@@ -636,42 +750,109 @@ function ComponentPreview({
       );
     case 'select':
       return (
-        <Card>
-          <FormField label="Select preview">
-            <Select defaultValue="one">
-              <option value="one">Option one</option>
-              <option value="two">Option two</option>
-            </Select>
-          </FormField>
-        </Card>
+        <div className={styles.previewStack}>
+          <Card>
+            <FormField label="Default select">
+              <Select defaultValue="one">
+                <option value="one">Option one</option>
+                <option value="two">Option two</option>
+              </Select>
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Invalid select" error="Choose an available option.">
+              <Select aria-invalid="true" defaultValue="">
+                <option value="">Choose…</option>
+                <option value="one">Option one</option>
+              </Select>
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Disabled select" disabled>
+              <Select disabled defaultValue="one">
+                <option value="one">Option one</option>
+              </Select>
+            </FormField>
+          </Card>
+        </div>
       );
     case 'textarea':
       return (
-        <Card>
-          <FormField label="Textarea preview">
-            <Textarea placeholder="Type details" />
-          </FormField>
-        </Card>
+        <div className={styles.previewStack}>
+          <Card>
+            <FormField label="Default textarea">
+              <Textarea placeholder="Type details" />
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Invalid textarea" error="Add a short description.">
+              <Textarea aria-invalid="true" defaultValue="" />
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Disabled textarea" disabled>
+              <Textarea disabled defaultValue="Read-only context" />
+            </FormField>
+          </Card>
+        </div>
       );
     case 'checkbox':
       return (
         <Card>
-          <Checkbox aria-label="Checkbox preview" /> <span>Checkbox preview</span>
+          <div className={styles.previewStack}>
+            <label className={styles.previewRow} htmlFor="host-checkbox-unchecked">
+              <Checkbox id="host-checkbox-unchecked" /> Unchecked
+            </label>
+            <label className={styles.previewRow} htmlFor="host-checkbox-checked">
+              <Checkbox id="host-checkbox-checked" defaultChecked /> Checked
+            </label>
+            <label className={styles.previewRow} htmlFor="host-checkbox-indeterminate">
+              <Checkbox id="host-checkbox-indeterminate" indeterminate /> Indeterminate
+            </label>
+            <label className={styles.previewRow} htmlFor="host-checkbox-disabled">
+              <Checkbox id="host-checkbox-disabled" disabled /> Disabled
+            </label>
+          </div>
         </Card>
       );
     case 'form-field':
       return (
-        <Card>
-          <FormField label="Field label" hint="Helpful hint">
-            <Input placeholder="Field value" />
-          </FormField>
-        </Card>
+        <div className={styles.previewStack}>
+          <Card>
+            <FormField label="Field label" hint="Helpful hint">
+              <Input placeholder="Field value" />
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Required field" required hint="Required for this example">
+              <Input placeholder="Field value" />
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Invalid field" error="Enter a valid value.">
+              <Input aria-invalid="true" defaultValue="Invalid" />
+            </FormField>
+          </Card>
+          <Card>
+            <FormField label="Disabled field" disabled>
+              <Input disabled defaultValue="Unavailable" />
+            </FormField>
+          </Card>
+        </div>
       );
     case 'search-field':
       return (
-        <Card>
-          <SearchField aria-label="Search preview" placeholder="Search" />
-        </Card>
+        <div className={styles.previewStack}>
+          <Card>
+            <SearchField aria-label="Empty search" placeholder="Search records" />
+          </Card>
+          <Card>
+            <SearchField aria-label="Search with query" defaultValue="evidence" />
+          </Card>
+          <Card>
+            <SearchField aria-label="Disabled search" disabled defaultValue="Unavailable" />
+          </Card>
+        </div>
       );
     case 'metric-card':
       return <MetricCard label="Projects" value="12" detail="active records" />;
@@ -726,7 +907,13 @@ function ComponentPreview({
         />
       );
     case 'progress':
-      return <Progress value={64} max={100} label="Progress preview" />;
+      return (
+        <div className={styles.previewStack}>
+          <Progress value={0} max={100} label="Starting" presentation="panel" />
+          <Progress value={64} max={100} label="In progress" presentation="panel" />
+          <Progress value={100} max={100} label="Complete" presentation="panel" />
+        </div>
+      );
     case 'status-chip':
       return (
         <Card>
@@ -755,55 +942,98 @@ function ComponentPreview({
       );
     case 'icon-button':
       return (
-        <Card>
+        <div className={styles.previewRow}>
           <IconButton aria-label="Add item">
             <Plus size={18} />
           </IconButton>
-        </Card>
+          <IconButton aria-label="Loading item" loading>
+            <Plus size={18} />
+          </IconButton>
+          <IconButton aria-label="Unavailable item" disabled>
+            <Plus size={18} />
+          </IconButton>
+        </div>
       );
     case 'multi-select':
       return (
-        <Card>
-          <FormField label="Project members">
-            <MultiSelect
-              aria-label="Project members"
-              defaultValue={['alex']}
-              options={[
-                { value: 'alex', label: 'Alex' },
-                { value: 'sam', label: 'Sam' },
-                { value: 'lee', label: 'Lee' },
-              ]}
-            />
-          </FormField>
-        </Card>
+        <div className={styles.previewStack}>
+          <MultiSelect
+            presentation="checkboxList"
+            label="Relevant evidence"
+            name="host-evidence"
+            defaultValue={['criteria', 'build']}
+            options={[
+              { value: 'criteria', label: 'Criteria evidence' },
+              { value: 'build', label: 'Build report' },
+            ]}
+          />
+          <MultiSelect
+            presentation="checkboxList"
+            label="Relevant evidence"
+            options={[]}
+            emptyMessage="No saved records available."
+          />
+        </div>
       );
     case 'file-picker':
       return (
-        <Card>
-          <FormField label="Evidence file">
-            <FilePicker aria-label="Evidence file" accept=".json,.md,.pdf" />
-          </FormField>
-        </Card>
+        <div className={styles.previewStack}>
+          <FilePicker
+            title="Choose JSON file"
+            description="Browse locally for a JSON file."
+            metadata=".json · Max 8 MiB"
+            accept="application/json,.json"
+          />
+          <FilePicker
+            title="Choose JSON file"
+            description="A selected file is handled by the consuming feature."
+            metadata=".json · Max 8 MiB"
+            accept="application/json,.json"
+            state="selected"
+          />
+          <FilePicker
+            title="Choose JSON file"
+            description="The selected file exceeds the feature's configured limit."
+            metadata=".json · Max 8 MiB"
+            accept="application/json,.json"
+            state="error"
+          />
+        </div>
       );
     case 'form-actions':
       return (
-        <Card>
-          <FormActions>
-            <Button variant="secondary">Cancel</Button>
-            <Button>Save changes</Button>
-          </FormActions>
-        </Card>
+        <div className={styles.previewStack}>
+          <FormActions onCancel={() => undefined} onSave={() => undefined} />
+          <FormActions state="saving" />
+          <FormActions state="readOnly" />
+        </div>
       );
     case 'radio':
       return (
         <Card>
           <fieldset className={styles.fieldset}>
             <legend>Repository access</legend>
-            <label>
-              <Radio name="host-repo-access" value="read" defaultChecked /> Read only
+            <label htmlFor="host-repo-access-read">
+              <Radio
+                id="host-repo-access-read"
+                name="host-repo-access"
+                value="read"
+                defaultChecked
+              />{' '}
+              Read only
             </label>
-            <label>
-              <Radio name="host-repo-access" value="write" /> Read and write
+            <label htmlFor="host-repo-access-write">
+              <Radio id="host-repo-access-write" name="host-repo-access" value="write" /> Read and
+              write
+            </label>
+            <label htmlFor="host-repo-access-disabled">
+              <Radio
+                id="host-repo-access-disabled"
+                name="host-repo-access-disabled"
+                value="none"
+                disabled
+              />{' '}
+              Unavailable
             </label>
           </fieldset>
         </Card>
@@ -811,9 +1041,17 @@ function ComponentPreview({
     case 'switch':
       return (
         <Card>
-          <label className={styles.previewRow}>
-            <Switch aria-label="Enable local observation" defaultChecked /> Enable local observation
-          </label>
+          <div className={styles.previewStack}>
+            <label className={styles.previewRow} htmlFor="host-switch-off">
+              <Switch id="host-switch-off" /> Off
+            </label>
+            <label className={styles.previewRow} htmlFor="host-switch-on">
+              <Switch id="host-switch-on" defaultChecked /> On
+            </label>
+            <label className={styles.previewRow} htmlFor="host-switch-disabled">
+              <Switch id="host-switch-disabled" disabled /> Disabled
+            </label>
+          </div>
         </Card>
       );
     case 'tabs':
@@ -824,6 +1062,12 @@ function ComponentPreview({
             tabs={[
               { id: 'overview', label: 'Overview', content: <p>Overview content</p> },
               { id: 'activity', label: 'Activity', content: <p>Recent activity</p> },
+              {
+                id: 'unavailable',
+                label: 'Unavailable',
+                content: <p>Disabled tab</p>,
+                disabled: true,
+              },
               { id: 'settings', label: 'Settings', content: <p>Workspace settings</p> },
             ]}
           />
@@ -848,6 +1092,7 @@ function ComponentPreview({
             <MenuItem onSelect={onIncrement}>Refresh data</MenuItem>
             <MenuItem destructive>Remove connection</MenuItem>
             <MenuItem disabled>Unavailable action</MenuItem>
+            <MenuItem selected>Selected action</MenuItem>
           </div>
         </Card>
       );
@@ -863,13 +1108,16 @@ function ComponentPreview({
       );
     case 'state-panel':
       return (
-        <Card>
+        <div className={styles.previewStack}>
+          <StatePanel kind="loading" title="Loading" description="Reading local metadata." />
+          <StatePanel kind="empty" title="No records" description="Nothing to show yet." />
           <StatePanel
             kind="readOnly"
             title="Planning-only workspace"
             description="No repository is required."
           />
-        </Card>
+          <StatePanel kind="error" title="Unavailable" description="Could not load this view." />
+        </div>
       );
     case 'tooltip':
       return (
@@ -883,13 +1131,22 @@ function ComponentPreview({
       return (
         <Card>
           <div className={styles.skeletonPreview} aria-label="Loading record preview">
-            <Skeleton aria-hidden="true" />
-            <Skeleton aria-hidden="true" />
+            <Skeleton aria-hidden="true" kind="text" />
+            <Skeleton aria-hidden="true" kind="title" />
+            <Skeleton aria-hidden="true" kind="avatar" />
+            <Skeleton aria-hidden="true" kind="card" />
+            <Skeleton aria-hidden="true" kind="list" />
           </div>
         </Card>
       );
     case 'toast':
-      return <Toast data-component-id={item.id}>Workspace settings saved.</Toast>;
+      return (
+        <div className={styles.previewStack}>
+          <Toast tone="success">Workspace settings saved.</Toast>
+          <Toast tone="error">Workspace could not be saved.</Toast>
+          <Toast tone="info">A new observation is available.</Toast>
+        </div>
+      );
     case 'record-row':
       return (
         <Card>
@@ -900,6 +1157,8 @@ function ComponentPreview({
                 metadata="FEAT-012 · reported manually"
                 status={<StatusChip tone="success">Complete</StatusChip>}
               />
+              <RecordRow title="Selected item" metadata="Current selection" selected />
+              <RecordRow title="Read-only item" metadata="Imported context" readOnly />
             </tbody>
           </table>
         </Card>
@@ -928,43 +1187,38 @@ function ComponentPreview({
     case 'table':
       return (
         <Card>
-          <Table
-            caption="Repository inventory"
-            columns={[
-              { key: 'name', label: 'Repository' },
-              { key: 'branch', label: 'Branch' },
-              { key: 'state', label: 'State' },
-            ]}
-            rows={[
-              { name: 'forge-core', branch: 'main', state: 'Observed' },
-              { name: 'docs-site', branch: 'Unavailable', state: 'Stale' },
-            ]}
-          />
+          <div className={styles.previewStack}>
+            <Table
+              caption="Repository inventory"
+              columns={[
+                { key: 'name', label: 'Repository' },
+                { key: 'branch', label: 'Branch' },
+                { key: 'state', label: 'State' },
+              ]}
+              rows={[
+                { name: 'forge-core', branch: 'main', state: 'Observed' },
+                { name: 'docs-site', branch: 'Unavailable', state: 'Stale' },
+              ]}
+            />
+            <Table
+              caption="Empty repository inventory"
+              columns={[{ key: 'name', label: 'Repository' }]}
+              rows={[]}
+              emptyMessage="No repositories available."
+            />
+          </div>
         </Card>
       );
     case 'dialog':
-      return (
-        <Card>
-          <Dialog
-            open
-            title="Confirm transfer"
-            description="No data is saved until you confirm."
-            actions={
-              <>
-                <Button variant="secondary">Cancel</Button>
-                <Button>Confirm</Button>
-              </>
-            }
-          >
-            Review the included project planning data.
-          </Dialog>
-        </Card>
-      );
+      return <DialogPreview />;
     case 'popover':
       return (
         <Card>
-          <Popover trigger="Details">
+          <Popover open trigger="Expanded details">
             <p>Local paths remain on this device.</p>
+          </Popover>
+          <Popover trigger="Collapsed details">
+            <p>This content is initially collapsed.</p>
           </Popover>
         </Card>
       );
@@ -993,7 +1247,549 @@ function ComponentPreview({
       );
     case 'icon-library':
       return <IconCatalogPreview />;
+    default:
+      return <ProductPreview item={item} />;
   }
+}
+
+type DialogPreviewVariant = 'confirm' | 'destructive' | 'busy';
+
+function DialogPreview() {
+  const [active, setActive] = useState<DialogPreviewVariant | null>(null);
+  const examples: Record<
+    DialogPreviewVariant,
+    { title: string; description: string; body: string }
+  > = {
+    confirm: {
+      title: 'Confirm transfer',
+      description: 'No data is saved until you confirm.',
+      body: 'Review the included project planning data.',
+    },
+    destructive: {
+      title: 'Remove repository',
+      description: 'This action requires deliberate confirmation.',
+      body: 'This cannot be undone.',
+    },
+    busy: {
+      title: 'Saving transfer',
+      description: 'A local transaction is in progress.',
+      body: 'Please wait while the local transaction completes.',
+    },
+  };
+  const current = active ? examples[active] : undefined;
+
+  return (
+    <Card>
+      <p>Open a dialog state to inspect its modal behavior.</p>
+      <div className={styles.previewRow}>
+        <Button onClick={() => setActive('confirm')}>Preview confirm dialog</Button>
+        <Button variant="danger" onClick={() => setActive('destructive')}>
+          Preview destructive dialog
+        </Button>
+        <Button variant="secondary" onClick={() => setActive('busy')}>
+          Preview busy dialog
+        </Button>
+      </div>
+      {active && current && (
+        <Dialog
+          open
+          variant={active}
+          title={current.title}
+          description={current.description}
+          onClose={() => setActive(null)}
+          actions={
+            <>
+              <Button variant="secondary" onClick={() => setActive(null)}>
+                Close preview
+              </Button>
+              {active !== 'busy' && (
+                <Button onClick={() => setActive(null)}>Confirm preview</Button>
+              )}
+            </>
+          }
+        >
+          {current.body}
+        </Dialog>
+      )}
+    </Card>
+  );
+}
+
+const previewProject: Project = {
+  id: 'host-project',
+  workspace_id: 'host-workspace',
+  name: 'Atlas planning',
+  description: 'Deterministic preview project.',
+  status: 'active',
+  archived_at: null,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+const previewFeature: Feature = {
+  id: 'host-feature',
+  project_id: previewProject.id,
+  epic_id: 'host-epic',
+  title: 'Review local planning changes',
+  description: 'A synthetic feature for the Component Host.',
+  goal: 'Keep the work explicit.',
+  status: 'in_progress',
+  priority: 'high',
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+const previewEpic: Epic & { features: Feature[] } = {
+  id: 'host-epic',
+  project_id: previewProject.id,
+  title: 'Planning foundations',
+  description: 'Synthetic epic preview.',
+  status: 'active',
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+  features: [previewFeature],
+};
+const previewTask: Task = {
+  id: 'host-task',
+  feature_id: previewFeature.id,
+  title: 'Confirm acceptance criteria',
+  description: null,
+  position: 0,
+  status: 'in_progress',
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+const previewCriterion: Criterion = {
+  id: 'host-criterion',
+  feature_id: previewFeature.id,
+  description: 'The review remains human-owned.',
+  position: 0,
+  satisfied: false,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+const previewReadiness: ReadinessResult = {
+  feature_id: previewFeature.id,
+  evaluated_at: '2026-01-01T00:00:00Z',
+  rule_set_version: '1',
+  input_fingerprint: 'sha256:preview-only',
+  outcome: 'NOT_READY',
+  passed_checks: ['R01'],
+  failed_checks: ['R02'],
+  blockers: [{ code: 'R02', message: 'A human planning input is still required.' }],
+  results: [{ rule_id: 'R01', result: 'PASS', explanation: 'Planning record is present.' }],
+  stale: false,
+};
+const previewRepository: Repository = {
+  id: 'host-repository',
+  project_id: previewProject.id,
+  root_path: 'C:/example/atlas',
+  status: 'connected',
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+const previewObservation: Observation = {
+  id: 'host-observation',
+  repository_id: previewRepository.id,
+  branch: 'main',
+  clean: true,
+  detached: false,
+  error_code: null,
+  head_sha: '0123456789abcdef',
+  observed_at: '2026-01-01T00:00:00Z',
+  observer_version: 'preview',
+  source_content_read: false,
+  staged_count: 0,
+  status: 'observed',
+  tracked_modified_count: 0,
+  unborn: false,
+  untracked_count: 0,
+};
+const previewContextPackage: ContextPackage = {
+  id: 'host-context-package',
+  project_id: previewProject.id,
+  feature_id: previewFeature.id,
+  schema_version: '1',
+  fingerprint: 'sha256:preview-only',
+  markdown: 'Synthetic context package preview.',
+  payload_json: '{}',
+  created_at: '2026-01-01T00:00:00Z',
+};
+
+function PalettePreview() {
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Open command palette preview
+      </Button>
+      <CommandPalette
+        open={open}
+        onClose={close}
+        commands={[
+          { id: 'planning', label: 'Planning', onSelect: close },
+          { id: 'readiness', label: 'Readiness', onSelect: close },
+        ]}
+      />
+      <CommandPalette open={false} commands={[]} onClose={close} />
+    </>
+  );
+}
+
+function ProductPreview({ item }: { item: CatalogItem }) {
+  let preview: ReactNode;
+  switch (item.id) {
+    case 'page-header':
+      preview = (
+        <div className={styles.previewStack}>
+          <PageHeader
+            title="Planning overview"
+            eyebrow="FORGE / Preview workspace"
+            description="A feature-owned page heading with an optional action slot."
+          >
+            <Button variant="secondary">Open command palette</Button>
+          </PageHeader>
+          <PageHeader
+            title="Feature detail"
+            eyebrow="FORGE / Atlas"
+            breadcrumbs={[
+              { label: 'Workspace', href: '/' },
+              { label: 'Planning', href: '/planning/preview' },
+              { label: 'Feature detail' },
+            ]}
+          />
+        </div>
+      );
+      break;
+    case 'workspace-switcher':
+      preview = (
+        <div className={styles.productStates}>
+          <WorkspaceSwitcher
+            value="one"
+            workspaces={[
+              { id: 'one', name: 'Atlas' },
+              { id: 'two', name: 'Beacon' },
+            ]}
+            onChange={() => undefined}
+          />
+          <WorkspaceSwitcher value="one" currentName="Atlas" />
+        </div>
+      );
+      break;
+    case 'command-palette':
+      preview = <PalettePreview />;
+      break;
+    case 'navigation-item':
+      preview = (
+        <nav aria-label="Preview product navigation" className={styles.productStates}>
+          <NavigationItem to="/__components" end label="Selected route" />
+          <NavigationItem to="/planning/preview" label="Other route" />
+          <NavigationItem to="/planning/preview" label="Unavailable" disabled />
+        </nav>
+      );
+      break;
+    case 'project-card':
+      preview = (
+        <div className={styles.productStates}>
+          <ProjectCard project={previewProject} workspaceId="host-workspace" />
+          <ProjectCard
+            project={{ ...previewProject, id: 'archived-project', status: 'archived' }}
+            workspaceId="host-workspace"
+          />
+        </div>
+      );
+      break;
+    case 'epic-card':
+      preview = (
+        <div className={styles.productStates}>
+          <EpicCard epic={previewEpic} />
+          <EpicCard epic={{ ...previewEpic, features: [] }} />
+          <EpicCard
+            epic={{
+              ...previewEpic,
+              features: [{ ...previewFeature, status: 'done' }],
+            }}
+          />
+        </div>
+      );
+      break;
+    case 'feature-card':
+      preview = (
+        <div className={styles.productStates}>
+          <FeatureCard
+            feature={{ ...previewFeature, status: 'backlog' }}
+            href="/planning/host-project/host-feature"
+          />
+          <FeatureCard feature={previewFeature} href="/planning/host-project/host-feature" />
+          <FeatureCard
+            feature={{ ...previewFeature, status: 'done' }}
+            href="/planning/host-project/host-feature"
+            readOnly
+          />
+        </div>
+      );
+      break;
+    case 'kanban-column':
+      preview = (
+        <div className={styles.productStates}>
+          <KanbanColumn status="in_progress">
+            <FeatureCard feature={previewFeature} href="/planning/host-project/host-feature" />
+          </KanbanColumn>
+          <KanbanColumn status="done" />
+        </div>
+      );
+      break;
+    case 'task-item':
+      preview = (
+        <div className={styles.productStates}>
+          <TaskItem
+            task={previewTask}
+            onStatusChange={() => undefined}
+            onMoveUp={() => undefined}
+            onMoveDown={() => undefined}
+          />
+          <TaskItem
+            task={previewTask}
+            editing
+            onStatusChange={() => undefined}
+            onMoveUp={() => undefined}
+            onMoveDown={() => undefined}
+          />
+          <TaskItem
+            task={previewTask}
+            archived
+            onStatusChange={() => undefined}
+            onMoveUp={() => undefined}
+            onMoveDown={() => undefined}
+          />
+        </div>
+      );
+      break;
+    case 'criterion-item':
+      preview = (
+        <ul className={styles.productStates}>
+          <CriterionItem criterion={previewCriterion} />
+          <CriterionItem criterion={{ ...previewCriterion, satisfied: true }} />
+          <CriterionItem criterion={previewCriterion} editing />
+          <CriterionItem criterion={previewCriterion} archived />
+        </ul>
+      );
+      break;
+    case 'dependency-group':
+      preview = (
+        <div className={styles.productStates}>
+          <DependencyGroup blocker="API contract" blocked="UI adoption" state="Blocked" />
+          <DependencyGroup blocker="Completed prerequisite" blocked="UI adoption" state="Clear" />
+          <DependencyGroup blocker="Archived prerequisite" blocked="Archived task" archived />
+        </div>
+      );
+      break;
+    case 'filter-bar':
+      preview = (
+        <div className={styles.productStates}>
+          <FilterBar>
+            <SearchField aria-label="Filter planning preview" placeholder="Search planning" />
+          </FilterBar>
+          <FilterBar resultCount={2}>
+            <SearchField aria-label="Filtered planning preview" value="Atlas" readOnly />
+          </FilterBar>
+          <FilterBar resultCount={0}>
+            <SearchField aria-label="No results planning preview" value="missing" readOnly />
+          </FilterBar>
+        </div>
+      );
+      break;
+    case 'feature-overview':
+      preview = (
+        <div className={styles.productStates}>
+          <FeatureOverview
+            result={{ ...previewReadiness, outcome: 'READY_TO_START', blockers: [] }}
+          />
+          <FeatureOverview result={previewReadiness} />
+          <FeatureOverview result={null} />
+        </div>
+      );
+      break;
+    case 'project-planning-home':
+      preview = (
+        <div className={styles.productStates}>
+          <ProjectPlanningHome state="Default" />
+          <ProjectPlanningHome state="Empty" />
+          <ProjectPlanningHome state="Archived" />
+        </div>
+      );
+      break;
+    case 'rule-card':
+      preview = (
+        <div className={styles.productStates}>
+          <RuleCard ruleId="R01" result="PASS" explanation="Planning record is present." />
+          <RuleCard ruleId="R02" result="BLOCKED" explanation="A planning input is missing." />
+          <RuleCard ruleId="R03" result="UNAVAILABLE" explanation="Evaluation is unavailable." />
+        </div>
+      );
+      break;
+    case 'evaluation-snapshot':
+      preview = (
+        <div className={styles.productStates}>
+          <EvaluationSnapshot fingerprint="sha256:preview-only" evaluatedAt="Preview only" />
+          <EvaluationSnapshot
+            fingerprint="sha256:saved-preview"
+            evaluatedAt="Saved preview"
+            state="Saved"
+          />
+          <EvaluationSnapshot
+            fingerprint="sha256:historical-preview"
+            evaluatedAt="Historical preview"
+            stale
+          />
+        </div>
+      );
+      break;
+    case 'rule-action':
+      preview = (
+        <div className={styles.previewRow}>
+          <RuleAction onClick={() => undefined}>Refresh evaluation</RuleAction>
+          <RuleAction archived>Archived action</RuleAction>
+          <RuleAction disabled>Unavailable action</RuleAction>
+        </div>
+      );
+      break;
+    case 'decision-card':
+      preview = (
+        <div className={styles.productStates}>
+          <DecisionCard title="Keep local-first workflow" revision={2} status="PROPOSED" />
+          <DecisionCard title="Use deterministic gates" revision={3} status="ACCEPTED" />
+          <DecisionCard title="Previous execution path" revision={1} status="SUPERSEDED" />
+        </div>
+      );
+      break;
+    case 'revision-history':
+      preview = (
+        <RevisionHistory
+          title="Decision history"
+          revisions={[
+            { revision: 1, text: 'Initial proposal (superseded).' },
+            { revision: 2, text: 'Current reviewed decision.' },
+          ]}
+        />
+      );
+      break;
+    case 'invariant-card':
+      preview = (
+        <div className={styles.productStates}>
+          <InvariantCard title="No unverified claims" revision={3} acknowledgedRevision={null} />
+          <InvariantCard title="Human review required" revision={2} acknowledgedRevision={2} />
+          <InvariantCard
+            title="Re-acknowledgement required"
+            revision={4}
+            acknowledgedRevision={3}
+          />
+        </div>
+      );
+      break;
+    case 'repository-card':
+      preview = (
+        <div className={styles.productStates}>
+          <RepositoryCard repository={previewRepository} />
+          <RepositoryCard repository={previewRepository} observation={previewObservation} />
+          <RepositoryCard repository={{ ...previewRepository, status: 'unavailable' }} />
+        </div>
+      );
+      break;
+    case 'context-package-card':
+      preview = (
+        <div className={styles.productStates}>
+          <ContextPackageCard contextPackage={previewContextPackage} state="Fresh" />
+          <ContextPackageCard contextPackage={previewContextPackage} state="Stale" />
+          <ContextPackageCard state="Unavailable" />
+        </div>
+      );
+      break;
+    case 'report-field':
+      preview = (
+        <div className={styles.productStates}>
+          <ReportField label="Executor" value="Human" />
+          <ReportField label="Optional note" value="" />
+        </div>
+      );
+      break;
+    case 'provenance-notice':
+      preview = (
+        <div className={styles.productStates}>
+          <ProvenanceNotice source="Human-reported run summary">
+            No independent verification is implied.
+          </ProvenanceNotice>
+          <ProvenanceNotice state="Observed" source="Synthetic host observation">
+            Observed context is not independently verified.
+          </ProvenanceNotice>
+          <ProvenanceNotice state="Unknown" source="No provenance recorded">
+            The originating source is unknown.
+          </ProvenanceNotice>
+        </div>
+      );
+      break;
+    case 'trust-disclosure':
+      preview = (
+        <div className={styles.productStates}>
+          <TrustDisclosure state="Default">
+            A blocked gate is not a publication, deployment, or release claim.
+          </TrustDisclosure>
+          <TrustDisclosure state="Expanded">
+            A blocked gate is not a publication, deployment, or release claim.
+          </TrustDisclosure>
+        </div>
+      );
+      break;
+    case 'download-action':
+      preview = (
+        <div className={styles.productStates}>
+          <DownloadAction label="Download manifest" href="#preview-manifest" />
+          <DownloadAction label="Download report" state="pending" />
+          <DownloadAction
+            label="Download failed"
+            state="error"
+            errorMessage="Artifact unavailable."
+          />
+        </div>
+      );
+      break;
+    case 'verification-summary':
+      preview = (
+        <div className={styles.productStates}>
+          <VerificationSummary outcome="PASS" fingerprint="sha256:scoped" blockers={[]} />
+          <VerificationSummary outcome="NOT_RUN" fingerprint="sha256:not-run" blockers={[]} />
+          <VerificationSummary
+            outcome="FAIL"
+            fingerprint="sha256:blocked"
+            blockers={['Required evidence is missing.']}
+          />
+          <VerificationSummary outcome="PASS" fingerprint="sha256:stale" blockers={[]} stale />
+        </div>
+      );
+      break;
+    case 'release-gate':
+      preview = (
+        <div className={styles.productStates}>
+          <ReleaseGate outcome="BLOCKED">
+            <p>Required review is incomplete.</p>
+          </ReleaseGate>
+          <ReleaseGate outcome="NOT_READY" />
+          <ReleaseGate outcome="SCOPED PASS">
+            <p>Scoped checks passed; this is not a release action.</p>
+          </ReleaseGate>
+        </div>
+      );
+      break;
+    default:
+      return null;
+  }
+
+  return (
+    <div className={styles.productFrame}>
+      <div className={styles.productStates} data-product-pattern={item.id}>
+        {preview}
+      </div>
+    </div>
+  );
 }
 
 /** Development-only inspection route. It showcases real exports and deterministic fixtures. */

@@ -14,3 +14,13 @@
 .error {
   color: var(--forge-danger);
 }
+.required {
+  margin-inline-start: 0.25rem;
+  color: var(--forge-danger);
+}
+.required::after {
+  content: '*';
+}
+.disabled .label {
+  color: var(--forge-text-muted);
+}

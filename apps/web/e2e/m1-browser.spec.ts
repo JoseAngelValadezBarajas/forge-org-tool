@@ -47,12 +47,27 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     has: page.getByText('A development-only catalog of actual exported React components'),
   });
   await expect(gallery).toHaveAttribute('data-theme', 'dark');
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
   const prefix =
     test.info().project.name === 'chromium-mobile'
       ? 'mobile-component-host'
       : 'desktop-component-host';
-  await page.screenshot({ path: resolve(evidenceDir, `${prefix}-dark.png`), fullPage: true });
   const primary = page.getByRole('button', { name: /increment 0/i });
+  await primary.scrollIntoViewIfNeeded();
+  await expect(primary).toBeVisible();
+  await page.screenshot({
+    path: resolve(evidenceDir, `${prefix}-dark.png`),
+    fullPage: false,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
   const defaultBackground = await primary.evaluate(
     (element) => getComputedStyle(element).backgroundColor,
   );
@@ -63,6 +78,7 @@ test('mobile gallery switches from dark to light with no browser errors', async 
   expect(hoverBackground).not.toBe(defaultBackground);
   await page.getByRole('button', { name: 'Switch to light', exact: true }).click();
   await expect(gallery).toHaveAttribute('data-theme', 'light');
+  await primary.scrollIntoViewIfNeeded();
   await expect(page.getByRole('button', { name: /increment 0/i })).toBeVisible();
   expect(
     await page.evaluate(
@@ -74,7 +90,10 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     test.info().project.name === 'chromium-mobile'
       ? 'mobile-gallery-light.png'
       : 'desktop-component-host.png';
-  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+  await page.screenshot({
+    path: resolve(evidenceDir, screenshotName),
+    fullPage: false,
+  });
 });
 
 test('planning and readiness remain manual truth states', async ({ page }) => {

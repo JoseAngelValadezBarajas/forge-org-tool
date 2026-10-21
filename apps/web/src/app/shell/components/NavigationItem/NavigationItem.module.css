@@ -10,3 +10,7 @@
   background: var(--forge-surface-raised);
   color: var(--forge-text);
 }
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

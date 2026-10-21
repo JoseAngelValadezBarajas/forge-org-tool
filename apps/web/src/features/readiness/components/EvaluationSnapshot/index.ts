@@ -1,1 +1,5 @@
-export { EvaluationSnapshot, type EvaluationSnapshotProps } from './EvaluationSnapshot';
+export {
+  EvaluationSnapshot,
+  type EvaluationSnapshotProps,
+  type EvaluationSnapshotState,
+} from './EvaluationSnapshot';

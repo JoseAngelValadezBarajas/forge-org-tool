@@ -1,5 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // Frozen brief inventory: counts alone cannot detect substituted nodes.
 const canonical = {
@@ -108,9 +109,10 @@ const counts = { core: 37, icon: 35, product: 28 };
 const implementationStatuses = new Set(['IMPLEMENTED', 'PARTIAL', 'NOT_IMPLEMENTED']);
 const nonempty = (v) => typeof v === 'string' && v.trim().length > 0;
 const record = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const repositoryRoot = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
 /** Check registry contracts without requiring future component files to exist. */
-export function validateParity(registry) {
+export function validateParity(registry, { root = repositoryRoot } = {}) {
   if (!record(registry) || !Array.isArray(registry.inventory))
     return ['inventory must be an array on a registry object'];
   const errors = [];
@@ -121,6 +123,22 @@ export function validateParity(registry) {
   if (rows.length !== 100) errors.push('inventory must contain exactly 100 rows');
   const ids = new Set();
   const previews = new Set();
+  const checkCurrentPath = (reference, label, expectedType = 'file') => {
+    const path = reference.split('#', 1)[0];
+    const absolutePath = resolve(root, path);
+    const pathFromRoot = relative(root, absolutePath);
+    if (
+      !path ||
+      pathFromRoot === '..' ||
+      pathFromRoot.startsWith(`..${sep}`) ||
+      isAbsolute(pathFromRoot) ||
+      !existsSync(absolutePath) ||
+      (expectedType === 'directory' && !statSync(absolutePath).isDirectory()) ||
+      (expectedType === 'file' && !statSync(absolutePath).isFile())
+    ) {
+      errors.push(`${label} current path does not resolve to a ${expectedType}: ${reference}`);
+    }
+  };
   for (const [index, row] of rows.entries()) {
     const label = `inventory[${index}]`;
     if (!record(row)) {
@@ -141,6 +159,8 @@ export function validateParity(registry) {
       }
     }
     if (!nonempty(row.owner)) errors.push(`${label}.owner is required`);
+    else if (row.componentHost?.status === 'AVAILABLE' || row.component?.current?.length)
+      checkCurrentPath(row.owner, `${label}.owner`, 'directory');
     for (const field of ['component', 'publicApi', 'styles', 'tests']) {
       const mapping = row[field];
       if (!record(mapping)) {
@@ -150,6 +170,10 @@ export function validateParity(registry) {
       if (!nonempty(mapping.target)) errors.push(`${label}.${field}.target is required`);
       if (!Array.isArray(mapping.current) || !mapping.current.every(nonempty))
         errors.push(`${label}.${field}.current must be a string array`);
+      else
+        mapping.current.forEach((reference) =>
+          checkCurrentPath(reference, `${label}.${field}`, 'file'),
+        );
     }
     if (!nonempty(row.component?.name)) errors.push(`${label}.component.name is required`);
     if (!implementationStatuses.has(row.implementationStatus))
@@ -184,8 +208,19 @@ export function validateParity(registry) {
         errors.push(`${label}.componentHost status is invalid`);
       if (host.status === 'AVAILABLE' && !nonempty(host.source))
         errors.push(`${label}.componentHost source required for AVAILABLE`);
+      else if (host.status === 'AVAILABLE')
+        checkCurrentPath(host.source, `${label}.componentHost`, 'file');
       if (host.status === 'PLANNED' && host.source !== null)
         errors.push(`${label}.componentHost planned source must be null`);
+    }
+    if (Array.isArray(row.relatedImplementation)) {
+      for (const related of row.relatedImplementation) {
+        if (!record(related)) continue;
+        for (const field of ['path', 'tests', 'styles']) {
+          if (nonempty(related[field]))
+            checkCurrentPath(related[field], `${label}.relatedImplementation.${field}`, 'file');
+        }
+      }
     }
   }
   for (const [category, count] of Object.entries(counts)) {
@@ -194,6 +229,19 @@ export function validateParity(registry) {
   }
   for (const id of Object.keys(canonical))
     if (!ids.has(id)) errors.push(`missing canonical figmaNodeId ${id}`);
+  for (const [index, component] of (registry.codeOnlyComponents ?? []).entries()) {
+    const label = `codeOnlyComponents[${index}]`;
+    if (!record(component)) {
+      errors.push(`${label} must be an object`);
+      continue;
+    }
+    if (!nonempty(component.name)) errors.push(`${label}.name is required`);
+    if (!nonempty(component.source)) errors.push(`${label}.source is required`);
+    else checkCurrentPath(component.source, `${label}.source`, 'file');
+    if (!nonempty(component.publicApi)) errors.push(`${label}.publicApi is required`);
+    if (component.visualReviewStatus !== 'NOT_HUMAN_REVIEWED')
+      errors.push(`${label}.visualReviewStatus must be NOT_HUMAN_REVIEWED`);
+  }
   const button = rows.find((row) => row?.figmaNodeId === '173:27');
   const sizes = rows.find((row) => row?.figmaNodeId === '206:690');
   if (

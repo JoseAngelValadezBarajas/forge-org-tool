@@ -20,6 +20,21 @@ test('feature imports shared package via public barrel', () => {
     0,
   );
 });
+test('consumers cannot deep-import icon package internals', () => {
+  assert.equal(
+    issuesFor(
+      'apps/web/src/features/planning/components/Icon.tsx',
+      "import { Search } from '@forge-org/icons/src/Search';",
+    ).length,
+    1,
+  );
+});
+test('icon package cannot depend on other Forge packages', () => {
+  assert.equal(
+    issuesFor('packages/icons/src/Search.tsx', "import { Button } from '@forge-org/ui';").length,
+    1,
+  );
+});
 test('cross-feature private imports are prohibited', () => {
   assert.equal(
     issuesFor(

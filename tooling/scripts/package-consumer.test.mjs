@@ -86,7 +86,7 @@ test('packed UI, tokens, icons, and API client work in an external React consume
   mkdirSync(join(consumer, 'src'), { recursive: true });
   writeFileSync(
     join(consumer, 'src/main.tsx'),
-    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Button, FormField, Input } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light'>('dark');\n  return <main data-theme={theme}><button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Theme</button><div className="button" data-testid="host-class">Host class</div><FormField label="Name"><Input /></FormField><Button onClick={() => setCount(count + 1)}>Save {count}</Button></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
+    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Alert, Button, Card, Checkbox, Dialog, FormField, Input, KeyValueRow, StatusChip, Tabs } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light'>('dark');\n  return <main data-theme={theme}><button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Theme</button><div className="button" data-testid="host-class">Host class</div><FormField label="Name"><Input /></FormField><label>Include metadata <Checkbox /></label><Button onClick={() => setCount(count + 1)}>Save {count}</Button><Card variant="elevated" data-testid="external-card"><StatusChip tone="success">Available</StatusChip><Alert heading="Review" message="Human review remains required." /></Card><dl><KeyValueRow label="Repository" value="atlas" /></dl><Tabs label="External tabs" tabs={[{ id: 'overview', label: 'Overview', content: 'Overview panel' }, { id: 'details', label: 'Details', content: 'Details panel' }]} /><Dialog title="External dialog" description="Dialog package contract" data-testid="external-dialog" /></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
   );
   writeFileSync(
     join(consumer, 'vite.config.ts'),
@@ -163,6 +163,20 @@ test('packed UI, tokens, icons, and API client work in an external React consume
       const page = await browser.newPage();
       await page.goto(`http://127.0.0.1:${port}`);
       assert.equal(await page.getByLabel('Name').isVisible(), true);
+      assert.equal(await page.getByLabel('Include metadata').isVisible(), true);
+      assert.equal(await page.getByText('Available').getAttribute('data-tone'), 'success');
+      assert.equal(
+        await page.getByRole('alert').textContent(),
+        'ReviewHuman review remains required.',
+      );
+      assert.equal(await page.getByText('atlas').isVisible(), true);
+      assert.equal(await page.getByRole('tabpanel').textContent(), 'Overview panel');
+      await page.getByRole('tab', { name: 'Details' }).click();
+      assert.equal(await page.getByRole('tabpanel').textContent(), 'Details panel');
+      assert.equal(
+        (await page.getByTestId('external-dialog').getAttribute('aria-labelledby')) !== null,
+        true,
+      );
       assert.equal(
         await page
           .getByTestId('host-class')

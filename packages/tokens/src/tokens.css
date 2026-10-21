@@ -22,6 +22,8 @@
   --forge-text-primary: #f5f3ee;
   --forge-text-secondary: #9ea5ad;
   --forge-surface-sunken: #111315;
+  --forge-surface-interactive: #1b1f22;
+  --forge-surface-tag: #202428;
   --forge-focus-ring: #d8874d;
   --forge-focus: #d8874d;
 }
@@ -48,6 +50,8 @@
   --forge-text-primary: #181a1d;
   --forge-text-secondary: #6d706f;
   --forge-surface-sunken: #f6f5f2;
+  --forge-surface-interactive: #fbfaf8;
+  --forge-surface-tag: #f6f5f2;
   --forge-focus-ring: #a94f18;
   --forge-focus: #a94f18;
 }

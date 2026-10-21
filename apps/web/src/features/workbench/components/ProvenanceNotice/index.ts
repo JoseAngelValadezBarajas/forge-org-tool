@@ -1,1 +1,5 @@
-export { ProvenanceNotice, type ProvenanceNoticeProps } from './ProvenanceNotice';
+export {
+  ProvenanceNotice,
+  type ProvenanceNoticeProps,
+  type ProvenanceNoticeState,
+} from './ProvenanceNotice';

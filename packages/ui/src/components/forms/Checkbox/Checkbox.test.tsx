@@ -12,4 +12,14 @@ describe('Checkbox', () => {
     );
     expect(screen.getByRole('checkbox', { name: 'Accept terms' })).toBeChecked();
   });
+
+  it('reflects the indeterminate state on the native checkbox and resets it', () => {
+    const { rerender } = render(<Checkbox aria-label="Select all" indeterminate />);
+    const checkbox = screen.getByRole('checkbox', { name: 'Select all' });
+    expect(checkbox).toHaveProperty('indeterminate', true);
+    expect(checkbox).not.toBeChecked();
+
+    rerender(<Checkbox aria-label="Select all" indeterminate={false} />);
+    expect(checkbox).toHaveProperty('indeterminate', false);
+  });
 });

@@ -156,6 +156,21 @@ test('validates the checked-in canonical inventory', () => {
   );
   assert.deepEqual(validateParity(registry), []);
 });
+test('validates code-only component source paths', () => {
+  const registry = JSON.parse(
+    readFileSync(new URL('../../docs/design/design-system-parity.json', import.meta.url), 'utf8'),
+  );
+  registry.codeOnlyComponents[0].source = 'packages/ui/src/components/DeletedState.tsx';
+  assert.ok(
+    validateParity(registry).some((error) => /codeOnlyComponents\[0\].*DeletedState/.test(error)),
+  );
+});
+test('rejects current mappings whose referenced source files do not exist', () => {
+  invalid(
+    (r) => (r.inventory[0].component.current = ['packages/ui/src/missing/Button.tsx']),
+    /current.*missing.*Button\.tsx/,
+  );
+});
 test('rejects missing, blank and duplicate node IDs', () => {
   invalid((r) => r.inventory.pop(), /100|missing/);
   invalid((r) => delete r.inventory[0].figmaNodeId, /figmaNodeId/);

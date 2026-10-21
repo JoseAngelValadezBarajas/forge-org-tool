@@ -4,6 +4,12 @@
 .row[data-selected] {
   background: color-mix(in srgb, var(--forge-accent) 10%, var(--forge-surface));
 }
+.row[data-read-only] {
+  background: var(--forge-surface-sunken);
+}
+.row[data-read-only] .primary {
+  color: var(--forge-text-muted);
+}
 .row th,
 .row td {
   padding: 0.75rem;

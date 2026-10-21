@@ -12,6 +12,19 @@
 .snapshot h3 {
   margin: 0;
 }
+.state {
+  margin: 0;
+  font-family: var(--forge-font-mono);
+  font-size: 0.625rem;
+  line-height: 1;
+}
+.preview,
+.saved {
+  color: var(--forge-accent);
+}
+.stale {
+  color: var(--forge-warning);
+}
 .snapshot dl {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);

@@ -38,6 +38,13 @@
   gap: var(--forge-space-6);
   align-items: start;
 }
+.layout > *,
+.entry {
+  min-width: 0;
+}
+.entry {
+  grid-template-columns: minmax(0, 1fr);
+}
 .catalogNav {
   position: sticky;
   top: var(--forge-space-4);
@@ -61,6 +68,7 @@
 .content,
 .section {
   display: grid;
+  min-width: 0;
   gap: var(--forge-space-4);
 }
 .section {
@@ -208,12 +216,22 @@
   border: 1px dashed var(--forge-border);
   border-radius: var(--forge-radius-md);
 }
+.productStates {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  align-items: start;
+  gap: var(--forge-space-3);
+}
+.productStates > * {
+  min-width: 0;
+}
 .caption {
   font-size: 0.85rem;
 }
 @media (max-width: 720px) {
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .catalogNav {
     position: static;

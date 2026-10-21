@@ -15,4 +15,18 @@ describe('FormField', () => {
     expect(input.getAttribute('aria-describedby')?.split(' ')).toHaveLength(2);
     expect(screen.getByRole('alert')).toHaveTextContent('Required');
   });
+
+  it('propagates required and disabled to the native control', () => {
+    const { container } = render(
+      <FormField label="Feature title" required disabled>
+        <TextInput />
+      </FormField>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Feature title' });
+    expect(screen.getByLabelText('Feature title')).toBe(input);
+    expect(input).toBeRequired();
+    expect(input).toBeDisabled();
+    expect(container.querySelector('label span[aria-hidden="true"]')).toBeEmptyDOMElement();
+  });
 });

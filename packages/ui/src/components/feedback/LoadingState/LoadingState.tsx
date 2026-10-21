@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react';
-import styles from '../primitives/Shared.module.css';
+import styles from './LoadingState.module.css';
 
 export interface LoadingStateProps extends HTMLAttributes<HTMLDivElement> {
   label?: string;

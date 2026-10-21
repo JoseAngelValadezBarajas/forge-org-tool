@@ -7,7 +7,7 @@
       "icon": "173:2",
       "product": "229:2"
     },
-    "inspectedAt": "2026-10-20",
+    "inspectedAt": "2026-10-21",
     "implementationSnapshot": "3c7bd9b6ef618236c0ee0a1055d937032d771e4a",
     "method": "Read-only Figma page metadata for all 100 exact nodes; concrete design contexts recorded per row. Dimensions are source specimen bounds, not responsive CSS requirements."
   },
@@ -21,27 +21,19 @@
       "component": {
         "name": "Button",
         "target": "packages/ui/src/components/actions/Button/Button.tsx",
-        "current": [
-          "packages/ui/src/components/actions/Button/Button.tsx"
-        ]
+        "current": ["packages/ui/src/components/actions/Button/Button.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Button",
-        "current": [
-          "packages/ui/src/index.ts#Button"
-        ]
+        "current": ["packages/ui/src/index.ts#Button"]
       },
       "styles": {
         "target": "packages/ui/src/components/actions/Button/Button.module.css",
-        "current": [
-          "packages/ui/src/components/actions/Button/Button.module.css"
-        ]
+        "current": ["packages/ui/src/components/actions/Button/Button.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/actions/Button/Button.test.tsx",
-        "current": [
-          "packages/ui/src/components/actions/Button/Button.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/actions/Button/Button.test.tsx"]
       },
       "componentHost": {
         "id": "button",
@@ -194,14 +186,7 @@
           "height": 36
         }
       ],
-      "states": [
-        "Default",
-        "Hover",
-        "Disabled",
-        "Focused",
-        "Pressed",
-        "Loading"
-      ],
+      "states": ["Default", "Hover", "Disabled", "Focused", "Pressed", "Loading"],
       "implementationStatus": "PARTIAL",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -224,27 +209,22 @@
       "component": {
         "name": "Button",
         "target": "packages/ui/src/components/actions/Button/Button.tsx",
-        "current": [
-          "packages/ui/src/components/actions/Button/Button.tsx"
-        ]
+        "current": ["packages/ui/src/components/actions/Button/Button.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#ButtonProps.size",
         "current": [
+          "packages/ui/src/index.ts#ButtonSize",
           "packages/ui/src/index.ts#ButtonProps.size"
         ]
       },
       "styles": {
         "target": "packages/ui/src/components/actions/Button/Button.module.css",
-        "current": [
-          "packages/ui/src/components/actions/Button/Button.module.css"
-        ]
+        "current": ["packages/ui/src/components/actions/Button/Button.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/actions/Button/Button.test.tsx",
-        "current": [
-          "packages/ui/src/components/actions/Button/Button.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/actions/Button/Button.test.tsx"]
       },
       "componentHost": {
         "id": "button-size",
@@ -299,25 +279,19 @@
       "component": {
         "name": "IconButton",
         "target": "packages/ui/src/components/actions/IconButton/IconButton.tsx",
-        "current": [
-          "packages/ui/src/components/actions/IconButton/IconButton.tsx"
-        ]
+        "current": ["packages/ui/src/components/actions/IconButton/IconButton.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#IconButton",
-        "current": []
+        "current": ["packages/ui/src/index.ts#IconButton"]
       },
       "styles": {
         "target": "packages/ui/src/components/actions/IconButton/IconButton.module.css",
-        "current": [
-          "packages/ui/src/components/actions/IconButton/IconButton.module.css"
-        ]
+        "current": ["packages/ui/src/components/actions/IconButton/IconButton.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/actions/IconButton/IconButton.test.tsx",
-        "current": [
-          "packages/ui/src/components/actions/IconButton/IconButton.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/actions/IconButton/IconButton.test.tsx"]
       },
       "componentHost": {
         "id": "icon-button",
@@ -350,12 +324,7 @@
           "height": 43
         }
       ],
-      "states": [
-        "Default",
-        "Disabled",
-        "Focused",
-        "Loading"
-      ],
+      "states": ["Default", "Disabled", "Focused", "Loading"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -366,7 +335,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public IconButton supports named native-button semantics, disabled and loading states; the host previews all three. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -378,27 +347,19 @@
       "component": {
         "name": "Input",
         "target": "packages/ui/src/components/forms/TextInput/TextInput.tsx",
-        "current": [
-          "packages/ui/src/components/forms/TextInput/TextInput.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/TextInput/TextInput.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Input",
-        "current": [
-          "packages/ui/src/index.ts#Input"
-        ]
+        "current": ["packages/ui/src/index.ts#TextInput", "packages/ui/src/index.ts#Input"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/TextInput/TextInput.module.css",
-        "current": [
-          "packages/ui/src/components/forms/TextInput/TextInput.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/TextInput/TextInput.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/TextInput/TextInput.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/TextInput/TextInput.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/TextInput/TextInput.test.tsx"]
       },
       "componentHost": {
         "id": "input",
@@ -437,13 +398,7 @@
           "height": 40
         }
       ],
-      "states": [
-        "Default",
-        "Focused",
-        "Disabled",
-        "Error",
-        "ReadOnly"
-      ],
+      "states": ["Default", "Focused", "Disabled", "Error", "ReadOnly"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -454,7 +409,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Current public export is Input. Native readOnly/disabled supported; explicit Figma Error treatment is not provided.",
+      "implementationNotes": "Public TextInput and compatibility Input aliases support native disabled, read-only and aria-invalid error styling. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -466,27 +421,19 @@
       "component": {
         "name": "Checkbox",
         "target": "packages/ui/src/components/forms/Checkbox/Checkbox.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Checkbox/Checkbox.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Checkbox/Checkbox.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Checkbox",
-        "current": [
-          "packages/ui/src/index.ts#Checkbox"
-        ]
+        "current": ["packages/ui/src/index.ts#Checkbox"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/Checkbox/Checkbox.module.css",
-        "current": [
-          "packages/ui/src/components/forms/Checkbox/Checkbox.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/Checkbox/Checkbox.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/Checkbox/Checkbox.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Checkbox/Checkbox.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Checkbox/Checkbox.test.tsx"]
       },
       "componentHost": {
         "id": "checkbox",
@@ -525,14 +472,8 @@
           "height": 46
         }
       ],
-      "states": [
-        "Unchecked",
-        "Checked",
-        "Disabled",
-        "Focused",
-        "Indeterminate"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Unchecked", "Checked", "Disabled", "Focused", "Indeterminate"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -542,7 +483,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Native checked, unchecked, disabled and focused behavior exists. The canonical indeterminate appearance/state is not implemented.",
+      "implementationNotes": "Native checked/unchecked and disabled behavior plus the canonical indeterminate DOM state are implemented and tested. Host shows the canonical state. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -554,27 +495,19 @@
       "component": {
         "name": "Select",
         "target": "packages/ui/src/components/forms/Select/Select.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Select/Select.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Select/Select.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Select",
-        "current": [
-          "packages/ui/src/index.ts#Select"
-        ]
+        "current": ["packages/ui/src/index.ts#Select"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/Select/Select.module.css",
-        "current": [
-          "packages/ui/src/components/forms/Select/Select.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/Select/Select.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/Select/Select.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Select/Select.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Select/Select.test.tsx"]
       },
       "componentHost": {
         "id": "select",
@@ -607,13 +540,8 @@
           "height": 42
         }
       ],
-      "states": [
-        "Default",
-        "Focused",
-        "Disabled",
-        "Error"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Focused", "Disabled", "Error"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -623,7 +551,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Native selection behavior is implemented. The canonical invalid/error visual treatment is outstanding.",
+      "implementationNotes": "Native selection and semantic-token invalid/error visual treatment are implemented and tested. Host shows default, invalid and disabled states. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -635,27 +563,19 @@
       "component": {
         "name": "Textarea",
         "target": "packages/ui/src/components/forms/Textarea/Textarea.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Textarea/Textarea.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Textarea/Textarea.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Textarea",
-        "current": [
-          "packages/ui/src/index.ts#Textarea"
-        ]
+        "current": ["packages/ui/src/index.ts#Textarea"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/Textarea/Textarea.module.css",
-        "current": [
-          "packages/ui/src/components/forms/Textarea/Textarea.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/Textarea/Textarea.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/Textarea/Textarea.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Textarea/Textarea.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Textarea/Textarea.test.tsx"]
       },
       "componentHost": {
         "id": "textarea",
@@ -688,13 +608,8 @@
           "height": 112
         }
       ],
-      "states": [
-        "Default",
-        "Disabled",
-        "Focused",
-        "Error"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Disabled", "Focused", "Error"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -704,7 +619,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Native editing behavior is implemented. The canonical invalid/error visual treatment is outstanding.",
+      "implementationNotes": "Native editing and semantic-token invalid/error visual treatment are implemented and tested. Host shows default, invalid and disabled states. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -716,27 +631,19 @@
       "component": {
         "name": "FormField",
         "target": "packages/ui/src/components/forms/FormField/FormField.tsx",
-        "current": [
-          "packages/ui/src/components/forms/FormField/FormField.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/FormField/FormField.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#FormField",
-        "current": [
-          "packages/ui/src/index.ts#FormField"
-        ]
+        "current": ["packages/ui/src/index.ts#FormField"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/FormField/FormField.module.css",
-        "current": [
-          "packages/ui/src/components/forms/FormField/FormField.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/FormField/FormField.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/FormField/FormField.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/FormField/FormField.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/FormField/FormField.test.tsx"]
       },
       "componentHost": {
         "id": "form-field",
@@ -769,13 +676,8 @@
           "height": 128
         }
       ],
-      "states": [
-        "Default",
-        "Required",
-        "Error",
-        "Disabled"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Required", "Error", "Disabled"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -785,7 +687,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Label, hint and error associations are implemented. Required marker and disabled composition are outstanding.",
+      "implementationNotes": "Label, hint, error association, required marker and disabled composition are implemented and tested. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -797,27 +699,19 @@
       "component": {
         "name": "SearchField",
         "target": "packages/ui/src/components/forms/SearchField/SearchField.tsx",
-        "current": [
-          "packages/ui/src/components/forms/SearchField/SearchField.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/SearchField/SearchField.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#SearchField",
-        "current": [
-          "packages/ui/src/index.ts#SearchField"
-        ]
+        "current": ["packages/ui/src/index.ts#SearchField"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/SearchField/SearchField.module.css",
-        "current": [
-          "packages/ui/src/components/forms/SearchField/SearchField.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/SearchField/SearchField.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/SearchField/SearchField.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/SearchField/SearchField.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/SearchField/SearchField.test.tsx"]
       },
       "componentHost": {
         "id": "search-field",
@@ -844,11 +738,7 @@
           "height": 52
         }
       ],
-      "states": [
-        "Empty",
-        "With query",
-        "Disabled"
-      ],
+      "states": ["Empty", "With query", "Disabled"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -857,9 +747,9 @@
         "width": 883,
         "height": 175,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Native search input exists; Figma composed query control differs.",
+      "implementationNotes": "Native search input is composed with the original Search icon and optional clear action. Empty, query and disabled states are supported; filtering and debounce remain feature-owned. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -871,25 +761,19 @@
       "component": {
         "name": "MultiSelect",
         "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.tsx",
-        "current": [
-          "packages/ui/src/components/forms/MultiSelect/MultiSelect.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/MultiSelect/MultiSelect.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#MultiSelect",
-        "current": []
+        "current": ["packages/ui/src/index.ts#MultiSelect"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.module.css",
-        "current": [
-          "packages/ui/src/components/forms/MultiSelect/MultiSelect.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/MultiSelect/MultiSelect.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/MultiSelect/MultiSelect.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/MultiSelect/MultiSelect.test.tsx"]
       },
       "componentHost": {
         "id": "multi-select",
@@ -910,11 +794,8 @@
           "height": 125
         }
       ],
-      "states": [
-        "Some selected",
-        "None available"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Some selected", "None available"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -922,9 +803,9 @@
         "width": 938,
         "height": 173,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Uses a native multiple-select; the Figma checkbox-list composition and explicit None available state are outstanding.",
+      "implementationNotes": "Preserves the native multiple-select API and adds a controlled/uncontrolled fieldset checkbox-list composition with Some selected and None available states. Options remain feature-owned. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -936,25 +817,19 @@
       "component": {
         "name": "FilePicker",
         "target": "packages/ui/src/components/forms/FilePicker/FilePicker.tsx",
-        "current": [
-          "packages/ui/src/components/forms/FilePicker/FilePicker.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/FilePicker/FilePicker.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#FilePicker",
-        "current": []
+        "current": ["packages/ui/src/index.ts#FilePicker"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/FilePicker/FilePicker.module.css",
-        "current": [
-          "packages/ui/src/components/forms/FilePicker/FilePicker.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/FilePicker/FilePicker.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/FilePicker/FilePicker.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/FilePicker/FilePicker.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/FilePicker/FilePicker.test.tsx"]
       },
       "componentHost": {
         "id": "file-picker",
@@ -981,12 +856,8 @@
           "height": 128
         }
       ],
-      "states": [
-        "Empty",
-        "Selected",
-        "Error"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Empty", "Selected", "Error"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -994,9 +865,9 @@
         "width": 992,
         "height": 415,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Native file selection is available; the Figma drop/browse composition and selected/error presentations are outstanding.",
+      "implementationNotes": "Retains native file input constraints and implements the Empty, Selected and Error panel states with a keyboard-accessible browse target. Drag-and-drop is intentionally not implemented; feature-owned accept/size validation and error copy remain caller controlled. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1008,25 +879,19 @@
       "component": {
         "name": "FormActions",
         "target": "packages/ui/src/components/forms/FormActions/FormActions.tsx",
-        "current": [
-          "packages/ui/src/components/forms/FormActions/FormActions.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/FormActions/FormActions.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#FormActions",
-        "current": []
+        "current": ["packages/ui/src/index.ts#FormActions"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/FormActions/FormActions.module.css",
-        "current": [
-          "packages/ui/src/components/forms/FormActions/FormActions.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/FormActions/FormActions.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/FormActions/FormActions.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/FormActions/FormActions.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/FormActions/FormActions.test.tsx"]
       },
       "componentHost": {
         "id": "form-actions",
@@ -1053,12 +918,8 @@
           "height": 61
         }
       ],
-      "states": [
-        "Default",
-        "Saving",
-        "ReadOnly"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Saving", "ReadOnly"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -1068,7 +929,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Composable action layout is implemented; canonical Saving and Read only action states are outstanding.",
+      "implementationNotes": "Composable layout and canonical default, Saving and Read only states are implemented and tested. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1080,25 +941,19 @@
       "component": {
         "name": "Radio",
         "target": "packages/ui/src/components/forms/Radio/Radio.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Radio/Radio.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Radio/Radio.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Radio",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Radio"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/Radio/Radio.module.css",
-        "current": [
-          "packages/ui/src/components/forms/Radio/Radio.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/Radio/Radio.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/Radio/Radio.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Radio/Radio.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Radio/Radio.test.tsx"]
       },
       "componentHost": {
         "id": "radio",
@@ -1125,11 +980,7 @@
           "height": 46
         }
       ],
-      "states": [
-        "Unchecked",
-        "Checked",
-        "Disabled"
-      ],
+      "states": ["Unchecked", "Checked", "Disabled"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -1140,7 +991,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Radio uses native radio input semantics; the host demonstrates grouped and disabled options. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1152,25 +1003,19 @@
       "component": {
         "name": "Switch",
         "target": "packages/ui/src/components/forms/Switch/Switch.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Switch/Switch.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Switch/Switch.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Switch",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Switch"]
       },
       "styles": {
         "target": "packages/ui/src/components/forms/Switch/Switch.module.css",
-        "current": [
-          "packages/ui/src/components/forms/Switch/Switch.module.css"
-        ]
+        "current": ["packages/ui/src/components/forms/Switch/Switch.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/forms/Switch/Switch.test.tsx",
-        "current": [
-          "packages/ui/src/components/forms/Switch/Switch.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/forms/Switch/Switch.test.tsx"]
       },
       "componentHost": {
         "id": "switch",
@@ -1197,11 +1042,7 @@
           "height": 48
         }
       ],
-      "states": [
-        "Off",
-        "On",
-        "Disabled"
-      ],
+      "states": ["Off", "On", "Disabled"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -1212,7 +1053,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Switch uses a native checkbox with switch semantics and supports off, on and disabled states. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1224,25 +1065,19 @@
       "component": {
         "name": "Tabs",
         "target": "packages/ui/src/components/navigation/Tabs/Tabs.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/Tabs/Tabs.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/Tabs/Tabs.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Tabs",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Tabs"]
       },
       "styles": {
         "target": "packages/ui/src/components/navigation/Tabs/Tabs.module.css",
-        "current": [
-          "packages/ui/src/components/navigation/Tabs/Tabs.module.css"
-        ]
+        "current": ["packages/ui/src/components/navigation/Tabs/Tabs.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/navigation/Tabs/Tabs.test.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/Tabs/Tabs.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/Tabs/Tabs.test.tsx"]
       },
       "componentHost": {
         "id": "tabs",
@@ -1275,12 +1110,7 @@
           "height": 30
         }
       ],
-      "states": [
-        "Selected",
-        "Idle",
-        "Focused",
-        "Disabled"
-      ],
+      "states": ["Selected", "Idle", "Focused", "Disabled"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -1291,7 +1121,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Tabs implements tablist/tab/tabpanel relationships, keyboard navigation and disabled tabs. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1303,25 +1133,19 @@
       "component": {
         "name": "Breadcrumbs",
         "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Breadcrumbs",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Breadcrumbs"]
       },
       "styles": {
         "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.module.css",
-        "current": [
-          "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.module.css"
-        ]
+        "current": ["packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx"]
       },
       "componentHost": {
         "id": "breadcrumbs",
@@ -1347,7 +1171,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Breadcrumbs exposes a labeled navigation landmark and current-page semantics. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1359,25 +1183,19 @@
       "component": {
         "name": "MenuItem",
         "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/MenuItem/MenuItem.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/MenuItem/MenuItem.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#MenuItem",
-        "current": []
+        "current": ["packages/ui/src/index.ts#MenuItem"]
       },
       "styles": {
         "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.module.css",
-        "current": [
-          "packages/ui/src/components/navigation/MenuItem/MenuItem.module.css"
-        ]
+        "current": ["packages/ui/src/components/navigation/MenuItem/MenuItem.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.test.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/MenuItem/MenuItem.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/MenuItem/MenuItem.test.tsx"]
       },
       "componentHost": {
         "id": "menu-item",
@@ -1404,12 +1222,8 @@
           "height": 42
         }
       ],
-      "states": [
-        "Default",
-        "Selected",
-        "Disabled"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Selected", "Disabled"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -1419,7 +1233,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Default, disabled and destructive behavior are implemented. The canonical Selected presentation/state is outstanding.",
+      "implementationNotes": "Default, disabled, destructive and selected states are implemented and tested. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1431,25 +1245,19 @@
       "component": {
         "name": "StepperStep",
         "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/StepperStep/StepperStep.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/StepperStep/StepperStep.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#StepperStep",
-        "current": []
+        "current": ["packages/ui/src/index.ts#StepperStep"]
       },
       "styles": {
         "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.module.css",
-        "current": [
-          "packages/ui/src/components/navigation/StepperStep/StepperStep.module.css"
-        ]
+        "current": ["packages/ui/src/components/navigation/StepperStep/StepperStep.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.test.tsx",
-        "current": [
-          "packages/ui/src/components/navigation/StepperStep/StepperStep.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/navigation/StepperStep/StepperStep.test.tsx"]
       },
       "componentHost": {
         "id": "stepper-step",
@@ -1476,11 +1284,7 @@
           "height": 55
         }
       ],
-      "states": [
-        "Complete",
-        "Current",
-        "Upcoming"
-      ],
+      "states": ["Complete", "Current", "Upcoming"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -1491,7 +1295,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public StepperStep supports complete, current and upcoming ordered-step states. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -1503,27 +1307,19 @@
       "component": {
         "name": "Card",
         "target": "packages/ui/src/components/surfaces/Card/Card.tsx",
-        "current": [
-          "packages/ui/src/components/surfaces/Card/Card.tsx"
-        ]
+        "current": ["packages/ui/src/components/surfaces/Card/Card.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Card",
-        "current": [
-          "packages/ui/src/index.ts#Card"
-        ]
+        "current": ["packages/ui/src/index.ts#Card"]
       },
       "styles": {
         "target": "packages/ui/src/components/surfaces/Card/Card.module.css",
-        "current": [
-          "packages/ui/src/components/surfaces/Card/Card.module.css"
-        ]
+        "current": ["packages/ui/src/components/surfaces/Card/Card.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/surfaces/Card/Card.test.tsx",
-        "current": [
-          "packages/ui/src/components/surfaces/Card/Card.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/surfaces/Card/Card.test.tsx"]
       },
       "componentHost": {
         "id": "card",
@@ -1567,27 +1363,19 @@
       "component": {
         "name": "MetricCard",
         "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.tsx",
-        "current": [
-          "packages/ui/src/components/surfaces/MetricCard/MetricCard.tsx"
-        ]
+        "current": ["packages/ui/src/components/surfaces/MetricCard/MetricCard.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#MetricCard",
-        "current": [
-          "packages/ui/src/index.ts#MetricCard"
-        ]
+        "current": ["packages/ui/src/index.ts#MetricCard"]
       },
       "styles": {
         "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.module.css",
-        "current": [
-          "packages/ui/src/components/surfaces/MetricCard/MetricCard.module.css"
-        ]
+        "current": ["packages/ui/src/components/surfaces/MetricCard/MetricCard.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.test.tsx",
-        "current": [
-          "packages/ui/src/components/surfaces/MetricCard/MetricCard.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/surfaces/MetricCard/MetricCard.test.tsx"]
       },
       "componentHost": {
         "id": "metric-card",
@@ -1625,27 +1413,19 @@
       "component": {
         "name": "StatusChip",
         "target": "packages/ui/src/components/status/StatusChip/StatusChip.tsx",
-        "current": [
-          "packages/ui/src/components/status/StatusChip/StatusChip.tsx"
-        ]
+        "current": ["packages/ui/src/components/status/StatusChip/StatusChip.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#StatusChip",
-        "current": [
-          "packages/ui/src/index.ts#StatusChip"
-        ]
+        "current": ["packages/ui/src/index.ts#StatusChip"]
       },
       "styles": {
         "target": "packages/ui/src/components/status/StatusChip/StatusChip.module.css",
-        "current": [
-          "packages/ui/src/components/status/StatusChip/StatusChip.module.css"
-        ]
+        "current": ["packages/ui/src/components/status/StatusChip/StatusChip.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/status/StatusChip/StatusChip.test.tsx",
-        "current": [
-          "packages/ui/src/components/status/StatusChip/StatusChip.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/status/StatusChip/StatusChip.test.tsx"]
       },
       "componentHost": {
         "id": "status-chip",
@@ -1713,27 +1493,19 @@
       "component": {
         "name": "Badge",
         "target": "packages/ui/src/components/status/Badge/Badge.tsx",
-        "current": [
-          "packages/ui/src/components/status/Badge/Badge.tsx"
-        ]
+        "current": ["packages/ui/src/components/status/Badge/Badge.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Badge",
-        "current": [
-          "packages/ui/src/index.ts#Badge"
-        ]
+        "current": ["packages/ui/src/index.ts#Badge"]
       },
       "styles": {
         "target": "packages/ui/src/components/status/Badge/Badge.module.css",
-        "current": [
-          "packages/ui/src/components/status/Badge/Badge.module.css"
-        ]
+        "current": ["packages/ui/src/components/status/Badge/Badge.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/status/Badge/Badge.test.tsx",
-        "current": [
-          "packages/ui/src/components/status/Badge/Badge.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/status/Badge/Badge.test.tsx"]
       },
       "componentHost": {
         "id": "badge",
@@ -1770,9 +1542,7 @@
         "height": 70,
         "metadataReviewed": true,
         "designContextReviewed": true,
-        "contextNodeIds": [
-          "177:170"
-        ]
+        "contextNodeIds": ["177:170"]
       },
       "implementationNotes": "Figma Neutral, Accent and Info tones are supported; additional legacy API tones remain available.",
       "relatedImplementation": []
@@ -1786,27 +1556,19 @@
       "component": {
         "name": "Alert",
         "target": "packages/ui/src/components/feedback/Alert/Alert.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Alert/Alert.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Alert/Alert.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Alert",
-        "current": [
-          "packages/ui/src/index.ts#Alert"
-        ]
+        "current": ["packages/ui/src/index.ts#Alert"]
       },
       "styles": {
         "target": "packages/ui/src/components/feedback/Alert/Alert.module.css",
-        "current": [
-          "packages/ui/src/components/feedback/Alert/Alert.module.css"
-        ]
+        "current": ["packages/ui/src/components/feedback/Alert/Alert.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/feedback/Alert/Alert.test.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Alert/Alert.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Alert/Alert.test.tsx"]
       },
       "componentHost": {
         "id": "alert",
@@ -1849,10 +1611,7 @@
         "height": 250,
         "metadataReviewed": true,
         "designContextReviewed": true,
-        "contextNodeIds": [
-          "173:70",
-          "173:76"
-        ]
+        "contextNodeIds": ["173:70", "173:76"]
       },
       "implementationNotes": "Figma Info, Warning, Error and Success tones and heading/message composition are supported; danger remains a backward-compatible alias.",
       "relatedImplementation": []
@@ -1866,25 +1625,19 @@
       "component": {
         "name": "StatePanel",
         "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/StatePanel/StatePanel.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/StatePanel/StatePanel.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#StatePanel",
-        "current": []
+        "current": ["packages/ui/src/index.ts#StatePanel"]
       },
       "styles": {
         "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.module.css",
-        "current": [
-          "packages/ui/src/components/feedback/StatePanel/StatePanel.module.css"
-        ]
+        "current": ["packages/ui/src/components/feedback/StatePanel/StatePanel.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.test.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/StatePanel/StatePanel.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/StatePanel/StatePanel.test.tsx"]
       },
       "componentHost": {
         "id": "state-panel",
@@ -1928,18 +1681,18 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No StatePanel export. Related EmptyState, LoadingState and ErrorState exist separately; Read only composition is absent.",
+      "implementationNotes": "Public StatePanel supports loading, empty, read-only and error states with status/alert semantics. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
-          "path": "packages/ui/src/components/EmptyState.tsx",
+          "path": "packages/ui/src/components/feedback/EmptyState/EmptyState.tsx",
           "kind": "RELATED_COMPONENT"
         },
         {
-          "path": "packages/ui/src/components/LoadingState.tsx",
+          "path": "packages/ui/src/components/feedback/LoadingState/LoadingState.tsx",
           "kind": "RELATED_COMPONENT"
         },
         {
-          "path": "packages/ui/src/components/ErrorState.tsx",
+          "path": "packages/ui/src/components/feedback/ErrorState/ErrorState.tsx",
           "kind": "RELATED_COMPONENT"
         }
       ]
@@ -1953,27 +1706,19 @@
       "component": {
         "name": "Progress",
         "target": "packages/ui/src/components/feedback/Progress/Progress.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Progress/Progress.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Progress/Progress.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Progress",
-        "current": [
-          "packages/ui/src/index.ts#Progress"
-        ]
+        "current": ["packages/ui/src/index.ts#Progress"]
       },
       "styles": {
         "target": "packages/ui/src/components/feedback/Progress/Progress.module.css",
-        "current": [
-          "packages/ui/src/components/feedback/Progress/Progress.module.css"
-        ]
+        "current": ["packages/ui/src/components/feedback/Progress/Progress.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/feedback/Progress/Progress.test.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Progress/Progress.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Progress/Progress.test.tsx"]
       },
       "componentHost": {
         "id": "progress",
@@ -2000,12 +1745,8 @@
           "height": 102
         }
       ],
-      "states": [
-        "Starting",
-        "In progress",
-        "Complete"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Starting", "In progress", "Complete"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -2015,7 +1756,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Native progressbar behavior is implemented; the Figma labeled panel with count, bar and note is outstanding.",
+      "implementationNotes": "Native progressbar plus the labeled panel composition with count, bar, note and starting/in-progress/complete states are implemented and tested. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2027,25 +1768,19 @@
       "component": {
         "name": "Tooltip",
         "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Tooltip/Tooltip.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Tooltip/Tooltip.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Tooltip",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Tooltip"]
       },
       "styles": {
         "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.module.css",
-        "current": [
-          "packages/ui/src/components/feedback/Tooltip/Tooltip.module.css"
-        ]
+        "current": ["packages/ui/src/components/feedback/Tooltip/Tooltip.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.test.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Tooltip/Tooltip.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Tooltip/Tooltip.test.tsx"]
       },
       "componentHost": {
         "id": "tooltip",
@@ -2066,10 +1801,7 @@
           "height": 80
         }
       ],
-      "states": [
-        "Default",
-        "Long"
-      ],
+      "states": ["Default", "Long"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -2080,7 +1812,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Tooltip associates its trigger and tooltip description accessibly; the host shows the real package export. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2092,25 +1824,19 @@
       "component": {
         "name": "Skeleton",
         "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Skeleton/Skeleton.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Skeleton/Skeleton.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Skeleton",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Skeleton"]
       },
       "styles": {
         "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.module.css",
-        "current": [
-          "packages/ui/src/components/feedback/Skeleton/Skeleton.module.css"
-        ]
+        "current": ["packages/ui/src/components/feedback/Skeleton/Skeleton.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.test.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Skeleton/Skeleton.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Skeleton/Skeleton.test.tsx"]
       },
       "componentHost": {
         "id": "skeleton",
@@ -2132,7 +1858,7 @@
         }
       ],
       "states": [],
-      "implementationStatus": "PARTIAL",
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -2142,7 +1868,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Text, title, avatar and card shapes are implemented. The canonical List variant is outstanding.",
+      "implementationNotes": "Text, title, avatar, card and canonical List skeleton shapes are implemented and tested. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2154,25 +1880,19 @@
       "component": {
         "name": "Toast",
         "target": "packages/ui/src/components/feedback/Toast/Toast.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Toast/Toast.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Toast/Toast.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Toast",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Toast"]
       },
       "styles": {
         "target": "packages/ui/src/components/feedback/Toast/Toast.module.css",
-        "current": [
-          "packages/ui/src/components/feedback/Toast/Toast.module.css"
-        ]
+        "current": ["packages/ui/src/components/feedback/Toast/Toast.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/feedback/Toast/Toast.test.tsx",
-        "current": [
-          "packages/ui/src/components/feedback/Toast/Toast.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/feedback/Toast/Toast.test.tsx"]
       },
       "componentHost": {
         "id": "toast",
@@ -2210,7 +1930,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Toast supports success, error and info tones with polite/assertive live-region behavior. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2222,25 +1942,19 @@
       "component": {
         "name": "RecordRow",
         "target": "packages/ui/src/components/data-display/RecordRow/RecordRow.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/RecordRow/RecordRow.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/RecordRow/RecordRow.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#RecordRow",
-        "current": []
+        "current": ["packages/ui/src/index.ts#RecordRow"]
       },
       "styles": {
         "target": "packages/ui/src/components/data-display/RecordRow/RecordRow.module.css",
-        "current": [
-          "packages/ui/src/components/data-display/RecordRow/RecordRow.module.css"
-        ]
+        "current": ["packages/ui/src/components/data-display/RecordRow/RecordRow.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/data-display/RecordRow/RecordRow.test.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/RecordRow/RecordRow.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/RecordRow/RecordRow.test.tsx"]
       },
       "componentHost": {
         "id": "record-row",
@@ -2267,12 +1981,8 @@
           "height": 81
         }
       ],
-      "states": [
-        "Default",
-        "Selected",
-        "Read only"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Selected", "Read only"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -2282,7 +1992,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Default and selected states are implemented. The canonical Read only state is outstanding.",
+      "implementationNotes": "Default, selected and read-only states are implemented and tested. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2294,25 +2004,19 @@
       "component": {
         "name": "KeyValueRow",
         "target": "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#KeyValueRow",
-        "current": []
+        "current": ["packages/ui/src/index.ts#KeyValueRow"]
       },
       "styles": {
         "target": "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.module.css",
-        "current": [
-          "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.module.css"
-        ]
+        "current": ["packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.test.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.test.tsx"]
       },
       "componentHost": {
         "id": "key-value-row",
@@ -2333,10 +2037,7 @@
           "height": 56
         }
       ],
-      "states": [
-        "Default",
-        "Muted"
-      ],
+      "states": ["Default", "Muted"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -2347,7 +2048,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public KeyValueRow provides definition-term/value semantics and is previewed inside a description list. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2359,25 +2060,19 @@
       "component": {
         "name": "TableRow",
         "target": "packages/ui/src/components/data-display/TableRow/TableRow.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/TableRow/TableRow.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/TableRow/TableRow.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#TableRow",
-        "current": []
+        "current": ["packages/ui/src/index.ts#TableRow"]
       },
       "styles": {
         "target": "packages/ui/src/components/data-display/TableRow/TableRow.module.css",
-        "current": [
-          "packages/ui/src/components/data-display/TableRow/TableRow.module.css"
-        ]
+        "current": ["packages/ui/src/components/data-display/TableRow/TableRow.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/data-display/TableRow/TableRow.test.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/TableRow/TableRow.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/TableRow/TableRow.test.tsx"]
       },
       "componentHost": {
         "id": "table-row",
@@ -2404,11 +2099,7 @@
           "height": 50
         }
       ],
-      "states": [
-        "Header",
-        "Regular",
-        "Warning"
-      ],
+      "states": ["Header", "Regular", "Warning"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -2419,7 +2110,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public TableRow supports header, warning and data-row compositions with scoped headers where appropriate. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2431,25 +2122,19 @@
       "component": {
         "name": "Table",
         "target": "packages/ui/src/components/data-display/Table/Table.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/Table/Table.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/Table/Table.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Table",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Table"]
       },
       "styles": {
         "target": "packages/ui/src/components/data-display/Table/Table.module.css",
-        "current": [
-          "packages/ui/src/components/data-display/Table/Table.module.css"
-        ]
+        "current": ["packages/ui/src/components/data-display/Table/Table.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/data-display/Table/Table.test.tsx",
-        "current": [
-          "packages/ui/src/components/data-display/Table/Table.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/data-display/Table/Table.test.tsx"]
       },
       "componentHost": {
         "id": "table",
@@ -2470,10 +2155,7 @@
           "height": 190
         }
       ],
-      "states": [
-        "Populated",
-        "Empty"
-      ],
+      "states": ["Populated", "Empty"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -2484,7 +2166,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Table supports captioned populated and empty states with scoped headers. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2496,25 +2178,19 @@
       "component": {
         "name": "Dialog",
         "target": "packages/ui/src/components/overlays/Dialog/Dialog.tsx",
-        "current": [
-          "packages/ui/src/components/overlays/Dialog/Dialog.tsx"
-        ]
+        "current": ["packages/ui/src/components/overlays/Dialog/Dialog.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Dialog",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Dialog"]
       },
       "styles": {
         "target": "packages/ui/src/components/overlays/Dialog/Dialog.module.css",
-        "current": [
-          "packages/ui/src/components/overlays/Dialog/Dialog.module.css"
-        ]
+        "current": ["packages/ui/src/components/overlays/Dialog/Dialog.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/overlays/Dialog/Dialog.test.tsx",
-        "current": [
-          "packages/ui/src/components/overlays/Dialog/Dialog.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/overlays/Dialog/Dialog.test.tsx"]
       },
       "componentHost": {
         "id": "dialog",
@@ -2552,7 +2228,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Dialog supports confirm, destructive and busy native modal variants with title/description associations. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2564,25 +2240,19 @@
       "component": {
         "name": "Popover",
         "target": "packages/ui/src/components/overlays/Popover/Popover.tsx",
-        "current": [
-          "packages/ui/src/components/overlays/Popover/Popover.tsx"
-        ]
+        "current": ["packages/ui/src/components/overlays/Popover/Popover.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Popover",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Popover"]
       },
       "styles": {
         "target": "packages/ui/src/components/overlays/Popover/Popover.module.css",
-        "current": [
-          "packages/ui/src/components/overlays/Popover/Popover.module.css"
-        ]
+        "current": ["packages/ui/src/components/overlays/Popover/Popover.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/overlays/Popover/Popover.test.tsx",
-        "current": [
-          "packages/ui/src/components/overlays/Popover/Popover.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/overlays/Popover/Popover.test.tsx"]
       },
       "componentHost": {
         "id": "popover",
@@ -2603,10 +2273,7 @@
           "height": 169
         }
       ],
-      "states": [
-        "Closed",
-        "Open"
-      ],
+      "states": ["Closed", "Open"],
       "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
@@ -2617,7 +2284,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Popover uses native details/summary disclosure; the open prop is explicitly typed and previewed. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2629,27 +2296,19 @@
       "component": {
         "name": "SectionHeader",
         "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.tsx",
-        "current": [
-          "packages/ui/src/components/layout/SectionHeader/SectionHeader.tsx"
-        ]
+        "current": ["packages/ui/src/components/layout/SectionHeader/SectionHeader.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#SectionHeader",
-        "current": [
-          "packages/ui/src/index.ts#SectionHeader"
-        ]
+        "current": ["packages/ui/src/index.ts#SectionHeader"]
       },
       "styles": {
         "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.module.css",
-        "current": [
-          "packages/ui/src/components/layout/SectionHeader/SectionHeader.module.css"
-        ]
+        "current": ["packages/ui/src/components/layout/SectionHeader/SectionHeader.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.test.tsx",
-        "current": [
-          "packages/ui/src/components/layout/SectionHeader/SectionHeader.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/layout/SectionHeader/SectionHeader.test.tsx"]
       },
       "componentHost": {
         "id": "section-header",
@@ -2687,25 +2346,19 @@
       "component": {
         "name": "Divider",
         "target": "packages/ui/src/components/layout/Divider/Divider.tsx",
-        "current": [
-          "packages/ui/src/components/layout/Divider/Divider.tsx"
-        ]
+        "current": ["packages/ui/src/components/layout/Divider/Divider.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#Divider",
-        "current": []
+        "current": ["packages/ui/src/index.ts#Divider"]
       },
       "styles": {
         "target": "packages/ui/src/components/layout/Divider/Divider.module.css",
-        "current": [
-          "packages/ui/src/components/layout/Divider/Divider.module.css"
-        ]
+        "current": ["packages/ui/src/components/layout/Divider/Divider.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/layout/Divider/Divider.test.tsx",
-        "current": [
-          "packages/ui/src/components/layout/Divider/Divider.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/layout/Divider/Divider.test.tsx"]
       },
       "componentHost": {
         "id": "divider",
@@ -2731,7 +2384,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public Divider supports semantic separator orientation and decorative mode. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2743,25 +2396,19 @@
       "component": {
         "name": "CodeLabel",
         "target": "packages/ui/src/components/layout/CodeLabel/CodeLabel.tsx",
-        "current": [
-          "packages/ui/src/components/layout/CodeLabel/CodeLabel.tsx"
-        ]
+        "current": ["packages/ui/src/components/layout/CodeLabel/CodeLabel.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/ui#CodeLabel",
-        "current": []
+        "current": ["packages/ui/src/index.ts#CodeLabel"]
       },
       "styles": {
         "target": "packages/ui/src/components/layout/CodeLabel/CodeLabel.module.css",
-        "current": [
-          "packages/ui/src/components/layout/CodeLabel/CodeLabel.module.css"
-        ]
+        "current": ["packages/ui/src/components/layout/CodeLabel/CodeLabel.module.css"]
       },
       "tests": {
         "target": "packages/ui/src/components/layout/CodeLabel/CodeLabel.test.tsx",
-        "current": [
-          "packages/ui/src/components/layout/CodeLabel/CodeLabel.test.tsx"
-        ]
+        "current": ["packages/ui/src/components/layout/CodeLabel/CodeLabel.test.tsx"]
       },
       "componentHost": {
         "id": "code-label",
@@ -2787,7 +2434,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "No corresponding component/API/host preview exists.",
+      "implementationNotes": "Public CodeLabel renders its code value semantically without color-only meaning. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -2799,27 +2446,19 @@
       "component": {
         "name": "Plus",
         "target": "packages/icons/src/icons/Plus/Plus.tsx",
-        "current": [
-          "packages/icons/src/icons/Plus/Plus.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Plus/Plus.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Plus",
-        "current": [
-          "packages/icons/src/index.ts#Plus"
-        ]
+        "current": ["packages/icons/src/index.ts#Plus"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Plus/Plus.module.css",
-        "current": [
-          "packages/icons/src/icons/Plus/Plus.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Plus/Plus.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Plus/Plus.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Plus/Plus.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Plus/Plus.test.tsx"]
       },
       "componentHost": {
         "id": "icon-plus",
@@ -2857,27 +2496,19 @@
       "component": {
         "name": "Close",
         "target": "packages/icons/src/icons/Close/Close.tsx",
-        "current": [
-          "packages/icons/src/icons/Close/Close.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Close/Close.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Close",
-        "current": [
-          "packages/icons/src/index.ts#Close"
-        ]
+        "current": ["packages/icons/src/index.ts#Close"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Close/Close.module.css",
-        "current": [
-          "packages/icons/src/icons/Close/Close.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Close/Close.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Close/Close.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Close/Close.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Close/Close.test.tsx"]
       },
       "componentHost": {
         "id": "icon-close",
@@ -2915,27 +2546,19 @@
       "component": {
         "name": "Chevron",
         "target": "packages/icons/src/icons/Chevron/Chevron.tsx",
-        "current": [
-          "packages/icons/src/icons/Chevron/Chevron.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Chevron/Chevron.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Chevron",
-        "current": [
-          "packages/icons/src/index.ts#Chevron"
-        ]
+        "current": ["packages/icons/src/index.ts#Chevron"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Chevron/Chevron.module.css",
-        "current": [
-          "packages/icons/src/icons/Chevron/Chevron.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Chevron/Chevron.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Chevron/Chevron.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Chevron/Chevron.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Chevron/Chevron.test.tsx"]
       },
       "componentHost": {
         "id": "icon-chevron",
@@ -2973,27 +2596,19 @@
       "component": {
         "name": "Check",
         "target": "packages/icons/src/icons/Check/Check.tsx",
-        "current": [
-          "packages/icons/src/icons/Check/Check.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Check/Check.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Check",
-        "current": [
-          "packages/icons/src/index.ts#Check"
-        ]
+        "current": ["packages/icons/src/index.ts#Check"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Check/Check.module.css",
-        "current": [
-          "packages/icons/src/icons/Check/Check.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Check/Check.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Check/Check.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Check/Check.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Check/Check.test.tsx"]
       },
       "componentHost": {
         "id": "icon-check",
@@ -3031,27 +2646,19 @@
       "component": {
         "name": "Minus",
         "target": "packages/icons/src/icons/Minus/Minus.tsx",
-        "current": [
-          "packages/icons/src/icons/Minus/Minus.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Minus/Minus.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Minus",
-        "current": [
-          "packages/icons/src/index.ts#Minus"
-        ]
+        "current": ["packages/icons/src/index.ts#Minus"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Minus/Minus.module.css",
-        "current": [
-          "packages/icons/src/icons/Minus/Minus.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Minus/Minus.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Minus/Minus.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Minus/Minus.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Minus/Minus.test.tsx"]
       },
       "componentHost": {
         "id": "icon-minus",
@@ -3089,27 +2696,19 @@
       "component": {
         "name": "Search",
         "target": "packages/icons/src/icons/Search/Search.tsx",
-        "current": [
-          "packages/icons/src/icons/Search/Search.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Search/Search.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Search",
-        "current": [
-          "packages/icons/src/index.ts#Search"
-        ]
+        "current": ["packages/icons/src/index.ts#Search"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Search/Search.module.css",
-        "current": [
-          "packages/icons/src/icons/Search/Search.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Search/Search.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Search/Search.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Search/Search.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Search/Search.test.tsx"]
       },
       "componentHost": {
         "id": "icon-search",
@@ -3147,27 +2746,19 @@
       "component": {
         "name": "Menu",
         "target": "packages/icons/src/icons/Menu/Menu.tsx",
-        "current": [
-          "packages/icons/src/icons/Menu/Menu.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Menu/Menu.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Menu",
-        "current": [
-          "packages/icons/src/index.ts#Menu"
-        ]
+        "current": ["packages/icons/src/index.ts#Menu"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Menu/Menu.module.css",
-        "current": [
-          "packages/icons/src/icons/Menu/Menu.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Menu/Menu.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Menu/Menu.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Menu/Menu.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Menu/Menu.test.tsx"]
       },
       "componentHost": {
         "id": "icon-menu",
@@ -3205,27 +2796,19 @@
       "component": {
         "name": "Edit",
         "target": "packages/icons/src/icons/Edit/Edit.tsx",
-        "current": [
-          "packages/icons/src/icons/Edit/Edit.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Edit/Edit.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Edit",
-        "current": [
-          "packages/icons/src/index.ts#Edit"
-        ]
+        "current": ["packages/icons/src/index.ts#Edit"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Edit/Edit.module.css",
-        "current": [
-          "packages/icons/src/icons/Edit/Edit.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Edit/Edit.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Edit/Edit.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Edit/Edit.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Edit/Edit.test.tsx"]
       },
       "componentHost": {
         "id": "icon-edit",
@@ -3263,27 +2846,19 @@
       "component": {
         "name": "Trash",
         "target": "packages/icons/src/icons/Trash/Trash.tsx",
-        "current": [
-          "packages/icons/src/icons/Trash/Trash.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Trash/Trash.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Trash",
-        "current": [
-          "packages/icons/src/index.ts#Trash"
-        ]
+        "current": ["packages/icons/src/index.ts#Trash"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Trash/Trash.module.css",
-        "current": [
-          "packages/icons/src/icons/Trash/Trash.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Trash/Trash.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Trash/Trash.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Trash/Trash.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Trash/Trash.test.tsx"]
       },
       "componentHost": {
         "id": "icon-trash",
@@ -3321,27 +2896,19 @@
       "component": {
         "name": "Download",
         "target": "packages/icons/src/icons/Download/Download.tsx",
-        "current": [
-          "packages/icons/src/icons/Download/Download.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Download/Download.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Download",
-        "current": [
-          "packages/icons/src/index.ts#Download"
-        ]
+        "current": ["packages/icons/src/index.ts#Download"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Download/Download.module.css",
-        "current": [
-          "packages/icons/src/icons/Download/Download.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Download/Download.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Download/Download.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Download/Download.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Download/Download.test.tsx"]
       },
       "componentHost": {
         "id": "icon-download",
@@ -3379,27 +2946,19 @@
       "component": {
         "name": "Upload",
         "target": "packages/icons/src/icons/Upload/Upload.tsx",
-        "current": [
-          "packages/icons/src/icons/Upload/Upload.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Upload/Upload.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Upload",
-        "current": [
-          "packages/icons/src/index.ts#Upload"
-        ]
+        "current": ["packages/icons/src/index.ts#Upload"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Upload/Upload.module.css",
-        "current": [
-          "packages/icons/src/icons/Upload/Upload.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Upload/Upload.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Upload/Upload.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Upload/Upload.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Upload/Upload.test.tsx"]
       },
       "componentHost": {
         "id": "icon-upload",
@@ -3437,27 +2996,19 @@
       "component": {
         "name": "Filter",
         "target": "packages/icons/src/icons/Filter/Filter.tsx",
-        "current": [
-          "packages/icons/src/icons/Filter/Filter.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Filter/Filter.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Filter",
-        "current": [
-          "packages/icons/src/index.ts#Filter"
-        ]
+        "current": ["packages/icons/src/index.ts#Filter"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Filter/Filter.module.css",
-        "current": [
-          "packages/icons/src/icons/Filter/Filter.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Filter/Filter.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Filter/Filter.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Filter/Filter.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Filter/Filter.test.tsx"]
       },
       "componentHost": {
         "id": "icon-filter",
@@ -3495,27 +3046,19 @@
       "component": {
         "name": "ArrowLeft",
         "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowLeft/ArrowLeft.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowLeft/ArrowLeft.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ArrowLeft",
-        "current": [
-          "packages/icons/src/index.ts#ArrowLeft"
-        ]
+        "current": ["packages/icons/src/index.ts#ArrowLeft"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.module.css",
-        "current": [
-          "packages/icons/src/icons/ArrowLeft/ArrowLeft.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ArrowLeft/ArrowLeft.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowLeft/ArrowLeft.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowLeft/ArrowLeft.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-left",
@@ -3553,27 +3096,19 @@
       "component": {
         "name": "ArrowRight",
         "target": "packages/icons/src/icons/ArrowRight/ArrowRight.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowRight/ArrowRight.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowRight/ArrowRight.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ArrowRight",
-        "current": [
-          "packages/icons/src/index.ts#ArrowRight"
-        ]
+        "current": ["packages/icons/src/index.ts#ArrowRight"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ArrowRight/ArrowRight.module.css",
-        "current": [
-          "packages/icons/src/icons/ArrowRight/ArrowRight.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ArrowRight/ArrowRight.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ArrowRight/ArrowRight.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowRight/ArrowRight.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowRight/ArrowRight.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-right",
@@ -3611,27 +3146,19 @@
       "component": {
         "name": "ArrowUp",
         "target": "packages/icons/src/icons/ArrowUp/ArrowUp.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowUp/ArrowUp.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowUp/ArrowUp.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ArrowUp",
-        "current": [
-          "packages/icons/src/index.ts#ArrowUp"
-        ]
+        "current": ["packages/icons/src/index.ts#ArrowUp"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ArrowUp/ArrowUp.module.css",
-        "current": [
-          "packages/icons/src/icons/ArrowUp/ArrowUp.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ArrowUp/ArrowUp.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ArrowUp/ArrowUp.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowUp/ArrowUp.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowUp/ArrowUp.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-up",
@@ -3669,27 +3196,19 @@
       "component": {
         "name": "ArrowDown",
         "target": "packages/icons/src/icons/ArrowDown/ArrowDown.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowDown/ArrowDown.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowDown/ArrowDown.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ArrowDown",
-        "current": [
-          "packages/icons/src/index.ts#ArrowDown"
-        ]
+        "current": ["packages/icons/src/index.ts#ArrowDown"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ArrowDown/ArrowDown.module.css",
-        "current": [
-          "packages/icons/src/icons/ArrowDown/ArrowDown.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ArrowDown/ArrowDown.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ArrowDown/ArrowDown.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ArrowDown/ArrowDown.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ArrowDown/ArrowDown.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-down",
@@ -3727,27 +3246,19 @@
       "component": {
         "name": "AlertTriangle",
         "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.tsx",
-        "current": [
-          "packages/icons/src/icons/AlertTriangle/AlertTriangle.tsx"
-        ]
+        "current": ["packages/icons/src/icons/AlertTriangle/AlertTriangle.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#AlertTriangle",
-        "current": [
-          "packages/icons/src/index.ts#AlertTriangle"
-        ]
+        "current": ["packages/icons/src/index.ts#AlertTriangle"]
       },
       "styles": {
         "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.module.css",
-        "current": [
-          "packages/icons/src/icons/AlertTriangle/AlertTriangle.module.css"
-        ]
+        "current": ["packages/icons/src/icons/AlertTriangle/AlertTriangle.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.test.tsx",
-        "current": [
-          "packages/icons/src/icons/AlertTriangle/AlertTriangle.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/AlertTriangle/AlertTriangle.test.tsx"]
       },
       "componentHost": {
         "id": "icon-alert-triangle",
@@ -3785,27 +3296,19 @@
       "component": {
         "name": "Info",
         "target": "packages/icons/src/icons/Info/Info.tsx",
-        "current": [
-          "packages/icons/src/icons/Info/Info.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Info/Info.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Info",
-        "current": [
-          "packages/icons/src/index.ts#Info"
-        ]
+        "current": ["packages/icons/src/index.ts#Info"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Info/Info.module.css",
-        "current": [
-          "packages/icons/src/icons/Info/Info.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Info/Info.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Info/Info.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Info/Info.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Info/Info.test.tsx"]
       },
       "componentHost": {
         "id": "icon-info",
@@ -3843,27 +3346,19 @@
       "component": {
         "name": "Clock",
         "target": "packages/icons/src/icons/Clock/Clock.tsx",
-        "current": [
-          "packages/icons/src/icons/Clock/Clock.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Clock/Clock.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Clock",
-        "current": [
-          "packages/icons/src/index.ts#Clock"
-        ]
+        "current": ["packages/icons/src/index.ts#Clock"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Clock/Clock.module.css",
-        "current": [
-          "packages/icons/src/icons/Clock/Clock.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Clock/Clock.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Clock/Clock.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Clock/Clock.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Clock/Clock.test.tsx"]
       },
       "componentHost": {
         "id": "icon-clock",
@@ -3901,27 +3396,19 @@
       "component": {
         "name": "Folder",
         "target": "packages/icons/src/icons/Folder/Folder.tsx",
-        "current": [
-          "packages/icons/src/icons/Folder/Folder.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Folder/Folder.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Folder",
-        "current": [
-          "packages/icons/src/index.ts#Folder"
-        ]
+        "current": ["packages/icons/src/index.ts#Folder"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Folder/Folder.module.css",
-        "current": [
-          "packages/icons/src/icons/Folder/Folder.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Folder/Folder.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Folder/Folder.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Folder/Folder.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Folder/Folder.test.tsx"]
       },
       "componentHost": {
         "id": "icon-folder",
@@ -3959,27 +3446,19 @@
       "component": {
         "name": "GitBranch",
         "target": "packages/icons/src/icons/GitBranch/GitBranch.tsx",
-        "current": [
-          "packages/icons/src/icons/GitBranch/GitBranch.tsx"
-        ]
+        "current": ["packages/icons/src/icons/GitBranch/GitBranch.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#GitBranch",
-        "current": [
-          "packages/icons/src/index.ts#GitBranch"
-        ]
+        "current": ["packages/icons/src/index.ts#GitBranch"]
       },
       "styles": {
         "target": "packages/icons/src/icons/GitBranch/GitBranch.module.css",
-        "current": [
-          "packages/icons/src/icons/GitBranch/GitBranch.module.css"
-        ]
+        "current": ["packages/icons/src/icons/GitBranch/GitBranch.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/GitBranch/GitBranch.test.tsx",
-        "current": [
-          "packages/icons/src/icons/GitBranch/GitBranch.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/GitBranch/GitBranch.test.tsx"]
       },
       "componentHost": {
         "id": "icon-git-branch",
@@ -4017,27 +3496,19 @@
       "component": {
         "name": "Refresh",
         "target": "packages/icons/src/icons/Refresh/Refresh.tsx",
-        "current": [
-          "packages/icons/src/icons/Refresh/Refresh.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Refresh/Refresh.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Refresh",
-        "current": [
-          "packages/icons/src/index.ts#Refresh"
-        ]
+        "current": ["packages/icons/src/index.ts#Refresh"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Refresh/Refresh.module.css",
-        "current": [
-          "packages/icons/src/icons/Refresh/Refresh.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Refresh/Refresh.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Refresh/Refresh.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Refresh/Refresh.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Refresh/Refresh.test.tsx"]
       },
       "componentHost": {
         "id": "icon-refresh",
@@ -4075,27 +3546,19 @@
       "component": {
         "name": "ExternalLink",
         "target": "packages/icons/src/icons/ExternalLink/ExternalLink.tsx",
-        "current": [
-          "packages/icons/src/icons/ExternalLink/ExternalLink.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ExternalLink/ExternalLink.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ExternalLink",
-        "current": [
-          "packages/icons/src/index.ts#ExternalLink"
-        ]
+        "current": ["packages/icons/src/index.ts#ExternalLink"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ExternalLink/ExternalLink.module.css",
-        "current": [
-          "packages/icons/src/icons/ExternalLink/ExternalLink.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ExternalLink/ExternalLink.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ExternalLink/ExternalLink.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ExternalLink/ExternalLink.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ExternalLink/ExternalLink.test.tsx"]
       },
       "componentHost": {
         "id": "icon-external-link",
@@ -4133,27 +3596,19 @@
       "component": {
         "name": "Lock",
         "target": "packages/icons/src/icons/Lock/Lock.tsx",
-        "current": [
-          "packages/icons/src/icons/Lock/Lock.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Lock/Lock.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Lock",
-        "current": [
-          "packages/icons/src/index.ts#Lock"
-        ]
+        "current": ["packages/icons/src/index.ts#Lock"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Lock/Lock.module.css",
-        "current": [
-          "packages/icons/src/icons/Lock/Lock.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Lock/Lock.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Lock/Lock.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Lock/Lock.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Lock/Lock.test.tsx"]
       },
       "componentHost": {
         "id": "icon-lock",
@@ -4191,27 +3646,19 @@
       "component": {
         "name": "History",
         "target": "packages/icons/src/icons/History/History.tsx",
-        "current": [
-          "packages/icons/src/icons/History/History.tsx"
-        ]
+        "current": ["packages/icons/src/icons/History/History.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#History",
-        "current": [
-          "packages/icons/src/index.ts#History"
-        ]
+        "current": ["packages/icons/src/index.ts#History"]
       },
       "styles": {
         "target": "packages/icons/src/icons/History/History.module.css",
-        "current": [
-          "packages/icons/src/icons/History/History.module.css"
-        ]
+        "current": ["packages/icons/src/icons/History/History.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/History/History.test.tsx",
-        "current": [
-          "packages/icons/src/icons/History/History.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/History/History.test.tsx"]
       },
       "componentHost": {
         "id": "icon-history",
@@ -4249,27 +3696,19 @@
       "component": {
         "name": "CheckCircle",
         "target": "packages/icons/src/icons/CheckCircle/CheckCircle.tsx",
-        "current": [
-          "packages/icons/src/icons/CheckCircle/CheckCircle.tsx"
-        ]
+        "current": ["packages/icons/src/icons/CheckCircle/CheckCircle.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#CheckCircle",
-        "current": [
-          "packages/icons/src/index.ts#CheckCircle"
-        ]
+        "current": ["packages/icons/src/index.ts#CheckCircle"]
       },
       "styles": {
         "target": "packages/icons/src/icons/CheckCircle/CheckCircle.module.css",
-        "current": [
-          "packages/icons/src/icons/CheckCircle/CheckCircle.module.css"
-        ]
+        "current": ["packages/icons/src/icons/CheckCircle/CheckCircle.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/CheckCircle/CheckCircle.test.tsx",
-        "current": [
-          "packages/icons/src/icons/CheckCircle/CheckCircle.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/CheckCircle/CheckCircle.test.tsx"]
       },
       "componentHost": {
         "id": "icon-check-circle",
@@ -4307,27 +3746,19 @@
       "component": {
         "name": "XCircle",
         "target": "packages/icons/src/icons/XCircle/XCircle.tsx",
-        "current": [
-          "packages/icons/src/icons/XCircle/XCircle.tsx"
-        ]
+        "current": ["packages/icons/src/icons/XCircle/XCircle.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#XCircle",
-        "current": [
-          "packages/icons/src/index.ts#XCircle"
-        ]
+        "current": ["packages/icons/src/index.ts#XCircle"]
       },
       "styles": {
         "target": "packages/icons/src/icons/XCircle/XCircle.module.css",
-        "current": [
-          "packages/icons/src/icons/XCircle/XCircle.module.css"
-        ]
+        "current": ["packages/icons/src/icons/XCircle/XCircle.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/XCircle/XCircle.test.tsx",
-        "current": [
-          "packages/icons/src/icons/XCircle/XCircle.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/XCircle/XCircle.test.tsx"]
       },
       "componentHost": {
         "id": "icon-xcircle",
@@ -4365,27 +3796,19 @@
       "component": {
         "name": "Bell",
         "target": "packages/icons/src/icons/Bell/Bell.tsx",
-        "current": [
-          "packages/icons/src/icons/Bell/Bell.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Bell/Bell.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Bell",
-        "current": [
-          "packages/icons/src/index.ts#Bell"
-        ]
+        "current": ["packages/icons/src/index.ts#Bell"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Bell/Bell.module.css",
-        "current": [
-          "packages/icons/src/icons/Bell/Bell.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Bell/Bell.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Bell/Bell.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Bell/Bell.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Bell/Bell.test.tsx"]
       },
       "componentHost": {
         "id": "icon-bell",
@@ -4423,27 +3846,19 @@
       "component": {
         "name": "ChevronDown",
         "target": "packages/icons/src/icons/ChevronDown/ChevronDown.tsx",
-        "current": [
-          "packages/icons/src/icons/ChevronDown/ChevronDown.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ChevronDown/ChevronDown.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ChevronDown",
-        "current": [
-          "packages/icons/src/index.ts#ChevronDown"
-        ]
+        "current": ["packages/icons/src/index.ts#ChevronDown"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ChevronDown/ChevronDown.module.css",
-        "current": [
-          "packages/icons/src/icons/ChevronDown/ChevronDown.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ChevronDown/ChevronDown.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ChevronDown/ChevronDown.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ChevronDown/ChevronDown.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ChevronDown/ChevronDown.test.tsx"]
       },
       "componentHost": {
         "id": "icon-chevron-down",
@@ -4481,27 +3896,19 @@
       "component": {
         "name": "ChevronRight",
         "target": "packages/icons/src/icons/ChevronRight/ChevronRight.tsx",
-        "current": [
-          "packages/icons/src/icons/ChevronRight/ChevronRight.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ChevronRight/ChevronRight.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#ChevronRight",
-        "current": [
-          "packages/icons/src/index.ts#ChevronRight"
-        ]
+        "current": ["packages/icons/src/index.ts#ChevronRight"]
       },
       "styles": {
         "target": "packages/icons/src/icons/ChevronRight/ChevronRight.module.css",
-        "current": [
-          "packages/icons/src/icons/ChevronRight/ChevronRight.module.css"
-        ]
+        "current": ["packages/icons/src/icons/ChevronRight/ChevronRight.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/ChevronRight/ChevronRight.test.tsx",
-        "current": [
-          "packages/icons/src/icons/ChevronRight/ChevronRight.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/ChevronRight/ChevronRight.test.tsx"]
       },
       "componentHost": {
         "id": "icon-chevron-right",
@@ -4539,27 +3946,19 @@
       "component": {
         "name": "GripVertical",
         "target": "packages/icons/src/icons/GripVertical/GripVertical.tsx",
-        "current": [
-          "packages/icons/src/icons/GripVertical/GripVertical.tsx"
-        ]
+        "current": ["packages/icons/src/icons/GripVertical/GripVertical.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#GripVertical",
-        "current": [
-          "packages/icons/src/index.ts#GripVertical"
-        ]
+        "current": ["packages/icons/src/index.ts#GripVertical"]
       },
       "styles": {
         "target": "packages/icons/src/icons/GripVertical/GripVertical.module.css",
-        "current": [
-          "packages/icons/src/icons/GripVertical/GripVertical.module.css"
-        ]
+        "current": ["packages/icons/src/icons/GripVertical/GripVertical.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/GripVertical/GripVertical.test.tsx",
-        "current": [
-          "packages/icons/src/icons/GripVertical/GripVertical.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/GripVertical/GripVertical.test.tsx"]
       },
       "componentHost": {
         "id": "icon-grip-vertical",
@@ -4597,27 +3996,19 @@
       "component": {
         "name": "Link",
         "target": "packages/icons/src/icons/Link/Link.tsx",
-        "current": [
-          "packages/icons/src/icons/Link/Link.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Link/Link.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Link",
-        "current": [
-          "packages/icons/src/index.ts#Link"
-        ]
+        "current": ["packages/icons/src/index.ts#Link"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Link/Link.module.css",
-        "current": [
-          "packages/icons/src/icons/Link/Link.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Link/Link.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Link/Link.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Link/Link.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Link/Link.test.tsx"]
       },
       "componentHost": {
         "id": "icon-link",
@@ -4655,27 +4046,19 @@
       "component": {
         "name": "Eye",
         "target": "packages/icons/src/icons/Eye/Eye.tsx",
-        "current": [
-          "packages/icons/src/icons/Eye/Eye.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Eye/Eye.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Eye",
-        "current": [
-          "packages/icons/src/index.ts#Eye"
-        ]
+        "current": ["packages/icons/src/index.ts#Eye"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Eye/Eye.module.css",
-        "current": [
-          "packages/icons/src/icons/Eye/Eye.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Eye/Eye.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Eye/Eye.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Eye/Eye.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Eye/Eye.test.tsx"]
       },
       "componentHost": {
         "id": "icon-eye",
@@ -4713,27 +4096,19 @@
       "component": {
         "name": "Layers",
         "target": "packages/icons/src/icons/Layers/Layers.tsx",
-        "current": [
-          "packages/icons/src/icons/Layers/Layers.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Layers/Layers.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Layers",
-        "current": [
-          "packages/icons/src/index.ts#Layers"
-        ]
+        "current": ["packages/icons/src/index.ts#Layers"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Layers/Layers.module.css",
-        "current": [
-          "packages/icons/src/icons/Layers/Layers.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Layers/Layers.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Layers/Layers.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Layers/Layers.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Layers/Layers.test.tsx"]
       },
       "componentHost": {
         "id": "icon-layers",
@@ -4771,27 +4146,19 @@
       "component": {
         "name": "Settings",
         "target": "packages/icons/src/icons/Settings/Settings.tsx",
-        "current": [
-          "packages/icons/src/icons/Settings/Settings.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Settings/Settings.tsx"]
       },
       "publicApi": {
         "target": "@forge-org/icons#Settings",
-        "current": [
-          "packages/icons/src/index.ts#Settings"
-        ]
+        "current": ["packages/icons/src/index.ts#Settings"]
       },
       "styles": {
         "target": "packages/icons/src/icons/Settings/Settings.module.css",
-        "current": [
-          "packages/icons/src/icons/Settings/Settings.module.css"
-        ]
+        "current": ["packages/icons/src/icons/Settings/Settings.module.css"]
       },
       "tests": {
         "target": "packages/icons/src/icons/Settings/Settings.test.tsx",
-        "current": [
-          "packages/icons/src/icons/Settings/Settings.test.tsx"
-        ]
+        "current": ["packages/icons/src/icons/Settings/Settings.test.tsx"]
       },
       "componentHost": {
         "id": "icon-settings",
@@ -4829,32 +4196,24 @@
       "component": {
         "name": "PageHeader",
         "target": "apps/web/src/app/shell/components/PageHeader/PageHeader.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/PageHeader/PageHeader.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/PageHeader/PageHeader.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/app/shell/components/index.ts#PageHeader",
-        "current": [
-          "apps/web/src/app/shell/components/index.ts#PageHeader"
-        ]
+        "target": "apps/web/src/app/shell/index.ts#PageHeader",
+        "current": ["apps/web/src/app/shell/index.ts#PageHeader"]
       },
       "styles": {
         "target": "apps/web/src/app/shell/components/PageHeader/PageHeader.module.css",
-        "current": [
-          "apps/web/src/app/shell/components/PageHeader/PageHeader.module.css"
-        ]
+        "current": ["apps/web/src/app/shell/components/PageHeader/PageHeader.module.css"]
       },
       "tests": {
         "target": "apps/web/src/app/shell/components/PageHeader/PageHeader.test.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/PageHeader/PageHeader.test.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/PageHeader/PageHeader.test.tsx"]
       },
       "componentHost": {
         "id": "page-header",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -4876,12 +4235,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Default",
-        "Breadcrumbs",
-        "WithCommand"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Breadcrumbs", "WithCommand"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -4889,9 +4244,9 @@
         "width": 948,
         "height": 403,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports Default, Breadcrumbs, and WithCommand using the shared Breadcrumbs primitive. The host previews default/action and breadcrumb compositions. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/app/App.tsx",
@@ -4910,15 +4265,11 @@
       "component": {
         "name": "WorkspaceSwitcher",
         "target": "apps/web/src/app/shell/components/WorkspaceSwitcher/WorkspaceSwitcher.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/WorkspaceSwitcher/WorkspaceSwitcher.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/WorkspaceSwitcher/WorkspaceSwitcher.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/app/shell/components/index.ts#WorkspaceSwitcher",
-        "current": [
-          "apps/web/src/app/shell/components/index.ts#WorkspaceSwitcher"
-        ]
+        "target": "apps/web/src/app/shell/index.ts#WorkspaceSwitcher",
+        "current": ["apps/web/src/app/shell/index.ts#WorkspaceSwitcher"]
       },
       "styles": {
         "target": "apps/web/src/app/shell/components/WorkspaceSwitcher/WorkspaceSwitcher.module.css",
@@ -4934,8 +4285,8 @@
       },
       "componentHost": {
         "id": "workspace-switcher",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -4957,12 +4308,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Idle",
-        "Expanded",
-        "ReadOnly"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Idle", "Expanded", "ReadOnly"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -4972,7 +4319,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports a read-only current-workspace status and controlled selection with native workspace options. The expanded state uses the platform select; there is no custom overlay menu. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -4984,32 +4331,24 @@
       "component": {
         "name": "CommandPalette",
         "target": "apps/web/src/app/shell/components/CommandPalette/CommandPalette.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/CommandPalette/CommandPalette.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/CommandPalette/CommandPalette.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/app/shell/components/index.ts#CommandPalette",
-        "current": [
-          "apps/web/src/app/shell/components/index.ts#CommandPalette"
-        ]
+        "target": "apps/web/src/app/shell/index.ts#CommandPalette",
+        "current": ["apps/web/src/app/shell/index.ts#CommandPalette"]
       },
       "styles": {
         "target": "apps/web/src/app/shell/components/CommandPalette/CommandPalette.module.css",
-        "current": [
-          "apps/web/src/app/shell/components/CommandPalette/CommandPalette.module.css"
-        ]
+        "current": ["apps/web/src/app/shell/components/CommandPalette/CommandPalette.module.css"]
       },
       "tests": {
         "target": "apps/web/src/app/shell/components/CommandPalette/CommandPalette.test.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/CommandPalette/CommandPalette.test.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/CommandPalette/CommandPalette.test.tsx"]
       },
       "componentHost": {
         "id": "command-palette",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5031,12 +4370,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Idle",
-        "Results",
-        "NoResults"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Idle", "Results", "NoResults"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5046,7 +4381,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports closed idle, filtered results, and no-results states, Escape close, focus containment, and focus restoration. The host opens it through an explicit trigger so the dialog does not obscure the catalog. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/app/App.tsx",
@@ -5065,32 +4400,24 @@
       "component": {
         "name": "NavigationItem",
         "target": "apps/web/src/app/shell/components/NavigationItem/NavigationItem.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/NavigationItem/NavigationItem.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/NavigationItem/NavigationItem.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/app/shell/components/index.ts#NavigationItem",
-        "current": [
-          "apps/web/src/app/shell/components/index.ts#NavigationItem"
-        ]
+        "target": "apps/web/src/app/shell/index.ts#NavigationItem",
+        "current": ["apps/web/src/app/shell/index.ts#NavigationItem"]
       },
       "styles": {
         "target": "apps/web/src/app/shell/components/NavigationItem/NavigationItem.module.css",
-        "current": [
-          "apps/web/src/app/shell/components/NavigationItem/NavigationItem.module.css"
-        ]
+        "current": ["apps/web/src/app/shell/components/NavigationItem/NavigationItem.module.css"]
       },
       "tests": {
         "target": "apps/web/src/app/shell/components/NavigationItem/NavigationItem.test.tsx",
-        "current": [
-          "apps/web/src/app/shell/components/NavigationItem/NavigationItem.test.tsx"
-        ]
+        "current": ["apps/web/src/app/shell/components/NavigationItem/NavigationItem.test.tsx"]
       },
       "componentHost": {
         "id": "navigation-item",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5112,12 +4439,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Default",
-        "Selected",
-        "Disabled"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Selected", "Disabled"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5125,9 +4448,9 @@
         "width": 948,
         "height": 403,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports Default and Selected through NavLink, and Disabled through a non-link aria-disabled span with no href or tab stop. The host previews all three states. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/app/App.tsx",
@@ -5146,32 +4469,24 @@
       "component": {
         "name": "ProjectCard",
         "target": "apps/web/src/features/planning/components/ProjectCard/ProjectCard.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/ProjectCard/ProjectCard.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/ProjectCard/ProjectCard.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#ProjectCard",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#ProjectCard"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#ProjectCard",
+        "current": ["apps/web/src/features/planning/index.ts#ProjectCard"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/ProjectCard/ProjectCard.module.css",
-        "current": [
-          "apps/web/src/features/planning/components/ProjectCard/ProjectCard.module.css"
-        ]
+        "current": ["apps/web/src/features/planning/components/ProjectCard/ProjectCard.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/ProjectCard/ProjectCard.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/ProjectCard/ProjectCard.test.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/ProjectCard/ProjectCard.test.tsx"]
       },
       "componentHost": {
         "id": "project-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5187,11 +4502,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Active",
-        "Archived"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Active", "Archived"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5201,7 +4513,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code derives Active/Archived presentation from project.status and preserves the planning route link. The host previews both statuses using typed project fixtures. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/organization/OrganizationPage.tsx",
@@ -5220,32 +4532,24 @@
       "component": {
         "name": "EpicCard",
         "target": "apps/web/src/features/planning/components/EpicCard/EpicCard.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/EpicCard/EpicCard.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/EpicCard/EpicCard.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#EpicCard",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#EpicCard"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#EpicCard",
+        "current": ["apps/web/src/features/planning/index.ts#EpicCard"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/EpicCard/EpicCard.module.css",
-        "current": [
-          "apps/web/src/features/planning/components/EpicCard/EpicCard.module.css"
-        ]
+        "current": ["apps/web/src/features/planning/components/EpicCard/EpicCard.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/EpicCard/EpicCard.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/EpicCard/EpicCard.test.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/EpicCard/EpicCard.test.tsx"]
       },
       "componentHost": {
         "id": "epic-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5267,12 +4571,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Backlog",
-        "InProgress",
-        "Done"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Backlog", "InProgress", "Done"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5282,7 +4582,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code derives Backlog, InProgress, and Done from child feature statuses. The host previews all three derived states with typed fixtures. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": []
     },
     {
@@ -5294,32 +4594,24 @@
       "component": {
         "name": "FeatureCard",
         "target": "apps/web/src/features/planning/components/FeatureCard/FeatureCard.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/FeatureCard/FeatureCard.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/FeatureCard/FeatureCard.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#FeatureCard",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#FeatureCard"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#FeatureCard",
+        "current": ["apps/web/src/features/planning/index.ts#FeatureCard"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/FeatureCard/FeatureCard.module.css",
-        "current": [
-          "apps/web/src/features/planning/components/FeatureCard/FeatureCard.module.css"
-        ]
+        "current": ["apps/web/src/features/planning/components/FeatureCard/FeatureCard.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/FeatureCard/FeatureCard.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/FeatureCard/FeatureCard.test.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/FeatureCard/FeatureCard.test.tsx"]
       },
       "componentHost": {
         "id": "feature-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5347,13 +4639,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Backlog",
-        "InProgress",
-        "Done",
-        "ReadOnly"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Backlog", "InProgress", "Done", "ReadOnly"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5363,7 +4650,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports backlog/in-progress/verify/done status, priority text, and the explicit readOnly state. The host previews an in-progress and a read-only done feature. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/PlanningPage.tsx",
@@ -5382,15 +4669,11 @@
       "component": {
         "name": "KanbanColumn",
         "target": "apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#KanbanColumn",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#KanbanColumn"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#KanbanColumn",
+        "current": ["apps/web/src/features/planning/index.ts#KanbanColumn"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.module.css",
@@ -5400,14 +4683,12 @@
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.test.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/KanbanColumn/KanbanColumn.test.tsx"]
       },
       "componentHost": {
         "id": "kanban-column",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5423,11 +4704,8 @@
           "height": 222
         }
       ],
-      "states": [
-        "HasCards",
-        "Empty"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["HasCards", "Empty"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5437,7 +4715,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code renders non-empty and empty column states, with a configurable empty message. The host previews both states with a real FeatureCard child. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/PlanningPage.tsx",
@@ -5456,32 +4734,24 @@
       "component": {
         "name": "TaskItem",
         "target": "apps/web/src/features/planning/components/TaskItem/TaskItem.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/TaskItem/TaskItem.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/TaskItem/TaskItem.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#TaskItem",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#TaskItem"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#TaskItem",
+        "current": ["apps/web/src/features/planning/index.ts#TaskItem"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/TaskItem/TaskItem.module.css",
-        "current": [
-          "apps/web/src/features/planning/components/TaskItem/TaskItem.module.css"
-        ]
+        "current": ["apps/web/src/features/planning/components/TaskItem/TaskItem.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/TaskItem/TaskItem.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/TaskItem/TaskItem.test.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/TaskItem/TaskItem.test.tsx"]
       },
       "componentHost": {
         "id": "task-item",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5515,14 +4785,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Todo",
-        "InProgress",
-        "Done",
-        "Editing",
-        "Archived"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Todo", "InProgress", "Done", "Editing", "Archived"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5532,7 +4796,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports todo/in-progress/done task statuses, editing presentation, and archived disabled controls. The host previews in-progress, editing, and archived cases. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
@@ -5551,15 +4815,11 @@
       "component": {
         "name": "CriterionItem",
         "target": "apps/web/src/features/planning/components/CriterionItem/CriterionItem.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/CriterionItem/CriterionItem.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/CriterionItem/CriterionItem.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#CriterionItem",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#CriterionItem"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#CriterionItem",
+        "current": ["apps/web/src/features/planning/index.ts#CriterionItem"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/CriterionItem/CriterionItem.module.css",
@@ -5575,8 +4835,8 @@
       },
       "componentHost": {
         "id": "criterion-item",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5604,13 +4864,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Pending",
-        "Satisfied",
-        "Editing",
-        "Archived"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Pending", "Satisfied", "Editing", "Archived"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5620,7 +4875,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code derives pending/satisfied state and supports editing/archived presentation. The host previews pending, satisfied, editing, and archived states. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
@@ -5639,15 +4894,11 @@
       "component": {
         "name": "DependencyGroup",
         "target": "apps/web/src/features/planning/components/DependencyGroup/DependencyGroup.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/DependencyGroup/DependencyGroup.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/DependencyGroup/DependencyGroup.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#DependencyGroup",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#DependencyGroup"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#DependencyGroup",
+        "current": ["apps/web/src/features/planning/index.ts#DependencyGroup"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/DependencyGroup/DependencyGroup.module.css",
@@ -5663,8 +4914,8 @@
       },
       "componentHost": {
         "id": "dependency-group",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5686,12 +4937,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Blocked",
-        "Clear",
-        "Archived"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Blocked", "Clear", "Archived"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5699,9 +4946,9 @@
         "width": 952,
         "height": 546,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code exposes Blocked, Clear, and Archived states with visible semantic-token status text, preserves the blocker-to-blocked relationship and consumer-owned actions, and retains the archived prop as a backward-compatible override. PlanningPage derives Clear only when the blocking feature is done; otherwise it presents Blocked. The host previews all three states. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/PlanningPage.tsx",
@@ -5720,32 +4967,24 @@
       "component": {
         "name": "FilterBar",
         "target": "apps/web/src/features/planning/components/FilterBar/FilterBar.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/FilterBar/FilterBar.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/FilterBar/FilterBar.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#FilterBar",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#FilterBar"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#FilterBar",
+        "current": ["apps/web/src/features/planning/index.ts#FilterBar"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/FilterBar/FilterBar.module.css",
-        "current": [
-          "apps/web/src/features/planning/components/FilterBar/FilterBar.module.css"
-        ]
+        "current": ["apps/web/src/features/planning/components/FilterBar/FilterBar.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/FilterBar/FilterBar.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/FilterBar/FilterBar.test.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/FilterBar/FilterBar.test.tsx"]
       },
       "componentHost": {
         "id": "filter-bar",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5767,12 +5006,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Default",
-        "Filtered",
-        "NoResults"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Filtered", "NoResults"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5782,7 +5017,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code derives Default, Filtered, and NoResults from resultCount and announces counts politely. The host shows all three cases with real search controls. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/PlanningPage.tsx",
@@ -5801,15 +5036,11 @@
       "component": {
         "name": "FeatureOverview",
         "target": "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.tsx"
-        ]
+        "current": ["apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#FeatureOverview",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#FeatureOverview"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#FeatureOverview",
+        "current": ["apps/web/src/features/planning/index.ts#FeatureOverview"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.module.css",
@@ -5825,8 +5056,8 @@
       },
       "componentHost": {
         "id": "feature-overview",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5848,12 +5079,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Ready",
-        "Blocked",
-        "Unavailable"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Ready", "Blocked", "Unavailable"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5863,7 +5090,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code derives Ready, Blocked, and Unavailable from ReadinessResult. The host renders all three using deterministic typed results, including a blocker. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
@@ -5887,10 +5114,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/planning/components/index.ts#ProjectPlanningHome",
-        "current": [
-          "apps/web/src/features/planning/components/index.ts#ProjectPlanningHome"
-        ]
+        "target": "apps/web/src/features/planning/index.ts#ProjectPlanningHome",
+        "current": ["apps/web/src/features/planning/index.ts#ProjectPlanningHome"]
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/ProjectPlanningHome/ProjectPlanningHome.module.css",
@@ -5906,8 +5131,8 @@
       },
       "componentHost": {
         "id": "project-planning-home",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -5929,12 +5154,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Default",
-        "Empty",
-        "Archived"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Empty", "Archived"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5942,9 +5163,9 @@
         "width": 948,
         "height": 403,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Exposes typed Default, Empty, and Archived static variants. Omitting state preserves the existing project-page wrapper API; explicit states render the canonical card composition. Host fixtures are not live backend values. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/planning/PlanningPage.tsx",
@@ -5963,32 +5184,24 @@
       "component": {
         "name": "RuleCard",
         "target": "apps/web/src/features/readiness/components/RuleCard/RuleCard.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/RuleCard/RuleCard.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/RuleCard/RuleCard.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/readiness/components/index.ts#RuleCard",
-        "current": [
-          "apps/web/src/features/readiness/components/index.ts#RuleCard"
-        ]
+        "target": "apps/web/src/features/readiness/index.ts#RuleCard",
+        "current": ["apps/web/src/features/readiness/index.ts#RuleCard"]
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/RuleCard/RuleCard.module.css",
-        "current": [
-          "apps/web/src/features/readiness/components/RuleCard/RuleCard.module.css"
-        ]
+        "current": ["apps/web/src/features/readiness/components/RuleCard/RuleCard.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/RuleCard/RuleCard.test.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/RuleCard/RuleCard.test.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/RuleCard/RuleCard.test.tsx"]
       },
       "componentHost": {
         "id": "rule-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6010,12 +5223,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Passed",
-        "Blocked",
-        "Unavailable"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Passed", "Blocked", "Unavailable"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6025,7 +5234,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code renders the supplied rule identifier, result, and explanation; PASS/PASSED receive success tone and other results remain visible warning text. The host previews passed, blocked, and unavailable results. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
@@ -6049,10 +5258,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/readiness/components/index.ts#EvaluationSnapshot",
-        "current": [
-          "apps/web/src/features/readiness/components/index.ts#EvaluationSnapshot"
-        ]
+        "target": "apps/web/src/features/readiness/index.ts#EvaluationSnapshot",
+        "current": ["apps/web/src/features/readiness/index.ts#EvaluationSnapshot"]
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.module.css",
@@ -6068,8 +5275,8 @@
       },
       "componentHost": {
         "id": "evaluation-snapshot",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6091,12 +5298,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Preview",
-        "Saved",
-        "Stale"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Preview", "Saved", "Stale"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6104,9 +5307,9 @@
         "width": 952,
         "height": 546,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Typed Preview, Saved, and Stale states are implemented and shown in the host. The Readiness consumer derives Preview/Stale from returned data and does not label an unsaved evaluation Saved; the deprecated stale prop remains compatible. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
@@ -6125,32 +5328,24 @@
       "component": {
         "name": "RuleAction",
         "target": "apps/web/src/features/readiness/components/RuleAction/RuleAction.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/RuleAction/RuleAction.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/RuleAction/RuleAction.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/readiness/components/index.ts#RuleAction",
-        "current": [
-          "apps/web/src/features/readiness/components/index.ts#RuleAction"
-        ]
+        "target": "apps/web/src/features/readiness/index.ts#RuleAction",
+        "current": ["apps/web/src/features/readiness/index.ts#RuleAction"]
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/RuleAction/RuleAction.module.css",
-        "current": [
-          "apps/web/src/features/readiness/components/RuleAction/RuleAction.module.css"
-        ]
+        "current": ["apps/web/src/features/readiness/components/RuleAction/RuleAction.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/RuleAction/RuleAction.test.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/RuleAction/RuleAction.test.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/RuleAction/RuleAction.test.tsx"]
       },
       "componentHost": {
         "id": "rule-action",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6172,12 +5367,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Available",
-        "ReadOnly",
-        "Unavailable"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Available", "ReadOnly", "Unavailable"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6187,7 +5378,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports an enabled action, the archived prop, and the native disabled prop. The host previews all three interaction states; disabled actions remain native disabled buttons. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
@@ -6206,15 +5397,11 @@
       "component": {
         "name": "DecisionCard",
         "target": "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/DecisionCard/DecisionCard.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/readiness/components/index.ts#DecisionCard",
-        "current": [
-          "apps/web/src/features/readiness/components/index.ts#DecisionCard"
-        ]
+        "target": "apps/web/src/features/readiness/index.ts#DecisionCard",
+        "current": ["apps/web/src/features/readiness/index.ts#DecisionCard"]
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.module.css",
@@ -6224,14 +5411,12 @@
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.test.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.test.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/DecisionCard/DecisionCard.test.tsx"]
       },
       "componentHost": {
         "id": "decision-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6253,12 +5438,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Proposed",
-        "Accepted",
-        "Superseded"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Proposed", "Accepted", "Superseded"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6268,7 +5449,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code renders title, revision, status, and children; ACCEPTED is success-toned while proposed/superseded status strings remain explicit. The host previews proposed, accepted, and superseded labels. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
@@ -6292,10 +5473,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/readiness/components/index.ts#RevisionHistory",
-        "current": [
-          "apps/web/src/features/readiness/components/index.ts#RevisionHistory"
-        ]
+        "target": "apps/web/src/features/readiness/index.ts#RevisionHistory",
+        "current": ["apps/web/src/features/readiness/index.ts#RevisionHistory"]
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.module.css",
@@ -6311,8 +5490,8 @@
       },
       "componentHost": {
         "id": "revision-history",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6328,11 +5507,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Current",
-        "Superseded"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Current", "Superseded"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6340,9 +5516,9 @@
         "width": 948,
         "height": 208,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Each revision is visibly marked Current or Superseded; callers can provide currentRevision or item status, and persisted decision history falls back to its highest ordered revision. The host shows both states without asserting live history. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
@@ -6361,15 +5537,11 @@
       "component": {
         "name": "InvariantCard",
         "target": "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.tsx"
-        ]
+        "current": ["apps/web/src/features/readiness/components/InvariantCard/InvariantCard.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/readiness/components/index.ts#InvariantCard",
-        "current": [
-          "apps/web/src/features/readiness/components/index.ts#InvariantCard"
-        ]
+        "target": "apps/web/src/features/readiness/index.ts#InvariantCard",
+        "current": ["apps/web/src/features/readiness/index.ts#InvariantCard"]
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.module.css",
@@ -6385,8 +5557,8 @@
       },
       "componentHost": {
         "id": "invariant-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6408,12 +5580,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Current",
-        "Acknowledged",
-        "Stale"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Current", "Acknowledged", "Stale"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6421,9 +5589,9 @@
         "width": 952,
         "height": 546,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Current, Acknowledged, and Stale are distinguished from the current and acknowledged revision numbers; an older acknowledgement is labeled Stale and still requires re-acknowledgement. Host fixtures are illustrative and do not imply verification. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
@@ -6447,10 +5615,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/repositories/components/index.ts#RepositoryCard",
-        "current": [
-          "apps/web/src/features/repositories/components/index.ts#RepositoryCard"
-        ]
+        "target": "apps/web/src/features/repositories/index.ts#RepositoryCard",
+        "current": ["apps/web/src/features/repositories/index.ts#RepositoryCard"]
       },
       "styles": {
         "target": "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.module.css",
@@ -6466,8 +5632,8 @@
       },
       "componentHost": {
         "id": "repository-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6489,12 +5655,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Connected",
-        "Observed",
-        "Unavailable"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Connected", "Observed", "Unavailable"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6504,7 +5666,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code renders connected, observed, and unavailable repository states, including read-only observation metadata and source-content disclosure. The host previews all three with typed synthetic data. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/repositories/RepositoriesPage.tsx",
@@ -6528,10 +5690,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/context/components/index.ts#ContextPackageCard",
-        "current": [
-          "apps/web/src/features/context/components/index.ts#ContextPackageCard"
-        ]
+        "target": "apps/web/src/features/context/index.ts#ContextPackageCard",
+        "current": ["apps/web/src/features/context/index.ts#ContextPackageCard"]
       },
       "styles": {
         "target": "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.module.css",
@@ -6547,8 +5707,8 @@
       },
       "componentHost": {
         "id": "context-package-card",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6570,12 +5730,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Fresh",
-        "Stale",
-        "Unavailable"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Fresh", "Stale", "Unavailable"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6585,7 +5741,7 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports Fresh, Stale, and Unavailable package states; an unverified freshness note is also available when state is omitted. The host previews all three named states using a typed synthetic snapshot. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/context/ContextPage.tsx",
@@ -6604,32 +5760,24 @@
       "component": {
         "name": "ReportField",
         "target": "apps/web/src/features/workbench/components/ReportField/ReportField.tsx",
-        "current": [
-          "apps/web/src/features/workbench/components/ReportField/ReportField.tsx"
-        ]
+        "current": ["apps/web/src/features/workbench/components/ReportField/ReportField.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/workbench/components/index.ts#ReportField",
-        "current": [
-          "apps/web/src/features/workbench/components/index.ts#ReportField"
-        ]
+        "target": "apps/web/src/features/workbench/index.ts#ReportField",
+        "current": ["apps/web/src/features/workbench/index.ts#ReportField"]
       },
       "styles": {
         "target": "apps/web/src/features/workbench/components/ReportField/ReportField.module.css",
-        "current": [
-          "apps/web/src/features/workbench/components/ReportField/ReportField.module.css"
-        ]
+        "current": ["apps/web/src/features/workbench/components/ReportField/ReportField.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/workbench/components/ReportField/ReportField.test.tsx",
-        "current": [
-          "apps/web/src/features/workbench/components/ReportField/ReportField.test.tsx"
-        ]
+        "current": ["apps/web/src/features/workbench/components/ReportField/ReportField.test.tsx"]
       },
       "componentHost": {
         "id": "report-field",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6645,11 +5793,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "HasValue",
-        "Empty"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["HasValue", "Empty"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6657,9 +5802,9 @@
         "width": 948,
         "height": 208,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code derives HasValue and Empty from whether the ReactNode contains renderable content, presents the state visibly, and preserves the reported/no-assumed-proof disclosure. Empty values omit the value row. Host previews both states. Human visual review remains NOT_HUMAN_REVIEWED; the low-contrast Figma footnote uses the semantic secondary text token.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/workbench/WorkbenchPage.tsx",
@@ -6683,10 +5828,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/workbench/components/index.ts#ProvenanceNotice",
-        "current": [
-          "apps/web/src/features/workbench/components/index.ts#ProvenanceNotice"
-        ]
+        "target": "apps/web/src/features/workbench/index.ts#ProvenanceNotice",
+        "current": ["apps/web/src/features/workbench/index.ts#ProvenanceNotice"]
       },
       "styles": {
         "target": "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.module.css",
@@ -6702,8 +5845,8 @@
       },
       "componentHost": {
         "id": "provenance-notice",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6725,12 +5868,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Reported",
-        "Observed",
-        "Unknown"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Reported", "Observed", "Unknown"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6738,9 +5877,9 @@
         "width": 948,
         "height": 403,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code and host expose Reported, Observed, and Unknown states using semantic tokens. The existing Reported copy is preserved; Observed states that observation alone is not verification, and Unknown never implies evidence. Figma's shared description 'Claimed execution is not observed verification' is expanded for Observed/Unknown with more explicit truth copy. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/workbench/WorkbenchPage.tsx",
@@ -6759,15 +5898,11 @@
       "component": {
         "name": "TrustDisclosure",
         "target": "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.tsx"
-        ]
+        "current": ["apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/delivery/components/index.ts#TrustDisclosure",
-        "current": [
-          "apps/web/src/features/delivery/components/index.ts#TrustDisclosure"
-        ]
+        "target": "apps/web/src/features/delivery/index.ts#TrustDisclosure",
+        "current": ["apps/web/src/features/delivery/index.ts#TrustDisclosure"]
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.module.css",
@@ -6783,8 +5918,8 @@
       },
       "componentHost": {
         "id": "trust-disclosure",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6800,11 +5935,8 @@
           "height": 160
         }
       ],
-      "states": [
-        "Default",
-        "Expanded"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Default", "Expanded"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6812,9 +5944,9 @@
         "width": 948,
         "height": 208,
         "metadataReviewed": true,
-        "designContextReviewed": false
+        "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code exposes typed Default and Expanded presentation states, matching the static Figma variants; no expanded/collapsed interaction is implied. Both states are tested and previewed from the feature export. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
@@ -6833,15 +5965,11 @@
       "component": {
         "name": "DownloadAction",
         "target": "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.tsx"
-        ]
+        "current": ["apps/web/src/features/delivery/components/DownloadAction/DownloadAction.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/delivery/components/index.ts#DownloadAction",
-        "current": [
-          "apps/web/src/features/delivery/components/index.ts#DownloadAction"
-        ]
+        "target": "apps/web/src/features/delivery/index.ts#DownloadAction",
+        "current": ["apps/web/src/features/delivery/index.ts#DownloadAction"]
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.module.css",
@@ -6857,8 +5985,8 @@
       },
       "componentHost": {
         "id": "download-action",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6880,12 +6008,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Ready",
-        "Downloading",
-        "Failed"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Ready", "Downloading", "Failed"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6895,7 +6019,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports ready downloads, pending preparation, and an error/alert state (the API names the latter error rather than Failed). The host previews all three without fetching or creating artifacts. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
@@ -6919,10 +6043,8 @@
         ]
       },
       "publicApi": {
-        "target": "apps/web/src/features/delivery/components/index.ts#VerificationSummary",
-        "current": [
-          "apps/web/src/features/delivery/components/index.ts#VerificationSummary"
-        ]
+        "target": "apps/web/src/features/delivery/index.ts#VerificationSummary",
+        "current": ["apps/web/src/features/delivery/index.ts#VerificationSummary"]
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.module.css",
@@ -6938,8 +6060,8 @@
       },
       "componentHost": {
         "id": "verification-summary",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -6967,13 +6089,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "NotRun",
-        "PassedScoped",
-        "Failed",
-        "Stale"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["NotRun", "PassedScoped", "Failed", "Stale"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6983,7 +6100,7 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code supports outcome and blocker presentation plus stale-state override; NotRun is expressible as an outcome string. The host previews scoped pass, failure with blocker, and stale results. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
@@ -7002,32 +6119,24 @@
       "component": {
         "name": "ReleaseGate",
         "target": "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.tsx"
-        ]
+        "current": ["apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.tsx"]
       },
       "publicApi": {
-        "target": "apps/web/src/features/delivery/components/index.ts#ReleaseGate",
-        "current": [
-          "apps/web/src/features/delivery/components/index.ts#ReleaseGate"
-        ]
+        "target": "apps/web/src/features/delivery/index.ts#ReleaseGate",
+        "current": ["apps/web/src/features/delivery/index.ts#ReleaseGate"]
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.module.css",
-        "current": [
-          "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.module.css"
-        ]
+        "current": ["apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.module.css"]
       },
       "tests": {
         "target": "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.test.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.test.tsx"
-        ]
+        "current": ["apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.test.tsx"]
       },
       "componentHost": {
         "id": "release-gate",
-        "status": "PLANNED",
-        "source": null
+        "status": "AVAILABLE",
+        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
       },
       "variants": [
         {
@@ -7049,12 +6158,8 @@
           "height": 224
         }
       ],
-      "states": [
-        "Blocked",
-        "NotReady",
-        "ScopedPass"
-      ],
-      "implementationStatus": "PARTIAL",
+      "states": ["Blocked", "NotReady", "ScopedPass"],
+      "implementationStatus": "IMPLEMENTED",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -7064,7 +6169,7 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Named feature-owned implementation, component stylesheet, focused test and public barrel exist. Canonical variant reconciliation and dedicated Component Host preview are pending.",
+      "implementationNotes": "Code accepts and displays arbitrary gate outcomes with optional explanatory content, covering Blocked, NotReady, and ScopedPass labels. The host clarifies that a scoped pass is not a release action. Visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
           "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
@@ -7078,21 +6183,21 @@
   "codeOnlyComponents": [
     {
       "name": "EmptyState",
-      "source": "packages/ui/src/components/EmptyState.tsx",
+      "source": "packages/ui/src/components/feedback/EmptyState/EmptyState.tsx",
       "publicApi": "@forge-org/ui#EmptyState",
       "relationship": "Related to StatePanel; not an additional canonical Figma row.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"
     },
     {
       "name": "LoadingState",
-      "source": "packages/ui/src/components/LoadingState.tsx",
+      "source": "packages/ui/src/components/feedback/LoadingState/LoadingState.tsx",
       "publicApi": "@forge-org/ui#LoadingState",
       "relationship": "Related to StatePanel; not an additional canonical Figma row.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"
     },
     {
       "name": "ErrorState",
-      "source": "packages/ui/src/components/ErrorState.tsx",
+      "source": "packages/ui/src/components/feedback/ErrorState/ErrorState.tsx",
       "publicApi": "@forge-org/ui#ErrorState",
       "relationship": "Related to StatePanel; not an additional canonical Figma row.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"

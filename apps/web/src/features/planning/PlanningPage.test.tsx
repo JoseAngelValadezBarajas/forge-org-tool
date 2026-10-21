@@ -145,6 +145,51 @@ describe('PlanningPage', () => {
     );
   });
 
+  it('marks a dependency clear when its blocking feature is done', async () => {
+    const dependency = {
+      id: 'd-complete',
+      project_id: 'p1',
+      blocking_feature_id: 'f1',
+      blocked_feature_id: 'f2',
+      created_at: '',
+      updated_at: '',
+    };
+    const completedOverview = {
+      ...overview,
+      epics: overview.epics.map((epic) => ({
+        ...epic,
+        features: epic.features.map((feature) =>
+          feature.id === 'f1' ? { ...feature, status: 'done' } : feature,
+        ),
+      })),
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify(
+              String(input).endsWith('/dependencies') ? [dependency] : completedOverview,
+            ),
+            { status: 200 },
+          ),
+        ),
+      ),
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const group = await screen.findByRole('group', { name: 'Alpha blocks Beta' });
+    expect(group).toHaveAttribute('data-state', 'Clear');
+    expect(group).toHaveTextContent('CLEAR');
+  });
+
   it('keeps the latest project response when navigation races an earlier request', async () => {
     const pending = new Map<string, Array<(response: Response) => void>>();
     const fetchMock = vi.fn().mockImplementation((input: string) => {

@@ -24,6 +24,7 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "@forge-org/icons": "0.1.0-bootstrap",
     "@forge-org/tokens": "0.1.0-bootstrap"
   },
   "peerDependencies": {

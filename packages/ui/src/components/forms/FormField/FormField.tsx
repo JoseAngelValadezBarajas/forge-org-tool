@@ -4,6 +4,8 @@ type ControlProps = {
   id?: string;
   'aria-describedby'?: string;
   'aria-invalid'?: boolean | 'false' | 'true';
+  required?: boolean;
+  disabled?: boolean;
 };
 export interface FormFieldProps {
   label: string;
@@ -12,30 +14,49 @@ export interface FormFieldProps {
   error?: string;
   htmlFor?: string;
   className?: string;
+  required?: boolean;
+  disabled?: boolean;
 }
-export function FormField({ label, children, hint, error, htmlFor, className }: FormFieldProps) {
+export function FormField({
+  label,
+  children,
+  hint,
+  error,
+  htmlFor,
+  className,
+  required,
+  disabled,
+}: FormFieldProps) {
   const id = `forge-field-${useId().replace(/:/g, '')}`;
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const child = isValidElement(children) ? (children as ReactElement<ControlProps>) : undefined;
+  const isRequired = required ?? child?.props.required ?? false;
+  const isDisabled = disabled ?? child?.props.disabled ?? false;
   const controlId = htmlFor ?? child?.props.id ?? id;
   const describedBy = [child?.props['aria-describedby'], hintId, errorId].filter(Boolean).join(' ');
   const enhanced = child
     ? cloneElement(child, {
         id: child.props.id ?? controlId,
+        required: isRequired,
+        disabled: isDisabled,
         'aria-describedby': describedBy || undefined,
         'aria-invalid': error ? true : child.props['aria-invalid'],
       })
     : children;
   return (
-    <div className={[styles.field, className].filter(Boolean).join(' ')}>
+    <div
+      className={[styles.field, isDisabled && styles.disabled, className].filter(Boolean).join(' ')}
+    >
       {child ? (
         <label htmlFor={controlId} className={styles.label}>
           {label}
+          {isRequired && <span aria-hidden="true" className={styles.required} />}
         </label>
       ) : (
         <label className={styles.label}>
           {label}
+          {isRequired && <span aria-hidden="true" className={styles.required} />}
           {children}
         </label>
       )}

@@ -6,3 +6,54 @@
 .home > * {
   min-width: 0;
 }
+
+.specimen {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  box-sizing: border-box;
+  width: min(100%, 430px);
+  min-height: 160px;
+  padding: 17px;
+  background: var(--forge-surface);
+}
+
+.specimen[data-state='Archived'] {
+  background: var(--forge-surface-tag);
+}
+
+.header,
+.title,
+.state,
+.description,
+.reference {
+  margin: 0;
+}
+
+.title {
+  color: var(--forge-text-primary);
+  font: var(--forge-font-weight-semibold) 15px/1 var(--forge-font-ui);
+}
+
+.state {
+  color: var(--forge-accent);
+  font: 400 10px/1 var(--forge-font-mono);
+}
+
+.specimen[data-state='Archived'] .state {
+  color: var(--forge-warning);
+}
+
+.description {
+  color: var(--forge-text-secondary);
+  font: var(--forge-font-weight-regular) 12px/1.4 var(--forge-font-ui);
+}
+
+.reference {
+  color: var(--forge-text-secondary);
+  font: 400 9px/1.4 var(--forge-font-mono);
+}
+
+.content {
+  min-width: 0;
+}

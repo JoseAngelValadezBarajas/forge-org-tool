@@ -12,7 +12,8 @@
   cursor: pointer;
 }
 .item:hover:not(:disabled),
-.item:focus-visible {
+.item:focus-visible,
+.item[data-selected] {
   background: var(--forge-surface-sunken);
 }
 .item:focus-visible {

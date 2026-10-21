@@ -35,3 +35,12 @@ test('every shared UI token reference is emitted by the token package', async ()
     'shared UI references an un-emitted design token',
   );
 });
+
+test('interactive and tag surfaces track reviewed dark Figma variables', async () => {
+  const source = JSON.parse(await readFile(join(packageRoot, 'tokens.json'), 'utf8'));
+
+  assert.equal(source.semantic.dark.surfaceInteractive, '#1b1f22');
+  assert.equal(source.semantic.dark.surfaceTag, '#202428');
+  assert.equal(source.semantic.light.surfaceInteractive, '#fbfaf8');
+  assert.equal(source.semantic.light.surfaceTag, '#f6f5f2');
+});

@@ -260,6 +260,12 @@ export function PlanningPage() {
               key={dependency.id}
               blocker={featureName(dependency.blocking_feature_id)}
               blocked={featureName(dependency.blocked_feature_id)}
+              state={
+                features.find((feature) => feature.id === dependency.blocking_feature_id)
+                  ?.status === 'done'
+                  ? 'Clear'
+                  : 'Blocked'
+              }
             >
               <Button
                 type="button"

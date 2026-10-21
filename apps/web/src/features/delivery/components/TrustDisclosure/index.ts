@@ -1,1 +1,5 @@
-export { TrustDisclosure, type TrustDisclosureProps } from './TrustDisclosure';
+export {
+  TrustDisclosure,
+  type TrustDisclosureProps,
+  type TrustDisclosureState,
+} from './TrustDisclosure';

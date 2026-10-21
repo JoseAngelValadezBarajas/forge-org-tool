@@ -1,0 +1,23 @@
+.state {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px dashed var(--forge-border-subtle);
+  border-radius: var(--forge-radius-md);
+  color: var(--forge-text-secondary);
+}
+
+.state h3,
+.state p {
+  margin: 0;
+}
+
+.state h3 {
+  color: var(--forge-text-primary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

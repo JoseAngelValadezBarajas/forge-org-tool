@@ -1,6 +1,6 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import type { DetailsHTMLAttributes, ReactNode } from 'react';
 import styles from './Popover.module.css';
-export interface PopoverProps extends Omit<HTMLAttributes<HTMLDetailsElement>, 'children'> {
+export interface PopoverProps extends Omit<DetailsHTMLAttributes<HTMLDetailsElement>, 'children'> {
   trigger: ReactNode;
   children: ReactNode;
 }

@@ -15,9 +15,13 @@ export function InvariantCard({
   children,
 }: InvariantCardProps) {
   const acknowledged = acknowledgedRevision === revision;
+  const stale = acknowledgedRevision !== null && acknowledgedRevision !== revision;
+  const state = stale ? 'Stale' : acknowledged ? 'Acknowledged' : 'Current';
+  const tone = stale ? 'warning' : acknowledged ? 'success' : 'accent';
+  const status = acknowledged ? `Acknowledged revision ${revision}` : stale ? 'STALE' : 'Current';
   return (
     <Card className={styles.invariant}>
-      <article aria-label={title}>
+      <article aria-label={title} data-state={state}>
         <header>
           <div>
             <h4>
@@ -25,9 +29,7 @@ export function InvariantCard({
             </h4>
             <p>Revision {revision}</p>
           </div>
-          <StatusChip tone={acknowledged ? 'success' : 'warning'}>
-            {acknowledged ? `Acknowledged revision ${revision}` : 'Current'}
-          </StatusChip>
+          <StatusChip tone={tone}>{status}</StatusChip>
         </header>
         {!acknowledged && (
           <p className={styles.notice}>Acknowledgement required for current revision</p>

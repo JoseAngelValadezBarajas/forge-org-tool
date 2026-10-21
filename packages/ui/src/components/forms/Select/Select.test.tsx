@@ -15,4 +15,16 @@ describe('Select', () => {
     );
     expect(screen.getByRole('combobox', { name: 'Environment' })).toHaveValue('prod');
   });
+
+  it('marks the canonical error state for its visual treatment', () => {
+    render(
+      <Select aria-label="Priority" aria-invalid="true">
+        <option>High</option>
+      </Select>,
+    );
+
+    const select = screen.getByRole('combobox', { name: 'Priority' });
+    expect(select).toHaveAttribute('aria-invalid', 'true');
+    expect(select.className).toMatch(/invalid/);
+  });
 });

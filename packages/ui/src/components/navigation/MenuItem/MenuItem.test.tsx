@@ -18,4 +18,11 @@ describe('MenuItem', () => {
       'true',
     );
   });
+
+  it('exposes the canonical selected state accessibly and visually', () => {
+    render(<MenuItem selected>Current view</MenuItem>);
+    const item = screen.getByRole('menuitem', { name: 'Current view' });
+    expect(item).toHaveAttribute('aria-current', 'true');
+    expect(item).toHaveAttribute('data-selected', 'true');
+  });
 });
