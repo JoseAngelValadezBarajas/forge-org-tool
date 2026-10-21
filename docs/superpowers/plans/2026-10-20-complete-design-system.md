@@ -70,6 +70,6 @@
 
 ### Task 6: Integrated verification and independent review
 
-- [ ] Run format/lint/typecheck, architecture checks, package builds, focused accessibility tests, full frontend tests, isolated Playwright, production route exclusion, and GitHub Quality CI.
+- [x] Run format/lint/typecheck, architecture checks, package builds, focused accessibility tests, full frontend tests, isolated Playwright, production route exclusion, and GitHub Quality CI.
 - [x] Ask an independent reviewer subagent to inspect the integrated source, inventory completeness, package isolation, feature behavior, and evidence; resolve findings.
-- [ ] Record exact commits, CI run, screenshot paths, inventory counts, and unresolved human visual review items.
+- [x] Record exact commits, CI run, screenshot paths, inventory counts, and unresolved human visual review items.
