@@ -71,7 +71,7 @@ describe('M1 application shell', () => {
       screen.getByRole('heading', { name: 'Product-specific components' }),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'Icon library' }).length).toBeGreaterThan(0);
-    expect(document.querySelectorAll('[data-component-id^="icon-"] svg')).toHaveLength(35);
+    expect(document.querySelectorAll('[data-icon-name]')).toHaveLength(35);
     expect(screen.getAllByText('IMPLEMENTED_NOT_REVIEWED').length).toBeGreaterThan(0);
 
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search components' }), {
@@ -82,18 +82,23 @@ describe('M1 application shell', () => {
     expect(screen.queryByRole('heading', { name: 'Button' })).not.toBeInTheDocument();
   });
 
-  it('renders a stable host anchor for every canonical preview marked available', () => {
-    const available = parity.inventory.filter(
-      (entry) => entry.componentHost.status === 'AVAILABLE',
-    );
+  it('renders a real preview under the stable host ID for every canonical core family', () => {
+    const coreEntries = parity.inventory.filter((entry) => entry.category === 'core');
 
     renderRoute('/__components');
 
-    expect(available.length).toBeGreaterThan(0);
-    for (const entry of available) {
+    expect(coreEntries).toHaveLength(37);
+    for (const entry of coreEntries) {
       expect(
         document.querySelector(`[data-component-id="${entry.componentHost.id}"]`),
       ).not.toBeNull();
+      const preview = document.querySelector(
+        `[data-component-preview="${entry.componentHost.id}"]`,
+      );
+      expect(
+        preview?.childElementCount,
+        `${entry.figmaName} must render a real preview`,
+      ).toBeGreaterThan(0);
     }
   });
 

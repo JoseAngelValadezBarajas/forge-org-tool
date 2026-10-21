@@ -136,6 +136,52 @@
 .iconItem span {
   overflow-wrap: anywhere;
 }
+.fieldset,
+.stepperPreview,
+.tablePreview,
+.keyValues {
+  width: 100%;
+  margin: 0;
+}
+.fieldset {
+  display: grid;
+  gap: var(--forge-space-2);
+  border: 0;
+  padding: 0;
+}
+.fieldset label {
+  display: flex;
+  align-items: center;
+  gap: var(--forge-space-2);
+}
+.stepperPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  padding: 0;
+  list-style: none;
+}
+.menuPreview {
+  display: grid;
+  width: min(100%, 260px);
+}
+.skeletonPreview {
+  display: grid;
+  gap: var(--forge-space-2);
+}
+.tablePreview {
+  border-collapse: collapse;
+  text-align: left;
+}
+.tablePreview th,
+.tablePreview td {
+  padding: var(--forge-space-2);
+  border-bottom: 1px solid var(--forge-border);
+}
+.keyValues {
+  display: grid;
+  gap: var(--forge-space-2);
+}
 .token {
   display: flex;
   align-items: center;
