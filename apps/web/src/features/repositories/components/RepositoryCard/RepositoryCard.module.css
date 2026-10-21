@@ -1,0 +1,43 @@
+.card {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: 0;
+}
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--forge-space-3);
+}
+.path {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--forge-font-mono);
+}
+.observation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: var(--forge-space-3);
+  margin: 0;
+}
+.observation div {
+  min-width: 0;
+}
+.observation dt {
+  color: var(--forge-text-muted);
+  font-size: 0.75rem;
+}
+.observation dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.pending {
+  margin: 0;
+  color: var(--forge-text-muted);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+}

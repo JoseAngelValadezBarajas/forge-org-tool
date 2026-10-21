@@ -12,6 +12,7 @@ import {
 import styles from './DeliveryPage.module.css';
 import { DeliverySummary } from './DeliverySummary';
 import { useDeliveryController } from './useDeliveryController';
+import { DownloadAction, ReleaseGate, TrustDisclosure, VerificationSummary } from './components';
 
 export function DeliveryPage() {
   const { workspaceId = '', projectId = '' } = useParams();
@@ -63,10 +64,10 @@ export function DeliveryPage() {
   return (
     <div className={styles.stack}>
       <SectionHeader title="Delivery overview" eyebrow="FORGE / Truth states" />
-      <p>
+      <TrustDisclosure>
         Evidence provenance and gates are explicit. A blocked gate is not a publication or
         deployment claim.
-      </p>
+      </TrustDisclosure>
       {error && <p role="alert">{error}</p>}
       <DeliverySummary
         evidenceCount={evidence.length}
@@ -289,14 +290,12 @@ export function DeliveryPage() {
           </div>
           {verification && (
             <div className={styles.result}>
-              <StatusChip tone={verification.outcome === 'PASS' ? 'success' : 'warning'}>
-                {verification.outcome}
-              </StatusChip>
-              <p>Input fingerprint: {verification.input_fingerprint}</p>
-              {verification.stale && <p>STALE evaluation: referenced inputs changed.</p>}
-              {verification.blockers.map((blocker: string) => (
-                <p key={blocker}>{blocker}</p>
-              ))}
+              <VerificationSummary
+                outcome={verification.outcome}
+                fingerprint={verification.input_fingerprint}
+                stale={verification.stale}
+                blockers={verification.blockers}
+              />
             </div>
           )}
           {verifications.map((item) => (
@@ -308,13 +307,9 @@ export function DeliveryPage() {
         </Card>
       )}
       {selectedCandidate && (
-        <Card>
-          <h3>Gate evaluation</h3>
+        <ReleaseGate outcome={gate?.outcome ?? 'NOT_EVALUATED'}>
           {gate ? (
             <>
-              <StatusChip tone={gate.outcome === 'PASS' ? 'success' : 'warning'}>
-                {gate.outcome}
-              </StatusChip>
               <p>Input fingerprint: {gate.input_fingerprint}</p>
               {gate.blockers.map((blocker) => (
                 <p key={blocker}>{blocker}</p>
@@ -335,7 +330,7 @@ export function DeliveryPage() {
           ) : (
             <p>Select Preview gates to inspect this candidate.</p>
           )}
-        </Card>
+        </ReleaseGate>
       )}
       {manifest && (
         <Card>
@@ -346,8 +341,8 @@ export function DeliveryPage() {
           </p>
           <p>{manifest.markdown}</p>
           <div className={styles.actions}>
-            <a href={downloadPath('json')}>JSON</a>
-            <a href={downloadPath('markdown')}>Markdown</a>
+            <DownloadAction label="JSON" href={downloadPath('json')} />
+            <DownloadAction label="Markdown" href={downloadPath('markdown')} />
           </div>
         </Card>
       )}

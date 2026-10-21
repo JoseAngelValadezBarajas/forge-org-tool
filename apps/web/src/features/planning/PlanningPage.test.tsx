@@ -135,7 +135,7 @@ describe('PlanningPage', () => {
         expect.objectContaining({ method: 'POST' }),
       ),
     );
-    expect(screen.getByText(/Alpha\s+blocks\s+Beta/)).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Alpha blocks Beta' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Remove dependency' }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

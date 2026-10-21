@@ -1,0 +1,13 @@
+.rule article {
+  display: grid;
+  gap: 0.5rem;
+}
+.rule header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.rule p {
+  margin: 0;
+}

@@ -56,8 +56,8 @@ describe('RepositoriesPage', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText(/unborn/i)).toBeInTheDocument();
-    expect(screen.getByText(/source content: no/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Latest observation: unborn/)).toBeInTheDocument();
+    expect(screen.getByText('Source content').nextElementSibling).toHaveTextContent('not read');
     fireEvent.click(screen.getByRole('button', { name: 'Disconnect C:/approved/repo' }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

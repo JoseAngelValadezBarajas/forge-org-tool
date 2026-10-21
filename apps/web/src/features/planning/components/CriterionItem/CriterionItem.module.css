@@ -1,0 +1,12 @@
+.item {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--forge-space-3);
+  padding-block: var(--forge-space-2);
+}
+.description {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

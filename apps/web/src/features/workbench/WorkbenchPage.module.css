@@ -26,6 +26,11 @@
   padding-top: var(--forge-space-3);
   border-top: 1px solid var(--forge-border);
 }
+.reportFields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+}
 .revision span {
   color: var(--forge-text-muted);
   overflow-wrap: anywhere;

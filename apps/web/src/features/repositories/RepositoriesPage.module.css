@@ -6,16 +6,10 @@
   display: grid;
   gap: var(--forge-space-3);
 }
-.item {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--forge-space-4);
-  align-items: center;
-  border-top: 1px solid var(--forge-border);
-  padding-top: var(--forge-space-3);
+.connections {
+  display: grid;
+  gap: var(--forge-space-3);
 }
-.path {
-  overflow-wrap: anywhere;
-  color: var(--forge-text-muted);
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+.connections h3 {
+  margin: 0;
 }

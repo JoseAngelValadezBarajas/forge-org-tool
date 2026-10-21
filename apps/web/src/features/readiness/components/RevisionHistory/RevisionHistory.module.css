@@ -1,0 +1,17 @@
+.history section {
+  display: grid;
+  gap: 0.5rem;
+}
+.history h4,
+.history p {
+  margin: 0;
+}
+.history ol {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+.history li {
+  overflow-wrap: anywhere;
+}

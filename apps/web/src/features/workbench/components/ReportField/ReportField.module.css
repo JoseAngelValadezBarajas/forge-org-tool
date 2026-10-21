@@ -1,0 +1,7 @@
+.field div {
+  display: grid;
+  gap: 0.35rem;
+}
+.field small {
+  color: var(--text-muted, #969a9e);
+}

@@ -11,6 +11,7 @@ import { ContextPage } from '../features/context';
 import { TransferPage } from '../features/transfer';
 import { ComponentGallery } from './component-gallery/ComponentGallery';
 import styles from './App.module.css';
+import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from './shell';
 export function App() {
   const navigate = useNavigate();
   const [light, setLight] = useState(false);
@@ -41,12 +42,10 @@ export function App() {
           <Link to="/" className={styles.brand}>
             <span className={styles.mark}>F</span> FORGE
           </Link>
-          <p className={styles.workspaceLabel}>Local Workspace</p>
+          <WorkspaceSwitcher currentName="Local Workspace" />
           <nav aria-label="Product navigation" className={styles.productNav}>
-            <Link to="/" aria-current="page">
-              Workspace
-            </Link>
-            {import.meta.env.DEV && <Link to="/__components">Component host</Link>}
+            <NavigationItem to="/" end label="Workspace" />
+            {import.meta.env.DEV && <NavigationItem to="/__components" label="Component host" />}
           </nav>
           <div className={styles.localMode}>
             <strong>LOCAL MODE</strong>
@@ -54,29 +53,22 @@ export function App() {
           </div>
         </aside>
         <div className={styles.contentColumn}>
-          <header className={styles.topbar}>
-            <div className={styles.mobileBrand}>
-              <Link to="/" className={styles.brand}>
-                FORGE <span>Org Tool</span>
-              </Link>
-            </div>
-            <nav aria-label="Primary">
-              <Button
-                variant="ghost"
-                onClick={() => setPaletteOpen(true)}
-                aria-label="Open command palette"
-              >
-                Command palette
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setLight((value) => !value)}
-                aria-label={`Switch to ${light ? 'dark' : 'light'} theme`}
-              >
-                Theme: {light ? 'light' : 'dark'}
-              </Button>
-            </nav>
-          </header>
+          <PageHeader className={styles.topbar} eyebrow="Local Workspace" title="FORGE Org Tool">
+            <Button
+              variant="ghost"
+              onClick={() => setPaletteOpen(true)}
+              aria-label="Open command palette"
+            >
+              Command palette
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setLight((value) => !value)}
+              aria-label={`Switch to ${light ? 'dark' : 'light'} theme`}
+            >
+              Theme: {light ? 'light' : 'dark'}
+            </Button>
+          </PageHeader>
           <main id="main" className={styles.main}>
             <Routes>
               <Route path="/" element={<OrganizationPage />} />
@@ -100,33 +92,16 @@ export function App() {
           </main>
         </div>
       </div>
-      {paletteOpen && (
-        <div
-          className={styles.paletteBackdrop}
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setPaletteOpen(false);
-          }}
-        >
-          <div
-            className={styles.palette}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Command palette"
-          >
-            <h2>Command palette</h2>
-            <Button variant="ghost" onClick={() => go('/')} aria-label="Go to Organization">
-              Organization
-            </Button>
-            {import.meta.env.DEV && (
-              <Button variant="ghost" onClick={() => go('/__components')}>
-                Component host
-              </Button>
-            )}
-            <p>Press Escape to close.</p>
-          </div>
-        </div>
-      )}
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        commands={[
+          { id: 'organization', label: 'Organization', onSelect: () => go('/') },
+          ...(import.meta.env.DEV
+            ? [{ id: 'components', label: 'Component host', onSelect: () => go('/__components') }]
+            : []),
+        ]}
+      />
     </div>
   );
 }

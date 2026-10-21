@@ -1,0 +1,8 @@
+.home {
+  display: grid;
+  gap: var(--forge-space-5);
+  min-width: 0;
+}
+.home > * {
+  min-width: 0;
+}

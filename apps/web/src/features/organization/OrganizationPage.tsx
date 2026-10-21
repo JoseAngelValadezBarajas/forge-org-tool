@@ -7,11 +7,12 @@ import {
   Input,
   SearchField,
   SectionHeader,
-  Select,
   StatusChip,
 } from '@forge-org/ui';
 import styles from './OrganizationPage.module.css';
 import { useOrganizationController } from './useOrganizationController';
+import { ProjectCard } from '../planning/index';
+import { WorkspaceSwitcher } from '../../app/shell/index';
 
 export function OrganizationPage() {
   const {
@@ -95,19 +96,12 @@ export function OrganizationPage() {
           </div>
           <Card>
             <div className={styles.toolbar}>
-              <FormField label="Workspace">
-                <Select
-                  id="workspace-select"
-                  value={workspaceId}
-                  onChange={(event) => setWorkspaceId(event.target.value)}
-                >
-                  {workspaces.map((workspace) => (
-                    <option key={workspace.id} value={workspace.id}>
-                      {workspace.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
+              <WorkspaceSwitcher
+                value={workspaceId}
+                workspaces={workspaces}
+                onChange={setWorkspaceId}
+                currentName={selectedWorkspace?.name ?? 'Local Workspace'}
+              />
             </div>
             <form onSubmit={createProject} className={styles.form}>
               <h3>Create project</h3>
@@ -150,26 +144,17 @@ export function OrganizationPage() {
             ) : (
               <div className={styles.projects}>
                 {projects.map((project) => (
-                  <article key={project.id} className={styles.project}>
-                    <div>
-                      <StatusChip tone={project.status === 'active' ? 'success' : 'neutral'}>
-                        {project.status}
-                      </StatusChip>
-                      <h3>
-                        <Link to={`/planning/${workspaceId}/${project.id}`}>{project.name}</Link>
-                      </h3>
-                      <p>
-                        <Link to={`/repositories/${workspaceId}/${project.id}`}>Repositories</Link>{' '}
-                        · <Link to={`/workbench/${workspaceId}/${project.id}`}>Workbench</Link> ·{' '}
-                        <Link to={`/delivery/${workspaceId}/${project.id}`}>Delivery</Link> ·{' '}
-                        <Link to={`/transfer/${workspaceId}/${project.id}`}>Transfer</Link>
-                      </p>
-                      {project.description && <p>{project.description}</p>}
-                    </div>
+                  <ProjectCard key={project.id} project={project} workspaceId={workspaceId}>
+                    <p>
+                      <Link to={`/repositories/${workspaceId}/${project.id}`}>Repositories</Link> ·{' '}
+                      <Link to={`/workbench/${workspaceId}/${project.id}`}>Workbench</Link> ·{' '}
+                      <Link to={`/delivery/${workspaceId}/${project.id}`}>Delivery</Link> ·{' '}
+                      <Link to={`/transfer/${workspaceId}/${project.id}`}>Transfer</Link>
+                    </p>
                     <Button variant="secondary" onClick={() => void toggleProject(project)}>
                       {project.status === 'active' ? 'Archive' : 'Restore'}
                     </Button>
-                  </article>
+                  </ProjectCard>
                 ))}
               </div>
             )}

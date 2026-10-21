@@ -1,0 +1,6 @@
+.notice {
+  border-inline-start: 3px solid var(--color-warning, #e2ae59);
+}
+.notice p {
+  margin: 0;
+}

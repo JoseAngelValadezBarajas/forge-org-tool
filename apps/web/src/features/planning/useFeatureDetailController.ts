@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { organizationApi, type Criterion, type Dependency, type Task } from '@forge-org/api-client';
+import {
+  organizationApi,
+  type Criterion,
+  type Dependency,
+  type ReadinessResult,
+  type Task,
+} from '@forge-org/api-client';
 
 export function useFeatureDetailController(
   workspaceId: string,
@@ -9,6 +15,7 @@ export function useFeatureDetailController(
   const [tasks, setTasks] = useState<Task[]>([]);
   const [criteria, setCriteria] = useState<Criterion[]>([]);
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
+  const [readiness, setReadiness] = useState<ReadinessResult | null>(null);
   const [taskTitle, setTaskTitle] = useState('');
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
@@ -16,15 +23,17 @@ export function useFeatureDetailController(
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
       try {
-        const [nextTasks, nextCriteria, nextDependencies] = await Promise.all([
+        const [nextTasks, nextCriteria, nextDependencies, nextReadiness] = await Promise.all([
           organizationApi.listTasks(workspaceId, projectId, featureId),
           organizationApi.listCriteria(workspaceId, projectId, featureId),
           organizationApi.listDependencies(workspaceId, projectId),
+          organizationApi.previewReadiness(workspaceId, projectId, featureId).catch(() => null),
         ]);
         if (!isCurrent()) return;
         setTasks(nextTasks);
         setCriteria(nextCriteria);
         setDependencies(nextDependencies);
+        setReadiness(nextReadiness);
       } catch (cause) {
         if (isCurrent()) {
           setError(cause instanceof Error ? cause.message : 'Unable to load feature detail.');
@@ -96,6 +105,7 @@ export function useFeatureDetailController(
     dependencies,
     error,
     moveTask,
+    readiness,
     setCriterion,
     setTaskTitle,
     taskTitle,

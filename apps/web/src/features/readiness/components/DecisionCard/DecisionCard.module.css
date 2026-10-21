@@ -1,0 +1,20 @@
+.decision article {
+  display: grid;
+  gap: 0.75rem;
+}
+.decision header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.decision h4,
+.decision p {
+  margin: 0;
+}
+.decision footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

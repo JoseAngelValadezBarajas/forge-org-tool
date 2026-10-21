@@ -1,0 +1,17 @@
+.select {
+  min-width: 10rem;
+}
+.current {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem;
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface-raised);
+}
+.current span {
+  overflow-wrap: anywhere;
+}
+.current small {
+  color: var(--forge-text-muted);
+  font-size: 0.72rem;
+}

@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Button, Card, SectionHeader, StatusChip } from '@forge-org/ui';
 import styles from './ContextPage.module.css';
 import { useContextController } from './useContextController';
+import { ContextPackageCard } from './components';
 
 export function ContextPage() {
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
@@ -118,18 +119,10 @@ export function ContextPage() {
           <p>No saved context packages.</p>
         ) : (
           packages.map((item) => (
-            <article className={styles.item} key={item.id}>
-              <div className={styles.row}>
-                <div>
-                  <StatusChip tone="neutral">{item.schema_version}</StatusChip>
-                  <p>Saved package {item.fingerprint}</p>
-                </div>
-                <div className={styles.links}>
-                  <a href={downloadPath(item.id, 'json')}>JSON</a>
-                  <a href={downloadPath(item.id, 'markdown')}>Markdown</a>
-                </div>
-              </div>
-            </article>
+            <ContextPackageCard key={item.id} contextPackage={item}>
+              <a href={downloadPath(item.id, 'json')}>JSON</a>
+              <a href={downloadPath(item.id, 'markdown')}>Markdown</a>
+            </ContextPackageCard>
           ))
         )}
       </Card>

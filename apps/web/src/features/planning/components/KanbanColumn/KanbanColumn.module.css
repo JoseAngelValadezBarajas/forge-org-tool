@@ -1,0 +1,22 @@
+.column {
+  min-width: 0;
+}
+.surface {
+  height: 100%;
+}
+.heading {
+  margin: 0 0 var(--forge-space-3);
+  text-transform: capitalize;
+}
+.cards {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: 0;
+}
+.empty {
+  margin: 0;
+  padding: var(--forge-space-4);
+  color: var(--forge-text-muted);
+  border: 1px dashed var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+}

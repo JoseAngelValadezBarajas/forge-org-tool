@@ -34,6 +34,23 @@ describe('FeatureDetailPage', () => {
       },
     ];
     const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input).endsWith('/readiness/preview'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              feature_id: 'f1',
+              evaluated_at: '2026-10-20T12:00:00Z',
+              rule_set_version: 'R01-R06',
+              input_fingerprint: 'detail-fp',
+              outcome: 'NOT_READY',
+              passed_checks: ['R01'],
+              failed_checks: ['R02'],
+              blockers: [{ code: 'DEPENDENCY', message: 'A dependency is incomplete' }],
+              results: [],
+            }),
+            { status: 200 },
+          ),
+        );
       if (String(input).endsWith('/tasks/reorder'))
         return Promise.resolve(new Response(JSON.stringify([tasks[1], tasks[0]]), { status: 200 }));
       if (String(input).endsWith('/tasks'))
@@ -57,6 +74,10 @@ describe('FeatureDetailPage', () => {
     );
 
     await screen.findByText('First');
+    expect(
+      await screen.findByRole('region', { name: 'Feature readiness overview' }),
+    ).toHaveAttribute('data-state', 'Blocked');
+    expect(screen.getByText('A dependency is incomplete')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Manage feature context' })).toHaveAttribute(
       'href',
       '/context/w1/p1/f1',

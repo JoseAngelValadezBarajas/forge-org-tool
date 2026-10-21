@@ -1,0 +1,35 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  padding: 12vh 1rem 1rem;
+  background: rgb(0 0 0 / 0.55);
+  z-index: 10;
+}
+.dialog {
+  margin: 0;
+  display: grid;
+  gap: var(--forge-space-2);
+  width: min(440px, 100%);
+  max-height: 76vh;
+  overflow: auto;
+  padding: var(--forge-space-5);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-lg);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.3);
+}
+.dialog h2,
+.dialog p {
+  margin: 0;
+}
+.dialog > p {
+  color: var(--forge-text-muted);
+  font-size: 0.85rem;
+}
+.commands {
+  display: grid;
+  gap: var(--forge-space-1);
+}

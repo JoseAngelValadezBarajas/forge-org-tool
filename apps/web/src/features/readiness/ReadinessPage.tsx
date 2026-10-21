@@ -1,7 +1,15 @@
 import { useParams } from 'react-router-dom';
-import { Button, Card, Input, SectionHeader, StatusChip } from '@forge-org/ui';
+import { Button, Card, Input, SectionHeader } from '@forge-org/ui';
 import styles from './ReadinessPage.module.css';
 import { useReadinessController } from './useReadinessController';
+import {
+  DecisionCard,
+  EvaluationSnapshot,
+  InvariantCard,
+  RevisionHistory,
+  RuleAction,
+  RuleCard,
+} from './components';
 
 export function ReadinessPage() {
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
@@ -34,18 +42,25 @@ export function ReadinessPage() {
         verification.
       </p>
       {error && <p role="alert">{error}</p>}
-      <Card>
-        <div className={styles.result}>
-          <StatusChip tone={result?.outcome === 'READY_TO_START' ? 'success' : 'warning'}>
-            {result?.outcome ?? 'Evaluating'}
-          </StatusChip>
-          <Button variant="secondary" onClick={() => void refresh()}>
-            Refresh evaluation
-          </Button>
-        </div>
-        {result && (
-          <>
-            <p>Rules passed: {result.passed_checks.join(', ') || 'none'}</p>
+      {result ? (
+        <EvaluationSnapshot
+          fingerprint={result.input_fingerprint}
+          evaluatedAt={result.evaluated_at}
+          stale={result.stale}
+        >
+          <p>Outcome: {result.outcome}</p>
+          <p>Rules passed: {result.passed_checks.join(', ') || 'none'}</p>
+          <div className={styles.ruleGrid}>
+            {result.results.map((rule) => (
+              <RuleCard
+                key={rule.rule_id}
+                ruleId={rule.rule_id}
+                result={rule.result}
+                explanation={rule.explanation}
+              />
+            ))}
+          </div>
+          {result.blockers.length > 0 && (
             <ul>
               {result.blockers.map((blocker) => (
                 <li key={blocker.code}>
@@ -53,9 +68,15 @@ export function ReadinessPage() {
                 </li>
               ))}
             </ul>
-          </>
-        )}
-      </Card>
+          )}
+          <RuleAction onClick={() => void refresh()}>Refresh evaluation</RuleAction>
+        </EvaluationSnapshot>
+      ) : (
+        <Card>
+          <p>Evaluating readiness…</p>
+          <RuleAction onClick={() => void refresh()}>Refresh evaluation</RuleAction>
+        </Card>
+      )}
       <div className={styles.forms}>
         <Card>
           <form onSubmit={addCriterion}>
@@ -100,12 +121,13 @@ export function ReadinessPage() {
           <p>No decisions recorded.</p>
         ) : (
           decisions.map((decision) => (
-            <article key={decision.id}>
+            <DecisionCard
+              key={decision.id}
+              title={decision.title}
+              revision={decision.revision}
+              status={decision.status}
+            >
               <div>
-                <strong>{decision.title}</strong>
-                <p>
-                  Revision {decision.revision} · {decision.status}
-                </p>
                 <p>{decision.decision}</p>
               </div>
               <div>
@@ -124,15 +146,15 @@ export function ReadinessPage() {
                 )}
               </div>
               {decisionRevisions[decision.id] && (
-                <ul>
-                  {decisionRevisions[decision.id].map((revision) => (
-                    <li key={revision.id}>
-                      Revision {revision.revision}: {revision.decision}
-                    </li>
-                  ))}
-                </ul>
+                <RevisionHistory
+                  title={`${decision.title} history`}
+                  revisions={decisionRevisions[decision.id].map((revision) => ({
+                    revision: revision.revision,
+                    text: revision.decision,
+                  }))}
+                />
               )}
-            </article>
+            </DecisionCard>
           ))
         )}
       </Card>
@@ -142,12 +164,13 @@ export function ReadinessPage() {
           <p>No invariants recorded.</p>
         ) : (
           invariants.map((invariant) => (
-            <article key={invariant.id}>
+            <InvariantCard
+              key={invariant.id}
+              title={invariant.title}
+              revision={invariant.revision}
+              acknowledgedRevision={invariant.acknowledged_revision}
+            >
               <div>
-                <strong>{invariant.title}</strong>
-                <p>
-                  Revision {invariant.revision} · {invariant.status}
-                </p>
                 <p>{invariant.statement}</p>
               </div>
               {invariant.feature_id === featureId &&
@@ -160,10 +183,7 @@ export function ReadinessPage() {
                     Acknowledge invariant
                   </Button>
                 )}
-              {invariant.acknowledged_revision === invariant.revision && (
-                <StatusChip tone="success">Acknowledged revision {invariant.revision}</StatusChip>
-              )}
-            </article>
+            </InvariantCard>
           ))
         )}
       </Card>

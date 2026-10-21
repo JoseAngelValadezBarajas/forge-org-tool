@@ -1,0 +1,11 @@
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--forge-space-3);
+}
+.relationship {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

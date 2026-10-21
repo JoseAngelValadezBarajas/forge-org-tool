@@ -1,8 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
-import { Button, Card, Input, SectionHeader, StatusChip } from '@forge-org/ui';
-import type { Task } from '@forge-org/api-client';
+import { Button, Card, Input, SectionHeader } from '@forge-org/ui';
 import styles from './PlanningPage.module.css';
 import { useFeatureDetailController } from './useFeatureDetailController';
+import { CriterionItem, FeatureOverview, TaskItem } from './components';
 
 export function FeatureDetailPage() {
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
@@ -15,6 +15,7 @@ export function FeatureDetailPage() {
     dependencies,
     error,
     moveTask,
+    readiness,
     setCriterion,
     setTaskTitle,
     taskTitle,
@@ -32,6 +33,9 @@ export function FeatureDetailPage() {
         <Link to={`/planning/${workspaceId}/${projectId}`}>Back to planning board</Link> ·{' '}
         <Link to={`/context/${workspaceId}/${projectId}/${featureId}`}>Manage feature context</Link>
       </p>
+      <FeatureOverview result={readiness}>
+        <Link to={`/readiness/${workspaceId}/${projectId}/${featureId}`}>Manage readiness</Link>
+      </FeatureOverview>
       <div className={styles.forms}>
         <Card>
           <form onSubmit={addTask}>
@@ -66,36 +70,15 @@ export function FeatureDetailPage() {
           <p>No tasks.</p>
         ) : (
           tasks.map((task, index) => (
-            <article className={styles.item} key={task.id}>
-              <strong>{task.title}</strong>
-              <select
-                aria-label={`Status for ${task.title}`}
-                value={task.status}
-                onChange={(event) => void changeTask(task, event.target.value as Task['status'])}
-              >
-                <option value="todo">todo</option>
-                <option value="in_progress">in_progress</option>
-                <option value="done">done</option>
-              </select>
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={index === 0}
-                onClick={() => void moveTask(index, -1)}
-                aria-label={`Move ${task.title} up`}
-              >
-                Move up
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={index === tasks.length - 1}
-                onClick={() => void moveTask(index, 1)}
-                aria-label={`Move ${task.title} down`}
-              >
-                Move down
-              </Button>
-            </article>
+            <TaskItem
+              key={task.id}
+              task={task}
+              isFirst={index === 0}
+              isLast={index === tasks.length - 1}
+              onStatusChange={(status) => void changeTask(task, status)}
+              onMoveUp={() => void moveTask(index, -1)}
+              onMoveDown={() => void moveTask(index, 1)}
+            />
           ))
         )}
       </Card>
@@ -106,12 +89,7 @@ export function FeatureDetailPage() {
         ) : (
           <ul>
             {criteria.map((item) => (
-              <li key={item.id}>
-                <StatusChip tone={item.satisfied ? 'success' : 'neutral'}>
-                  {item.satisfied ? 'satisfied' : 'open'}
-                </StatusChip>{' '}
-                {item.description}
-              </li>
+              <CriterionItem key={item.id} criterion={item} />
             ))}
           </ul>
         )}

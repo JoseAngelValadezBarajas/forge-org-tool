@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { Button, Card, FormField, Input, SectionHeader, StatusChip, Textarea } from '@forge-org/ui';
 import styles from './WorkbenchPage.module.css';
 import { useWorkbenchController } from './useWorkbenchController';
+import { ProvenanceNotice, ReportField } from './components';
 
 export function WorkbenchPage() {
   const { workspaceId = '', projectId = '' } = useParams();
@@ -24,10 +25,9 @@ export function WorkbenchPage() {
   return (
     <div className={styles.stack}>
       <SectionHeader title="Workbench" eyebrow="FORGE / Reported work" />
-      <p>
-        Runs and handoffs are human-reported records. FORGE does not execute agents or claim
-        delivery evidence.
-      </p>
+      <ProvenanceNotice source="Human-reported runs and handoffs">
+        FORGE does not execute agents or claim delivery evidence.
+      </ProvenanceNotice>
       {error && <p role="alert">{error}</p>}
       <Card>
         <form onSubmit={createRun} className={styles.form}>
@@ -54,9 +54,10 @@ export function WorkbenchPage() {
                 <strong>{run.title}</strong>
               </div>
               <div>
-                <span>
-                  {run.executor_type} / {run.execution_mode}
-                </span>
+                <ReportField
+                  label="Execution"
+                  value={`${run.executor_type} / ${run.execution_mode}`}
+                />
                 <Button
                   variant="secondary"
                   onClick={() => void createHandoff(run)}
