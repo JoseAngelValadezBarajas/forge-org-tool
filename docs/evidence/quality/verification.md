@@ -61,8 +61,8 @@ data, merge PR #1, or archive the original FORGE repository.
   full API pytest (21/21), and OpenAPI drift check pass locally.
 - Isolated Chromium smoke remains 18/18 across desktop and mobile, with a
   disposable API database and `reuseExistingServer: false`.
-- GitHub Quality run `39538665880` passed API, web, and Windows desktop for
-  implementation commit `9c43f4f`, including frontend format/lint/package-
+- GitHub Quality run `39539824930` passed API, web, and Windows desktop for
+  implementation commit `4aacc36`, including frontend format/lint/package-
   consumer/test/build/e2e, API Ruff/mypy/pytest/OpenAPI checks, Rust
   format/Clippy/tests, desktop smoke tests, and the release build. The final
   documentation-only commit records this evidence without changing runtime
