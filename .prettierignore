@@ -7,6 +7,7 @@ test-results
 apps/web/playwright-report
 contracts/generated
 contracts/openapi
+packages/tokens/src/tokens.css
 *.lock
 *.png
 *.jpg
