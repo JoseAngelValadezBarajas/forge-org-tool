@@ -3,7 +3,10 @@ import { apiErrorFromResponse } from './errors';
 export type ApiRequest = { path: `/api/v1/${string}`; signal?: AbortSignal };
 
 export async function getApiJson<T>(request: ApiRequest): Promise<T> {
-  const response = await fetch(request.path, { signal: request.signal, credentials: 'same-origin' });
+  const response = await fetch(request.path, {
+    signal: request.signal,
+    credentials: 'same-origin',
+  });
   if (!response.ok) throw await apiErrorFromResponse(response);
   return response.json() as Promise<T>;
 }

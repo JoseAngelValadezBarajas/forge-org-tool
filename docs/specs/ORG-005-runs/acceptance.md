@@ -6,6 +6,6 @@
 - [x] Publish immutable handoff revisions and reject duplicate/stale acknowledgement.
 - [x] Keep reported work distinct from execution and delivery evidence.
 - [x] Browser workbench and handoff review screens preserve human-reported and
-  draft truth states.
+      draft truth states.
 - [x] Retrieve and filter project-scoped reported runs by status/search.
 - [x] Retrieve immutable handoff revisions and their JSON/Markdown representations.

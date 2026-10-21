@@ -8,8 +8,13 @@ export interface SectionHeaderProps {
 }
 export function SectionHeader({ title, eyebrow, actions, headingLevel = 2 }: SectionHeaderProps) {
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
-  return <header className={styles.header}>
-    <div>{eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}<Heading className={styles.title}>{title}</Heading></div>
-    {actions && <div className={styles.actions}>{actions}</div>}
-  </header>;
+  return (
+    <header className={styles.header}>
+      <div>
+        {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
+        <Heading className={styles.title}>{title}</Heading>
+      </div>
+      {actions && <div className={styles.actions}>{actions}</div>}
+    </header>
+  );
 }

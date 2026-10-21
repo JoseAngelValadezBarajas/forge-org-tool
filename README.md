@@ -46,4 +46,4 @@ Open Vite's local URL for the shell. In development only, `/__components` showca
 
 **Before first public push:** generate and commit `package-lock.json` and `apps/api/uv.lock`; run the quality checks, review changes for secrets and personal data, and verify that local databases and backups are not tracked.
 
-The original repository should not be archived until its refs, PR #30, contracts and any required *local* data are preserved and signed off. Never push local data to the public repository.
+The original repository should not be archived until its refs, PR #30, contracts and any required _local_ data are preserved and signed off. Never push local data to the public repository.

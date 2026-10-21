@@ -13,7 +13,10 @@ function renderRoute(path: string) {
 }
 
 describe('M1 application shell', () => {
-  afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
 
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('[]', { status: 200 })));
@@ -63,11 +66,15 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('navigation', { name: 'Component host sections' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Foundations and tokens' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Core UI primitives' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Product-specific components' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Product-specific components' }),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'Icon library' }).length).toBeGreaterThan(0);
     expect(screen.getAllByText('NOT_IMPLEMENTED').length).toBeGreaterThan(0);
 
-    fireEvent.change(screen.getByRole('searchbox', { name: 'Search components' }), { target: { value: 'status' } });
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search components' }), {
+      target: { value: 'status' },
+    });
 
     expect(screen.getByRole('heading', { name: 'StatusChip' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Button' })).not.toBeInTheDocument();

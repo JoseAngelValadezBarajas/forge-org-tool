@@ -4,5 +4,9 @@ export interface StatusChipProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 }
 export function StatusChip({ tone = 'neutral', children, className, ...props }: StatusChipProps) {
-  return <span {...props} className={[styles.chip, styles[tone], className].filter(Boolean).join(' ')}>{children}</span>;
+  return (
+    <span {...props} className={[styles.chip, styles[tone], className].filter(Boolean).join(' ')}>
+      {children}
+    </span>
+  );
 }

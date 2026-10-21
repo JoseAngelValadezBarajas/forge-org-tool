@@ -1,19 +1,99 @@
-.stack { display: grid; gap: var(--forge-space-4); }
-.summaryGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--forge-space-3); }
-.metricLabel { display: block; color: var(--forge-text-muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
-.metricValue { display: block; margin: var(--forge-space-2) 0; font-size: 1.45rem; overflow-wrap: anywhere; }
-.summaryGrid small { color: var(--forge-text-muted); }
-.stack p { color: var(--forge-text-muted); line-height: 1.5; }
-.forms { display: grid; gap: var(--forge-space-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.forms form { display: grid; gap: var(--forge-space-2); }
-.item { display: flex; justify-content: space-between; align-items: center; gap: var(--forge-space-3); border-top: 1px solid var(--forge-border); padding: var(--forge-space-3) 0; }
-.actions { display: flex; flex-wrap: wrap; gap: var(--forge-space-2); margin-top: var(--forge-space-3); }
-.filters { display: flex; flex-wrap: wrap; gap: var(--forge-space-2); align-items: center; margin-bottom: var(--forge-space-3); }
-.filters input { flex: 1 1 220px; }
-.filters select, .stack select { min-height: 40px; padding: 0 var(--forge-space-2); background: var(--forge-surface); color: var(--forge-text); border: 1px solid var(--forge-border); border-radius: var(--forge-radius-sm); }
-.form { display: grid; gap: var(--forge-space-2); min-width: min(100%, 360px); }
-.result { margin-top: var(--forge-space-3); padding-top: var(--forge-space-3); border-top: 1px solid var(--forge-border); }
-.item > div { min-width: 0; }
-.item small { display: block; color: var(--forge-text-muted); overflow-wrap: anywhere; }
-@media (max-width: 720px) { .forms { grid-template-columns: 1fr; } }
-@media (max-width: 800px) { .summaryGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+}
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--forge-space-3);
+}
+.metricLabel {
+  display: block;
+  color: var(--forge-text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.metricValue {
+  display: block;
+  margin: var(--forge-space-2) 0;
+  font-size: 1.45rem;
+  overflow-wrap: anywhere;
+}
+.summaryGrid small {
+  color: var(--forge-text-muted);
+}
+.stack p {
+  color: var(--forge-text-muted);
+  line-height: 1.5;
+}
+.forms {
+  display: grid;
+  gap: var(--forge-space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.forms form {
+  display: grid;
+  gap: var(--forge-space-2);
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--forge-space-3);
+  border-top: 1px solid var(--forge-border);
+  padding: var(--forge-space-3) 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  margin-top: var(--forge-space-3);
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  align-items: center;
+  margin-bottom: var(--forge-space-3);
+}
+.filters input {
+  flex: 1 1 220px;
+}
+.filters select,
+.stack select {
+  min-height: 40px;
+  padding: 0 var(--forge-space-2);
+  background: var(--forge-surface);
+  color: var(--forge-text);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+}
+.form {
+  display: grid;
+  gap: var(--forge-space-2);
+  min-width: min(100%, 360px);
+}
+.result {
+  margin-top: var(--forge-space-3);
+  padding-top: var(--forge-space-3);
+  border-top: 1px solid var(--forge-border);
+}
+.item > div {
+  min-width: 0;
+}
+.item small {
+  display: block;
+  color: var(--forge-text-muted);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 720px) {
+  .forms {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 800px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

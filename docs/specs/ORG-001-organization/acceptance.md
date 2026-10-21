@@ -8,4 +8,4 @@
 - [x] Render actionable empty, loading, error, active, and archived states.
 - [x] Keep `/__components` deterministic and backend-free.
 - [ ] Human Figma review of the organization screen; automated tests are not
-  visual certification.
+      visual certification.

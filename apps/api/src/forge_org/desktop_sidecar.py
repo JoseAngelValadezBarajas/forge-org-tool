@@ -24,7 +24,9 @@ class BearerTokenMiddleware:
         headers = {key.lower(): value for key, value in scope.get('headers', [])}
         expected = b'Bearer ' + self.token
         if not hmac.compare_digest(headers.get(b'authorization', b''), expected):
-            response = JSONResponse({'detail': 'Desktop sidecar authentication required'}, status_code=401)
+            response = JSONResponse(
+                {'detail': 'Desktop sidecar authentication required'}, status_code=401
+            )
             await response(scope, receive, send)
             return
         await self.app(scope, receive, send)

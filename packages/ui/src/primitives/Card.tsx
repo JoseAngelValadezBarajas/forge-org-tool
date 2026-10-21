@@ -1,4 +1,10 @@
-import { createElement, forwardRef, type ComponentPropsWithoutRef, type ElementRef, type ElementType } from 'react';
+import {
+  createElement,
+  forwardRef,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type ElementType,
+} from 'react';
 import styles from './Card.module.css';
 
 type CardElement = Extract<ElementType, 'div' | 'section' | 'article' | 'aside'>;
@@ -12,7 +18,11 @@ export const Card = forwardRef(function Card<T extends CardElement = 'div'>(
   ref: React.ForwardedRef<ElementRef<T>>,
 ) {
   const Component = as ?? 'div';
-  return createElement(Component, { ...props, ref, className: [styles.card, className].filter(Boolean).join(' ') });
+  return createElement(Component, {
+    ...props,
+    ref,
+    className: [styles.card, className].filter(Boolean).join(' '),
+  });
 }) as <T extends CardElement = 'div'>(
   props: CardProps<T> & { ref?: React.ForwardedRef<ElementRef<T>> },
 ) => React.ReactElement | null;

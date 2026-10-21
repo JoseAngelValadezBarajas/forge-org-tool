@@ -6,53 +6,65 @@ from forge_org.main import app
 
 
 def test_workspace_and_project_lifecycle_is_scoped_and_durable(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setenv("FORGE_DATABASE_PATH", str(tmp_path / "forge.db"))
+    monkeypatch.setenv('FORGE_DATABASE_PATH', str(tmp_path / 'forge.db'))
 
     with TestClient(app) as client:
-        workspace = client.post("/api/v1/workspaces", json={"name": "Research"})
+        workspace = client.post('/api/v1/workspaces', json={'name': 'Research'})
         assert workspace.status_code == 201
-        workspace_id = workspace.json()["id"]
+        workspace_id = workspace.json()['id']
 
-        duplicate = client.post("/api/v1/workspaces", json={"name": " research "})
+        duplicate = client.post('/api/v1/workspaces', json={'name': ' research '})
         assert duplicate.status_code == 409
 
         project = client.post(
-            f"/api/v1/workspaces/{workspace_id}/projects",
-            json={"name": "Forge Core", "description": "Foundation"},
+            f'/api/v1/workspaces/{workspace_id}/projects',
+            json={'name': 'Forge Core', 'description': 'Foundation'},
         )
         assert project.status_code == 201
-        project_id = project.json()["id"]
+        project_id = project.json()['id']
 
-        assert client.get(
-            f"/api/v1/workspaces/{workspace_id}/projects", params={"search": "foundation"}
-        ).json()[0]["id"] == project_id
-        assert client.post(
-            f"/api/v1/workspaces/{workspace_id}/projects/{project_id}/archive"
-        ).json()["status"] == "archived"
-        assert client.get(
-            f"/api/v1/workspaces/{workspace_id}/projects", params={"status": "active"}
-        ).json() == []
+        assert (
+            client.get(
+                f'/api/v1/workspaces/{workspace_id}/projects', params={'search': 'foundation'}
+            ).json()[0]['id']
+            == project_id
+        )
+        assert (
+            client.post(f'/api/v1/workspaces/{workspace_id}/projects/{project_id}/archive').json()[
+                'status'
+            ]
+            == 'archived'
+        )
+        assert (
+            client.get(
+                f'/api/v1/workspaces/{workspace_id}/projects', params={'status': 'active'}
+            ).json()
+            == []
+        )
 
-        other = client.post("/api/v1/workspaces", json={"name": "Other"}).json()
+        other = client.post('/api/v1/workspaces', json={'name': 'Other'}).json()
         allowed = client.post(
-            f"/api/v1/workspaces/{other['id']}/projects", json={"name": "Forge Core"}
+            f'/api/v1/workspaces/{other["id"]}/projects', json={'name': 'Forge Core'}
         )
         assert allowed.status_code == 201
-        assert client.get(
-            f"/api/v1/workspaces/{other['id']}/projects/{project_id}"
-        ).status_code == 404
+        assert (
+            client.get(f'/api/v1/workspaces/{other["id"]}/projects/{project_id}').status_code == 404
+        )
 
     with TestClient(app) as client:
-        assert client.get(f"/api/v1/workspaces/{workspace_id}").status_code == 200
-        assert client.get(
-            f"/api/v1/workspaces/{workspace_id}/projects", params={"status": "archived"}
-        ).json()[0]["name"] == "Forge Core"
+        assert client.get(f'/api/v1/workspaces/{workspace_id}').status_code == 200
+        assert (
+            client.get(
+                f'/api/v1/workspaces/{workspace_id}/projects', params={'status': 'archived'}
+            ).json()[0]['name']
+            == 'Forge Core'
+        )
 
 
 def test_invalid_names_and_missing_resources_are_explicit(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setenv("FORGE_DATABASE_PATH", str(tmp_path / "forge.db"))
+    monkeypatch.setenv('FORGE_DATABASE_PATH', str(tmp_path / 'forge.db'))
 
     with TestClient(app) as client:
-        assert client.post("/api/v1/workspaces", json={"name": " "}).status_code == 422
-        assert client.get("/api/v1/workspaces/missing").status_code == 404
-        assert client.get("/api/v1/workspaces/missing/projects").status_code == 404
+        assert client.post('/api/v1/workspaces', json={'name': ' '}).status_code == 422
+        assert client.get('/api/v1/workspaces/missing').status_code == 404
+        assert client.get('/api/v1/workspaces/missing/projects').status_code == 404

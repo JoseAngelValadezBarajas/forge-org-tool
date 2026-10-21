@@ -4,5 +4,8 @@
   "type": "module",
   "version": "0.1.0-bootstrap",
   "license": "Apache-2.0",
-  "exports": {"./tokens.css": "./src/tokens.css", "./tokens.json": "./tokens.json"}
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./tokens.json": "./tokens.json"
+  }
 }

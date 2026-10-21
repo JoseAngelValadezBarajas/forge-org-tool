@@ -7,4 +7,4 @@
 - [x] Save immutable readiness results and report stale history after input changes.
 - [x] Keep readiness explicitly separate from delivery or technical verification.
 - [x] Browser review of decision/invariant/readiness interactions with
-  deterministic truth-state evidence.
+      deterministic truth-state evidence.

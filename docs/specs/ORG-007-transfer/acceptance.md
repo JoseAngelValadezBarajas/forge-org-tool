@@ -7,4 +7,4 @@
 - [x] Transfer is planning-only and does not import delivery truth.
 - [x] Enforce collection limits and reject dependency cycles before writing.
 - [x] Browser import/export flow exposes reviewed fingerprints and planning-only
-  transfer semantics.
+      transfer semantics.

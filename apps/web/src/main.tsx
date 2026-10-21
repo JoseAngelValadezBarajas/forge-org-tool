@@ -6,4 +6,10 @@ import './app/global.css';
 import { App } from './app/App';
 const host = document.getElementById('root');
 if (!host) throw new Error('Missing #root');
-createRoot(host).render(<React.StrictMode><BrowserRouter><App /></BrowserRouter></React.StrictMode>);
+createRoot(host).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>,
+);
