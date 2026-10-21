@@ -21,9 +21,9 @@ fn main() {
                 .args(["--port", &port.to_string()])
                 .env("FORGE_SIDECAR_TOKEN", &token)
                 .spawn()?;
-            tauri::async_runtime::spawn(async move {
-                while let Some(_event) = events.recv().await {}
-            });
+            tauri::async_runtime::spawn(
+                async move { while let Some(_event) = events.recv().await {} },
+            );
             app.manage(SidecarAddress {
                 base_url: format!("http://127.0.0.1:{port}"),
                 token,
