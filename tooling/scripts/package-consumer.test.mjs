@@ -82,7 +82,7 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
   mkdirSync(join(consumer, 'src'), { recursive: true });
   writeFileSync(
     join(consumer, 'src/main.tsx'),
-    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Button, FormField, Input } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light'>('dark');\n  return <main data-theme={theme}><button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Theme</button><FormField label="Name"><Input /></FormField><Button onClick={() => setCount(count + 1)}>Save {count}</Button></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
+    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Button, FormField, Input } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light'>('dark');\n  return <main data-theme={theme}><button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Theme</button><div className="button" data-testid="host-class">Host class</div><FormField label="Name"><Input /></FormField><Button onClick={() => setCount(count + 1)}>Save {count}</Button></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
   );
   writeFileSync(
     join(consumer, 'vite.config.ts'),
@@ -107,6 +107,15 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
     ),
   );
   run(npm, ['install', '--ignore-scripts', '--no-audit', '--no-fund'], consumer);
+  const installedUi = join(consumer, 'node_modules/@forge-org/ui');
+  const installedUiPackage = JSON.parse(readFileSync(join(installedUi, 'package.json'), 'utf8'));
+  assert.equal(installedUiPackage.name, '@forge-org/ui');
+  assert.equal(existsSync(join(installedUi, 'dist/index.js')), true);
+  assert.equal(existsSync(join(installedUi, 'dist/styles.css')), true);
+  const packedAggregate = readFileSync(join(installedUi, 'dist/styles.css'), 'utf8');
+  for (const selector of ['.button', '.control', '.card', '.state']) {
+    assert.doesNotMatch(packedAggregate, new RegExp(`\\.${selector.slice(1)}(?=[\\s,{:#>+~.])`));
+  }
   run(npm, ['run', 'typecheck'], consumer);
   run(npm, ['run', 'build'], consumer);
 
@@ -142,6 +151,14 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
       const page = await browser.newPage();
       await page.goto(`http://127.0.0.1:${port}`);
       assert.equal(await page.getByLabel('Name').isVisible(), true);
+      assert.equal(
+        await page.getByTestId('host-class').evaluate((element) => getComputedStyle(element).minHeight),
+        '0px',
+      );
+      assert.notEqual(
+        await page.getByRole('button', { name: 'Save 0' }).getAttribute('class'),
+        'button',
+      );
       await page.getByRole('button', { name: 'Save 0' }).click();
       assert.equal(await page.getByRole('button', { name: 'Save 1' }).isVisible(), true);
       const before = await page

@@ -38,14 +38,19 @@ async function collectCss(directory) {
   for (const entry of entries) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) await collectCss(path);
-    else if (entry.name.endsWith('.css')) cssFiles.push(path);
+    else if (entry.name.endsWith('.css') && !entry.name.endsWith('.module.css')) {
+      cssFiles.push(path);
+    }
   }
 }
 await collectCss(join(dist, 'src')).catch(() => {});
 await collectCss(dist);
 const uniqueCss = [...new Set(cssFiles)];
 const contents = await Promise.all(uniqueCss.map((file) => readFile(file, 'utf8')));
-await writeFile(join(dist, 'styles.css'), contents.join('\n'));
+await writeFile(
+  join(dist, 'styles.css'),
+  `/* Safe aggregate stylesheet. Component CSS Modules are emitted beside each component. */\n@layer forge-ui;\n${contents.join('\n')}`,
+);
 await writeFile(
   join(dist, 'styles.css.d.ts'),
   'declare const stylesheet: string;\nexport default stylesheet;\n',
