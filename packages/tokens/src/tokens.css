@@ -8,6 +8,13 @@
   --forge-border: #30363d;
   --forge-accent: #d8874d;
   --forge-accent-contrast: #111315;
+  --forge-info: #71a7e8;
+  --forge-status-neutral-bg: #24272a;
+  --forge-status-accent-bg: #2d221a;
+  --forge-status-success-bg: #1b2a24;
+  --forge-status-warning-bg: #2a251b;
+  --forge-status-error-bg: #301d20;
+  --forge-status-info-bg: #1c2734;
   --forge-success: #63c18c;
   --forge-warning: #e2ae59;
   --forge-danger: #e57373;
@@ -27,6 +34,13 @@
   --forge-border: #dddad4;
   --forge-accent: #a94f18;
   --forge-accent-contrast: #ffffff;
+  --forge-info: #2563eb;
+  --forge-status-neutral-bg: #f0efed;
+  --forge-status-accent-bg: #f8ede5;
+  --forge-status-success-bg: #e7f4ec;
+  --forge-status-warning-bg: #fbf2df;
+  --forge-status-error-bg: #fae9eb;
+  --forge-status-info-bg: #e8f1fc;
   --forge-success: #187644;
   --forge-warning: #855b0f;
   --forge-danger: #b52d38;
@@ -46,6 +60,7 @@
   --forge-space-6: 24px;
   --forge-space-8: 32px;
   --forge-radius-sm: 6px;
+  --forge-radius-alert: 8px;
   --forge-radius-md: 10px;
   --forge-radius-lg: 14px;
   --forge-font-ui: Geist, Inter, system-ui, sans-serif;

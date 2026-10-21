@@ -102,6 +102,37 @@ describe('M1 application shell', () => {
     }
   });
 
+  it('previews the reconciled canonical Card and status variants', () => {
+    renderRoute('/__components');
+
+    expect(
+      document.querySelector('[data-component-preview="card"] [data-variant="elevated"]'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('[data-component-preview="status-chip"] [data-tone="info"]'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('[data-component-preview="status-chip"] [data-tone="reported"]'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('[data-component-preview="badge"] [data-tone="info"]'),
+    ).not.toBeNull();
+    expect(
+      document.querySelector('[data-component-preview="alert"] [data-tone="error"]'),
+    ).not.toBeNull();
+  });
+
+  it('distinguishes implementation gaps from implementations awaiting visual review', () => {
+    renderRoute('/__components');
+
+    expect(document.querySelector('[data-component-id="checkbox"]')).toHaveTextContent(
+      'PARTIAL_NOT_REVIEWED',
+    );
+    expect(document.querySelector('[data-component-id="card"]')).toHaveTextContent(
+      'IMPLEMENTED_NOT_REVIEWED',
+    );
+  });
+
   it('previews every canonical icon export under its stable inventory ID', () => {
     renderRoute('/__components');
 

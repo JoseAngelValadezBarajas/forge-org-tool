@@ -11,4 +11,9 @@ describe('Badge', () => {
     );
     expect(screen.getByLabelText('2 pending')).toHaveTextContent('2');
   });
+
+  it('supports the canonical informational tone separately from accent', () => {
+    render(<Badge tone="info">Optional</Badge>);
+    expect(screen.getByText('Optional')).toHaveAttribute('data-tone', 'info');
+  });
 });

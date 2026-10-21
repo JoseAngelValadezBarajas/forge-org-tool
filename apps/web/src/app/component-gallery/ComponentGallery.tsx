@@ -88,7 +88,7 @@ type CatalogSection =
   | 'Generic shared compositions'
   | 'Product-specific components'
   | 'Icon library';
-type CatalogStatus = 'IMPLEMENTED_NOT_REVIEWED' | 'NOT_IMPLEMENTED';
+type CatalogStatus = 'IMPLEMENTED_NOT_REVIEWED' | 'PARTIAL_NOT_REVIEWED' | 'NOT_IMPLEMENTED';
 
 interface CatalogItem {
   id: string;
@@ -377,6 +377,12 @@ for (const item of catalog) {
   const entry = canonicalByHostId.get(item.id);
   if (!entry || entry.category !== 'core') continue;
   if (entry.figmaName === 'TextInput') item.name = 'TextInput';
+  item.status =
+    entry.implementationStatus === 'NOT_IMPLEMENTED'
+      ? 'NOT_IMPLEMENTED'
+      : entry.implementationStatus === 'PARTIAL'
+        ? 'PARTIAL_NOT_REVIEWED'
+        : 'IMPLEMENTED_NOT_REVIEWED';
   item.figma = entry.figmaNodeId;
   item.variants = entry.variants.map((variant) => variant.name).join('; ') || 'Default contract';
   item.states = entry.states.join(', ') || 'No State axis documented';
@@ -421,7 +427,9 @@ catalog.push(
       status:
         entry.implementationStatus === 'NOT_IMPLEMENTED'
           ? ('NOT_IMPLEMENTED' as const)
-          : ('IMPLEMENTED_NOT_REVIEWED' as const),
+          : entry.implementationStatus === 'PARTIAL'
+            ? ('PARTIAL_NOT_REVIEWED' as const)
+            : ('IMPLEMENTED_NOT_REVIEWED' as const),
       figma: entry.figmaNodeId,
       variants: entry.variants.map((variant) => variant.name).join('; ') || 'Default contract',
       states: entry.states.join(', ') || 'No State axis documented',
@@ -608,10 +616,16 @@ function ComponentPreview({
       );
     case 'card':
       return (
-        <Card>
-          <strong>Actual Card preview</strong>
-          <p>Content is supplied by the host fixture, not a backend record.</p>
-        </Card>
+        <div className={styles.previewRow}>
+          <Card>
+            <strong>Default</strong>
+            <p>Neutral surface</p>
+          </Card>
+          <Card variant="elevated">
+            <strong>Elevated</strong>
+            <p>Raised surface</p>
+          </Card>
+        </div>
       );
     case 'input':
       return (
@@ -663,12 +677,37 @@ function ComponentPreview({
       return <MetricCard label="Projects" value="12" detail="active records" />;
     case 'badge':
       return (
-        <Card>
-          <Badge tone="accent">Accent badge</Badge>
-        </Card>
+        <div className={styles.previewRow}>
+          <Badge tone="neutral">Neutral</Badge>
+          <Badge tone="accent">Accent</Badge>
+          <Badge tone="info">Info</Badge>
+        </div>
       );
     case 'alert':
-      return <Alert tone="info">Informational alert</Alert>;
+      return (
+        <div className={styles.previewStack}>
+          <Alert
+            tone="info"
+            heading="Context available"
+            message="State clearly what happened and what to do next."
+          />
+          <Alert
+            tone="warning"
+            heading="Context available"
+            message="State clearly what happened and what to do next."
+          />
+          <Alert
+            tone="error"
+            heading="Context available"
+            message="State clearly what happened and what to do next."
+          />
+          <Alert
+            tone="success"
+            heading="Context available"
+            message="State clearly what happened and what to do next."
+          />
+        </div>
+      );
     case 'empty-state':
       return (
         <EmptyState
@@ -697,6 +736,8 @@ function ComponentPreview({
             <StatusChip tone="success">Success</StatusChip>
             <StatusChip tone="warning">Warning</StatusChip>
             <StatusChip tone="danger">Danger</StatusChip>
+            <StatusChip tone="info">Info</StatusChip>
+            <StatusChip tone="reported">Reported</StatusChip>
           </div>
         </Card>
       );
@@ -707,6 +748,7 @@ function ComponentPreview({
             headingLevel={3}
             eyebrow="Shared composition"
             title="SectionHeader"
+            counter={12}
             actions={<Button variant="ghost">Action</Button>}
           />
         </Card>
@@ -1022,7 +1064,9 @@ export function ComponentGallery() {
                         <h3>{item.name}</h3>
                         <p className={styles.owner}>{item.owner}</p>
                       </div>
-                      <StatusChip tone={item.status === 'NOT_IMPLEMENTED' ? 'warning' : 'accent'}>
+                      <StatusChip
+                        tone={item.status === 'IMPLEMENTED_NOT_REVIEWED' ? 'accent' : 'warning'}
+                      >
                         {item.status}
                       </StatusChip>
                     </div>

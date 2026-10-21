@@ -1,29 +1,41 @@
 .chip {
   display: inline-flex;
   max-width: 100%;
-  padding: 0.25rem 0.6rem;
+  padding: 6px 11px;
   overflow-wrap: anywhere;
-  border: 1px solid var(--forge-border-subtle);
   border-radius: 999px;
+  background: var(--forge-status-neutral-bg);
   color: var(--forge-text-muted);
-  font: 500 0.73rem/1.4 var(--forge-font-mono);
+  font: 400 11px/14px var(--forge-font-mono);
 }
 .neutral {
+  background: var(--forge-status-neutral-bg);
   color: var(--forge-text-muted);
 }
 .accent {
-  border-color: currentColor;
+  background: var(--forge-status-accent-bg);
   color: var(--forge-accent);
 }
 .success {
-  border-color: currentColor;
+  background: var(--forge-status-success-bg);
   color: var(--forge-success);
 }
 .warning {
-  border-color: currentColor;
+  background: var(--forge-status-warning-bg);
   color: var(--forge-warning);
 }
 .danger {
-  border-color: currentColor;
+  background: var(--forge-status-error-bg);
   color: var(--forge-danger);
+}
+.info {
+  padding-inline: 10px;
+  background: var(--forge-status-info-bg);
+  color: var(--forge-info);
+  font-family: var(--forge-font-ui);
+  font-weight: 500;
+}
+.reported {
+  background: var(--forge-status-neutral-bg);
+  color: var(--forge-text-secondary);
 }

@@ -93,6 +93,10 @@
   align-items: center;
   gap: var(--forge-space-2);
 }
+.previewStack {
+  display: grid;
+  gap: var(--forge-space-2);
+}
 .meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

@@ -13,4 +13,14 @@ describe('Card', () => {
     );
     expect(screen.getByRole('article', { name: 'Summary' })).toBeInTheDocument();
   });
+
+  it('exposes the canonical elevated visual variant without changing root semantics', () => {
+    render(
+      <Card variant="elevated" data-testid="elevated-card">
+        Summary
+      </Card>,
+    );
+    expect(screen.getByTestId('elevated-card')).toHaveAttribute('data-variant', 'elevated');
+    expect(screen.getByTestId('elevated-card').tagName).toBe('DIV');
+  });
 });

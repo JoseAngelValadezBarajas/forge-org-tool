@@ -6,3 +6,7 @@
   background: var(--forge-surface);
   color: var(--forge-text-primary);
 }
+
+.elevated {
+  background: var(--forge-surface-raised);
+}

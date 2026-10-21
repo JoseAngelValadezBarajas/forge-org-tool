@@ -7,4 +7,12 @@ describe('StatusChip', () => {
     render(<StatusChip tone="success">Connected</StatusChip>);
     expect(screen.getByText('Connected').tagName).toBe('SPAN');
   });
+
+  it.each(['info', 'reported'] as const)(
+    'supports the Figma %s tone distinctly from accent',
+    (tone) => {
+      const { container } = render(<StatusChip tone={tone}>Evidence status</StatusChip>);
+      expect(container.firstElementChild).toHaveAttribute('data-tone', tone);
+    },
+  );
 });
