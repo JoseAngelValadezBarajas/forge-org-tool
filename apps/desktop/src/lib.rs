@@ -48,7 +48,7 @@ pub fn validate_request(method: &str, path: &str, body_len: usize) -> Result<(),
         return Err(PolicyError::UnsupportedRoute);
     }
     let allowed = ["/api/v1/health", "/api/v1/workspaces"];
-    if allowed.iter().any(|route| *route == path) || path.starts_with("/api/v1/workspaces/") {
+    if allowed.contains(&path) || path.starts_with("/api/v1/workspaces/") {
         Ok(())
     } else {
         Err(PolicyError::UnsupportedRoute)
