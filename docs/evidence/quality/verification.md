@@ -49,11 +49,12 @@ data, merge PR #1, or archive the original FORGE repository.
 - Frontend typecheck, architecture checks, token check, Vitest 22/22, and
   production build pass locally.
 - API Ruff, strict mypy, pytest 16/16, and OpenAPI drift check pass locally.
-- Existing isolated Chromium smoke remains 18/18 from Quality run
-  `39526881321`.
-- GitHub Quality run `39526881321` passed web, API, and desktop before this
-  initiative. The quality-gate changes require a fresh CI run for this branch
-  before certification.
+- Existing isolated Chromium smoke remains 18/18; the same web journey suite
+  passed in the final GitHub Quality run.
+- GitHub Quality run `39530621562` passed web, API, and desktop for commit
+  `2178531`, including frontend format/lint/test/build/e2e, API Ruff/mypy/
+  pytest/OpenAPI checks, Rust format/Clippy/tests, desktop smoke tests, and the
+  release build.
 
 No runtime performance improvement is claimed; this report concerns
 readability, repeatable checks, and preserved contracts.
