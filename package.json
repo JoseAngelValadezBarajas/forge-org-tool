@@ -5,8 +5,16 @@
   "private": true,
   "type": "module",
   "packageManager": "npm@11.6.2",
-  "engines": {"node": ">=24 <25", "npm": ">=11 <12"},
-  "workspaces": ["apps/web", "packages/tokens", "packages/ui", "packages/api-client"],
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "workspaces": [
+    "apps/web",
+    "packages/tokens",
+    "packages/ui",
+    "packages/api-client"
+  ],
   "scripts": {
     "dev": "npm run dev --workspace=@forge-org/web",
     "build": "npm run build --workspace=@forge-org/web",
@@ -17,6 +25,32 @@
     "check:tokens": "node tooling/scripts/generate-tokens.mjs --check",
     "test": "npm run check:architecture && npm run check:tokens && npm run typecheck && npm run test:architecture && npm run test:ui",
     "test:ui": "npm run test --workspace=@forge-org/web",
-    "test:e2e": "npm run test:e2e --workspace=@forge-org/web"
+    "test:e2e": "npm run test:e2e --workspace=@forge-org/web",
+    "format": "prettier --write . && uv run --project apps/api --locked ruff format apps/api/src apps/api/tests && cargo fmt --all",
+    "format:check": "prettier --check . && uv run --project apps/api --locked ruff format --check apps/api/src apps/api/tests && cargo fmt --all -- --check",
+    "lint": "npm run lint:frontend && npm run lint:python && npm run lint:rust",
+    "lint:frontend": "eslint .",
+    "lint:python": "uv run --project apps/api --locked ruff check apps/api/src apps/api/tests",
+    "lint:rust": "cargo clippy --all-targets --manifest-path apps/desktop/Cargo.toml -- -D warnings && cargo clippy --all-targets --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings",
+    "lint:fix": "prettier --write . && eslint . --fix && uv run --project apps/api --locked ruff check --fix apps/api/src apps/api/tests && uv run --project apps/api --locked ruff format apps/api/src apps/api/tests && cargo fmt --all",
+    "quality": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.9.10",
+    "typescript-eslint": "^8.72.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.6.2",
+    "typescript-eslint": "^8.46.2"
   }
 }

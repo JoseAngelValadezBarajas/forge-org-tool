@@ -21,6 +21,13 @@ packages = ["src/forge_org"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
+lint.select = ["E4", "E7", "E9", "F", "I", "B"]
+lint.ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "lf"
 [tool.mypy]
 python_version = "3.12"
 strict = true
