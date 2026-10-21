@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from fastapi import APIRouter
 from fastapi.testclient import TestClient
 
@@ -19,7 +22,17 @@ from forge_org.api.routes import router as legacy_router
 
 
 def _paths(router: APIRouter) -> set[str]:
-    return {route.path for route in router.routes}
+    return {route.path for route in _routes(router) if hasattr(route, 'path')}
+
+
+def _routes(router: APIRouter):
+    """Flatten FastAPI's nested include markers for compatibility assertions."""
+    for route in router.routes:
+        nested = getattr(route, 'routes', None)
+        if nested is not None:
+            yield from _routes(nested)
+        else:
+            yield route
 
 
 def test_capability_routers_partition_the_existing_http_surface() -> None:
@@ -39,6 +52,54 @@ def test_capability_routers_partition_the_existing_http_surface() -> None:
     assert all_paths >= _paths(legacy_router)
     assert sum(len(_paths(router)) for router in routers.values()) == len(all_paths)
     assert list_workspaces.__module__.endswith('organization_impl')
+
+
+def test_legacy_router_exports_the_complete_public_http_surface() -> None:
+    """The historical router import must not be an empty compatibility shell."""
+    from forge_org.main import create_app
+
+    app_routes = [
+        (path, (method.upper(),))
+        for path, operations in create_app().openapi()['paths'].items()
+        if path != '/api/v1/health'
+        for method in operations
+        if method != 'parameters'
+    ]
+    legacy_routes = [
+        (route.path, tuple(sorted(route.methods or ()))) for route in _routes(legacy_router)
+    ]
+
+    assert legacy_routes
+    assert legacy_routes == app_routes
+
+
+def test_legacy_router_matches_authoritative_openapi_surface_and_order() -> None:
+    """Compatibility covers operations, order, models, and status metadata."""
+    from forge_org.main import create_app
+
+    app = create_app()
+    actual = app.openapi()
+    expected = json.loads(
+        (Path(__file__).parents[3] / 'contracts' / 'openapi' / 'forge-org-v1.json').read_text()
+    )
+
+    assert actual['paths'] == expected['paths']
+    assert actual['components']['schemas'] == expected['components']['schemas']
+
+    legacy_order = [
+        (route.path, method.upper())
+        for route in _routes(legacy_router)
+        for method in sorted(route.methods or ())
+    ]
+    openapi_order = [
+        (path, method.upper())
+        for path, operations in actual['paths'].items()
+        if path != '/api/v1/health'
+        for method in operations
+        if method != 'parameters'
+    ]
+    assert legacy_order == openapi_order
+    assert len(legacy_order) == len(set(legacy_order))
 
 
 def test_connection_exposes_migration_and_repository_boundaries() -> None:

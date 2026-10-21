@@ -41,10 +41,10 @@
 
 **Files:** `apps/api/src/forge_org/api/routes.py`, bounded route modules, backend characterization/OpenAPI tests.
 
-- [ ] Add a failing characterization test asserting the legacy import exposes the complete non-empty route surface and exact OpenAPI contract.
-- [ ] Extract or compose bounded routers while preserving dependencies, ordering, response models, and status codes.
-- [ ] Make the boundary test fail when a legacy router has zero routes, then pass against the composed implementation.
-- [ ] Run backend and OpenAPI suites; commit the compatibility correction.
+- [x] Add a failing characterization test asserting the legacy import exposes the complete non-empty route surface and exact OpenAPI contract.
+- [x] Extract or compose bounded routers while preserving dependencies, ordering, response models, and status codes.
+- [x] Make the boundary test fail when a legacy router has zero routes, then pass against the composed implementation.
+- [x] Run backend and OpenAPI suites; commit the compatibility correction. The legacy facade now exposes 91 API operations; `/api/v1/health` remains composed by the application root.
 
 ### Task 3: UI package CSS distribution
 
