@@ -1,0 +1,16 @@
+.field {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+.label {
+  color: var(--forge-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.hint {
+  color: var(--forge-text-muted);
+}
+.error {
+  color: var(--forge-danger);
+}

@@ -1,8 +1,2 @@
-import type { InputHTMLAttributes } from 'react';
-import styles from './Input.module.css';
-
-export type InputProps = InputHTMLAttributes<HTMLInputElement>;
-
-export function Input({ className, ...props }: InputProps) {
-  return <input {...props} className={[styles.input, className].filter(Boolean).join(' ')} />;
-}
+export { TextInput as Input } from '../components/forms/TextInput';
+export type { TextInputProps as InputProps } from '../components/forms/TextInput';

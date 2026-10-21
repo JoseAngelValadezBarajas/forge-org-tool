@@ -1,0 +1,24 @@
+.input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-primary);
+  font: inherit;
+}
+.input::placeholder {
+  color: var(--forge-text-muted);
+}
+.input:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
+}
+.input[aria-invalid='true'] {
+  border-color: var(--forge-danger);
+}
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

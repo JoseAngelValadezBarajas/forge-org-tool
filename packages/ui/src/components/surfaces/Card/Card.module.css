@@ -1,0 +1,8 @@
+.card {
+  min-width: 0;
+  padding: var(--forge-space-5);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface);
+  color: var(--forge-text-primary);
+}

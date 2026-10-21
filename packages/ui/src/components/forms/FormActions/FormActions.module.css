@@ -1,0 +1,20 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.start {
+  justify-content: flex-start;
+}
+.end {
+  justify-content: flex-end;
+}
+.between {
+  justify-content: space-between;
+}
+@media (max-width: 30rem) {
+  .actions {
+    gap: 0.375rem;
+  }
+}

@@ -1,0 +1,17 @@
+.row {
+  border-bottom: 1px solid var(--forge-border-subtle);
+}
+.cell {
+  padding: 0.7rem 0.8rem;
+  text-align: start;
+  color: var(--forge-text-primary);
+  overflow-wrap: anywhere;
+}
+th.cell {
+  color: var(--forge-text-muted);
+  background: var(--forge-surface-raised);
+  font: 600 0.7rem/1.4 var(--forge-font-mono);
+}
+.warning {
+  background: color-mix(in srgb, var(--forge-warning) 12%, var(--forge-surface));
+}

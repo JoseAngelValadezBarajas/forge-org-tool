@@ -1,0 +1,20 @@
+.input {
+  width: 100%;
+  color: var(--forge-text-primary);
+  font: inherit;
+}
+.input::file-selector-button {
+  min-height: 2.25rem;
+  margin-inline-end: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface-raised);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.input:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
+}

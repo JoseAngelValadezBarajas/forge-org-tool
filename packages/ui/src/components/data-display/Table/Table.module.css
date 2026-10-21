@@ -1,0 +1,33 @@
+.scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-md);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--forge-surface);
+  color: var(--forge-text-primary);
+}
+.table caption {
+  padding: 0.65rem 0.8rem;
+  text-align: start;
+  color: var(--forge-text-secondary);
+}
+.table th,
+.table td {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--forge-border-subtle);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.table th {
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-muted);
+  font: 600 0.7rem/1.4 var(--forge-font-mono);
+}
+.empty {
+  text-align: center !important;
+  color: var(--forge-text-muted);
+}

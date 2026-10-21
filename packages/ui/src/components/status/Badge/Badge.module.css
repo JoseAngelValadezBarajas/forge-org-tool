@@ -1,0 +1,30 @@
+.badge {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.neutral {
+  color: var(--forge-text-secondary);
+  background: var(--forge-surface-sunken);
+}
+.success {
+  color: var(--forge-success);
+  background: color-mix(in srgb, var(--forge-success) 12%, transparent);
+}
+.warning {
+  color: var(--forge-warning);
+  background: color-mix(in srgb, var(--forge-warning) 12%, transparent);
+}
+.danger {
+  color: var(--forge-danger);
+  background: color-mix(in srgb, var(--forge-danger) 12%, transparent);
+}
+.accent {
+  color: var(--forge-accent);
+  background: color-mix(in srgb, var(--forge-accent) 12%, transparent);
+}

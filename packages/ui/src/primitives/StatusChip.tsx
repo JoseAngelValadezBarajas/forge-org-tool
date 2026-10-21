@@ -1,12 +1,2 @@
-import type { HTMLAttributes } from 'react';
-import styles from './StatusChip.module.css';
-export interface StatusChipProps extends HTMLAttributes<HTMLSpanElement> {
-  tone?: 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
-}
-export function StatusChip({ tone = 'neutral', children, className, ...props }: StatusChipProps) {
-  return (
-    <span {...props} className={[styles.chip, styles[tone], className].filter(Boolean).join(' ')}>
-      {children}
-    </span>
-  );
-}
+export { StatusChip } from '../components/status/StatusChip';
+export type { StatusChipProps } from '../components/status/StatusChip';

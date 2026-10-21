@@ -1,0 +1,11 @@
+.label {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.25rem 0.45rem;
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface-sunken);
+  color: var(--forge-text-secondary);
+  font: 0.72rem/1.4 var(--forge-font-mono);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

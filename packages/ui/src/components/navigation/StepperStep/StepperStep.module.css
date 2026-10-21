@@ -1,0 +1,42 @@
+.step {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface);
+}
+.marker {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--forge-surface-sunken);
+  color: var(--forge-text-secondary);
+}
+.copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+.label {
+  color: var(--forge-text-primary);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.description {
+  color: var(--forge-text-muted);
+  font-size: 0.8rem;
+}
+.current {
+  border-color: var(--forge-accent);
+  background: color-mix(in srgb, var(--forge-accent) 10%, var(--forge-surface));
+}
+.complete .marker {
+  background: var(--forge-success);
+  color: var(--forge-surface);
+}
