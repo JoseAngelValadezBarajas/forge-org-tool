@@ -30,13 +30,16 @@ pub fn bearer_header(token: &str) -> Result<String, PolicyError> {
 }
 
 pub fn validate_request(method: &str, path: &str, body_len: usize) -> Result<(), PolicyError> {
+    let route = path.split('?').next().unwrap_or(path);
     if body_len > MAX_JSON_BODY
         || !path.starts_with("/api/v1/")
-        || path.contains("//")
-        || path.contains("..")
+        || route.contains("//")
+        || route.contains("..")
+        || route.contains('#')
+        || route.contains('%')
         || path.contains('#')
-        || path.contains('?')
-        || path.contains('%')
+        || path.contains('\r')
+        || path.contains('\n')
     {
         return Err(if body_len > MAX_JSON_BODY {
             PolicyError::BodyTooLarge
@@ -61,6 +64,14 @@ mod tests {
     #[test]
     fn accepts_relative_api_route() {
         assert_eq!(validate_request("GET", "/api/v1/workspaces", 0), Ok(()));
+        assert_eq!(
+            validate_request(
+                "GET",
+                "/api/v1/workspaces/w1/projects?search=forge%20org&status=active",
+                0
+            ),
+            Ok(())
+        );
     }
 
     #[test]
@@ -71,6 +82,10 @@ mod tests {
         );
         assert_eq!(
             validate_request("GET", "/api/v1/workspaces/%2e%2e", 0),
+            Err(PolicyError::InvalidPath)
+        );
+        assert_eq!(
+            validate_request("GET", "/api/v1/workspaces/\r\nX-Injected: true", 0),
             Err(PolicyError::InvalidPath)
         );
     }

@@ -4,6 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import '@forge-org/tokens/tokens.css';
 import './app/global.css';
 import { App } from './app/App';
+import { installDesktopTransport } from './desktopTransport';
+
+installDesktopTransport();
+
 const host = document.getElementById('root');
 if (!host) throw new Error('Missing #root');
 createRoot(host).render(

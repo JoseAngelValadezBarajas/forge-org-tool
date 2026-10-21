@@ -8,7 +8,7 @@
     "devUrl": "http://127.0.0.1:5173"
   },
   "app": {
-    "withGlobalTauri": false,
+    "withGlobalTauri": true,
     "security": {
       "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1"
     }
