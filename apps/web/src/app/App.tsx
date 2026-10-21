@@ -12,9 +12,18 @@ import { TransferPage } from '../features/transfer';
 import { ComponentGallery } from './component-gallery/ComponentGallery';
 import styles from './App.module.css';
 import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from './shell';
+import { ThemeProvider, useTheme } from './theme';
 export function App() {
+  return (
+    <ThemeProvider applyToDocument>
+      <ApplicationShell />
+    </ThemeProvider>
+  );
+}
+
+function ApplicationShell() {
   const navigate = useNavigate();
-  const [light, setLight] = useState(false);
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [paletteOpen, setPaletteOpen] = useState(false);
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -32,11 +41,7 @@ export function App() {
     navigate(path);
   }
   return (
-    <div
-      className={styles.app}
-      data-testid="application-shell"
-      data-theme={light ? 'light' : 'dark'}
-    >
+    <div className={styles.app} data-testid="application-shell" data-theme={resolvedTheme}>
       <div className={styles.shellGrid}>
         <aside className={styles.sidebar}>
           <Link to="/" className={styles.brand}>
@@ -61,13 +66,17 @@ export function App() {
             >
               Command palette
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setLight((value) => !value)}
-              aria-label={`Switch to ${light ? 'dark' : 'light'} theme`}
-            >
-              Theme: {light ? 'light' : 'dark'}
-            </Button>
+            <label className={styles.themeControl}>
+              Appearance{' '}
+              <select
+                value={theme}
+                onChange={(event) => setTheme(event.target.value as typeof theme)}
+              >
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="system">System</option>
+              </select>
+            </label>
           </PageHeader>
           <main id="main" className={styles.main}>
             <Routes>

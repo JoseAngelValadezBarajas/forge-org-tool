@@ -128,9 +128,22 @@ component moves to `PASS` only after a reviewer inspects the retained
 Chromium screenshot, responsive behavior, token correspondence and relevant
 accessibility behavior.
 
-Theme evidence: [desktop dark](../evidence/m1/desktop-component-host-dark.png),
-[desktop light](../evidence/m1/desktop-component-host.png), [mobile dark](../evidence/m1/mobile-component-host-dark.png),
-and [mobile light](../evidence/m1/mobile-gallery-light.png).
+The Component Host captures are automated behavior/render evidence, not a
+human Figma parity certification. Each category was captured in both theme
+modes at desktop and mobile viewport sizes:
+
+| Host category               | Desktop Dark                                                                          | Desktop Light                                                                          | Mobile Dark                                                                          | Mobile Light                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| Foundations and tokens      | [capture](../evidence/m1/desktop-component-host-dark-foundations-and-tokens.png)      | [capture](../evidence/m1/desktop-component-host-light-foundations-and-tokens.png)      | [capture](../evidence/m1/mobile-component-host-dark-foundations-and-tokens.png)      | [capture](../evidence/m1/mobile-component-host-light-foundations-and-tokens.png)      |
+| Core UI primitives          | [capture](../evidence/m1/desktop-component-host-dark-core-ui-primitives.png)          | [capture](../evidence/m1/desktop-component-host-light-core-ui-primitives.png)          | [capture](../evidence/m1/mobile-component-host-dark-core-ui-primitives.png)          | [capture](../evidence/m1/mobile-component-host-light-core-ui-primitives.png)          |
+| Generic shared compositions | [capture](../evidence/m1/desktop-component-host-dark-generic-shared-compositions.png) | [capture](../evidence/m1/desktop-component-host-light-generic-shared-compositions.png) | [capture](../evidence/m1/mobile-component-host-dark-generic-shared-compositions.png) | [capture](../evidence/m1/mobile-component-host-light-generic-shared-compositions.png) |
+| Product-specific components | [capture](../evidence/m1/desktop-component-host-dark-product-specific-components.png) | [capture](../evidence/m1/desktop-component-host-light-product-specific-components.png) | [capture](../evidence/m1/mobile-component-host-dark-product-specific-components.png) | [capture](../evidence/m1/mobile-component-host-light-product-specific-components.png) |
+| Icon library                | [capture](../evidence/m1/desktop-component-host-dark-icon-library.png)                | [capture](../evidence/m1/desktop-component-host-light-icon-library.png)                | [capture](../evidence/m1/mobile-component-host-dark-icon-library.png)                | [capture](../evidence/m1/mobile-component-host-light-icon-library.png)                |
+
+Overview captures: [desktop dark](../evidence/m1/desktop-component-host-dark.png),
+[desktop light](../evidence/m1/desktop-component-host-light.png),
+[mobile dark](../evidence/m1/mobile-component-host-dark.png), and
+[mobile light](../evidence/m1/mobile-component-host-light.png).
 
 ## Focused audit notes
 

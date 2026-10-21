@@ -1,5 +1,9 @@
 import '@forge-org/tokens/tokens.css';
 
+// Platform appearance utility; preference and persistence remain consumer-owned.
+export { useSystemTheme } from './hooks';
+export type { SystemTheme } from './hooks';
+
 // Actions
 export { Button } from './components/actions/Button';
 export type { ButtonProps, ButtonSize } from './components/actions/Button';

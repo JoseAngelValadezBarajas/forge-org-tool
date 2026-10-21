@@ -19,5 +19,5 @@
   flex-wrap: wrap;
 }
 .notice {
-  color: var(--color-warning, #e2ae59);
+  color: var(--forge-warning);
 }

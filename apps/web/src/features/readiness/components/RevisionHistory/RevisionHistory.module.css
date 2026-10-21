@@ -18,21 +18,21 @@
   overflow-wrap: anywhere;
 }
 .revisionText {
-  color: var(--color-text-muted, #9ea5ad);
+  color: var(--forge-text-secondary);
   font-size: 0.75rem;
 }
 .revisionText > span {
-  color: var(--color-text, #f5f3ee);
+  color: var(--forge-text-primary);
   font-weight: 600;
 }
 .status {
-  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-family: var(--forge-font-mono);
   font-size: 0.625rem;
   line-height: 1;
 }
 .current .status {
-  color: var(--color-accent, #d8874d);
+  color: var(--forge-accent);
 }
 .superseded .status {
-  color: var(--color-warning, #e2ae59);
+  color: var(--forge-warning);
 }

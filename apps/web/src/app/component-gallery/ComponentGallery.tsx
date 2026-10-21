@@ -83,6 +83,7 @@ import type {
   Repository,
   Task,
 } from '@forge-org/api-client';
+import { ThemeProvider, useTheme } from '../theme';
 import {
   AlertTriangle,
   ArrowDown,
@@ -660,8 +661,25 @@ function CatalogMeta({ item }: { item: CatalogItem }) {
 }
 
 function TokenPreview() {
+  const primitiveTokens = [
+    'palette-graphite-950',
+    'palette-graphite-900',
+    'palette-graphite-800',
+    'palette-graphite-700',
+    'palette-copper-500',
+    'palette-copper-700',
+    'palette-success-400',
+    'palette-success-700',
+    'palette-warning-400',
+    'palette-warning-700',
+    'palette-danger-400',
+    'palette-danger-700',
+    'palette-info-400',
+    'palette-info-700',
+  ];
   return (
     <Card>
+      <h4>Semantic theme tokens</h4>
       <div className={styles.tokenGrid} aria-label="Semantic token preview">
         {['bg', 'surface', 'surface-raised', 'text', 'accent', 'success', 'warning', 'danger'].map(
           (token) => (
@@ -675,6 +693,19 @@ function TokenPreview() {
             </div>
           ),
         )}
+      </div>
+      <h4>Primitive palette samples</h4>
+      <div className={styles.tokenGrid} aria-label="Primitive palette preview">
+        {primitiveTokens.map((token) => (
+          <div className={styles.token} key={token}>
+            <span
+              className={styles.swatch}
+              style={{ background: `var(--forge-${token})` }}
+              aria-hidden="true"
+            />
+            <code>--forge-{token}</code>
+          </div>
+        ))}
       </div>
     </Card>
   );
@@ -1794,7 +1825,15 @@ function ProductPreview({ item }: { item: CatalogItem }) {
 
 /** Development-only inspection route. It showcases real exports and deterministic fixtures. */
 export function ComponentGallery() {
-  const [light, setLight] = useState(false);
+  return (
+    <ThemeProvider initialTheme="dark" storageKey={null}>
+      <ComponentGalleryContent />
+    </ThemeProvider>
+  );
+}
+
+function ComponentGalleryContent() {
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [query, setQuery] = useState('');
   const [counter, setCounter] = useState(0);
   const normalizedQuery = query.trim().toLowerCase();
@@ -1809,14 +1848,22 @@ export function ComponentGallery() {
   );
 
   return (
-    <div className={styles.gallery} data-theme={light ? 'light' : 'dark'}>
+    <div className={styles.gallery} data-theme={resolvedTheme}>
       <SectionHeader
         eyebrow="FORGE / Component Host / M1"
         title="Component Host"
         actions={
-          <Button variant="secondary" onClick={() => setLight((value) => !value)}>
-            Switch to {light ? 'dark' : 'light'}
-          </Button>
+          <label className={styles.themeControl}>
+            Preview theme{' '}
+            <select
+              value={theme}
+              onChange={(event) => setTheme(event.target.value as typeof theme)}
+            >
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+              <option value="system">System</option>
+            </select>
+          </label>
         }
       />
       <p className={styles.intro}>

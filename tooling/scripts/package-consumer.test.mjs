@@ -86,7 +86,7 @@ test('packed UI, tokens, icons, and API client work in an external React consume
   mkdirSync(join(consumer, 'src'), { recursive: true });
   writeFileSync(
     join(consumer, 'src/main.tsx'),
-    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Alert, Button, Card, Checkbox, Dialog, FormField, Input, KeyValueRow, StatusChip, Tabs } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light'>('dark');\n  return <main data-theme={theme}><button type="button" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>Theme</button><div className="button" data-testid="host-class">Host class</div><FormField label="Name"><Input /></FormField><label>Include metadata <Checkbox /></label><Button onClick={() => setCount(count + 1)}>Save {count}</Button><Card variant="elevated" data-testid="external-card"><StatusChip tone="success">Available</StatusChip><Alert heading="Review" message="Human review remains required." /></Card><dl><KeyValueRow label="Repository" value="atlas" /></dl><Tabs label="External tabs" tabs={[{ id: 'overview', label: 'Overview', content: 'Overview panel' }, { id: 'details', label: 'Details', content: 'Details panel' }]} /><Dialog title="External dialog" description="Dialog package contract" data-testid="external-dialog" /></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
+    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Alert, Button, Card, Checkbox, Dialog, FormField, Input, KeyValueRow, StatusChip, Tabs, useSystemTheme } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>(() => { const saved = localStorage.getItem('external-theme'); return saved === 'dark' || saved === 'light' || saved === 'system' ? saved : 'dark'; });\n  const systemTheme = useSystemTheme();\n  const resolvedTheme = theme === 'system' ? systemTheme : theme;\n  return <main data-theme={resolvedTheme} style={{ fontFamily: 'var(--forge-font-ui)' }}><label>Appearance mode<select aria-label="Appearance mode" value={theme} onChange={(event) => { const next = event.target.value as typeof theme; setTheme(next); localStorage.setItem('external-theme', next); }}><option value="dark">Dark</option><option value="light">Light</option><option value="system">System</option></select></label><div className="button" data-testid="host-class">Host class</div><FormField label="Name"><Input /></FormField><label>Include metadata <Checkbox /></label><Button onClick={() => setCount(count + 1)}>Save {count}</Button><Card variant="elevated" data-testid="external-card"><StatusChip tone="success">Available</StatusChip><Alert heading="Review" message="Human review remains required." /></Card><dl><KeyValueRow label="Repository" value="atlas" /></dl><Tabs label="External tabs" tabs={[{ id: 'overview', label: 'Overview', content: 'Overview panel' }, { id: 'details', label: 'Details', content: 'Details panel' }]} /><Dialog title="External dialog" description="Dialog package contract" data-testid="external-dialog" /></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
   );
   writeFileSync(
     join(consumer, 'vite.config.ts'),
@@ -198,12 +198,38 @@ test('packed UI, tokens, icons, and API client work in an external React consume
       const before = await page
         .getByLabel('Name')
         .evaluate((element) => globalThis.getComputedStyle(element).backgroundColor);
-      await page.getByRole('button', { name: 'Theme' }).click();
+      assert.notEqual(
+        await page
+          .locator('main')
+          .evaluate((element) => getComputedStyle(element).getPropertyValue('--forge-bg').trim()),
+        '',
+      );
+      assert.match(
+        await page
+          .locator('main')
+          .evaluate((element) => getComputedStyle(element).getPropertyValue('--forge-font-ui')),
+        /system-ui/,
+      );
+      await page.getByLabel('Appearance mode').selectOption('light');
       assert.equal(await page.locator('main').getAttribute('data-theme'), 'light');
       const after = await page
         .getByLabel('Name')
         .evaluate((element) => globalThis.getComputedStyle(element).backgroundColor);
       assert.notEqual(before, after);
+      await page.getByLabel('Appearance mode').selectOption('system');
+      assert.equal(await page.locator('main').getAttribute('data-theme'), 'light');
+      await page.emulateMedia({ colorScheme: 'dark' });
+      await page.waitForFunction(
+        () => globalThis.document.querySelector('main')?.getAttribute('data-theme') === 'dark',
+      );
+      assert.equal(await page.locator('main').getAttribute('data-theme'), 'dark');
+      assert.equal(
+        await page.evaluate(() => globalThis.localStorage.getItem('external-theme')),
+        'system',
+      );
+      await page.reload();
+      assert.equal(await page.getByLabel('Appearance mode').inputValue(), 'system');
+      assert.equal(await page.locator('main').getAttribute('data-theme'), 'dark');
     } finally {
       await browser.close();
     }

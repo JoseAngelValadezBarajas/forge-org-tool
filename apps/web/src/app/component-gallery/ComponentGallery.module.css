@@ -32,6 +32,20 @@
   outline: 2px solid var(--forge-accent);
   outline-offset: 3px;
 }
+.themeControl {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--forge-space-2);
+  color: var(--forge-text-muted);
+}
+.themeControl select {
+  min-height: 36px;
+  padding: 0 var(--forge-space-2);
+  color: var(--forge-text);
+  background: var(--forge-surface);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+}
 .layout {
   display: grid;
   grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);

@@ -47,6 +47,7 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     has: page.getByText('A development-only catalog of actual exported React components'),
   });
   await expect(gallery).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
@@ -57,12 +58,32 @@ test('mobile gallery switches from dark to light with no browser errors', async 
       ? 'mobile-component-host'
       : 'desktop-component-host';
   const primary = page.getByRole('button', { name: /increment 0/i });
+  const captureCategories = async (theme: 'dark' | 'light') => {
+    await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
+    for (const category of [
+      'Foundations and tokens',
+      'Core UI primitives',
+      'Generic shared compositions',
+      'Product-specific components',
+      'Icon library',
+    ]) {
+      const heading = page.getByRole('heading', { name: category, exact: true }).first();
+      await heading.scrollIntoViewIfNeeded();
+      await expect(heading).toBeVisible();
+      const slug = category.toLowerCase().replaceAll(' ', '-');
+      await page.screenshot({
+        path: resolve(evidenceDir, `${prefix}-${theme}-${slug}.png`),
+        fullPage: false,
+      });
+    }
+  };
   await primary.scrollIntoViewIfNeeded();
   await expect(primary).toBeVisible();
   await page.screenshot({
     path: resolve(evidenceDir, `${prefix}-dark.png`),
     fullPage: false,
   });
+  await captureCategories('dark');
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
@@ -76,10 +97,17 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     (element) => getComputedStyle(element).backgroundColor,
   );
   expect(hoverBackground).not.toBe(defaultBackground);
-  await page.getByRole('button', { name: 'Switch to light', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Preview theme' }).selectOption('light');
   await expect(gallery).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await primary.scrollIntoViewIfNeeded();
   await expect(page.getByRole('button', { name: /increment 0/i })).toBeVisible();
+  await page.screenshot({
+    path: resolve(evidenceDir, `${prefix}-light.png`),
+    fullPage: false,
+  });
+  await captureCategories('light');
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
@@ -94,6 +122,15 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     path: resolve(evidenceDir, screenshotName),
     fullPage: false,
   });
+  const previewTheme = page.getByRole('combobox', { name: 'Preview theme' });
+  await previewTheme.selectOption('system');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(gallery).toHaveAttribute('data-theme', 'dark');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect(gallery).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.evaluate(() => localStorage.getItem('forge-theme'))).resolves.toBeNull();
 });
 
 test('planning and readiness remain manual truth states', async ({ page }) => {
@@ -413,8 +450,19 @@ test('application shell exposes command palette and theme control', async ({ pag
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Go to Organization' })).toBeVisible();
   await page.getByRole('button', { name: 'Go to Organization' }).click();
-  await page.getByRole('button', { name: /switch to light theme/i }).click();
+  const appearance = page.getByRole('combobox', { name: 'Appearance' });
+  await appearance.selectOption('light');
   await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await appearance.selectOption('system');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'light');
+  await expect(page.evaluate(() => localStorage.getItem('forge-theme'))).resolves.toBe('system');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(page.getByRole('combobox', { name: 'Appearance' })).toHaveValue('system');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden();
 });

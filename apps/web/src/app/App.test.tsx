@@ -17,6 +17,8 @@ function renderRoute(path: string) {
 describe('M1 application shell', () => {
   afterEach(() => {
     cleanup();
+    localStorage.clear();
+    delete document.documentElement.dataset.theme;
     vi.unstubAllGlobals();
   });
 
@@ -136,9 +138,51 @@ describe('M1 application shell', () => {
     fireEvent.click(screen.getByRole('button', { name: /increment 0/i }));
     expect(screen.getByRole('button', { name: /increment 1/i })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /^Switch to light$/ }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Preview theme' }), {
+      target: { value: 'light' },
+    });
     expect(gallery).toHaveAttribute('data-theme', 'light');
-    expect(screen.getByRole('button', { name: /switch to dark/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Preview theme' })).toHaveValue('light');
+  });
+
+  it('keeps the Component Host preview isolated from persisted application appearance', () => {
+    localStorage.setItem('forge-theme', 'dark');
+    renderRoute('/__components');
+
+    const app = screen.getByTestId('application-shell');
+    const gallery = screen.getByRole('heading', { name: 'Component Host' }).closest('[data-theme]');
+    expect(app).toHaveAttribute('data-theme', 'dark');
+    expect(gallery).toHaveAttribute('data-theme', 'dark');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+
+    fireEvent.change(screen.getByRole('combobox', { name: 'Preview theme' }), {
+      target: { value: 'light' },
+    });
+    expect(gallery).toHaveAttribute('data-theme', 'light');
+    expect(app).toHaveAttribute('data-theme', 'dark');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'dark');
+    expect(localStorage.getItem('forge-theme')).toBe('dark');
+  });
+
+  it('previews primitive palette tokens alongside semantic theme tokens', () => {
+    renderRoute('/__components');
+
+    expect(screen.getByText('--forge-palette-graphite-950')).toBeInTheDocument();
+    expect(screen.getByText('--forge-palette-copper-500')).toBeInTheDocument();
+  });
+
+  it('provides a three-mode persistent application appearance control', () => {
+    renderRoute('/');
+
+    const appearance = screen.getByRole('combobox', { name: 'Appearance' });
+    expect(appearance).toHaveValue('dark');
+    expect(screen.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+    fireEvent.change(appearance, { target: { value: 'light' } });
+    expect(screen.getByTestId('application-shell')).toHaveAttribute('data-theme', 'light');
+    expect(localStorage.getItem('forge-theme')).toBe('light');
+    fireEvent.change(appearance, { target: { value: 'system' } });
+    expect(appearance).toHaveValue('system');
+    expect(localStorage.getItem('forge-theme')).toBe('system');
   });
 
   it('provides searchable catalog sections and clearly labels review status', () => {
