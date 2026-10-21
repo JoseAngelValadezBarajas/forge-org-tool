@@ -34,7 +34,7 @@
 **Files:** Create `docs/design/design-system-parity.json`, update `docs/design/component-parity.md`.
 
 - [x] Extract the 37 generic family list and 28 product master IDs, variants/states, and dimensions from page 19/20 metadata; Figma contexts now work when queried against concrete master nodes (for example `173:27` and `229:135`). The exact 35 icon node list still needs extraction.
-- [ ] Record all 100 inventory rows with owner, public API, stylesheet, tests, Component Host, and review state; explicitly list code-only components.
+- [x] Record all 100 inventory rows with owner, public API, stylesheet, tests, Component Host, and review state; explicitly list code-only components.
 - [ ] Add a validator that rejects missing/duplicate inventory rows and nonexistent source owners/host entries.
 
 ### Task 2: Generic UI components
