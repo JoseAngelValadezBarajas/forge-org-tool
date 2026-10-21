@@ -1,6 +1,6 @@
 # M1 verification evidence
 
-Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). Subsequent reconstruction commits include `753b4be` (workbench/transfer surfaces), `9d2b518` (context verification), `ec7a943` (planning detail), `5576ccb` (shell command palette), `522840a` (handoff lifecycle), `5674f35` (refreshed evidence), `40dedfb` (Windows resource icon), `13f7fc5` (isolated desktop CI frontend build), `f83e1a9` (ORG-006 delivery truth vertical slice), `3221de0` (versioned persistence migrations), `159a930` (desktop lifecycle and product hierarchy), `f6bfdce` (isolated browser assertion), `8031914` (sidecar-before-Tauri CI ordering), and Figma evidence commit `cbb3841`.
+Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). The shared package initiative adds `a8ea80d` (committed implementation plan), `5f3377e` (shared UI contracts), `3fca7bf` (feature consumer adoption), and the current API/Component Host documentation commit recorded below.
 
 Final verification commit: `734c25a`; the browser evidence refresh follows the green GitHub Quality run `39422706855` for the same implementation state. Documentation commit `ae598c4` was verified by Quality run `39423678963`.
 
@@ -22,6 +22,9 @@ foundation audit record.
 - GitHub Quality: run [39390208428](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390208428) passed for `cdc8114`; web, API, and Windows desktop jobs completed successfully.
 - GitHub Quality: run [39390708097](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39390708097) passed for final documentation commit `39b0421`; web, API, and Windows desktop jobs completed successfully.
 - Component Host: `/__components` renders public `@forge-org/ui` exports and the existing organization feature with deterministic local fixtures; it makes no backend calls. The route remains development-only and is excluded from production output.
+- Shared package adoption: Organization, Planning, Repositories, Workbench, Delivery and Transfer now consume the public `@forge-org/ui` controls where the contract applies; no `@forge-org/icons` or `@forge-org/testing` package was created because there is no licensed icon consumer or cross-package test utility need.
+- API client: `transport.ts`, `errors.ts`, `types.ts`, and the `organization.ts` capability module now back the compatibility-preserving `organizationApi` facade. Remaining capability methods retain their public behavior while moving incrementally behind the same transport boundary.
+- Component Host coverage: every implemented shared export has a deterministic preview under `/__components`; dark/light and representative desktop/mobile evidence are retained. This is automated behavior evidence only, not human Figma certification.
 - Figma review: read-only node context and retained captures were reviewed for Button `173:27`, StatusChip `173:40`, Card `173:65`, SectionHeader `178:191`, and product reference screen `4:32`. These are human-review inputs, not visual certification.
 - Playwright isolation: both servers use `reuseExistingServer: false`; the API also receives a unique temporary SQLite path per run, so occupied ports or stale local data cannot silently affect assertions.
 - Shared contracts: Card default `div` and typed semantic option passed; Button loading/disabled/pressed DOM contract passed. Button visual parity remains unreviewed, including the 40px implementation height versus the 36/38px Figma reference.
