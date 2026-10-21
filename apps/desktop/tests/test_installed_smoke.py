@@ -11,7 +11,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).parents[2] / 'api' / 'src'))
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
-from forge_org.infrastructure.sqlite import connect  # noqa: E402
+from forge_org.infrastructure.connection import connect  # noqa: E402
 from sidecar_launcher import app_data_root, backup_database, local_paths  # noqa: E402
 
 
