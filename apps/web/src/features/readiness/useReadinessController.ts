@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   organizationApi,
   type Decision,
@@ -18,21 +18,23 @@ export function useReadinessController(workspaceId: string, projectId: string, f
   const [decisionTitle, setDecisionTitle] = useState('');
   const [invariantTitle, setInvariantTitle] = useState('');
   const [error, setError] = useState('');
+  const refreshGeneration = useRef(0);
 
   const refresh = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      const generation = ++refreshGeneration.current;
       try {
         const [nextReadiness, nextDecisions, nextInvariants] = await Promise.all([
           organizationApi.previewReadiness(workspaceId, projectId, featureId),
           organizationApi.listDecisions(workspaceId, projectId),
           organizationApi.listInvariants(workspaceId, projectId, featureId),
         ]);
-        if (!isCurrent()) return;
+        if (!isCurrent() || generation !== refreshGeneration.current) return;
         setResult(nextReadiness);
         setDecisions(nextDecisions);
         setInvariants(nextInvariants);
       } catch (cause) {
-        if (isCurrent()) {
+        if (isCurrent() && generation === refreshGeneration.current) {
           setError(cause instanceof Error ? cause.message : 'Unable to evaluate readiness.');
         }
       }

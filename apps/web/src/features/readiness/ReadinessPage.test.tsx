@@ -98,4 +98,50 @@ describe('ReadinessPage', () => {
       ),
     );
   });
+
+  it('does not let the initial refresh overwrite a newly created invariant', async () => {
+    let resolveInitialInvariants: ((response: Response) => void) | undefined;
+    const initialInvariants = new Promise<Response>((resolve) => {
+      resolveInitialInvariants = resolve;
+    });
+    const createdInvariant = { ...invariant, id: 'i2', title: 'Fresh invariant' };
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      const path = String(input);
+      if (path.endsWith('/readiness/preview')) {
+        return Promise.resolve(new Response(JSON.stringify(readiness), { status: 200 }));
+      }
+      if (path.endsWith('/decisions')) {
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }
+      if (path.includes('/invariants?feature_id=f1')) {
+        if (init?.method === 'POST') {
+          return Promise.resolve(new Response(JSON.stringify(createdInvariant), { status: 201 }));
+        }
+        if (fetchMock.mock.calls.filter(([request]) => String(request).includes('/invariants?')).length === 1) {
+          return initialInvariants;
+        }
+        return Promise.resolve(new Response(JSON.stringify([createdInvariant]), { status: 200 }));
+      }
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/readiness/w1/p1/f1']}>
+        <Routes>
+          <Route path="/readiness/:workspaceId/:projectId/:featureId" element={<ReadinessPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    fireEvent.change(screen.getByLabelText('Invariant title'), {
+      target: { value: 'Fresh invariant' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Add invariant' }));
+    expect(await screen.findByText('Fresh invariant')).toBeInTheDocument();
+
+    resolveInitialInvariants?.(new Response('[]', { status: 200 }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(screen.getByText('Fresh invariant')).toBeInTheDocument();
+  });
 });
