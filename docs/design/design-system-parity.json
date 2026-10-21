@@ -1481,7 +1481,7 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Neutral, Success, Warning, Danger, Info and Reported are supported. Accent remains an additional API tone and is not mapped to Info/Reported.",
+      "implementationNotes": "Neutral, Success, Warning, Danger, Info and Reported are supported. Accent remains an additional API tone and is not mapped to Info/Reported. The Light neutral background uses #f4f3f1 instead of #f0efed to bring secondary label contrast above 4.5:1; human visual review is pending.",
       "relatedImplementation": []
     },
     {

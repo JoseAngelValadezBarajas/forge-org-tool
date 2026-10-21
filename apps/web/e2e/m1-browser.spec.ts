@@ -93,10 +93,21 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     (element) => getComputedStyle(element).backgroundColor,
   );
   await primary.hover();
+  await page.waitForTimeout(150);
   const hoverBackground = await primary.evaluate(
     (element) => getComputedStyle(element).backgroundColor,
   );
   expect(hoverBackground).not.toBe(defaultBackground);
+  const primaryBounds = await primary.boundingBox();
+  if (!primaryBounds) throw new Error('Component Host primary button is not measurable');
+  await page.mouse.down();
+  const pressedBackground = await primary.evaluate(
+    (element) => getComputedStyle(element).backgroundColor,
+  );
+  await page.mouse.move(0, 0);
+  await page.mouse.up();
+  expect(pressedBackground).not.toBe(hoverBackground);
+  await expect(primary).toHaveAccessibleName('Increment 0');
   await page.getByRole('combobox', { name: 'Preview theme' }).selectOption('light');
   await expect(gallery).toHaveAttribute('data-theme', 'light');
   await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');

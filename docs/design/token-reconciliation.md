@@ -67,6 +67,12 @@ Light tokens; the generated `--forge-palette-*` names are code-level foundations
 only. They do not imply that Figma defines matching shade scales or variable
 names.
 
+The additional neutral-chip contrast pair exposed a Light-mode failure at
+4.35:1 (`textSecondary` on `statusNeutralBg`). The implementation background
+was adjusted from `#f0efed` to `#f4f3f1`, yielding 4.51:1 while preserving the
+existing `#6d706f` secondary text. This is an accessibility correction, not a
+claim of exact Figma parity; the chip’s visual review remains open.
+
 ## Validation
 
 `npm run check:tokens` checks generated-file freshness, component token

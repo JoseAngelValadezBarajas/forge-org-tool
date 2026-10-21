@@ -66,6 +66,21 @@
   background: var(--forge-danger);
   color: var(--forge-surface);
 }
+.primary:active:not(:disabled) {
+  border-color: var(--forge-accent-soft);
+  background: var(--forge-accent-soft);
+  color: var(--forge-text-primary);
+}
+.secondary:active:not(:disabled),
+.ghost:active:not(:disabled) {
+  border-color: var(--forge-border-strong);
+  background: var(--forge-surface-active);
+}
+.danger:active:not(:disabled) {
+  border-color: var(--forge-danger);
+  background: var(--forge-status-error-bg);
+  color: var(--forge-danger);
+}
 .button:active:not(:disabled) {
   transform: translateY(1px);
 }
