@@ -29,7 +29,7 @@ fn start_sidecar(app: &AppHandle) -> Result<(u16, String, CommandChild), String>
         .take(48)
         .map(char::from)
         .collect();
-    let (mut events, mut child) = app
+    let (mut events, child) = app
         .shell()
         .sidecar("forge-sidecar")
         .map_err(|error| format!("cannot locate sidecar: {error}"))?
@@ -162,7 +162,7 @@ fn desktop_request(
 
 fn stop_sidecar(state: &DesktopTransport) {
     if let Ok(mut child) = state.child.lock() {
-        if let Some(mut child) = child.take() {
+        if let Some(child) = child.take() {
             let _ = child.kill();
         }
     }
