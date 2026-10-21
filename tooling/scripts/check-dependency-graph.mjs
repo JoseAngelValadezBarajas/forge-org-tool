@@ -71,8 +71,7 @@ function dependencies(file) {
   return [...new Set(result)];
 }
 
-export function findCycles() {
-  const graph = new Map(files.map((file) => [file, dependencies(file)]));
+export function findCyclesInGraph(graph) {
   const state = new Map();
   const stack = [];
   const cycles = [];
@@ -89,8 +88,12 @@ export function findCycles() {
     stack.pop();
     state.set(file, 2);
   }
-  for (const file of files) visit(file);
+  for (const file of graph.keys()) visit(file);
   return [...new Set(cycles)];
+}
+
+export function findCycles() {
+  return findCyclesInGraph(new Map(files.map((file) => [file, dependencies(file)])));
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
