@@ -1,5 +1,5 @@
-import { getApiJson, sendJson } from './transport';
-import type { Project, Workspace } from './types';
+import { getApiJson, sendJson } from './transport.js';
+import type { Project, Workspace } from './types.js';
 
 export const organizationCapability = {
   listWorkspaces: () => getApiJson<Workspace[]>({ path: '/api/v1/workspaces' }),

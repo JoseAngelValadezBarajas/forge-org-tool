@@ -1,12 +1,13 @@
 import hashlib
 import json
+import sqlite3
 from typing import Any
 
-from forge_org.infrastructure.sqlite import OrganizationRepository
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 
 class DeliveryService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.repository = OrganizationRepository(connection)
 
     VERIFICATION_RULES = (

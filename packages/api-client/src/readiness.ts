@@ -1,5 +1,5 @@
-import { sendJson } from './transport';
-import type { ReadinessResult } from './types';
+import { sendJson } from './transport.js';
+import type { ReadinessResult } from './types.js';
 
 export const readinessCapability = {
   previewReadiness: (workspaceId: string, projectId: string, featureId: string) =>

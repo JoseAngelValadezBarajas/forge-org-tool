@@ -1,5 +1,5 @@
-import { getApiJson, sendJson } from './transport';
-import type { Observation, Repository } from './types';
+import { getApiJson, sendJson } from './transport.js';
+import type { Observation, Repository } from './types.js';
 
 export const repositoriesCapability = {
   listRepositories: (workspaceId: string, projectId: string) =>

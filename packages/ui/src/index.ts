@@ -1,3 +1,5 @@
+import '@forge-org/tokens/tokens.css';
+
 export { Button } from './primitives/Button';
 export type { ButtonProps } from './primitives/Button';
 export { Input } from './primitives/Input';

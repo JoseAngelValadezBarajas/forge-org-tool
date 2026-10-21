@@ -1,5 +1,5 @@
-import { getApiJson, sendJson } from './transport';
-import type { ProjectTransferPreview } from './types';
+import { getApiJson, sendJson } from './transport.js';
+import type { ProjectTransferPreview } from './types.js';
 
 export const transferCapability = {
   previewProjectImport: (workspaceId: string, document: unknown) =>

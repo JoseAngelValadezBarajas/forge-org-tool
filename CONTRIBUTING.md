@@ -13,7 +13,9 @@ npm run quality
 
 Individual checks are available through `npm run format`,
 `npm run format:check`, `npm run lint`, `npm run lint:fix`,
-`npm run typecheck`, `npm run test`, and `npm run build`.
+`npm run typecheck`, `npm run test`, `npm run test:packages`, and
+`npm run build`. `npm run build:packages` validates the distributable outputs
+for tokens, UI, and API client before the web build.
 
 Python formatting/linting uses `uv run --project apps/api --locked ruff
 format` and `ruff check`; Rust uses `cargo fmt` and `cargo clippy` against

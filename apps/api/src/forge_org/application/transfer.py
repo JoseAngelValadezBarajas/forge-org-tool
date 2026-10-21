@@ -1,5 +1,6 @@
 import hashlib
 import json
+import sqlite3
 from typing import Any
 from uuid import uuid4
 
@@ -14,7 +15,7 @@ MAX_CRITERIA = 2000
 
 
 class ProjectTransferService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.connection = connection
 
     @staticmethod

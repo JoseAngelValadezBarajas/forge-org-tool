@@ -3,7 +3,7 @@
 import sqlite3
 
 from ..connection import utc_now
-from ..sqlite import _apply_legacy_schema
+from .legacy_schema import _apply_legacy_schema
 from .v0002_metadata import VERSION as METADATA_MIGRATION_VERSION
 from .v0002_metadata import upgrade as upgrade_metadata
 

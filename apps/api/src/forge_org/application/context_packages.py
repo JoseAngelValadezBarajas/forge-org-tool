@@ -1,14 +1,15 @@
 import hashlib
 import json
+import sqlite3
 from typing import Any
 
-from forge_org.infrastructure.sqlite import OrganizationRepository
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 SCHEMA_VERSION = 'forge-context-v1'
 
 
 class ContextPackageService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.repository = OrganizationRepository(connection)
 
     def _scope(

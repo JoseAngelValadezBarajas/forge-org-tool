@@ -1,5 +1,5 @@
-import { getApiJson, sendJson } from './transport';
-import type { Handoff, HandoffRevision, Run } from './types';
+import { getApiJson, sendJson } from './transport.js';
+import type { Handoff, HandoffRevision, Run } from './types.js';
 
 export const workbenchCapability = {
   listRuns: (workspaceId: string, projectId: string, status = '', search = '') =>

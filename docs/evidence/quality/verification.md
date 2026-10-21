@@ -35,28 +35,36 @@ data, merge PR #1, or archive the original FORGE repository.
   planning, readiness, repositories, context, transfer, workbench, and delivery
   operations are implemented in focused modules with shared response types.
 - API dependency providers remain in `api/dependencies.py`. Connection lifecycle
-  remains in `infrastructure/connection.py`; migration execution now lives in
-  `infrastructure/migrations/runner.py` while the legacy schema and repository
-  SQL remain unchanged for compatibility.
-- Public route registration is composed into capability groups in
-  `api/route_groups.py`; handler extraction from the 1,653-line legacy-compatible
-  `routes.py` and cohesive repository extraction from `sqlite.py` remain open
-  structural work.
+  remains in `infrastructure/connection.py`; migration execution lives in
+  `infrastructure/migrations/runner.py`, legacy schema creation in
+  `infrastructure/migrations/legacy_schema.py`, and the repository implementation
+  in `infrastructure/persistence/organization.py`. `sqlite.py` and `routes.py`
+  are now compatibility surfaces rather than storage locations for handlers or
+  persistence implementation.
+- Delivery state/mutations are coordinated by
+  `features/delivery/useDeliveryController.ts`, with metrics in
+  `DeliverySummary.tsx`; product semantics remain feature-owned.
+- Tokens now emit the previously missing semantic variables, and a static
+  reference check runs in architecture verification.
+- Tokens, UI, and API client each produce package artifacts with declarations and
+  export maps. A disposable external React/Vite consumer installs packed
+  artifacts and verifies TypeScript, runtime bundling, CSS, and React deduplication.
 
 ## Verification evidence
 
-- Frontend typecheck, architecture checks, token check, Vitest 25/25, ESLint,
-  Prettier, and production build pass locally.
-- API Ruff, migration characterization tests (3/3), full API pytest (25/25),
-  and OpenAPI drift check pass locally. Strict mypy is not green: the existing
-  application has 17 pre-existing untyped-service errors and the new route
-  composition was reduced to a clean standalone module check.
-- Existing isolated Chromium smoke remains 18/18; the same web journey suite
-  passed in the final GitHub Quality run.
+- Frontend typecheck, architecture checks (6/6), token checks, Vitest 26/26,
+  ESLint with zero warnings, Prettier, package builds, external consumer test,
+  and production build pass locally.
+- API Ruff, strict mypy (46 source files), migration/boundary characterization,
+  full API pytest (19/19), and OpenAPI drift check pass locally.
+- Isolated Chromium smoke remains 18/18 across desktop and mobile, with a
+  disposable API database and `reuseExistingServer: false`.
 - GitHub Quality run `39530621562` passed web, API, and desktop for commit
   `2178531`, including frontend format/lint/test/build/e2e, API Ruff/mypy/
   pytest/OpenAPI checks, Rust format/Clippy/tests, desktop smoke tests, and the
   release build.
 
-This record is not a certification: strict mypy and the remaining backend
-handler/repository extraction findings still block `CODE_QUALITY_CERTIFIED`.
+Rustfmt, Clippy, and desktop tests require the Rust toolchain and are verified
+in Windows CI; they were not runnable in the current environment because
+`cargo` is unavailable. Human Figma parity remains un-certified pending
+external visual review.

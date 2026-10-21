@@ -1,4 +1,4 @@
-import { getApiJson, sendJson } from './transport';
+import { getApiJson, sendJson } from './transport.js';
 import type {
   Criterion,
   Decision,
@@ -10,7 +10,7 @@ import type {
   InvariantRevision,
   PlanningOverview,
   Task,
-} from './types';
+} from './types.js';
 
 export const planningCapability = {
   planningOverview: (workspaceId: string, projectId: string) =>

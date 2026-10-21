@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sqlite3
 from typing import Any
 
-from forge_org.infrastructure.sqlite import OrganizationRepository
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 RUN_STATUSES = {'PLANNED', 'IN_PROGRESS', 'AWAITING_HANDOFF', 'COMPLETED', 'FAILED', 'CANCELLED'}
 TRANSITIONS = {
@@ -15,7 +16,7 @@ TRANSITIONS = {
 
 
 class RunService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.repository = OrganizationRepository(connection)
 
     def _project(self, workspace_id: str, project_id: str) -> dict[str, Any]:
@@ -85,7 +86,7 @@ class RunService:
 
 
 class HandoffService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.repository = OrganizationRepository(connection)
 
     def _project(self, workspace_id: str, project_id: str) -> dict[str, Any]:

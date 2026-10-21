@@ -1,14 +1,16 @@
 import hashlib
 import json
+import sqlite3
 from typing import Any
 
-from forge_org.infrastructure.sqlite import OrganizationRepository, utc_now
+from forge_org.infrastructure.connection import utc_now
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 RULE_SET_VERSION = 'fnd03-v1'
 
 
 class ReadinessService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.repository = OrganizationRepository(connection)
 
     def _feature_context(

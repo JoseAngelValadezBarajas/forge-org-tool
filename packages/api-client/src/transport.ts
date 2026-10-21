@@ -1,4 +1,4 @@
-import { apiErrorFromResponse } from './errors';
+import { apiErrorFromResponse } from './errors.js';
 
 export type ApiRequest = { path: `/api/v1/${string}`; signal?: AbortSignal };
 

@@ -1,11 +1,11 @@
-import { getApiJson, sendJson } from './transport';
+import { getApiJson, sendJson } from './transport.js';
 import type {
   CandidateHistory,
   Evidence,
   ReleaseCandidate,
   ReleaseManifest,
   Verification,
-} from './types';
+} from './types.js';
 
 export type GateEvaluation = {
   id?: string;

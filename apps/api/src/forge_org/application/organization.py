@@ -2,7 +2,8 @@ import sqlite3
 from typing import Any
 
 from forge_org.domain.organization import ACTIVE, ARCHIVED, normalized_name, validate_project_status
-from forge_org.infrastructure.sqlite import OrganizationRepository, utc_now
+from forge_org.infrastructure.connection import utc_now
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 
 class NotFound(Exception):

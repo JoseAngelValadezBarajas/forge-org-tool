@@ -1,5 +1,5 @@
-import { getApiJson, sendJson } from './transport';
-import type { ContextPackage, FeatureRepositoryLink, Repository } from './types';
+import { getApiJson, sendJson } from './transport.js';
+import type { ContextPackage, FeatureRepositoryLink, Repository } from './types.js';
 
 export const contextCapability = {
   listFeatureRepositories: (workspaceId: string, projectId: string, featureId: string) =>

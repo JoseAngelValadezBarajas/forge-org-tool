@@ -11,6 +11,12 @@
   --forge-success: #63c18c;
   --forge-warning: #e2ae59;
   --forge-danger: #e57373;
+  --forge-border-subtle: #30363d;
+  --forge-text-primary: #f5f3ee;
+  --forge-text-secondary: #9ea5ad;
+  --forge-surface-sunken: #111315;
+  --forge-focus-ring: #d8874d;
+  --forge-focus: #d8874d;
 }
 [data-theme="light"] {
   --forge-bg: #f6f5f2;
@@ -24,6 +30,12 @@
   --forge-success: #187644;
   --forge-warning: #855b0f;
   --forge-danger: #b52d38;
+  --forge-border-subtle: #dddad4;
+  --forge-text-primary: #181a1d;
+  --forge-text-secondary: #6d706f;
+  --forge-surface-sunken: #f6f5f2;
+  --forge-focus-ring: #a94f18;
+  --forge-focus: #a94f18;
 }
 :root {
   --forge-space-1: 4px;

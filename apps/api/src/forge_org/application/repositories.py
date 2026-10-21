@@ -1,16 +1,18 @@
 import json
 import os
+import sqlite3
 import subprocess
 from pathlib import Path
 from typing import Any
 
-from forge_org.infrastructure.sqlite import OrganizationRepository, utc_now
+from forge_org.infrastructure.connection import utc_now
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 OBSERVER_VERSION = 'forge-git-observer-v1'
 
 
 class RepositoryService:
-    def __init__(self, connection):
+    def __init__(self, connection: sqlite3.Connection) -> None:
         self.repository = OrganizationRepository(connection)
 
     def _project(self, workspace_id: str, project_id: str) -> dict[str, Any]:
