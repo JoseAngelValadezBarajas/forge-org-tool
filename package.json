@@ -32,7 +32,7 @@
     "lint:frontend": "eslint .",
     "lint:python": "uv run --project apps/api --locked ruff check apps/api/src apps/api/tests",
     "lint:rust": "cargo clippy --all-targets --manifest-path apps/desktop/Cargo.toml -- -D warnings && cargo clippy --all-targets --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings",
-    "lint:fix": "prettier --write . && eslint . --fix && uv run --project apps/api --locked ruff check --fix apps/api/src apps/api/tests && uv run --project apps/api --locked ruff format apps/api/src apps/api/tests && cargo fmt --all",
+    "lint:fix": "prettier --write . && eslint . --fix && uv run --project apps/api --locked ruff check --fix apps/api/src apps/api/tests && uv run --project apps/api --locked ruff format apps/api/src apps/api/tests && cargo fmt --manifest-path apps/desktop/Cargo.toml && cargo fmt --manifest-path apps/desktop/src-tauri/Cargo.toml",
     "quality": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
@@ -43,14 +43,5 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "prettier": "^3.9.10",
     "typescript-eslint": "^8.72.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.5",
-    "eslint": "^9.39.5",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "prettier": "^3.6.2",
-    "typescript-eslint": "^8.46.2"
   }
 }
