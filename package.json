@@ -19,6 +19,7 @@
     "dev": "npm run dev --workspace=@forge-org/web",
     "build:packages": "npm run build --workspace=@forge-org/tokens && npm run build --workspace=@forge-org/ui && npm run build --workspace=@forge-org/api-client",
     "build": "npm run build:packages && npm run build --workspace=@forge-org/web",
+    "desktop:build:nsis": "tauri build --config apps/desktop/src-tauri/tauri.conf.json",
     "typecheck": "npm run typecheck --workspace=@forge-org/web",
     "check:architecture": "node tooling/scripts/check-boundaries.mjs && node tooling/scripts/check-dependency-graph.mjs",
     "test:architecture": "node --test tooling/scripts/check-boundaries.test.mjs tooling/scripts/check-dependency-graph.test.mjs tooling/scripts/check-token-references.test.mjs",
@@ -41,7 +42,9 @@
     "quality": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
     "@eslint/js": "^9.39.5",
+    "@tauri-apps/cli": "^2.0.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
