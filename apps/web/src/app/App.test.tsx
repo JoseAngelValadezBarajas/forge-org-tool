@@ -2,6 +2,7 @@
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import parity from '../../../../docs/design/design-system-parity.json';
 import { App } from './App';
 
 function renderRoute(path: string) {
@@ -78,5 +79,20 @@ describe('M1 application shell', () => {
 
     expect(screen.getByRole('heading', { name: 'StatusChip' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Button' })).not.toBeInTheDocument();
+  });
+
+  it('renders a stable host anchor for every canonical preview marked available', () => {
+    const available = parity.inventory.filter(
+      (entry) => entry.componentHost.status === 'AVAILABLE',
+    );
+
+    renderRoute('/__components');
+
+    expect(available.length).toBeGreaterThan(0);
+    for (const entry of available) {
+      expect(
+        document.querySelector(`[data-component-id="${entry.componentHost.id}"]`),
+      ).not.toBeNull();
+    }
   });
 });

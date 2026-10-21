@@ -561,7 +561,7 @@ export function ComponentGallery() {
               >
                 <SectionHeader headingLevel={2} title={section} />
                 {items.map((item) => (
-                  <article className={styles.entry} key={item.id}>
+                  <article className={styles.entry} key={item.id} data-component-id={item.id}>
                     <div className={styles.entryHeader}>
                       <div>
                         <h3>{item.name}</h3>

@@ -34,17 +34,20 @@ function pack(packageDirectory, destination) {
   return join(destination, output.trim().split(/\r?\n/).at(-1));
 }
 
-test('packed UI, tokens, and API client work in an external React consumer', async () => {
+test('packed UI, tokens, icons, and API client work in an external React consumer', async () => {
   const consumer = mkdtempSync(join(tmpdir(), 'forge-package-consumer-'));
   const artifacts = join(consumer, 'artifacts');
   const ui = resolve(root, 'packages/ui');
+  const icons = resolve(root, 'packages/icons');
   const tokens = resolve(root, 'packages/tokens');
   const apiClient = resolve(root, 'packages/api-client');
   run(npm, ['run', 'build', '--workspace=@forge-org/tokens'], root);
   run(npm, ['run', 'build', '--workspace=@forge-org/ui'], root);
+  run(npm, ['run', 'build', '--workspace=@forge-org/icons'], root);
   run(npm, ['run', 'build', '--workspace=@forge-org/api-client'], root);
   mkdirSync(artifacts, { recursive: true });
   const uiTar = pack(ui, artifacts);
+  const iconsTar = pack(icons, artifacts);
   const tokensTar = pack(tokens, artifacts);
   const apiTar = pack(apiClient, artifacts);
 
@@ -58,6 +61,7 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
         scripts: { build: 'vite build', typecheck: 'tsc --noEmit' },
         dependencies: {
           '@forge-org/api-client': `file:${apiTar}`,
+          '@forge-org/icons': `file:${iconsTar}`,
           '@forge-org/tokens': `file:${tokensTar}`,
           '@forge-org/ui': `file:${uiTar}`,
           '@vitejs/plugin-react': '^6.1.2',
@@ -87,6 +91,14 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
   writeFileSync(
     join(consumer, 'vite.config.ts'),
     `import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nexport default defineConfig({ plugins: [react()] });\n`,
+  );
+  writeFileSync(
+    join(consumer, 'icons.html'),
+    '<div id="root"></div><script type="module" src="/src/icons.tsx"></script>',
+  );
+  writeFileSync(
+    join(consumer, 'src/icons.tsx'),
+    `import { createRoot } from 'react-dom/client';\nimport { Search } from '@forge-org/icons';\ncreateRoot(document.getElementById('root')!).render(<Search aria-label="Search icon" />);\n`,
   );
   writeFileSync(
     join(consumer, 'tsconfig.json'),
@@ -157,6 +169,12 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
           .evaluate((element) => getComputedStyle(element).minHeight),
         '0px',
       );
+      await page.goto(`http://127.0.0.1:${port}/icons.html`);
+      assert.equal(
+        await page.getByLabel('Search icon').evaluate((element) => element.tagName.toLowerCase()),
+        'svg',
+      );
+      await page.goto(`http://127.0.0.1:${port}`);
       assert.notEqual(
         await page.getByRole('button', { name: 'Save 0' }).getAttribute('class'),
         'button',
@@ -184,6 +202,7 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
   }
 
   assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/dist/index.js')), true);
+  assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/icons/dist/index.js')), true);
   assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/dist/styles.css')), true);
   assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/tokens/dist/tokens.css')), true);
   assert.equal(existsSync(join(consumer, 'node_modules/react')), true);
