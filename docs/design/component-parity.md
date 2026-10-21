@@ -146,3 +146,10 @@ separate decision requiring side-by-side review of the Chromium evidence.
 
 The ORG-006 delivery implementation does not change these visual review
 statuses; its browser evidence is behavior evidence, not Figma certification.
+
+## Product patterns outside the canonical libraries
+
+The read-only screen audit and proposed future masters, with concrete source
+node IDs and intended feature ownership, are tracked in
+[proposed-pattern-masters.md](proposed-pattern-masters.md). Proposals are not
+approved Figma masters and are not counted as implemented page-20 components.
