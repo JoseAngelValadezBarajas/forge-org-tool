@@ -17,7 +17,6 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "prepare": "npm run build",
     "typecheck:consumer": "node ../../node_modules/typescript/bin/tsc --project tsconfig.consumer.json",
     "test": "vitest run --config vitest.config.ts && npm run build && npm run typecheck:consumer && node --test scripts/package-exports.test.mjs"
   },

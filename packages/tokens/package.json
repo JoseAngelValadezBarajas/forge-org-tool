@@ -17,7 +17,6 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "prepare": "npm run build",
     "test": "node --test scripts/*.test.mjs"
   }
 }

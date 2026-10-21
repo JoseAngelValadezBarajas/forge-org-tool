@@ -12,11 +12,12 @@
   "workspaces": [
     "apps/web",
     "packages/tokens",
-    "packages/ui",
     "packages/icons",
+    "packages/ui",
     "packages/api-client"
   ],
   "scripts": {
+    "postinstall": "npm run build:packages",
     "dev": "npm run dev --workspace=@forge-org/web",
     "build:packages": "npm run build --workspace=@forge-org/tokens && npm run build --workspace=@forge-org/icons && npm run build --workspace=@forge-org/ui && npm run build --workspace=@forge-org/api-client",
     "build": "npm run build:packages && npm run build --workspace=@forge-org/web",
@@ -24,7 +25,7 @@
     "typecheck": "npm run typecheck --workspace=@forge-org/web",
     "check:architecture": "node tooling/scripts/check-boundaries.mjs && node tooling/scripts/check-dependency-graph.mjs",
     "check:design-system": "node tooling/scripts/validate-design-system-parity.mjs",
-    "test:architecture": "node --test tooling/scripts/check-boundaries.test.mjs tooling/scripts/check-dependency-graph.test.mjs tooling/scripts/check-token-references.test.mjs tooling/scripts/validate-design-system-parity.test.mjs tooling/scripts/component-directory-architecture.test.mjs",
+    "test:architecture": "node --test tooling/scripts/check-boundaries.test.mjs tooling/scripts/check-dependency-graph.test.mjs tooling/scripts/check-token-references.test.mjs tooling/scripts/validate-design-system-parity.test.mjs tooling/scripts/component-directory-architecture.test.mjs tooling/scripts/workspace-lifecycle-order.test.mjs",
     "generate:tokens": "node tooling/scripts/generate-tokens.mjs",
     "generate:api-types": "openapi-typescript contracts/openapi/forge-org-v1.json -o packages/api-client/src/generated/openapi.d.ts",
     "check:api-types": "npm run generate:api-types && git diff --exit-code -- packages/api-client/src/generated/openapi.d.ts",
@@ -46,7 +47,6 @@
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0",
     "@eslint/js": "^9.39.5",
-    "@tauri-apps/cli": "^2.0.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
