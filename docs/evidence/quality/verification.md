@@ -61,11 +61,10 @@ data, merge PR #1, or archive the original FORGE repository.
   full API pytest (21/21), and OpenAPI drift check pass locally.
 - Isolated Chromium smoke remains 18/18 across desktop and mobile, with a
   disposable API database and `reuseExistingServer: false`.
-- GitHub Quality run `39534793241` passed the API and web jobs for commit
-  `f907ad8`; the Windows desktop release build was still running when this
-  record was drafted. The completed jobs include frontend format/lint/test/
-  build/e2e and API Ruff/mypy/pytest/OpenAPI checks. A final CI run will be
-  recorded after the follow-up architecture and persistence changes are pushed.
+- GitHub Quality run `39536448360` passed API, web, and Windows desktop for
+  commit `5d27c96`, including frontend format/lint/package-consumer/test/build/
+  e2e, API Ruff/mypy/pytest/OpenAPI checks, Rust format/Clippy/tests, desktop
+  smoke tests, and the release build.
 
 Rustfmt, Clippy, and desktop tests require the Rust toolchain and are verified
 in Windows CI; they were not runnable in the current environment because
