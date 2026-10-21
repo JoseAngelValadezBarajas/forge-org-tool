@@ -117,7 +117,10 @@ describe('ReadinessPage', () => {
         if (init?.method === 'POST') {
           return Promise.resolve(new Response(JSON.stringify(createdInvariant), { status: 201 }));
         }
-        if (fetchMock.mock.calls.filter(([request]) => String(request).includes('/invariants?')).length === 1) {
+        if (
+          fetchMock.mock.calls.filter(([request]) => String(request).includes('/invariants?'))
+            .length === 1
+        ) {
           return initialInvariants;
         }
         return Promise.resolve(new Response(JSON.stringify([createdInvariant]), { status: 200 }));

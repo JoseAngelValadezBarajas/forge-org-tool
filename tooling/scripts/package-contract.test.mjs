@@ -14,8 +14,10 @@ test('root package tooling has one dependency definition and concrete Rust targe
     'eslint-config-prettier': '^10.1.8',
     'eslint-plugin-jsx-a11y': '^6.10.2',
     'eslint-plugin-react-hooks': '^7.1.1',
+    'openapi-typescript': '^7.13.0',
     prettier: '^3.9.10',
     'typescript-eslint': '^8.72.0',
+    typescript: '^5.9.3',
   });
   assert.match(
     packageJson.scripts['lint:fix'],

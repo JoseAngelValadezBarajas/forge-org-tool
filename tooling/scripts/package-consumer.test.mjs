@@ -152,7 +152,9 @@ test('packed UI, tokens, and API client work in an external React consumer', asy
       await page.goto(`http://127.0.0.1:${port}`);
       assert.equal(await page.getByLabel('Name').isVisible(), true);
       assert.equal(
-        await page.getByTestId('host-class').evaluate((element) => getComputedStyle(element).minHeight),
+        await page
+          .getByTestId('host-class')
+          .evaluate((element) => getComputedStyle(element).minHeight),
         '0px',
       );
       assert.notEqual(
