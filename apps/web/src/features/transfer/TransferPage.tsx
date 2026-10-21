@@ -1,61 +1,21 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, FormField, SectionHeader, StatusChip, Textarea } from '@forge-org/ui';
-import { organizationApi } from '@forge-org/api-client';
 import styles from './TransferPage.module.css';
-
-type Preview = {
-  schema_version: string;
-  fingerprint: string;
-  project: { name: string };
-  counts: Record<string, number>;
-};
+import { useTransferController } from './useTransferController';
 
 export function TransferPage() {
   const { workspaceId = '', projectId = '' } = useParams();
-  const [documentText, setDocumentText] = useState('');
-  const [preview, setPreview] = useState<Preview | null>(null);
-  const [exported, setExported] = useState(false);
-  const [importedProjectId, setImportedProjectId] = useState('');
-  const [error, setError] = useState('');
-
-  async function exportProject() {
-    try {
-      const document = await organizationApi.exportProject(workspaceId, projectId);
-      setExported(true);
-      setDocumentText(JSON.stringify(document, null, 2));
-      setPreview(null);
-      setError('');
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to export project.');
-    }
-  }
-
-  async function previewImport() {
-    try {
-      const document = JSON.parse(documentText) as unknown;
-      setPreview(await organizationApi.previewProjectImport(workspaceId, document));
-      setError('');
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to preview project import.');
-    }
-  }
-
-  async function importProject() {
-    if (!preview) return;
-    try {
-      const document = JSON.parse(documentText) as unknown;
-      const result = await organizationApi.importProject(
-        workspaceId,
-        document,
-        preview.fingerprint,
-      );
-      setImportedProjectId(result.project_id);
-      setError('');
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to import project.');
-    }
-  }
+  const {
+    documentText,
+    error,
+    exportProject,
+    exported,
+    importedProjectId,
+    importProject,
+    preview,
+    previewImport,
+    updateDocumentText,
+  } = useTransferController(workspaceId, projectId);
 
   return (
     <div className={styles.stack}>
@@ -86,9 +46,7 @@ export function TransferPage() {
             id="transfer-document"
             value={documentText}
             onChange={(event) => {
-              setDocumentText(event.target.value);
-              setExported(false);
-              setImportedProjectId('');
+              updateDocumentText(event.target.value);
             }}
             placeholder="Paste a forge-project-import-v1 document"
             rows={16}

@@ -1,88 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Card, SectionHeader, StatusChip } from '@forge-org/ui';
-import { organizationApi, type ContextPackage, type Repository } from '@forge-org/api-client';
 import styles from './ContextPage.module.css';
-
-type ContextPreview = {
-  schema_version: string;
-  fingerprint: string;
-  payload: unknown;
-  markdown: string;
-};
+import { useContextController } from './useContextController';
 
 export function ContextPage() {
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
-  const [repositories, setRepositories] = useState<Repository[]>([]);
-  const [linkedRepositories, setLinkedRepositories] = useState<Repository[]>([]);
-  const [packages, setPackages] = useState<ContextPackage[]>([]);
-  const [preview, setPreview] = useState<ContextPreview | null>(null);
-  const [error, setError] = useState('');
-
-  const load = useCallback(
-    async (isCurrent: () => boolean = () => true) => {
-      try {
-        const [nextRepositories, nextLinked, nextPackages] = await Promise.all([
-          organizationApi.listRepositories(workspaceId, projectId),
-          organizationApi.listFeatureRepositories(workspaceId, projectId, featureId),
-          organizationApi.listContextPackages(workspaceId, projectId, featureId),
-        ]);
-        if (!isCurrent()) return;
-        setRepositories(nextRepositories);
-        setLinkedRepositories(nextLinked);
-        setPackages(nextPackages);
-      } catch (cause) {
-        if (isCurrent()) {
-          setError(cause instanceof Error ? cause.message : 'Unable to load feature context.');
-        }
-      }
-    },
-    [featureId, projectId, workspaceId],
-  );
-  useEffect(() => {
-    let current = true;
-    queueMicrotask(() => void load(() => current));
-    return () => {
-      current = false;
-    };
-  }, [load]);
-
-  async function link(repository: Repository) {
-    try {
-      await organizationApi.linkFeatureRepository(workspaceId, projectId, featureId, repository.id);
-      await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to link repository.');
-    }
-  }
-  async function unlink(repository: Repository) {
-    try {
-      await organizationApi.unlinkFeatureRepository(
-        workspaceId,
-        projectId,
-        featureId,
-        repository.id,
-      );
-      await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to remove repository link.');
-    }
-  }
-  async function showPreview() {
-    try {
-      setPreview(await organizationApi.previewContext(workspaceId, projectId, featureId));
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to preview context package.');
-    }
-  }
-  async function save() {
-    try {
-      await organizationApi.saveContext(workspaceId, projectId, featureId);
-      await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to save context package.');
-    }
-  }
+  const {
+    error,
+    link,
+    linkedRepositories,
+    packages,
+    preview,
+    repositories,
+    save,
+    showPreview,
+    unlink,
+  } = useContextController(workspaceId, projectId, featureId);
   const linkedIds = new Set(linkedRepositories.map((repository) => repository.id));
   const downloadPath = (packageId: string, format: 'json' | 'markdown') =>
     `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/context/packages/${packageId}/download?format=${format}`;
