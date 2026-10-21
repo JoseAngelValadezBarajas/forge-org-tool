@@ -1,6 +1,7 @@
 # M1 verification evidence
 
 Focused audit implementation commit: `bbf5fa2` (`feat: expose delivery verification truth states`). The shared package initiative adds `a8ea80d` (committed implementation plan), `5f3377e` (shared UI contracts), `3fca7bf` (feature consumer adoption), and the current API/Component Host documentation commit recorded below.
+Shared package implementation commit: `7ed33e1`; isolated browser evidence refresh: `58661ea`.
 
 Final verification commit: `734c25a`; the browser evidence refresh follows the green GitHub Quality run `39422706855` for the same implementation state. Documentation commit `ae598c4` was verified by Quality run `39423678963`.
 
@@ -26,7 +27,7 @@ foundation audit record.
 - API client: `transport.ts`, `errors.ts`, `types.ts`, and the `organization.ts` capability module now back the compatibility-preserving `organizationApi` facade. Remaining capability methods retain their public behavior while moving incrementally behind the same transport boundary.
 - Component Host coverage: every implemented shared export has a deterministic preview under `/__components`; dark/light and representative desktop/mobile evidence are retained. This is automated behavior evidence only, not human Figma certification.
 - Figma review: read-only node context and retained captures were reviewed for Button `173:27`, StatusChip `173:40`, Card `173:65`, SectionHeader `178:191`, and product reference screen `4:32`. These are human-review inputs, not visual certification.
-- Playwright isolation: both servers use `reuseExistingServer: false`; the API also receives a unique temporary SQLite path per run, so occupied ports or stale local data cannot silently affect assertions.
+- Playwright isolation: both servers use `reuseExistingServer: false`; the API also receives a unique temporary SQLite path per run, so occupied ports or stale local data cannot silently affect assertions. Port occupation fails the controlled server startup instead of attaching to an unknown process.
 - Shared contracts: Card default `div` and typed semantic option passed; Button loading/disabled/pressed DOM contract passed. Button visual parity remains unreviewed, including the 40px implementation height versus the 36/38px Figma reference.
 
 ## Clean-clone evidence
