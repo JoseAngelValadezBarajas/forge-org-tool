@@ -8,12 +8,12 @@ Figma file `r10szKLgiIPVi2NBmbjTpm`, page 19 (`173:2`), owns core
 contracts/icons; page 20 (`229:2`) owns feature patterns. All 100 exact brief
 IDs were located in read-only page metadata on 2026-10-20.
 
-The first audit baseline was `3c7bd9b6ef618236c0ee0a1055d937032d771e4a`.
+The first audit baseline was `3c7bd9b6ef618236c0ee0a1055d937032d771e4a`;
+the integrated implementation snapshot is `6c0de88cac8a5601a2266a0e64edf75e19f9ea84`.
 Since then, all 37 Core UI families have been organized into self-contained
 directories, the reusable icon package has been added, and the Component Host
 has real previews for every core family and icon. The canonical JSON registry
-contains current per-entry mappings and implementation status; its snapshot
-commit will be advanced with the next reconciliation commit. All 100 visual
+contains current per-entry mappings and implementation status. All 100 visual
 statuses remain `NOT_HUMAN_REVIEWED`.
 
 ### Registry schema

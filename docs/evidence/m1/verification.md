@@ -48,7 +48,7 @@ The final public repository was cloned into an isolated temporary directory. `np
 - `npm run lint:frontend` (zero warnings), `npm run format:check:web`, `npm run typecheck`, `npm run build`, isolated `npm run test:e2e` (Chromium desktop/mobile 18/18), Python Ruff, architecture checks and production `/__components` exclusion scan passed.
 - The current screenshots include desktop and mobile Component Host in Dark and Light plus representative product journeys. They are automated browser evidence, not human visual certification. All 100 `visualReviewStatus` values remain `NOT_HUMAN_REVIEWED`.
 - The independent reviewer found and the implementation fixed a Tabs disabled-first keyboard trap, with regression tests observed RED then GREEN. The parity registry validator now also checks code-only component paths.
-- This entry records local worktree verification; exact implementation commit and GitHub Quality run for this design-system initiative will be appended after the branch is committed and CI finishes. Rust formatting/Clippy/tests are not available locally because Cargo is absent.
+- This entry records local verification for implementation commit `6c0de88cac8a5601a2266a0e64edf75e19f9ea84`; GitHub Quality CI for that commit is pending. Rust formatting/Clippy/tests are not available locally because Cargo is absent.
 
 ## RED/GREEN notes
 
