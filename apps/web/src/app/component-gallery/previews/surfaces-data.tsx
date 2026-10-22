@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import {
   Badge,
+  Button,
   Card,
   CodeLabel,
   KeyValueRow,
   MetricCard,
   RecordRow,
+  SectionHeader,
   StatusChip,
   Table,
   TableRow,
@@ -14,6 +16,18 @@ import styles from '../ComponentGallery.module.css';
 
 export function renderSurfaceDataPreview(componentId: string): ReactNode | null {
   switch (componentId) {
+    case 'section-header':
+      return (
+        <Card>
+          <SectionHeader
+            headingLevel={3}
+            eyebrow="Shared composition"
+            title="SectionHeader"
+            counter={12}
+            actions={<Button variant="ghost">Action</Button>}
+          />
+        </Card>
+      );
     case 'card':
       return (
         <div className={styles.previewRow}>

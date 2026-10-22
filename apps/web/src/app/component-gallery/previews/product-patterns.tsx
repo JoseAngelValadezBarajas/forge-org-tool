@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Button, SearchField } from '@forge-org/ui';
 import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from '../../shell';
+import { OrganizationEmptyState } from '../../../features/organization';
 import {
   CriterionItem,
   DependencyGroup,
@@ -46,6 +47,9 @@ import styles from '../ComponentGallery.module.css';
 export function renderProductPatternPreview(componentId: string): ReactNode | null {
   let content: ReactNode;
   switch (componentId) {
+    case 'organization-empty-state':
+      content = <OrganizationEmptyState />;
+      break;
     case 'page-header':
       content = (
         <div className={styles.previewStack}>

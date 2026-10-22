@@ -26,4 +26,22 @@ describe('surface and data previews', () => {
     expect(screen.getByText('No repositories available.')).toBeInTheDocument();
     expect(renderSurfaceDataPreview('input')).toBeNull();
   });
+
+  it('renders the shared SectionHeader counter and action composition', () => {
+    render(renderSurfaceDataPreview('section-header'));
+    expect(screen.getByRole('heading', { name: 'SectionHeader' })).toBeInTheDocument();
+    expect(screen.getByText('12')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
+  });
+
+  it('renders metric and badge examples from the owned surface module', () => {
+    render(
+      <>
+        {renderSurfaceDataPreview('metric-card')}
+        {renderSurfaceDataPreview('badge')}
+      </>,
+    );
+    expect(screen.getByText('Projects')).toBeInTheDocument();
+    expect(screen.getByText('Neutral')).toBeInTheDocument();
+  });
 });

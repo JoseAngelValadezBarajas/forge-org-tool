@@ -20,4 +20,10 @@ describe('product pattern previews', () => {
     expect(screen.getByText('sha256:scoped')).toBeInTheDocument();
     expect(renderProductPatternPreview('unknown-pattern')).toBeNull();
   });
+
+  it('renders the organization-owned empty-state product pattern', () => {
+    render(renderProductPatternPreview('organization-empty-state'));
+    expect(screen.getByRole('heading', { name: 'Organization' })).toBeInTheDocument();
+    expect(screen.getByText('No workspace fixture')).toBeInTheDocument();
+  });
 });
