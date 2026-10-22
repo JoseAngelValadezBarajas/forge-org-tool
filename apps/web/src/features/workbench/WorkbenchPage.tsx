@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Button, Card, FormField, Input, SectionHeader, StatusChip, Textarea } from '@forge-org/ui';
 import styles from './WorkbenchPage.module.css';
 import { useWorkbenchController } from './useWorkbenchController';
@@ -58,6 +58,9 @@ export function WorkbenchPage() {
                   label="Execution"
                   value={`${run.executor_type} / ${run.execution_mode}`}
                 />
+                <Link to={`/workbench/${workspaceId}/${projectId}/runs/${run.id}`}>
+                  View run {run.title}
+                </Link>
                 <Button
                   variant="secondary"
                   onClick={() => void createHandoff(run)}
@@ -79,6 +82,13 @@ export function WorkbenchPage() {
             <article className={styles.item} key={handoff.id}>
               <div>
                 <strong>{handoff.title}</strong>
+                {handoff.status !== 'DRAFT' && (
+                  <Link to={`/workbench/${workspaceId}/${projectId}/handoffs/${handoff.id}`}>
+                    {handoff.status === 'ACKNOWLEDGED'
+                      ? `View acknowledged handoff ${handoff.title}`
+                      : `Review handoff ${handoff.title}`}
+                  </Link>
+                )}
                 {handoff.status === 'DRAFT' ? (
                   <form
                     onSubmit={(event) => void saveHandoff(event, handoff)}

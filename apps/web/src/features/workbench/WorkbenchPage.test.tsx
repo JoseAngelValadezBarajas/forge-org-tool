@@ -147,6 +147,10 @@ describe('WorkbenchPage', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Mark handoff ready' }));
     expect(await screen.findByText('Revision 1')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Review handoff Ready handoff' })).toHaveAttribute(
+      'href',
+      '/workbench/w1/p1/handoffs/h1',
+    );
     expect(screen.getByRole('link', { name: 'JSON' })).toHaveAttribute(
       'href',
       '/api/v1/workspaces/w1/projects/p1/handoffs/h1/revisions/1/download?format=json',
@@ -165,6 +169,72 @@ describe('WorkbenchPage', () => {
       expect(
         screen.queryByRole('button', { name: 'Acknowledge revision' }),
       ).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.getByRole('link', { name: 'View acknowledged handoff Ready handoff' }),
+    ).toHaveAttribute('href', '/workbench/w1/p1/handoffs/h1');
+  });
+  it('offers a retry after initial load fails and recovers without losing the project context', async () => {
+    let failed = false;
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      const path = String(input);
+      if (path.endsWith('/runs?status=&search=') && !failed) {
+        failed = true;
+        return Promise.resolve(
+          new Response(JSON.stringify({ detail: 'Network unavailable' }), { status: 503 }),
+        );
+      }
+      if (path.endsWith('/runs?status=&search='))
+        return Promise.resolve(new Response(JSON.stringify([run]), { status: 200 }));
+      if (path.endsWith('/handoffs'))
+        return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+      if (path.endsWith('/handoffs/hr1/revisions'))
+        return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/workbench/w1/p1']}>
+        <Routes>
+          <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Network unavailable');
+    fireEvent.click(screen.getByRole('button', { name: 'Retry loading workbench' }));
+    expect(await screen.findByText('Manual report')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/workspaces/w1/projects/p1/runs?status=&search=',
+      expect.objectContaining({ credentials: 'same-origin' }),
+    );
+  });
+
+  it('links each run to its detail route', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementation((input: string) =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify(String(input).endsWith('/runs?status=&search=') ? [run] : []),
+              { status: 200 },
+            ),
+          ),
+        ),
+    );
+    render(
+      <MemoryRouter initialEntries={['/workbench/w1/p1']}>
+        <Routes>
+          <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('link', { name: 'View run Manual report' })).toHaveAttribute(
+      'href',
+      '/workbench/w1/p1/runs/run1',
     );
   });
 });
