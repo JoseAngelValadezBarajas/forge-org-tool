@@ -1,18 +1,30 @@
 .button {
+  /* Button master 173:27 state tokens; Light keeps existing semantic fallbacks.
+     These are scoped here until the shared token package owns these roles. */
+  --button-action-primary-hover: light-dark(
+    color-mix(in srgb, var(--forge-accent) 84%, var(--forge-text-primary) 16%),
+    #e59b64
+  );
+  --button-action-primary-pressed: light-dark(var(--forge-accent-soft), #a65320);
+  --button-surface-selected: light-dark(var(--forge-surface-active), #30261e);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
   border: 1px solid var(--forge-border);
   border-radius: var(--forge-radius-sm);
-  font: inherit;
-  font-weight: 600;
+  font-family: var(--forge-font-ui);
+  font-size: var(--forge-font-size-sm);
+  font-weight: var(--forge-font-weight-medium);
   line-height: 1.25;
   cursor: pointer;
   transition:
     background-color 120ms ease,
-    border-color 120ms ease,
-    transform 80ms ease;
+    border-color 120ms ease;
+}
+.loadingIndicator {
+  font-family: var(--forge-font-mono);
+  font-weight: var(--forge-font-weight-regular);
 }
 .small {
   min-height: 2rem;
@@ -32,57 +44,48 @@
   outline-offset: 3px;
 }
 .button:disabled {
-  opacity: 0.55;
   cursor: not-allowed;
 }
+.button:disabled:not([aria-busy='true']) {
+  background: var(--forge-surface-tag);
+  color: var(--forge-text-subtle);
+  opacity: 0.58;
+}
+.button[aria-busy='true'] {
+  opacity: 0.82;
+}
+.secondary .loadingIndicator,
+.ghost .loadingIndicator {
+  color: var(--forge-text-secondary);
+}
 .primary {
-  border-color: var(--forge-accent);
+  border-color: transparent;
   background: var(--forge-accent);
   color: var(--forge-accent-contrast);
 }
 .primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--forge-accent) 84%, var(--forge-text-primary) 16%);
+  background: var(--button-action-primary-hover);
 }
 .secondary {
-  background: var(--forge-surface-raised);
+  background: var(--forge-surface-tag);
   color: var(--forge-text-primary);
 }
-.secondary:hover:not(:disabled),
-.ghost:hover:not(:disabled) {
-  border-color: var(--forge-border);
-  background: var(--forge-surface-sunken);
-}
 .ghost {
-  border-color: transparent;
-  background: transparent;
+  background: var(--forge-surface);
   color: var(--forge-text-primary);
 }
 .danger {
-  border-color: var(--forge-danger);
-  background: transparent;
-  color: var(--forge-danger);
-}
-.danger:hover:not(:disabled) {
-  background: var(--forge-danger);
-  color: var(--forge-surface);
-}
-.primary:active:not(:disabled) {
-  border-color: var(--forge-accent-soft);
-  background: var(--forge-accent-soft);
-  color: var(--forge-text-primary);
-}
-.secondary:active:not(:disabled),
-.ghost:active:not(:disabled) {
-  border-color: var(--forge-border-strong);
-  background: var(--forge-surface-active);
-}
-.danger:active:not(:disabled) {
-  border-color: var(--forge-danger);
+  border-color: transparent;
   background: var(--forge-status-error-bg);
   color: var(--forge-danger);
 }
-.button:active:not(:disabled) {
-  transform: translateY(1px);
+.primary:active:not(:disabled) {
+  background: var(--button-action-primary-pressed);
+  color: light-dark(var(--forge-text-primary), var(--forge-accent-contrast));
+}
+.secondary:active:not(:disabled),
+.ghost:active:not(:disabled) {
+  background: var(--button-surface-selected);
 }
 @media (prefers-reduced-motion: reduce) {
   .button {

@@ -31,8 +31,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         .join(' ')}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
+      aria-label={loading ? (props['aria-label'] ?? loadingLabel) : props['aria-label']}
     >
-      {loading ? loadingLabel : children}
+      {loading && (
+        <span className={styles.loadingIndicator} aria-hidden="true">
+          ···
+        </span>
+      )}
+      {children}
     </button>
   );
 });

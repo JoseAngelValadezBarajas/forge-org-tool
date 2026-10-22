@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import '@testing-library/jest-dom/vitest';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Card } from './Card';
 describe('Card', () => {
   it('defaults to neutral div semantics and permits explicit landmark semantics', () => {
@@ -22,5 +23,30 @@ describe('Card', () => {
     );
     expect(screen.getByTestId('elevated-card')).toHaveAttribute('data-variant', 'elevated');
     expect(screen.getByTestId('elevated-card').tagName).toBe('DIV');
+  });
+
+  it('forwards typed semantic refs, native props and consumer classes to its root', () => {
+    const ref = createRef<HTMLElement>();
+    const select = vi.fn();
+    render(
+      <Card
+        as="section"
+        ref={ref}
+        aria-label="Summary"
+        id="summary"
+        tabIndex={0}
+        className="consumer-card"
+        onClick={select}
+      >
+        Body
+      </Card>,
+    );
+    const card = screen.getByRole('region', { name: 'Summary' });
+    expect(ref.current).toBe(card);
+    expect(card).toHaveAttribute('id', 'summary');
+    expect(card).toHaveAttribute('tabindex', '0');
+    expect(card).toHaveClass('consumer-card');
+    fireEvent.click(card);
+    expect(select).toHaveBeenCalledOnce();
   });
 });
