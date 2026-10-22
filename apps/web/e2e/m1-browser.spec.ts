@@ -23,7 +23,11 @@ test('desktop shell is truthful and has no horizontal overflow', async ({ page }
   await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
   await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
   await expect(page.getByLabel('Workspace summary').getByText(`Evidence ${suffix}`)).toBeVisible();
-  await expect(page.getByRole('link', { name: `Loaded project ${suffix}` })).toBeVisible();
+  await expect(
+    page
+      .getByRole('region', { name: 'Project summaries' })
+      .getByRole('link', { name: `Loaded project ${suffix}`, exact: true }),
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
@@ -429,7 +433,7 @@ test('project transfer is planning-only and exposes reviewed fingerprints', asyn
     buffer: Buffer.from(JSON.stringify(transferDocument)),
   });
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(/fingerprint/i)).toBeVisible();
+  await expect(page.getByText(/^Fingerprint:/)).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Review planning changes' })).toBeVisible();
   await expect(page.getByText('FINGERPRINT_REQUIRED')).toBeVisible();
   await page.getByRole('button', { name: 'Confirm planning import' }).click();
@@ -463,7 +467,7 @@ test('readiness records explicit planning context and repository metadata only',
     })
   ).json();
   await page.goto(`/readiness/${workspace.id}/${project.id}/${feature.id}`);
-  await expect(page.getByRole('heading', { name: 'Readiness' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Readiness', exact: true })).toBeVisible();
   await page.getByLabel('Acceptance criterion').fill(`Criterion ${suffix}`);
   await page.getByRole('button', { name: 'Add criterion' }).click();
   await page.getByLabel('Decision title').fill(`Decision ${suffix}`);
