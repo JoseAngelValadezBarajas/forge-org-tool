@@ -4,6 +4,8 @@
 **Follow-up API test lint fix:** `fca1e5a3615d3c1c1759ef2b641e8c811163829a`<br />
 **CI async assertion fix:** `6b7bea78e2e514046574377bc2d9964350772f17`<br />
 **Browser locator correction:** `8ba32aa`<br />
+**UX-02 workflow implementation:** `748a830bfb2c17b92c4989229a86c8941e9cfe5d`<br />
+**Quality CI:** run `39856802320` passed on the implementation commit<br />
 **Branch:** `codex/forge-reconstruction-vertical-slices` (PR #1 remains open)
 
 ## Automated evidence
@@ -39,11 +41,15 @@
   `ef1244e11caf86e22d940a6432427c01568f4f7b`. Since that run, the focused
   Chromium-mobile journey passed with real API-backed repository, context,
   run, handoff, evidence, verification, candidate, and transfer interactions.
-  Quality CI for these latest changes is pending.
 - Latest local verification: `npm test` passed (58 frontend suites / 160 tests,
   architecture and package checks included); `npm run lint:frontend` passed
   with zero warnings; `npm run build` passed with production Component Host
   exclusion; isolated Playwright passed 24/24 across desktop and mobile.
+- GitHub Quality run `39856802320` passed all API, web, and Desktop jobs on
+  `748a830bfb2c17b92c4989229a86c8941e9cfe5d`. It includes frontend formatting,
+  zero-warning ESLint, package and unit tests, production build, isolated
+  Playwright journeys, API Ruff/mypy/pytest/OpenAPI, and Desktop rustfmt,
+  Clippy, Rust tests, release build, NSIS packaging, and installed smoke.
 
 ## Browser captures
 
@@ -77,5 +83,6 @@ execution API for verification rules, or independently verified delivery
 activity. The UI continues to distinguish reported, observed, verified, and
 not-published states rather than implying unsupported capabilities. Focused
 loading-state regression tests now cover Workbench, Repositories, and Context.
-UX-02 remains pending external visual review and a successful Quality CI run
-on the final PR commit.
+Quality CI passed on the implementation commit. UX-02 remains pending external
+human visual review; PR #1 remains open and unmerged. This work does not certify
+Figma parity or replace that review.
