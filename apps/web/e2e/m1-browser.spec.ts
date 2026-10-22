@@ -159,7 +159,12 @@ test('mobile gallery switches from dark to light with no browser errors', async 
               element: describe(element),
               ancestors,
               clipped,
-              overflow: Math.max(0, rect.right - viewport, -rect.left),
+              overflow: Math.max(
+                0,
+                rect.right - viewport,
+                -rect.left,
+                element.scrollWidth - element.clientWidth,
+              ),
             };
           })
           .filter((item) => item.overflow > 0 && !item.clipped)

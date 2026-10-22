@@ -84,7 +84,6 @@
 .content,
 .section {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
   gap: var(--forge-space-4);
 }
