@@ -3,6 +3,7 @@
 **Implementation:** `75b52a12edaf46a45df5138a9c7b74c6704fcf84`<br />
 **Follow-up API test lint fix:** `fca1e5a3615d3c1c1759ef2b641e8c811163829a`<br />
 **CI async assertion fix:** `6b7bea78e2e514046574377bc2d9964350772f17`<br />
+**Browser locator correction:** `8ba32aa`<br />
 **Branch:** `codex/forge-reconstruction-vertical-slices` (PR #1 remains open)
 
 ## Automated evidence
@@ -27,6 +28,13 @@
   package fingerprint and complete filtered result; the full `npm test` passes
   locally after this correction. A new Quality run on the final PR commit is
   required; PR #1 was not merged.
+- Quality CI run `39846669544` on `c287196cc2961c84c7b180834f3dc7b859c21e65`
+  passed API and Desktop and passed the full frontend/unit suite and build, but
+  exposed four ambiguous accessible-name locators in existing desktop/mobile
+  browser journeys after UX-02 added overlapping labels. Those locators now
+  target the intended project-summary region and exact fingerprint/readiness
+  labels. The full isolated Playwright run passes 24/24 locally after the fix;
+  a final Quality run on the updated PR head is required.
 
 ## Browser captures
 
