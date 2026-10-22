@@ -1,12 +1,9 @@
 .button {
-  /* Button master 173:27 state tokens; Light keeps existing semantic fallbacks.
-     These are scoped here until the shared token package owns these roles. */
-  --button-action-primary-hover: light-dark(
-    color-mix(in srgb, var(--forge-accent) 84%, var(--forge-text-primary) 16%),
-    #e59b64
-  );
-  --button-action-primary-pressed: light-dark(var(--forge-accent-soft), #a65320);
-  --button-surface-selected: light-dark(var(--forge-surface-active), #30261e);
+  /* Button master 173:27 state values remain component-scoped, not global tokens. */
+  --button-action-primary-hover: light-dark(#98461a, #e59b64);
+  --button-action-primary-pressed: light-dark(#78320f, #a65320);
+  --button-action-primary-pressed-foreground: #fff;
+  --button-surface-selected: light-dark(#f4e3d5, #30261e);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +78,7 @@
 }
 .primary:active:not(:disabled) {
   background: var(--button-action-primary-pressed);
-  color: light-dark(var(--forge-text-primary), var(--forge-accent-contrast));
+  color: var(--button-action-primary-pressed-foreground);
 }
 .secondary:active:not(:disabled),
 .ghost:active:not(:disabled) {

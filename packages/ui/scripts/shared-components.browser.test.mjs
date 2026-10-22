@@ -109,23 +109,59 @@ for (const [variant, background, foreground, border] of [
   });
 }
 
-for (const [variant, hover, pressed, foreground, border] of [
-  ['primary', 'rgb(229, 155, 100)', 'rgb(166, 83, 32)', 'rgb(17, 19, 21)', 'rgba(0, 0, 0, 0)'],
-  ['secondary', 'rgb(32, 36, 40)', 'rgb(48, 38, 30)', 'rgb(245, 243, 238)', 'rgb(48, 54, 61)'],
-  ['ghost', 'rgb(23, 26, 29)', 'rgb(48, 38, 30)', 'rgb(245, 243, 238)', 'rgb(48, 54, 61)'],
-  ['danger', 'rgb(48, 29, 32)', 'rgb(48, 29, 32)', 'rgb(229, 115, 115)', 'rgba(0, 0, 0, 0)'],
+for (const [variant, hover, pressed, hoverForeground, pressedForeground, border] of [
+  [
+    'primary',
+    'rgb(229, 155, 100)',
+    'rgb(166, 83, 32)',
+    'rgb(17, 19, 21)',
+    'rgb(255, 255, 255)',
+    'rgba(0, 0, 0, 0)',
+  ],
+  [
+    'secondary',
+    'rgb(32, 36, 40)',
+    'rgb(48, 38, 30)',
+    'rgb(245, 243, 238)',
+    'rgb(245, 243, 238)',
+    'rgb(48, 54, 61)',
+  ],
+  [
+    'ghost',
+    'rgb(23, 26, 29)',
+    'rgb(48, 38, 30)',
+    'rgb(245, 243, 238)',
+    'rgb(245, 243, 238)',
+    'rgb(48, 54, 61)',
+  ],
+  [
+    'danger',
+    'rgb(48, 29, 32)',
+    'rgb(48, 29, 32)',
+    'rgb(229, 115, 115)',
+    'rgb(229, 115, 115)',
+    'rgba(0, 0, 0, 0)',
+  ],
 ]) {
   test(`Button ${variant} hover follows its evidenced state`, async () => {
     const button = page.getByTestId(variant + '-default');
     await button.hover();
-    assert.deepEqual(await colors(button), { background: hover, foreground, border });
+    assert.deepEqual(await colors(button), {
+      background: hover,
+      foreground: hoverForeground,
+      border,
+    });
   });
 
   test(`Button ${variant} pressed follows its evidenced state without moving the control`, async () => {
     const button = page.getByTestId(variant + '-default');
     await button.hover();
     await page.mouse.down();
-    assert.deepEqual(await colors(button), { background: pressed, foreground, border });
+    assert.deepEqual(await colors(button), {
+      background: pressed,
+      foreground: pressedForeground,
+      border,
+    });
     assert.equal(await button.evaluate((element) => getComputedStyle(element).transform), 'none');
     await page.mouse.up();
   });
@@ -299,16 +335,20 @@ test('Button and Card resolve Light surfaces from semantic tokens', async () => 
     assert.equal(disabled.background, 'rgb(229, 226, 221)');
     assert.equal(disabled.foreground, 'rgb(107, 110, 104)');
   }
-  for (const [variant, background] of [
-    ['primary', 'rgb(247, 231, 219)'],
-    ['secondary', 'rgb(229, 226, 220)'],
-    ['ghost', 'rgb(229, 226, 220)'],
+  for (const [variant, hoverBackground, pressedBackground] of [
+    ['primary', 'rgb(152, 70, 26)', 'rgb(120, 50, 15)'],
+    ['secondary', 'rgb(229, 226, 221)', 'rgb(244, 227, 213)'],
+    ['ghost', 'rgb(255, 255, 255)', 'rgb(244, 227, 213)'],
   ]) {
     const button = page.getByTestId(variant + '-default');
     await button.hover();
+    assert.equal((await colors(button)).background, hoverBackground);
     await page.mouse.down();
-    assert.equal((await colors(button)).background, background);
-    assert.equal((await colors(button)).foreground, 'rgb(24, 26, 29)');
+    assert.equal((await colors(button)).background, pressedBackground);
+    assert.equal(
+      (await colors(button)).foreground,
+      variant === 'primary' ? 'rgb(255, 255, 255)' : 'rgb(24, 26, 29)',
+    );
     await page.mouse.up();
   }
   assert.equal(
@@ -321,4 +361,32 @@ test('Button and Card resolve Light surfaces from semantic tokens', async () => 
       .evaluate((element) => getComputedStyle(element).backgroundColor),
     'rgb(251, 250, 248)',
   );
+});
+
+test('Button Dark primary pressed label meets 4.5:1 text contrast', async () => {
+  const button = page.getByTestId('primary-default');
+  await button.hover();
+  await page.mouse.down();
+  const ratio = await button.evaluate((element) => {
+    const [foreground, background] = [
+      getComputedStyle(element).color,
+      getComputedStyle(element).backgroundColor,
+    ].map((value) =>
+      value
+        .match(/[\d.]+/g)
+        .slice(0, 3)
+        .map(Number),
+    );
+    const luminance = ([r, g, b]) => {
+      const linear = [r, g, b].map((channel) => {
+        const normalized = channel / 255;
+        return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+    };
+    const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+    return (values[0] + 0.05) / (values[1] + 0.05);
+  });
+  assert.ok(ratio >= 4.5, `Expected at least 4.5:1, received ${ratio.toFixed(2)}:1`);
+  await page.mouse.up();
 });
