@@ -126,12 +126,12 @@ describe('DeliveryPage', () => {
     expect(screen.getByRole('navigation', { name: 'Delivery workflows' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Candidate detail & history' })).toHaveAttribute(
       'href',
-      '/candidates/c1',
+      '/delivery/w1/p1/candidates/c1',
     );
     expect(
       screen
         .getAllByRole('link', { name: 'Open verification result' })
-        .some((link) => link.getAttribute('href') === '/verifications/v0'),
+        .some((link) => link.getAttribute('href') === '/delivery/w1/p1/verifications/v0'),
     ).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Evidence detail & provenance' }));
     expect(screen.getByText('report-1')).toBeInTheDocument();

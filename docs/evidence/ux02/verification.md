@@ -10,7 +10,7 @@
 
 - `npm test`: passed. Architecture, design-system/token validation, generated
   OpenAPI type consistency, TypeScript, package tests, consumer contract, and
-  frontend tests passed; frontend: 58 files / 157 tests.
+  frontend tests passed; frontend: 58 files / 160 tests.
 - `npm run lint:frontend`: passed with zero warnings. Python Ruff passed.
 - `uv run --project apps/api --locked pytest`: 32 passed, including API,
   migration, transfer, and Desktop sidecar/installed-smoke Python tests.
@@ -35,15 +35,32 @@
   labels. The full isolated Playwright run passes 24/24 locally after the fix;
   final Quality run `39848645182` passed all API, web, and Desktop jobs on
   `a97bf68f1852c82ae7a40882298cc44c5867303b`. PR #1 remains open and unmerged.
+- Follow-up Quality run `39849991176` passed all API, web, and Desktop jobs on
+  `ef1244e11caf86e22d940a6432427c01568f4f7b`. Since that run, the focused
+  Chromium-mobile journey passed with real API-backed repository, context,
+  run, handoff, evidence, verification, candidate, and transfer interactions.
+  Quality CI for these latest changes is pending.
+- Latest local verification: `npm test` passed (58 frontend suites / 160 tests,
+  architecture and package checks included); `npm run lint:frontend` passed
+  with zero warnings; `npm run build` passed with production Component Host
+  exclusion; isolated Playwright passed 24/24 across desktop and mobile.
 
 ## Browser captures
 
 Automated Playwright captures (not human visual certification):
 
-- Planning: `desktop-planning.png`, `desktop-planning-light.png`,
-  `mobile-planning.png`, `mobile-planning-light.png`.
-- Readiness: `desktop-readiness.png`, `desktop-readiness-light.png`,
-  `mobile-readiness.png`, `mobile-readiness-light.png`.
+- Planning and Readiness workflows were captured with loaded records at
+  1440, 1280, 1024, 390, and 375px in both Dark and Light themes. Files use the
+  `<route>-<width>-<theme>.png` names, for example
+  `planning-1440-dark.png` and `readiness-375-light.png`. Each viewport asserts
+  its page heading is visible and the document has no horizontal overflow.
+- Run, handoff, repository, context-package, evidence, verification, and
+  candidate detail routes were captured at 1280px desktop and 390px mobile in
+  both themes. Their responsive checks exposed and fixed wrapping for long
+  handoff and candidate fingerprints.
+- Earlier representative captures remain: `desktop-planning.png`,
+  `desktop-planning-light.png`, `mobile-planning.png`,
+  `mobile-planning-light.png`, and corresponding Readiness files.
 - Existing workflow captures also include desktop/mobile Workbench and Transfer
   under `docs/evidence/ux01/`; those UX-01 baselines were preserved.
 
@@ -58,6 +75,7 @@ product data.
 The existing API does not provide evidence provenance event history, an
 execution API for verification rules, or independently verified delivery
 activity. The UI continues to distinguish reported, observed, verified, and
-not-published states rather than implying unsupported capabilities. UX-02
-remains pending external visual review and a successful Quality CI run on the
-final PR commit.
+not-published states rather than implying unsupported capabilities. Focused
+loading-state regression tests now cover Workbench, Repositories, and Context.
+UX-02 remains pending external visual review and a successful Quality CI run
+on the final PR commit.

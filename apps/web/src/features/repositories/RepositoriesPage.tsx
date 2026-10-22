@@ -12,6 +12,7 @@ export function RepositoriesPage() {
     disconnect,
     error,
     load,
+    loading,
     observe,
     observations,
     repositories,
@@ -25,14 +26,6 @@ export function RepositoriesPage() {
         Connections are optional, allowlisted, read-only Git observations. FORGE never reads source
         content or contacts remotes.
       </p>
-      {error && (
-        <div role="group" aria-label="Repository loading error">
-          <p role="alert">{error}</p>
-          <Button type="button" variant="secondary" onClick={() => void load()}>
-            Retry loading repositories
-          </Button>
-        </div>
-      )}
       <Card>
         <form onSubmit={connect} className={styles.form}>
           <FormField label="Approved local Git root">
@@ -49,7 +42,16 @@ export function RepositoriesPage() {
       </Card>
       <section className={styles.connections} aria-labelledby="repository-connections-heading">
         <h3 id="repository-connections-heading">Connections</h3>
-        {repositories.length === 0 ? (
+        {loading ? (
+          <p role="status">Loading repositories…</p>
+        ) : error ? (
+          <div role="group" aria-label="Repository loading error">
+            <p role="alert">{error}</p>
+            <Button type="button" variant="secondary" onClick={() => void load()}>
+              Retry loading repositories
+            </Button>
+          </div>
+        ) : repositories.length === 0 ? (
           <p>No repositories connected.</p>
         ) : (
           repositories.map((repository) => (

@@ -12,6 +12,7 @@ export function ContextPage() {
     link,
     load,
     linkedRepositories,
+    loading,
     packages,
     preview,
     repositories,
@@ -30,6 +31,12 @@ export function ContextPage() {
         Context packages contain planning records and metadata-only observations. They never contain
         source content or remote data.
       </p>
+      <p>
+        <Link to={`/planning/${workspaceId}/${projectId}/features/${featureId}`}>
+          Back to feature detail
+        </Link>
+      </p>
+      {loading && <p role="status">Loading feature context…</p>}
       {error && (
         <div role="group" aria-label="Context loading error">
           <p role="alert">{error}</p>
@@ -38,12 +45,7 @@ export function ContextPage() {
           </Button>
         </div>
       )}
-      <p>
-        <Link to={`/planning/${workspaceId}/${projectId}/features/${featureId}`}>
-          Back to feature detail
-        </Link>
-      </p>
-      <Card>
+      <Card hidden={loading || Boolean(error)}>
         <h3>Linked repositories</h3>
         {linkedRepositories.length === 0 ? (
           <p>No repositories linked to this feature.</p>
@@ -68,7 +70,7 @@ export function ContextPage() {
           ))
         )}
       </Card>
-      <Card>
+      <Card hidden={loading || Boolean(error)}>
         <h3>Available repositories</h3>
         {repositories.length === 0 ? (
           <p>No repositories connected.</p>
@@ -98,7 +100,7 @@ export function ContextPage() {
           ))
         )}
       </Card>
-      <Card>
+      <Card hidden={loading || Boolean(error)}>
         <div className={styles.previewHeader}>
           <h3>Context package preview</h3>
           <Button type="button" variant="secondary" onClick={() => void showPreview()}>
@@ -122,7 +124,7 @@ export function ContextPage() {
           </div>
         )}
       </Card>
-      <Card>
+      <Card hidden={loading || Boolean(error)}>
         <h3>Saved packages</h3>
         {packages.length === 0 ? (
           <p>No saved context packages.</p>

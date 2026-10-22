@@ -10,6 +10,11 @@
   display: grid;
   gap: var(--space-4, 1rem);
 }
+.page dd {
+  min-width: 0;
+  margin-inline-start: 0;
+  overflow-wrap: anywhere;
+}
 .row {
   display: flex;
   flex-wrap: wrap;

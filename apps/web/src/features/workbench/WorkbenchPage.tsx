@@ -14,6 +14,7 @@ export function WorkbenchPage() {
     error,
     handoffs,
     load,
+    loading,
     revisions,
     readyHandoff,
     runs,
@@ -29,14 +30,6 @@ export function WorkbenchPage() {
       <ProvenanceNotice source="Human-reported runs and handoffs">
         FORGE does not execute agents or claim delivery evidence.
       </ProvenanceNotice>
-      {error && (
-        <div role="group" aria-label="Workbench loading error">
-          <p role="alert">{error}</p>
-          <Button type="button" variant="secondary" onClick={() => void load()}>
-            Retry loading workbench
-          </Button>
-        </div>
-      )}
       <Card>
         <form onSubmit={createRun} className={styles.form}>
           <FormField label="Run title">
@@ -50,7 +43,16 @@ export function WorkbenchPage() {
           <Button type="submit">Record Run</Button>
         </form>
       </Card>
-      <Card>
+      {loading && <p role="status">Loading reported work…</p>}
+      {error && (
+        <div role="group" aria-label="Workbench loading error">
+          <p role="alert">{error}</p>
+          <Button type="button" variant="secondary" onClick={() => void load()}>
+            Retry loading workbench
+          </Button>
+        </div>
+      )}
+      <Card hidden={loading || Boolean(error)}>
         <h3>Runs</h3>
         {runs.length === 0 ? (
           <p>No reported runs.</p>
@@ -81,7 +83,7 @@ export function WorkbenchPage() {
           ))
         )}
       </Card>
-      <Card>
+      <Card hidden={loading || Boolean(error)}>
         <h3>Handoffs</h3>
         {handoffs.length === 0 ? (
           <p>No handoffs.</p>

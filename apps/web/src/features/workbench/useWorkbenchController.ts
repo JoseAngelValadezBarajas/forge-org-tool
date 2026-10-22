@@ -12,12 +12,14 @@ export function useWorkbenchController(workspaceId: string, projectId: string) {
   const [revisions, setRevisions] = useState<Record<string, HandoffRevision[]>>({});
   const [title, setTitle] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const [busyHandoffId, setBusyHandoffId] = useState<string | null>(null);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      setLoading(true);
+      setError('');
       try {
-        setError('');
         const [nextRuns, nextHandoffs] = await Promise.all([
           organizationApi.listRuns(workspaceId, projectId),
           organizationApi.listHandoffs(workspaceId, projectId),
@@ -35,9 +37,11 @@ export function useWorkbenchController(workspaceId: string, projectId: string) {
         setRuns(nextRuns);
         setHandoffs(nextHandoffs);
         setRevisions(Object.fromEntries(nextRevisions));
+        setLoading(false);
       } catch (cause) {
         if (isCurrent()) {
           setError(cause instanceof Error ? cause.message : 'Unable to load reported work.');
+          setLoading(false);
         }
       }
     },
@@ -137,6 +141,7 @@ export function useWorkbenchController(workspaceId: string, projectId: string) {
     error,
     handoffs,
     load,
+    loading,
     readyHandoff,
     revisions,
     runs,

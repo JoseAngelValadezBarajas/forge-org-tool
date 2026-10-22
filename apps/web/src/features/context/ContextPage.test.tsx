@@ -29,6 +29,24 @@ describe('ContextPage', () => {
     vi.restoreAllMocks();
   });
 
+  it('shows loading instead of empty context states while initial requests are pending', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {})),
+    );
+    render(
+      <MemoryRouter initialEntries={['/context/w1/p1/f1']}>
+        <Routes>
+          <Route path="/context/:workspaceId/:projectId/:featureId" element={<ContextPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading feature context');
+    expect(screen.queryByText('No repositories linked to this feature.')).not.toBeVisible();
+    expect(screen.queryByText('No repositories connected.')).not.toBeVisible();
+    expect(screen.queryByText('No saved context packages.')).not.toBeVisible();
+  });
+
   it('links a repository, previews and saves an immutable context package', async () => {
     let saved = false;
     const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {

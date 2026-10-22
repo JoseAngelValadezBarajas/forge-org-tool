@@ -60,6 +60,23 @@ describe('WorkbenchPage', () => {
     vi.restoreAllMocks();
   });
 
+  it('shows loading instead of empty run and handoff states while initial requests are pending', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {})),
+    );
+    render(
+      <MemoryRouter initialEntries={['/workbench/w1/p1']}>
+        <Routes>
+          <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading reported work');
+    expect(screen.queryByText('No reported runs.')).not.toBeVisible();
+    expect(screen.queryByText('No handoffs.')).not.toBeVisible();
+  });
+
   it('edits, publishes, reviews, acknowledges, and downloads an immutable handoff revision', async () => {
     let handoff = { ...draft, current_revision: null as number | null, status: 'DRAFT' as string };
     let handoffCreated = false;

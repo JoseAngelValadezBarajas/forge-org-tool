@@ -14,9 +14,12 @@ export function useContextController(workspaceId: string, projectId: string, fea
   const [packages, setPackages] = useState<ContextPackage[]>([]);
   const [preview, setPreview] = useState<ContextPreview | null>(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      setLoading(true);
+      setError('');
       try {
         const [nextRepositories, nextLinked, nextPackages] = await Promise.all([
           organizationApi.listRepositories(workspaceId, projectId),
@@ -28,9 +31,11 @@ export function useContextController(workspaceId: string, projectId: string, fea
         setRepositories(nextRepositories);
         setLinkedRepositories(nextLinked);
         setPackages(nextPackages);
+        setLoading(false);
       } catch (cause) {
         if (isCurrent()) {
           setError(cause instanceof Error ? cause.message : 'Unable to load feature context.');
+          setLoading(false);
         }
       }
     },
@@ -89,6 +94,7 @@ export function useContextController(workspaceId: string, projectId: string, fea
     error,
     link,
     linkedRepositories,
+    loading,
     load,
     packages,
     preview,

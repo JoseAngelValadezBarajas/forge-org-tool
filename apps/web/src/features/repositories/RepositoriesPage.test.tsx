@@ -36,6 +36,22 @@ describe('RepositoriesPage', () => {
     vi.restoreAllMocks();
   });
 
+  it('shows loading instead of an empty repository state while the initial request is pending', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {})),
+    );
+    render(
+      <MemoryRouter initialEntries={['/repositories/w1/p1']}>
+        <Routes>
+          <Route path="/repositories/:workspaceId/:projectId" element={<RepositoriesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading repositories');
+    expect(screen.queryByText('No repositories connected.')).not.toBeInTheDocument();
+  });
+
   it('shows metadata-only observation history and disconnects without deleting it', async () => {
     const previousObservation = {
       ...observation,

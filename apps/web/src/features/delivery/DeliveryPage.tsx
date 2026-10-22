@@ -273,7 +273,7 @@ export function DeliveryPage() {
                 </small>
               </div>
               <div className={styles.actions}>
-                <Link to={`/candidates/${item.id}`} state={{ workspaceId, projectId }}>
+                <Link to={`/delivery/${workspaceId}/${projectId}/candidates/${item.id}`}>
                   Candidate detail &amp; history
                 </Link>
                 <Button
@@ -389,7 +389,7 @@ export function DeliveryPage() {
                   Inspect result
                 </Button>
                 {item.id && (
-                  <Link to={`/verifications/${item.id}`} state={{ workspaceId, projectId }}>
+                  <Link to={`/delivery/${workspaceId}/${projectId}/verifications/${item.id}`}>
                     Open verification result
                   </Link>
                 )}

@@ -6,9 +6,12 @@ export function useRepositoriesController(workspaceId: string, projectId: string
   const [observations, setObservations] = useState<Record<string, Observation[]>>({});
   const [rootPath, setRootPath] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      setLoading(true);
+      setError('');
       try {
         const nextRepositories = await organizationApi.listRepositories(workspaceId, projectId);
         const nextObservations = await Promise.all(
@@ -24,9 +27,11 @@ export function useRepositoriesController(workspaceId: string, projectId: string
         setError('');
         setRepositories(nextRepositories);
         setObservations(Object.fromEntries(nextObservations));
+        setLoading(false);
       } catch (cause) {
         if (isCurrent()) {
           setError(cause instanceof Error ? cause.message : 'Unable to load repositories.');
+          setLoading(false);
         }
       }
     },
@@ -76,6 +81,7 @@ export function useRepositoriesController(workspaceId: string, projectId: string
     disconnect,
     error,
     load,
+    loading,
     observe,
     observations,
     repositories,
