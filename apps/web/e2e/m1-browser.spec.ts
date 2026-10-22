@@ -141,6 +141,13 @@ test('mobile gallery switches from dark to light with no browser errors', async 
             clientWidth: element.clientWidth,
             scrollWidth: element.scrollWidth,
             overflowX: getComputedStyle(element).overflowX,
+            componentId: element
+              .closest('article[data-component-id]')
+              ?.getAttribute('data-component-id'),
+            text:
+              element.childElementCount === 0
+                ? element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80)
+                : undefined,
           };
         };
         const offenders = [...document.querySelectorAll('body *')]
@@ -163,7 +170,9 @@ test('mobile gallery switches from dark to light with no browser errors', async 
                 0,
                 rect.right - viewport,
                 -rect.left,
-                element.scrollWidth - element.clientWidth,
+                getComputedStyle(element).overflowX === 'visible'
+                  ? element.scrollWidth - element.clientWidth
+                  : 0,
               ),
             };
           })
@@ -183,6 +192,15 @@ test('mobile gallery switches from dark to light with no browser errors', async 
         overflow.hasNoOverflow,
         `Component Host overflows at ${width}px in ${theme} theme: ${JSON.stringify(overflow)}`,
       ).toBe(true);
+      if (width === 375) {
+        const organizationOwner = page
+          .locator('[data-component-id="organization-empty-state"] > div:first-child p')
+          .first();
+        expect(
+          await organizationOwner.evaluate((element) => element.scrollWidth <= element.clientWidth),
+          'Long catalog owner metadata must wrap inside its card at 375px',
+        ).toBe(true);
+      }
       await expect(page.getByRole('navigation', { name: 'Component host sections' })).toBeVisible();
     }
   }

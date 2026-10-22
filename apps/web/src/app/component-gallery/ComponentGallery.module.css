@@ -111,6 +111,7 @@
 .owner {
   margin: var(--forge-space-1) 0 0;
   font: 0.75rem/1.4 var(--forge-font-mono);
+  overflow-wrap: anywhere;
 }
 .previewRow {
   display: flex;
