@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@forge-org/ui';
 import { OrganizationPage } from '../features/organization';
 import { FeatureDetailPage, PlanningPage } from '../features/planning';
@@ -30,6 +30,7 @@ export function App() {
 
 function ApplicationShell() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [paletteOpen, setPaletteOpen] = useState(false);
   useEffect(() => {
@@ -47,6 +48,48 @@ function ApplicationShell() {
     setPaletteOpen(false);
     navigate(path);
   }
+  const context = getProjectContext(location.pathname);
+  const productDestinations = [
+    {
+      id: 'planning',
+      label: 'Planning',
+      path: context && `/planning/${context.workspaceId}/${context.projectId}`,
+    },
+    {
+      id: 'readiness',
+      label: 'Readiness',
+      path:
+        context?.featureId &&
+        `/readiness/${context.workspaceId}/${context.projectId}/${context.featureId}`,
+    },
+    {
+      id: 'workbench',
+      label: 'Workbench',
+      path: context && `/workbench/${context.workspaceId}/${context.projectId}`,
+    },
+    {
+      id: 'delivery',
+      label: 'Delivery',
+      path: context && `/delivery/${context.workspaceId}/${context.projectId}`,
+    },
+    {
+      id: 'repositories',
+      label: 'Repositories',
+      path: context && `/repositories/${context.workspaceId}/${context.projectId}`,
+    },
+    {
+      id: 'context',
+      label: 'Context',
+      path:
+        context?.featureId &&
+        `/context/${context.workspaceId}/${context.projectId}/${context.featureId}`,
+    },
+    {
+      id: 'transfer',
+      label: 'Transfer',
+      path: context && `/transfer/${context.workspaceId}/${context.projectId}`,
+    },
+  ];
   return (
     <div className={styles.app} data-testid="application-shell" data-theme={resolvedTheme}>
       <div className={styles.shellGrid}>
@@ -57,6 +100,19 @@ function ApplicationShell() {
           <WorkspaceSwitcher currentName="Local Workspace" />
           <nav aria-label="Product navigation" className={styles.productNav}>
             <NavigationItem to="/" end label="Workspace" />
+            {productDestinations.map((destination) =>
+              destination.path ? (
+                <NavigationItem
+                  key={destination.id}
+                  to={destination.path}
+                  label={destination.label}
+                />
+              ) : (
+                <span key={destination.id} aria-disabled="true" className={styles.disabledNavItem}>
+                  {destination.label} ({context ? 'choose a feature' : 'choose a project'})
+                </span>
+              ),
+            )}
             {import.meta.env.DEV && <NavigationItem to="/__components" label="Component host" />}
           </nav>
           <div className={styles.localMode}>
@@ -122,6 +178,15 @@ function ApplicationShell() {
         onClose={() => setPaletteOpen(false)}
         commands={[
           { id: 'organization', label: 'Organization', onSelect: () => go('/') },
+          ...productDestinations
+            .filter((destination): destination is typeof destination & { path: string } =>
+              Boolean(destination.path),
+            )
+            .map((destination) => ({
+              id: destination.id,
+              label: destination.label,
+              onSelect: () => go(destination.path),
+            })),
           ...(import.meta.env.DEV
             ? [{ id: 'components', label: 'Component host', onSelect: () => go('/__components') }]
             : []),
@@ -129,4 +194,29 @@ function ApplicationShell() {
       />
     </div>
   );
+}
+
+function getProjectContext(pathname: string) {
+  const [section, workspaceId, projectId, fourth, fifth] = pathname.split('/').filter(Boolean);
+  if (!section || !workspaceId || !projectId) return null;
+  if (
+    ![
+      'planning',
+      'readiness',
+      'workbench',
+      'delivery',
+      'repositories',
+      'context',
+      'transfer',
+    ].includes(section)
+  ) {
+    return null;
+  }
+  const featureId =
+    section === 'readiness' || section === 'context'
+      ? fourth
+      : section === 'planning' && fourth === 'features'
+        ? fifth
+        : undefined;
+  return { workspaceId, projectId, featureId };
 }

@@ -46,6 +46,50 @@ describe('M1 application shell', () => {
     expect(screen.getByText('LOCAL MODE')).toBeInTheDocument();
   });
 
+  it('exposes contextual destinations for every product capability on project routes', () => {
+    renderRoute('/planning/w1/p1');
+
+    const navigation = screen.getByRole('navigation', { name: 'Product navigation' });
+    expect(within(navigation).getByRole('link', { name: 'Planning' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Workbench' })).toHaveAttribute(
+      'href',
+      '/workbench/w1/p1',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Delivery' })).toHaveAttribute(
+      'href',
+      '/delivery/w1/p1',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Repositories' })).toHaveAttribute(
+      'href',
+      '/repositories/w1/p1',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Transfer' })).toHaveAttribute(
+      'href',
+      '/transfer/w1/p1',
+    );
+    expect(within(navigation).getByText('Readiness (choose a feature)')).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
+  it('adds feature-scoped destinations from feature detail routes', () => {
+    renderRoute('/planning/w1/p1/features/f1');
+
+    const navigation = screen.getByRole('navigation', { name: 'Product navigation' });
+    expect(within(navigation).getByRole('link', { name: 'Readiness' })).toHaveAttribute(
+      'href',
+      '/readiness/w1/p1/f1',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Context' })).toHaveAttribute(
+      'href',
+      '/context/w1/p1/f1',
+    );
+  });
+
   it('exposes loading state and prevents native button interaction', async () => {
     await renderRoute('/__components');
 

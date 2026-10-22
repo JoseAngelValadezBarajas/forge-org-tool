@@ -48,6 +48,12 @@
   background: var(--forge-surface-raised);
   color: var(--forge-text);
 }
+.disabledNavItem {
+  padding: var(--forge-space-3);
+  color: var(--forge-text-muted);
+  opacity: 0.72;
+  font-size: 0.82rem;
+}
 .localMode {
   display: grid;
   gap: 4px;
@@ -145,6 +151,29 @@
     display: block;
   }
   .sidebar {
+    gap: var(--forge-space-2);
+    padding: var(--forge-space-2) var(--forge-space-3);
+    border-right: 0;
+    border-bottom: 1px solid var(--forge-border);
+  }
+  .brand {
+    display: none;
+  }
+  .sidebar > :global(*) {
+    min-width: 0;
+  }
+  .productNav {
+    display: flex;
+    gap: var(--forge-space-1);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-bottom: 2px;
+  }
+  .productNav > * {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .localMode {
     display: none;
   }
   .mobileBrand {
