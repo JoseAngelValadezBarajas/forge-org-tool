@@ -84,5 +84,9 @@ describe('ContextPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save context package' }));
     expect(await screen.findByText('Saved context package')).toBeInTheDocument();
     expect(screen.getByText('Fingerprint').nextElementSibling).toHaveTextContent('abc123');
+    expect(screen.getByRole('link', { name: 'Open context package' })).toHaveAttribute(
+      'href',
+      '/context/w1/p1/f1/packages/pkg1',
+    );
   });
 });

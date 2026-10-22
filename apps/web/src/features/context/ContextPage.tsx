@@ -121,6 +121,9 @@ export function ContextPage() {
         ) : (
           packages.map((item) => (
             <ContextPackageCard key={item.id} contextPackage={item}>
+              <Link to={`/context/${workspaceId}/${projectId}/${featureId}/packages/${item.id}`}>
+                Open context package
+              </Link>
               <a href={downloadPath(item.id, 'json')}>JSON</a>
               <a href={downloadPath(item.id, 'markdown')}>Markdown</a>
             </ContextPackageCard>

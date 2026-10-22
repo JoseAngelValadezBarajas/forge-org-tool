@@ -1,0 +1,49 @@
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+  min-width: 0;
+}
+.provenance {
+  color: var(--forge-text-muted);
+  line-height: 1.5;
+}
+.feedback,
+.heading,
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--forge-space-2);
+}
+.heading {
+  justify-content: space-between;
+}
+.heading h3,
+.stack h3 {
+  margin: 0;
+}
+.metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: var(--forge-space-3);
+  margin: var(--forge-space-3) 0 0;
+}
+.metadata dt {
+  color: var(--forge-text-muted);
+  font-size: 0.8rem;
+}
+.metadata dd {
+  margin: var(--forge-space-1) 0 0;
+  overflow-wrap: anywhere;
+}
+.fingerprint {
+  font-family: var(--forge-font-mono);
+}
+.content {
+  max-width: 100%;
+  margin: var(--forge-space-3) 0 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 0.8rem/1.5 var(--forge-font-mono);
+}
