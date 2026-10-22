@@ -1,7 +1,7 @@
 # UX-02 Workflow Verification
 
-**Implementation:** `75b52a12edaf46a45df5138a9c7b74c6704fcf84`  
-**Follow-up API test lint fix:** `fca1e5a3615d3c1c1759ef2b641e8c811163829a`  
+**Implementation:** `75b52a12edaf46a45df5138a9c7b74c6704fcf84`<br />
+**Follow-up API test lint fix:** `fca1e5a3615d3c1c1759ef2b641e8c811163829a`<br />
 **Branch:** `codex/forge-reconstruction-vertical-slices` (PR #1 remains open)
 
 ## Automated evidence
