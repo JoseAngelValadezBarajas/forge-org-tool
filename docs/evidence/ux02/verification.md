@@ -26,15 +26,15 @@
   passed API and Desktop, then exposed two asynchronous test assertions that
   observed loading states in the web suite. The assertions now wait for the
   package fingerprint and complete filtered result; the full `npm test` passes
-  locally after this correction. A new Quality run on the final PR commit is
-  required; PR #1 was not merged.
+  locally after this correction.
 - Quality CI run `39846669544` on `c287196cc2961c84c7b180834f3dc7b859c21e65`
   passed API and Desktop and passed the full frontend/unit suite and build, but
   exposed four ambiguous accessible-name locators in existing desktop/mobile
   browser journeys after UX-02 added overlapping labels. Those locators now
   target the intended project-summary region and exact fingerprint/readiness
   labels. The full isolated Playwright run passes 24/24 locally after the fix;
-  a final Quality run on the updated PR head is required.
+  final Quality run `39848645182` passed all API, web, and Desktop jobs on
+  `a97bf68f1852c82ae7a40882298cc44c5867303b`. PR #1 remains open and unmerged.
 
 ## Browser captures
 
