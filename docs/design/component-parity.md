@@ -232,3 +232,46 @@ The read-only screen audit and proposed future masters, with concrete source
 node IDs and intended feature ownership, are tracked in
 [proposed-pattern-masters.md](proposed-pattern-masters.md). Proposals are not
 approved Figma masters and are not counted as implemented page-20 components.
+
+## UX-01 focused visual and interaction update
+
+The following are source-contract and automated browser observations from the
+UX-01 worktree; they do not certify visual parity.
+
+- Button 173:27 supports the recorded Default, Hover, Pressed, Focused,
+  Disabled and Loading states. Hover/pressed are covered in package Chromium
+  tests; disabled, loading and focus-visible precedence are retained. The
+  implementation height remains 40px against Figma 36/38px reference sizes.
+  Dark Primary Pressed uses a white label (5.41:1) rather than the 3.44:1
+  literal Figma foreground/background pair; this is an intentional
+  accessibility deviation pending design review.
+- The Button's component-scoped Light state values follow the inspected
+  bindings: hover #98461a, pressed #78320f, selected #f4e3d5. No global
+  token or variable was changed. Danger Pressed 190:455 remains ambiguous:
+  the rendered node is black while its bound error-background variable
+  resolves to #301d20; implementation follows the binding pending a design
+  decision.
+- Card 173:65 now documents Default and Elevated as implemented variants;
+  neutral div semantics, typed semantic-root option, radius and padding are
+  covered by browser tests. No specimen dimensions are imposed.
+- StatusChip 173:40 has separate Info and Reported API tones; Accent is
+  an additional implementation tone, not a Figma alias. SectionHeader 177:183
+  includes the typed counter composition and its host preview.
+- OrganizationEmptyState is linked only to the closest related product screen,
+  Workspace Home 4:32; no exact native empty-state master on page 20 was
+  confirmed.
+- Host catalog responsibilities now have a thin development route, theme
+  shell, section navigation, typed catalog inventory, synthetic domain
+  fixtures, and owned Foundations/Icons previews. The remaining category
+  preview renderer still composes the broader set of examples centrally; this
+  is tracked as a modularization follow-up rather than claimed as a fully
+  decomposed preview implementation.
+
+Automated host evidence is retained in
+[docs/evidence/ux01/](../evidence/ux01/): Dark/Light Component Host
+desktop/mobile overview and category captures, plus representative
+Organization, Planning, Feature Detail, Readiness, Context, Workbench,
+Delivery and Transfer journeys. The host responsive check covers 1440, 1280,
+1024, 390 and 375 CSS pixels in both themes. These images are deterministic
+synthetic browser evidence; all Figma visual statuses remain
+NOT_HUMAN_REVIEWED.

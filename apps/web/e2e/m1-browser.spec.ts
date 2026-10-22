@@ -2,7 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-const evidenceDir = resolve(process.cwd(), '../../docs/evidence/m1');
+const evidenceDir = resolve(process.cwd(), '../../docs/evidence/ux01');
 
 test('desktop shell is truthful and has no horizontal overflow', async ({ page }) => {
   const consoleErrors: string[] = [];
@@ -11,10 +11,11 @@ test('desktop shell is truthful and has no horizontal overflow', async ({ page }
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
   await mkdir(evidenceDir, { recursive: true });
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `Evidence ${suffix}` } })
   ).json();
+  expect(workspace.name).toBe(`Evidence ${test.info().project.name}`);
   await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
     data: { name: `Loaded project ${suffix}`, description: 'Synthetic browser evidence' },
   });
@@ -57,7 +58,7 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     test.info().project.name === 'chromium-mobile'
       ? 'mobile-component-host'
       : 'desktop-component-host';
-  const primary = page.getByRole('button', { name: /increment 0/i });
+  const primary = page.locator('[data-component-preview="button"] button').first();
   const captureCategories = async (theme: 'dark' | 'light') => {
     await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
     for (const category of [
@@ -77,8 +78,9 @@ test('mobile gallery switches from dark to light with no browser errors', async 
       });
     }
   };
-  await primary.scrollIntoViewIfNeeded();
   await expect(primary).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.locator('main').evaluate((element) => element.scrollTo(0, 0));
   await page.screenshot({
     path: resolve(evidenceDir, `${prefix}-dark.png`),
     fullPage: false,
@@ -89,36 +91,50 @@ test('mobile gallery switches from dark to light with no browser errors', async 
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     ),
   ).toBe(true);
-  const defaultBackground = await primary.evaluate(
-    (element) => getComputedStyle(element).backgroundColor,
-  );
-  await primary.hover();
-  await page.waitForTimeout(150);
-  const hoverBackground = await primary.evaluate(
-    (element) => getComputedStyle(element).backgroundColor,
-  );
-  expect(hoverBackground).not.toBe(defaultBackground);
-  const primaryBounds = await primary.boundingBox();
-  if (!primaryBounds) throw new Error('Component Host primary button is not measurable');
-  await page.mouse.down();
-  const pressedBackground = await primary.evaluate(
-    (element) => getComputedStyle(element).backgroundColor,
-  );
-  await page.mouse.move(0, 0);
-  await page.mouse.up();
-  expect(pressedBackground).not.toBe(hoverBackground);
-  await expect(primary).toHaveAccessibleName('Increment 0');
+  await primary.scrollIntoViewIfNeeded();
+  if (test.info().project.name === 'chromium-mobile') {
+    await primary.tap();
+    await expect(primary).toHaveAccessibleName('Increment 1');
+  } else {
+    const defaultBackground = await primary.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    await primary.hover();
+    await page.waitForTimeout(150);
+    const hoverBackground = await primary.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    expect(hoverBackground).not.toBe(defaultBackground);
+    await primary.click();
+    await expect(primary).toHaveAccessibleName('Increment 1');
+  }
   await page.getByRole('combobox', { name: 'Preview theme' }).selectOption('light');
   await expect(gallery).toHaveAttribute('data-theme', 'light');
   await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await primary.scrollIntoViewIfNeeded();
-  await expect(page.getByRole('button', { name: /increment 0/i })).toBeVisible();
+  await expect(primary).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.locator('main').evaluate((element) => element.scrollTo(0, 0));
   await page.screenshot({
     path: resolve(evidenceDir, `${prefix}-light.png`),
     fullPage: false,
   });
   await captureCategories('light');
+  for (const width of [1440, 1280, 1024, 390, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ['dark', 'light'] as const) {
+      await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
+      await expect(gallery).toHaveAttribute('data-theme', theme);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        ),
+        `Component Host overflows at ${width}px in ${theme} theme`,
+      ).toBe(true);
+      await expect(page.getByRole('navigation', { name: 'Component host sections' })).toBeVisible();
+    }
+  }
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
@@ -145,7 +161,7 @@ test('mobile gallery switches from dark to light with no browser errors', async 
 });
 
 test('planning and readiness remain manual truth states', async ({ page }) => {
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspaceResponse = await page.request.post('/api/v1/workspaces', {
     data: { name: `Browser ${suffix}` },
   });
@@ -199,7 +215,7 @@ test('planning and readiness remain manual truth states', async ({ page }) => {
 });
 
 test('delivery exposes deterministic gates and non-published truth', async ({ page }) => {
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `Delivery ${suffix}` } })
   ).json();
@@ -261,7 +277,7 @@ test('delivery exposes deterministic gates and non-published truth', async ({ pa
 });
 
 test('workbench records reported runs and keeps handoffs human-owned', async ({ page }) => {
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `Workbench ${suffix}` } })
   ).json();
@@ -318,7 +334,7 @@ test('workbench records reported runs and keeps handoffs human-owned', async ({ 
 });
 
 test('project transfer is planning-only and exposes reviewed fingerprints', async ({ page }) => {
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `Transfer ${suffix}` } })
   ).json();
@@ -357,7 +373,7 @@ test('readiness records explicit planning context and repository metadata only',
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `Context ${suffix}` } })
   ).json();
@@ -386,17 +402,21 @@ test('readiness records explicit planning context and repository metadata only',
   await expect(page.getByText(/Acknowledged revision/)).toBeVisible();
   await expect(page.getByText(/NOT_READY|READY_TO_START/)).toBeVisible();
   await page.goto(`/repositories/${workspace.id}/${project.id}`);
-  await page.getByLabel('Approved local Git root').fill(resolve(process.cwd(), '../..'));
+  const syntheticRepositoryRoot = process.env.FORGE_E2E_REPOSITORY_ROOT;
+  expect(syntheticRepositoryRoot).toBeTruthy();
+  expect(syntheticRepositoryRoot).not.toBe(resolve(process.cwd(), '../..'));
+  await page.getByLabel('Approved local Git root').fill(syntheticRepositoryRoot!);
   await page.getByRole('button', { name: 'Connect Repository' }).click();
   await expect(page.getByText(/connected/i)).toBeVisible();
   await page.getByRole('button', { name: 'Observe metadata' }).click();
   await expect(page.getByText(/never reads source content/i)).toBeVisible();
-  const approvedRoot = resolve(process.cwd(), '../..');
   await expect(page.getByText(new RegExp(`Latest observation:.*source content: no`))).toBeVisible();
   await page.goto(`/context/${workspace.id}/${project.id}/${feature.id}`);
   await expect(page.getByRole('heading', { name: 'Feature context' })).toBeVisible();
-  await page.getByRole('button', { name: `Link ${approvedRoot}` }).click();
-  await expect(page.getByRole('button', { name: `Unlink ${approvedRoot}` })).toBeVisible();
+  await page.getByRole('button', { name: `Link ${syntheticRepositoryRoot}` }).click();
+  await expect(
+    page.getByRole('button', { name: `Unlink ${syntheticRepositoryRoot}` }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Preview context package' }).click();
   await expect(page.locator('p').filter({ hasText: /Schema:.*forge-context-v1/ })).toBeVisible();
   await expect(page.getByText(/source content/i).last()).toBeVisible();
@@ -416,7 +436,7 @@ test('readiness records explicit planning context and repository metadata only',
 });
 
 test('planning feature detail manages tasks and acceptance criteria', async ({ page }) => {
-  const suffix = Date.now().toString();
+  const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `Plan detail ${suffix}` } })
   ).json();
@@ -476,4 +496,43 @@ test('application shell exposes command palette and theme control', async ({ pag
   await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden();
+});
+
+test('workspace summary keeps multiword names readable on narrow screens', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const expectedWorkspaceName = `Synthetic Audit Workspace ${test.info().project.name}`;
+  const workspace = await (
+    await page.request.post('/api/v1/workspaces', { data: { name: expectedWorkspaceName } })
+  ).json();
+  await page.goto('/');
+  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+  const workspaceName = page.getByLabel('Workspace summary').locator('strong').last();
+  await expect(workspaceName).toHaveText(expectedWorkspaceName);
+  const renderedLineCount = await workspaceName.evaluate((element) => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    return range.getClientRects().length;
+  });
+  expect(renderedLineCount).toBeLessThanOrEqual(3);
+});
+
+test('delivery status metric remains legible at mobile width', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const workspace = await (
+    await page.request.post('/api/v1/workspaces', { data: { name: 'UX-01 Delivery Workspace' } })
+  ).json();
+  const project = await (
+    await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
+      data: { name: 'UX-01 Delivery Project' },
+    })
+  ).json();
+  await page.goto(`/delivery/${workspace.id}/${project.id}`);
+  const releaseStatus = page.locator('strong').filter({ hasText: /^NOT_PUBLISHED$/ });
+  await expect(releaseStatus).toBeVisible();
+  const renderedLineCount = await releaseStatus.evaluate((element) => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    return range.getClientRects().length;
+  });
+  expect(renderedLineCount).toBe(1);
 });

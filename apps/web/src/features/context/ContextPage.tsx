@@ -3,6 +3,7 @@ import { Button, Card, SectionHeader, StatusChip } from '@forge-org/ui';
 import styles from './ContextPage.module.css';
 import { useContextController } from './useContextController';
 import { ContextPackageCard } from './components';
+import { repositoryDisplayName } from '../repositories/index';
 
 export function ContextPage() {
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
@@ -44,7 +45,7 @@ export function ContextPage() {
               <div className={styles.row}>
                 <div>
                   <StatusChip tone="success">linked</StatusChip>
-                  <p className={styles.muted}>{repository.root_path}</p>
+                  <p className={styles.muted}>{repositoryDisplayName(repository.root_path)}</p>
                 </div>
                 <Button
                   type="button"
@@ -71,7 +72,7 @@ export function ContextPage() {
                   <StatusChip tone={repository.status === 'connected' ? 'success' : 'neutral'}>
                     {repository.status}
                   </StatusChip>
-                  <p className={styles.muted}>{repository.root_path}</p>
+                  <p className={styles.muted}>{repositoryDisplayName(repository.root_path)}</p>
                 </div>
                 {linkedIds.has(repository.id) ? (
                   <span>Linked</span>

@@ -7,11 +7,15 @@ import parity from '../../../../docs/design/design-system-parity.json';
 import { App } from './App';
 
 function renderRoute(path: string) {
-  return render(
+  const result = render(
     <MemoryRouter initialEntries={[path]}>
       <App />
     </MemoryRouter>,
   );
+  if (path === '/__components') {
+    return screen.findByRole('heading', { name: 'Component Host' }).then(() => result);
+  }
+  return result;
 }
 
 describe('M1 application shell', () => {
@@ -42,16 +46,16 @@ describe('M1 application shell', () => {
     expect(screen.getByText('LOCAL MODE')).toBeInTheDocument();
   });
 
-  it('exposes loading state and prevents native button interaction', () => {
-    renderRoute('/__components');
+  it('exposes loading state and prevents native button interaction', async () => {
+    await renderRoute('/__components');
 
     const loadingButton = screen.getByRole('button', { name: /working/i });
     expect(loadingButton).toBeDisabled();
     expect(loadingButton).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('gives host form controls accessible names from their visible labels', () => {
-    renderRoute('/__components');
+  it('gives host form controls accessible names from their visible labels', async () => {
+    await renderRoute('/__components');
 
     expect(screen.getByRole('checkbox', { name: 'Unchecked' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Read only' })).toBeInTheDocument();
@@ -60,8 +64,8 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('switch', { name: 'Disabled' })).toBeDisabled();
   });
 
-  it('previews the canonical PageHeader breadcrumb composition', () => {
-    renderRoute('/__components');
+  it('previews the canonical PageHeader breadcrumb composition', async () => {
+    await renderRoute('/__components');
 
     expect(
       screen.getByText('Feature detail', { selector: '[aria-current="page"]' }),
@@ -72,8 +76,8 @@ describe('M1 application shell', () => {
     );
   });
 
-  it('previews Disabled navigation and every DependencyGroup state', () => {
-    renderRoute('/__components');
+  it('previews Disabled navigation and every DependencyGroup state', async () => {
+    await renderRoute('/__components');
 
     const disabledItem = document.querySelector(
       '[data-product-pattern="navigation-item"] [aria-disabled="true"]',
@@ -87,8 +91,8 @@ describe('M1 application shell', () => {
     expect(within(dependencies as HTMLElement).getByText('ARCHIVED')).toBeInTheDocument();
   });
 
-  it('previews Reported, Observed, and Unknown provenance without certifying verification', () => {
-    renderRoute('/__components');
+  it('previews Reported, Observed, and Unknown provenance without certifying verification', async () => {
+    await renderRoute('/__components');
 
     const provenance = document.querySelector('[data-product-pattern="provenance-notice"]');
     expect(within(provenance as HTMLElement).getByText('REPORTED')).toBeInTheDocument();
@@ -99,8 +103,8 @@ describe('M1 application shell', () => {
     ).toBeGreaterThan(0);
   });
 
-  it('previews both canonical TrustDisclosure variants as static compositions', () => {
-    renderRoute('/__components');
+  it('previews both canonical TrustDisclosure variants as static compositions', async () => {
+    await renderRoute('/__components');
 
     const trustDisclosure = document.querySelector('[data-product-pattern="trust-disclosure"]');
     expect(within(trustDisclosure as HTMLElement).getByText('DEFAULT')).toBeInTheDocument();
@@ -108,8 +112,8 @@ describe('M1 application shell', () => {
     expect(trustDisclosure).not.toHaveAttribute('aria-expanded');
   });
 
-  it('previews each supported product state from the feature-owned components', () => {
-    renderRoute('/__components');
+  it('previews each supported product state from the feature-owned components', async () => {
+    await renderRoute('/__components');
 
     const planning = document.querySelector('[data-product-pattern="project-planning-home"]');
     expect(within(planning as HTMLElement).getByText('DEFAULT')).toBeInTheDocument();
@@ -129,8 +133,8 @@ describe('M1 application shell', () => {
     expect(within(revisions as HTMLElement).getByText('SUPERSEDED')).toBeInTheDocument();
   });
 
-  it('supports gallery interaction and dark/light switching', () => {
-    renderRoute('/__components');
+  it('supports gallery interaction and dark/light switching', async () => {
+    await renderRoute('/__components');
 
     const gallery = screen.getByRole('heading', { name: 'Component Host' }).closest('[data-theme]');
     expect(gallery).toHaveAttribute('data-theme', 'dark');
@@ -145,9 +149,9 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('combobox', { name: 'Preview theme' })).toHaveValue('light');
   });
 
-  it('keeps the Component Host preview isolated from persisted application appearance', () => {
+  it('keeps the Component Host preview isolated from persisted application appearance', async () => {
     localStorage.setItem('forge-theme', 'dark');
-    renderRoute('/__components');
+    await renderRoute('/__components');
 
     const app = screen.getByTestId('application-shell');
     const gallery = screen.getByRole('heading', { name: 'Component Host' }).closest('[data-theme]');
@@ -164,8 +168,8 @@ describe('M1 application shell', () => {
     expect(localStorage.getItem('forge-theme')).toBe('dark');
   });
 
-  it('previews primitive palette tokens alongside semantic theme tokens', () => {
-    renderRoute('/__components');
+  it('previews primitive palette tokens alongside semantic theme tokens', async () => {
+    await renderRoute('/__components');
 
     expect(screen.getByText('--forge-palette-graphite-950')).toBeInTheDocument();
     expect(screen.getByText('--forge-palette-copper-500')).toBeInTheDocument();
@@ -185,8 +189,8 @@ describe('M1 application shell', () => {
     expect(localStorage.getItem('forge-theme')).toBe('system');
   });
 
-  it('provides searchable catalog sections and clearly labels review status', () => {
-    renderRoute('/__components');
+  it('provides searchable catalog sections and clearly labels review status', async () => {
+    await renderRoute('/__components');
 
     expect(screen.getByRole('navigation', { name: 'Component host sections' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Foundations and tokens' })).toBeInTheDocument();
@@ -206,10 +210,10 @@ describe('M1 application shell', () => {
     expect(screen.queryByRole('heading', { name: 'Button' })).not.toBeInTheDocument();
   });
 
-  it('renders a real preview under the stable host ID for every canonical core family', () => {
+  it('renders a real preview under the stable host ID for every canonical core family', async () => {
     const coreEntries = parity.inventory.filter((entry) => entry.category === 'core');
 
-    renderRoute('/__components');
+    await renderRoute('/__components');
 
     expect(coreEntries).toHaveLength(37);
     for (const entry of coreEntries) {
@@ -226,10 +230,10 @@ describe('M1 application shell', () => {
     }
   });
 
-  it('renders a real feature-owned preview for every page-20 product pattern', () => {
+  it('renders a real feature-owned preview for every page-20 product pattern', async () => {
     const productEntries = parity.inventory.filter((entry) => entry.category === 'product');
 
-    renderRoute('/__components');
+    await renderRoute('/__components');
 
     expect(productEntries).toHaveLength(28);
     for (const entry of productEntries) {
@@ -250,8 +254,8 @@ describe('M1 application shell', () => {
     }
   });
 
-  it('previews the reconciled canonical Card and status variants', () => {
-    renderRoute('/__components');
+  it('previews the reconciled canonical Card and status variants', async () => {
+    await renderRoute('/__components');
 
     expect(
       document.querySelector('[data-component-preview="card"] [data-variant="elevated"]'),
@@ -270,8 +274,8 @@ describe('M1 application shell', () => {
     ).not.toBeNull();
   });
 
-  it('previews the canonical MultiSelect and FilePicker state compositions', () => {
-    renderRoute('/__components');
+  it('previews the canonical MultiSelect and FilePicker state compositions', async () => {
+    await renderRoute('/__components');
 
     expect(
       document.querySelectorAll('[data-component-preview="multi-select"] fieldset'),
@@ -288,7 +292,7 @@ describe('M1 application shell', () => {
   });
 
   it('keeps modal previews closed until explicitly opened and lets the preview close', async () => {
-    renderRoute('/__components');
+    await renderRoute('/__components');
     const dialogPreview = document.querySelector(
       '[data-component-preview="dialog"]',
     ) as HTMLElement;
@@ -301,8 +305,8 @@ describe('M1 application shell', () => {
     await waitFor(() => expect(view.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('distinguishes implementation gaps from implementations awaiting visual review', () => {
-    renderRoute('/__components');
+  it('distinguishes implementation gaps from implementations awaiting visual review', async () => {
+    await renderRoute('/__components');
 
     expect(document.querySelector('[data-component-id="checkbox"]')).toHaveTextContent(
       'IMPLEMENTED_NOT_REVIEWED',
@@ -312,8 +316,8 @@ describe('M1 application shell', () => {
     );
   });
 
-  it('previews every canonical icon export under its stable inventory ID', () => {
-    renderRoute('/__components');
+  it('previews every canonical icon export under its stable inventory ID', async () => {
+    await renderRoute('/__components');
 
     const iconEntries = parity.inventory.filter((entry) => entry.category === 'icon');
     expect(iconEntries).toHaveLength(35);

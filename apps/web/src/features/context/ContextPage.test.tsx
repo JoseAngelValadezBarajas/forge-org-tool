@@ -70,7 +70,8 @@ describe('ContextPage', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText('C:/approved/repo')).toBeInTheDocument();
+    expect(await screen.findByText('repo')).toBeInTheDocument();
+    expect(screen.queryByText('C:/approved/repo')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Link C:/approved/repo' }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

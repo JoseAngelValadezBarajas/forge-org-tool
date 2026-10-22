@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { Button } from '@forge-org/ui';
 import { OrganizationPage } from '../features/organization';
@@ -9,10 +9,17 @@ import { DeliveryPage } from '../features/delivery';
 import { RepositoriesPage } from '../features/repositories';
 import { ContextPage } from '../features/context';
 import { TransferPage } from '../features/transfer';
-import { ComponentGallery } from './component-gallery/ComponentGallery';
 import styles from './App.module.css';
 import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from './shell';
 import { ThemeProvider, useTheme } from './theme';
+
+const ComponentGallery = import.meta.env.DEV
+  ? lazy(() =>
+      import('./component-gallery/ComponentGallery').then(({ ComponentGallery: Gallery }) => ({
+        default: Gallery,
+      })),
+    )
+  : null;
 export function App() {
   return (
     <ThemeProvider applyToDocument>
@@ -95,7 +102,16 @@ function ApplicationShell() {
               <Route path="/repositories/:workspaceId/:projectId" element={<RepositoriesPage />} />
               <Route path="/context/:workspaceId/:projectId/:featureId" element={<ContextPage />} />
               <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
-              {import.meta.env.DEV && <Route path="/__components" element={<ComponentGallery />} />}
+              {ComponentGallery && (
+                <Route
+                  path="/__components"
+                  element={
+                    <Suspense fallback={<p>Loading component host…</p>}>
+                      <ComponentGallery />
+                    </Suspense>
+                  }
+                />
+              )}
               <Route path="*" element={<p>Page not found.</p>} />
             </Routes>
           </main>

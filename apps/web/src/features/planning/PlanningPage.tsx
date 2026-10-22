@@ -9,6 +9,7 @@ import {
   FeatureCard,
   FilterBar,
   KanbanColumn,
+  PLANNING_COLUMN_STATUSES,
   ProjectPlanningHome,
 } from './components';
 
@@ -106,10 +107,11 @@ export function PlanningPage() {
                 onChange={(event) => setStatusFilter(event.target.value)}
               >
                 <option value="all">All statuses</option>
-                <option value="backlog">Backlog</option>
-                <option value="in_progress">In progress</option>
-                <option value="verify">Verify</option>
-                <option value="done">Done</option>
+                {PLANNING_COLUMN_STATUSES.map((column) => (
+                  <option key={column.value} value={column.value}>
+                    {column.label}
+                  </option>
+                ))}
               </Select>
             </FormField>
             <FormField label="Priority">
@@ -143,7 +145,7 @@ export function PlanningPage() {
           </div>
         </FilterBar>
         <div className={styles.board} aria-label="Planning board">
-          {(['backlog', 'in_progress', 'verify', 'done'] as const).map((status) => {
+          {PLANNING_COLUMN_STATUSES.map(({ value: status }) => {
             const columnFeatures = visibleFeatures.filter((feature) => feature.status === status);
             return (
               <KanbanColumn key={status} status={status}>
@@ -182,10 +184,11 @@ export function PlanningPage() {
                             })
                           }
                         >
-                          <option value="backlog">backlog</option>
-                          <option value="in_progress">in progress</option>
-                          <option value="verify">verify</option>
-                          <option value="done">done</option>
+                          {PLANNING_COLUMN_STATUSES.map((column) => (
+                            <option key={column.value} value={column.value}>
+                              {column.label.toLowerCase()}
+                            </option>
+                          ))}
                         </select>
                       </label>
                       <label>

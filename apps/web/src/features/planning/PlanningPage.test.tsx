@@ -93,6 +93,62 @@ describe('PlanningPage', () => {
     );
   });
 
+  it('renders all six API-supported planning workflow columns', async () => {
+    const sixColumnOverview = {
+      ...overview,
+      unassigned_features: [
+        ...overview.unassigned_features,
+        {
+          id: 'f3',
+          project_id: 'p1',
+          epic_id: null,
+          title: 'Gamma',
+          description: null,
+          goal: null,
+          priority: 'medium',
+          status: 'refining',
+          created_at: '',
+          updated_at: '',
+        },
+        {
+          id: 'f4',
+          project_id: 'p1',
+          epic_id: null,
+          title: 'Delta',
+          description: null,
+          goal: null,
+          priority: 'medium',
+          status: 'ready',
+          created_at: '',
+          updated_at: '',
+        },
+      ],
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((input: string) => {
+        const payload = String(input).endsWith('/dependencies') ? [] : sixColumnOverview;
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    for (const column of ['Backlog', 'Refining', 'Ready', 'In progress', 'Verify', 'Done']) {
+      expect(await screen.findByRole('heading', { name: column })).toBeInTheDocument();
+    }
+    expect(screen.getByRole('link', { name: 'Gamma' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Delta' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Filter planning by status' })).toHaveDisplayValue(
+      'All statuses',
+    );
+  });
+
   it('creates and removes a project dependency without implying delivery evidence', async () => {
     const dependency = {
       id: 'd1',

@@ -37,7 +37,8 @@ describe('RepositoryCard', () => {
         <button>Observe metadata</button>
       </RepositoryCard>,
     );
-    expect(screen.getByText('C:/repo')).toBeInTheDocument();
+    expect(screen.getByText('repo')).toBeInTheDocument();
+    expect(screen.queryByText('C:/repo')).not.toBeInTheDocument();
     expect(screen.getByText('main')).toBeInTheDocument();
     expect(screen.getByText('Latest observation: main · source content: no')).toBeInTheDocument();
     expect(screen.getByText('Source content').nextElementSibling).toHaveTextContent('not read');

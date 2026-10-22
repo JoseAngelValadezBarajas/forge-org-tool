@@ -18,7 +18,8 @@
   display: block;
   margin: var(--forge-space-2) 0;
   font-size: 1.45rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 .summaryGrid small {
   color: var(--forge-text-muted);
@@ -95,5 +96,10 @@
 @media (max-width: 800px) {
   .summaryGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .metricValue {
+    font-size: 1rem;
   }
 }

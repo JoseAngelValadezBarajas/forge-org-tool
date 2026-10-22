@@ -10,7 +10,7 @@
   flex-wrap: wrap;
   gap: var(--forge-space-3);
 }
-.path {
+.name {
   min-width: 0;
   overflow-wrap: anywhere;
   font-family: var(--forge-font-mono);

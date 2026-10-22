@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Card, StatusChip } from '@forge-org/ui';
 import type { Observation, Repository } from '@forge-org/api-client';
 import styles from './RepositoryCard.module.css';
+import { repositoryDisplayName } from '../../repositoryDisplayName';
 
 type RepositoryCardProps = {
   repository: Repository;
@@ -15,7 +16,7 @@ export function RepositoryCard({ repository, observation, children }: Repository
   return (
     <Card className={styles.card} data-state={state}>
       <header className={styles.heading}>
-        <strong className={styles.path}>{repository.root_path}</strong>
+        <strong className={styles.name}>{repositoryDisplayName(repository.root_path)}</strong>
         <StatusChip tone={connected ? 'success' : 'neutral'}>{repository.status}</StatusChip>
       </header>
       {observation ? (
