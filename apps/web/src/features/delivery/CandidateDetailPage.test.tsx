@@ -47,13 +47,12 @@ describe('CandidateDetailPage', () => {
       ),
     );
     render(
-      <MemoryRouter
-        initialEntries={[
-          { pathname: '/candidates/c1', state: { workspaceId: 'w1', projectId: 'p1' } },
-        ]}
-      >
+      <MemoryRouter initialEntries={['/delivery/w1/p1/candidates/c1']}>
         <Routes>
-          <Route path="/candidates/:candidateId" element={<CandidateDetailPage />} />
+          <Route
+            path="/delivery/:workspaceId/:projectId/candidates/:candidateId"
+            element={<CandidateDetailPage />}
+          />
         </Routes>
       </MemoryRouter>,
     );

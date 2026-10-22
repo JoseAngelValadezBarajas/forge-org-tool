@@ -10,6 +10,7 @@ export function ContextPage() {
   const {
     error,
     link,
+    load,
     linkedRepositories,
     packages,
     preview,
@@ -29,7 +30,14 @@ export function ContextPage() {
         Context packages contain planning records and metadata-only observations. They never contain
         source content or remote data.
       </p>
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <div role="group" aria-label="Context loading error">
+          <p role="alert">{error}</p>
+          <Button type="button" variant="secondary" onClick={() => void load()}>
+            Retry loading context
+          </Button>
+        </div>
+      )}
       <p>
         <Link to={`/planning/${workspaceId}/${projectId}/features/${featureId}`}>
           Back to feature detail

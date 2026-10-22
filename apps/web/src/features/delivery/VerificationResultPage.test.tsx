@@ -39,13 +39,12 @@ describe('VerificationResultPage', () => {
       ),
     );
     render(
-      <MemoryRouter
-        initialEntries={[
-          { pathname: '/verifications/v1', state: { workspaceId: 'w1', projectId: 'p1' } },
-        ]}
-      >
+      <MemoryRouter initialEntries={['/delivery/w1/p1/verifications/v1']}>
         <Routes>
-          <Route path="/verifications/:verificationId" element={<VerificationResultPage />} />
+          <Route
+            path="/delivery/:workspaceId/:projectId/verifications/:verificationId"
+            element={<VerificationResultPage />}
+          />
         </Routes>
       </MemoryRouter>,
     );

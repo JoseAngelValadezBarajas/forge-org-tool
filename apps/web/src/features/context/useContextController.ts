@@ -24,6 +24,7 @@ export function useContextController(workspaceId: string, projectId: string, fea
           organizationApi.listContextPackages(workspaceId, projectId, featureId),
         ]);
         if (!isCurrent()) return;
+        setError('');
         setRepositories(nextRepositories);
         setLinkedRepositories(nextLinked);
         setPackages(nextPackages);

@@ -21,6 +21,7 @@ export function useRepositoriesController(workspaceId: string, projectId: string
           ),
         );
         if (!isCurrent()) return;
+        setError('');
         setRepositories(nextRepositories);
         setObservations(Object.fromEntries(nextObservations));
       } catch (cause) {
@@ -74,6 +75,7 @@ export function useRepositoriesController(workspaceId: string, projectId: string
     connect,
     disconnect,
     error,
+    load,
     observe,
     observations,
     repositories,

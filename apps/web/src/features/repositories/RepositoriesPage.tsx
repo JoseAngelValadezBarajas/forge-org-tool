@@ -7,8 +7,17 @@ import { repositoryDisplayName } from './repositoryDisplayName';
 
 export function RepositoriesPage() {
   const { workspaceId = '', projectId = '' } = useParams();
-  const { connect, disconnect, error, observe, observations, repositories, rootPath, setRootPath } =
-    useRepositoriesController(workspaceId, projectId);
+  const {
+    connect,
+    disconnect,
+    error,
+    load,
+    observe,
+    observations,
+    repositories,
+    rootPath,
+    setRootPath,
+  } = useRepositoriesController(workspaceId, projectId);
   return (
     <div className={styles.stack}>
       <SectionHeader title="Repositories" eyebrow="FORGE / Metadata-only context" />
@@ -16,7 +25,14 @@ export function RepositoriesPage() {
         Connections are optional, allowlisted, read-only Git observations. FORGE never reads source
         content or contacts remotes.
       </p>
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <div role="group" aria-label="Repository loading error">
+          <p role="alert">{error}</p>
+          <Button type="button" variant="secondary" onClick={() => void load()}>
+            Retry loading repositories
+          </Button>
+        </div>
+      )}
       <Card>
         <form onSubmit={connect} className={styles.form}>
           <FormField label="Approved local Git root">
@@ -41,6 +57,7 @@ export function RepositoriesPage() {
               key={repository.id}
               repository={repository}
               observation={observations[repository.id]?.[0]}
+              history={observations[repository.id] ?? []}
             >
               <Link to={`/repositories/${workspaceId}/${projectId}/${repository.id}`}>
                 View repository {repositoryDisplayName(repository.root_path)}

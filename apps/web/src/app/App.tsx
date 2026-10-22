@@ -4,10 +4,15 @@ import { Button } from '@forge-org/ui';
 import { OrganizationPage } from '../features/organization';
 import { FeatureDetailPage, PlanningPage } from '../features/planning';
 import { ReadinessPage } from '../features/readiness';
-import { WorkbenchPage } from '../features/workbench';
-import { DeliveryPage } from '../features/delivery';
-import { RepositoriesPage } from '../features/repositories';
-import { ContextPage } from '../features/context';
+import { HandoffDetailPage, RunDetailPage, WorkbenchPage } from '../features/workbench';
+import {
+  CandidateDetailPage,
+  DeliveryPage,
+  EvidenceDetailPage,
+  VerificationResultPage,
+} from '../features/delivery';
+import { RepositoriesPage, RepositoryDetailPage } from '../features/repositories';
+import { ContextPackageDetailPage, ContextPage } from '../features/context';
 import { TransferPage } from '../features/transfer';
 import styles from './App.module.css';
 import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from './shell';
@@ -155,9 +160,37 @@ function ApplicationShell() {
                 element={<ReadinessPage />}
               />
               <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
+              <Route
+                path="/workbench/:workspaceId/:projectId/runs/:runId"
+                element={<RunDetailPage />}
+              />
+              <Route
+                path="/workbench/:workspaceId/:projectId/handoffs/:handoffId"
+                element={<HandoffDetailPage />}
+              />
               <Route path="/delivery/:workspaceId/:projectId" element={<DeliveryPage />} />
+              <Route
+                path="/delivery/:workspaceId/:projectId/evidence/:evidenceId"
+                element={<EvidenceDetailPage />}
+              />
+              <Route
+                path="/delivery/:workspaceId/:projectId/verifications/:verificationId"
+                element={<VerificationResultPage />}
+              />
+              <Route
+                path="/delivery/:workspaceId/:projectId/candidates/:candidateId"
+                element={<CandidateDetailPage />}
+              />
               <Route path="/repositories/:workspaceId/:projectId" element={<RepositoriesPage />} />
+              <Route
+                path="/repositories/:workspaceId/:projectId/:repositoryId"
+                element={<RepositoryDetailPage />}
+              />
               <Route path="/context/:workspaceId/:projectId/:featureId" element={<ContextPage />} />
+              <Route
+                path="/context/:workspaceId/:projectId/:featureId/packages/:packageId"
+                element={<ContextPackageDetailPage />}
+              />
               <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
               {ComponentGallery && (
                 <Route

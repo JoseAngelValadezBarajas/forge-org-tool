@@ -7,11 +7,15 @@ import styles from './DeliveryDetails.module.css';
 
 type Rule = { id: string; label: string; description: string };
 export function VerificationResultPage() {
-  const { verificationId = '' } = useParams();
+  const {
+    workspaceId: routeWorkspaceId = '',
+    projectId: routeProjectId = '',
+    verificationId = '',
+  } = useParams();
   const location = useLocation();
   const routeContext = location.state as { workspaceId?: string; projectId?: string } | null;
-  const workspaceId = routeContext?.workspaceId ?? '';
-  const projectId = routeContext?.projectId ?? '';
+  const workspaceId = routeContext?.workspaceId ?? routeWorkspaceId;
+  const projectId = routeContext?.projectId ?? routeProjectId;
   const missingContext = !workspaceId || !projectId;
   const [result, setResult] = useState<Verification | null>(null);
   const [rules, setRules] = useState<Rule[]>([]);
@@ -46,7 +50,7 @@ export function VerificationResultPage() {
   }, [workspaceId, projectId, verificationId, missingContext]);
   const rule = result ? rules.find((item) => item.id === result.rule_id) : undefined;
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Link className={styles.back} to={`/delivery/${workspaceId}/${projectId}`}>
         ← Back to delivery
       </Link>
@@ -106,7 +110,7 @@ export function VerificationResultPage() {
           </p>
         </>
       )}
-    </main>
+    </div>
   );
 }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

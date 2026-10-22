@@ -114,8 +114,11 @@ describe('ContextPage', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText('Historical context', { exact: false })).toBeInTheDocument();
-    expect(screen.getByText(/source_content_included/)).toBeInTheDocument();
+    expect(await screen.findByText('abc123')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open context package' })).toHaveAttribute(
+      'href',
+      '/context/w1/p1/f1/packages/pkg1',
+    );
   });
 
   it('offers a retry after feature context loading fails', async () => {

@@ -6,11 +6,15 @@ import type { CandidateHistory, ReleaseCandidate } from '@forge-org/api-client';
 import styles from './DeliveryDetails.module.css';
 
 export function CandidateDetailPage() {
-  const { candidateId = '' } = useParams();
+  const {
+    workspaceId: routeWorkspaceId = '',
+    projectId: routeProjectId = '',
+    candidateId = '',
+  } = useParams();
   const location = useLocation();
   const routeContext = location.state as { workspaceId?: string; projectId?: string } | null;
-  const workspaceId = routeContext?.workspaceId ?? '';
-  const projectId = routeContext?.projectId ?? '';
+  const workspaceId = routeContext?.workspaceId ?? routeWorkspaceId;
+  const projectId = routeContext?.projectId ?? routeProjectId;
   const missingContext = !workspaceId || !projectId;
   const [candidate, setCandidate] = useState<ReleaseCandidate | null>(null);
   const [history, setHistory] = useState<CandidateHistory[]>([]);
@@ -40,7 +44,7 @@ export function CandidateDetailPage() {
     };
   }, [workspaceId, projectId, candidateId, missingContext]);
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Link className={styles.back} to={`/delivery/${workspaceId}/${projectId}`}>
         ← Back to delivery
       </Link>
@@ -90,7 +94,7 @@ export function CandidateDetailPage() {
           </Card>
         </>
       )}
-    </main>
+    </div>
   );
 }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

@@ -7,6 +7,11 @@ const evidenceDir = resolve(process.cwd(), '../../docs/evidence/ux02');
 test('project navigation connects planning, readiness, context and product workspaces', async ({
   page,
 }) => {
+  page.on('requestfailed', (request) =>
+    console.log(
+      `UX-02 request failed: ${request.method()} ${request.url()} ${request.failure()?.errorText}`,
+    ),
+  );
   const suffix = test.info().project.name;
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `UX-02 ${suffix}` } })
@@ -21,6 +26,7 @@ test('project navigation connects planning, readiness, context and product works
       data: { title: `Feature ${suffix}`, goal: 'Verify contextual product navigation' },
     })
   ).json();
+  expect(feature.id).toBeTruthy();
 
   await page.goto(`/planning/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
@@ -49,7 +55,12 @@ test('project navigation connects planning, readiness, context and product works
   await expect(page.getByRole('heading', { name: 'Feature detail' })).toBeVisible();
   await page.getByRole('link', { name: 'Readiness', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Readiness', exact: true })).toBeVisible();
+  await expect(page.getByText(/^Outcome:/).or(page.getByRole('alert'))).toBeVisible();
+  if (await page.getByRole('alert').isVisible()) {
+    await page.getByRole('button', { name: 'Retry readiness evaluation' }).click();
+  }
   await expect(page.getByText(/^Outcome:/)).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(0);
   await page.screenshot({
     path: resolve(
       evidenceDir,

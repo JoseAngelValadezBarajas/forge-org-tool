@@ -17,6 +17,7 @@ export function useWorkbenchController(workspaceId: string, projectId: string) {
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
       try {
+        setError('');
         const [nextRuns, nextHandoffs] = await Promise.all([
           organizationApi.listRuns(workspaceId, projectId),
           organizationApi.listHandoffs(workspaceId, projectId),

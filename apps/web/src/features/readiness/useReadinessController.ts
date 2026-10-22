@@ -30,6 +30,7 @@ export function useReadinessController(workspaceId: string, projectId: string, f
           organizationApi.listInvariants(workspaceId, projectId, featureId),
         ]);
         if (!isCurrent() || generation !== refreshGeneration.current) return;
+        setError('');
         setResult(nextReadiness);
         setDecisions(nextDecisions);
         setInvariants(nextInvariants);

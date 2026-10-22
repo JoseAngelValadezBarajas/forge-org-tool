@@ -1,5 +1,5 @@
 ﻿import { expect, test } from '@playwright/test';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const evidenceDir = resolve(process.cwd(), '../../docs/evidence/ux01');
@@ -359,7 +359,7 @@ test('workbench records reported runs and keeps handoffs human-owned', async ({ 
   await expect(page.getByRole('heading', { name: 'Workbench' })).toBeVisible();
   await page.getByLabel('Run title').fill(`Manual run ${suffix}`);
   await page.getByRole('button', { name: 'Record Run' }).click();
-  await expect(page.getByText(`Manual run ${suffix}`)).toBeVisible();
+  await expect(page.getByText(`Manual run ${suffix}`, { exact: true })).toBeVisible();
   await expect(page.getByText(/human \/ manual/i)).toBeVisible();
   await page.getByRole('button', { name: `Create handoff for Manual run ${suffix}` }).click();
   await expect(page.getByText(`Handoff for Manual run ${suffix}`)).toBeVisible();
@@ -414,19 +414,25 @@ test('project transfer is planning-only and exposes reviewed fingerprints', asyn
   ).json();
   await page.goto(`/transfer/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Project transfer' })).toBeVisible();
-  await expect(page.getByText(/planning records only/i)).toBeVisible();
-  await page.getByRole('button', { name: 'Export project' }).click();
-  await expect(page.getByText('forge-project-import-v1', { exact: true })).toBeVisible();
-  await expect(page.getByText(/fingerprint/i)).toBeVisible();
-  const transferDocument = JSON.parse(await page.locator('textarea').inputValue()) as {
+  await expect(page.getByText(/only planning records are transferred/i)).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download project export' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('project-export.json');
+  const transferDocument = JSON.parse(await readFile((await download.path())!, 'utf8')) as {
     project: { name: string };
   };
   transferDocument.project.name = `Imported ${suffix}`;
-  await page.locator('textarea').fill(JSON.stringify(transferDocument, null, 2));
-  await page.getByRole('button', { name: 'Preview import' }).click();
-  await expect(page.getByRole('heading', { name: 'Reviewed import' })).toBeVisible();
+  await page.getByLabel('Choose a project JSON file').setInputFiles({
+    name: download.suggestedFilename(),
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(transferDocument)),
+  });
+  await page.getByRole('button', { name: 'Review import' }).click();
+  await expect(page.getByText(/fingerprint/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Review planning changes' })).toBeVisible();
   await expect(page.getByText('FINGERPRINT_REQUIRED')).toBeVisible();
-  await page.getByRole('button', { name: 'Commit reviewed import' }).click();
+  await page.getByRole('button', { name: 'Confirm planning import' }).click();
   await expect(page.getByText('IMPORTED_PLANNING_ONLY')).toBeVisible();
   await expect(page.getByText(/Created project:/)).toBeVisible();
   const screenshotName =

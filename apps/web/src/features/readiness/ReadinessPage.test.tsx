@@ -148,4 +148,32 @@ describe('ReadinessPage', () => {
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(screen.getByText('Fresh invariant')).toBeInTheDocument();
   });
+
+  it('recovers a failed readiness request when the user retries evaluation', async () => {
+    let failed = false;
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input).endsWith('/readiness/preview') && !failed) {
+        failed = true;
+        return Promise.resolve(
+          new Response(JSON.stringify({ detail: 'Temporary outage' }), { status: 503 }),
+        );
+      }
+      if (String(input).endsWith('/readiness/preview'))
+        return Promise.resolve(new Response(JSON.stringify(readiness), { status: 200 }));
+      return Promise.resolve(new Response('[]', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/readiness/w1/p1/f1']}>
+        <Routes>
+          <Route path="/readiness/:workspaceId/:projectId/:featureId" element={<ReadinessPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Temporary outage');
+    fireEvent.click(screen.getByRole('button', { name: 'Retry readiness evaluation' }));
+    expect(await screen.findByText('Outcome: NOT_READY')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
 });

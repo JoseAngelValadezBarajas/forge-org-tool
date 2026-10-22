@@ -70,8 +70,8 @@ describe('RepositoriesPage', () => {
 
     expect(await screen.findByText(/Latest observation: unborn/)).toBeInTheDocument();
     expect(screen.getByText('Source content').nextElementSibling).toHaveTextContent('not read');
-    expect(screen.getByText('feature/previous')).toBeInTheDocument();
-    expect(screen.getByText('0123456789abcdef')).toBeInTheDocument();
+    expect(screen.getByText(/feature\/previous/)).toBeInTheDocument();
+    expect(screen.getByText(/0123456789abcdef/)).toBeInTheDocument();
     expect(screen.getByText(/modified 2/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Disconnect repo' }));
     await waitFor(() =>

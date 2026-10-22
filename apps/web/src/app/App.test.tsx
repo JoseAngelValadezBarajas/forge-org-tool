@@ -109,6 +109,100 @@ describe('M1 application shell', () => {
     expect(within(breadcrumb).getByText('Readiness')).toHaveAttribute('aria-current', 'page');
   });
 
+  it('opens persisted evidence detail through its direct project-scoped URL', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            id: 'e1',
+            title: 'Synthetic report',
+            summary: 'A human-reported reference',
+            provenance: 'REPORTED',
+            status: 'ACTIVE',
+            reference_kind: 'url',
+            reference_value: 'https://example.invalid/report',
+            feature_id: null,
+            created_at: '2026-10-22T00:00:00Z',
+            project_id: 'p1',
+          }),
+          { status: 200 },
+        ),
+      ),
+    );
+    renderRoute('/delivery/w1/p1/evidence/e1');
+
+    expect(await screen.findByRole('heading', { name: 'Synthetic report' })).toBeInTheDocument();
+    expect(screen.getByText('REPORTED')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to delivery/i })).toHaveAttribute(
+      'href',
+      '/delivery/w1/p1',
+    );
+  });
+
+  it('mounts run activity and immutable context snapshots at their direct URLs', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      const path = String(input);
+      if (path.endsWith('/runs/run-1'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              id: 'run-1',
+              project_id: 'p1',
+              feature_id: null,
+              title: 'Human report',
+              description: null,
+              execution_mode: 'manual',
+              executor_type: 'human',
+              status: 'PLANNED',
+              version: 1,
+              created_at: '',
+              updated_at: '',
+            }),
+            { status: 200 },
+          ),
+        );
+      if (path.endsWith('/runs/run-1/events'))
+        return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+      if (path.endsWith('/context/packages/pkg-1'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              id: 'pkg-1',
+              project_id: 'p1',
+              feature_id: 'f1',
+              schema_version: 'forge-context-v1',
+              fingerprint: 'sha256:snapshot',
+              payload_json: '{}',
+              markdown: '# Saved context',
+              created_at: '',
+            }),
+            { status: 200 },
+          ),
+        );
+      return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const runView = render(
+      <MemoryRouter initialEntries={['/workbench/w1/p1/runs/run-1']}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(
+      await screen.findByRole('heading', { name: 'Human report', level: 2 }),
+    ).toBeInTheDocument();
+    runView.unmount();
+
+    render(
+      <MemoryRouter initialEntries={['/context/w1/p1/f1/packages/pkg-1']}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText('sha256:snapshot')).toBeInTheDocument();
+    expect(screen.getByText('# Saved context')).toBeInTheDocument();
+  });
+
   it('exposes loading state and prevents native button interaction', async () => {
     await renderRoute('/__components');
 

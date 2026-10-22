@@ -41,7 +41,14 @@ export function ReadinessPage() {
         This is a deterministic planning evaluation, not delivery, CI, deployment, or technical
         verification.
       </p>
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <div role="group" aria-label="Readiness evaluation error">
+          <p role="alert">{error}</p>
+          <Button type="button" variant="secondary" onClick={() => void refresh()}>
+            Retry readiness evaluation
+          </Button>
+        </div>
+      )}
       {result ? (
         <EvaluationSnapshot
           fingerprint={result.input_fingerprint}

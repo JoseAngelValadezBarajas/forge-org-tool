@@ -65,7 +65,11 @@ export function RepositoryDetailPage() {
         </div>
       )}
       {!loading && repository && (
-        <RepositoryCard repository={repository} observations={observations} />
+        <RepositoryCard
+          repository={repository}
+          observation={observations[0]}
+          history={observations}
+        />
       )}
     </div>
   );

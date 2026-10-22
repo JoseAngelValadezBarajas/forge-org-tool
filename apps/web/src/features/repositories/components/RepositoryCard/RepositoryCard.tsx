@@ -7,10 +7,16 @@ import { repositoryDisplayName } from '../../repositoryDisplayName';
 type RepositoryCardProps = {
   repository: Repository;
   observation?: Observation;
+  history?: Observation[];
   children?: ReactNode;
 };
 
-export function RepositoryCard({ repository, observation, children }: RepositoryCardProps) {
+export function RepositoryCard({
+  repository,
+  observation,
+  history = [],
+  children,
+}: RepositoryCardProps) {
   const connected = repository.status === 'connected';
   const state = !connected ? 'Unavailable' : observation ? 'Observed' : 'Connected';
   return (
@@ -57,6 +63,20 @@ export function RepositoryCard({ repository, observation, children }: Repository
         </>
       ) : (
         <p className={styles.pending}>No metadata observation has been recorded.</p>
+      )}
+      {history.length > 1 && (
+        <ol aria-label="Observation history">
+          {history.slice(1).map((entry) => (
+            <li key={entry.id}>
+              {entry.unborn ? 'unborn' : (entry.branch ?? 'detached')} ·{' '}
+              {entry.head_sha ?? 'HEAD unavailable'}
+              {' · '}
+              {entry.tracked_modified_count === 0
+                ? 'no tracked modifications'
+                : `modified ${entry.tracked_modified_count}`}
+            </li>
+          ))}
+        </ol>
       )}
       {children && <div className={styles.actions}>{children}</div>}
     </Card>

@@ -25,7 +25,7 @@ export function EvidenceDetailPage() {
   }, [workspaceId, projectId, evidenceId]);
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <Link className={styles.back} to={`/delivery/${workspaceId}/${projectId}`}>
         ← Back to delivery
       </Link>
@@ -61,7 +61,7 @@ export function EvidenceDetailPage() {
           </p>
         </>
       )}
-    </main>
+    </div>
   );
 }
 
