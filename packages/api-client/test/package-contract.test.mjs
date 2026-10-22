@@ -36,7 +36,7 @@ test('workbench event facade preserves generated API paths and request bodies', 
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input, init) => {
     calls.push({ input: String(input), init });
-    return new Response(JSON.stringify({ id: 'event-1' }), {
+    return new globalThis.Response(JSON.stringify({ id: 'event-1' }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
