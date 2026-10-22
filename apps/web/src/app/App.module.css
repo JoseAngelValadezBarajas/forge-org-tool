@@ -118,6 +118,31 @@
   width: min(1200px, calc(100% - 32px));
   margin: var(--forge-space-8) auto;
 }
+.breadcrumb {
+  margin-bottom: var(--forge-space-5);
+  color: var(--forge-text-muted);
+  font-size: 0.85rem;
+}
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.breadcrumb li + li::before {
+  content: '/';
+  margin-right: var(--forge-space-2);
+  color: var(--forge-border-strong);
+}
+.breadcrumb a {
+  color: var(--forge-text-muted);
+}
+.breadcrumb a:hover,
+.breadcrumb [aria-current='page'] {
+  color: var(--forge-text);
+}
 .paletteBackdrop {
   position: fixed;
   inset: 0;

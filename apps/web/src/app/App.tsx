@@ -142,6 +142,7 @@ function ApplicationShell() {
             </label>
           </PageHeader>
           <main id="main" className={styles.main}>
+            <Breadcrumbs pathname={location.pathname} />
             <Routes>
               <Route path="/" element={<OrganizationPage />} />
               <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
@@ -193,6 +194,48 @@ function ApplicationShell() {
         ]}
       />
     </div>
+  );
+}
+
+function Breadcrumbs({ pathname }: { pathname: string }) {
+  const context = getProjectContext(pathname);
+  if (!context) return null;
+  const parts = pathname.split('/').filter(Boolean);
+  const section = parts[0];
+  const projectPath = `/planning/${context.workspaceId}/${context.projectId}`;
+  const featurePath = `${projectPath}/features/${context.featureId}`;
+  const labelBySection: Record<string, string> = {
+    planning: context.featureId ? 'Feature' : 'Planning',
+    readiness: 'Readiness',
+    workbench: 'Workbench',
+    delivery: 'Delivery',
+    repositories: 'Repositories',
+    context: 'Context',
+    transfer: 'Transfer',
+  };
+  const crumbs = [
+    { label: 'Workspace', href: '/' },
+    { label: 'Project', href: projectPath },
+    ...(context.featureId && section !== 'planning'
+      ? [{ label: 'Feature', href: featurePath }]
+      : []),
+  ];
+  const currentLabel = labelBySection[section] ?? 'Project';
+  if (crumbs.at(-1)?.label !== currentLabel) crumbs.push({ label: currentLabel, href: '' });
+  return (
+    <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+      <ol>
+        {crumbs.map((crumb, index) => (
+          <li key={`${crumb.label}-${index}`}>
+            {crumb.href ? (
+              <Link to={crumb.href}>{crumb.label}</Link>
+            ) : (
+              <span aria-current="page">{crumb.label}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
   );
 }
 

@@ -90,6 +90,25 @@ describe('M1 application shell', () => {
     );
   });
 
+  it('shows a contextual breadcrumb from workspace through the current feature page', () => {
+    renderRoute('/readiness/w1/p1/f1');
+
+    const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(within(breadcrumb).getByRole('link', { name: 'Workspace' })).toHaveAttribute(
+      'href',
+      '/',
+    );
+    expect(within(breadcrumb).getByRole('link', { name: 'Project' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(within(breadcrumb).getByRole('link', { name: 'Feature' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1/features/f1',
+    );
+    expect(within(breadcrumb).getByText('Readiness')).toHaveAttribute('aria-current', 'page');
+  });
+
   it('exposes loading state and prevents native button interaction', async () => {
     await renderRoute('/__components');
 
