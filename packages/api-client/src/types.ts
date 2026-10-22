@@ -24,6 +24,8 @@ export type ProjectTransferPreview = {
   project: { name: string; description?: string | null };
 };
 export type Run = Schema['RunResponse'];
+export type RunEvent = Schema['RunEventResponse'];
+export type RunEventCreate = Schema['RunEventCreate'];
 export type Handoff = Schema['HandoffResponse'];
 export type HandoffRevision = Schema['HandoffRevisionResponse'];
 export type Evidence = Schema['EvidenceResponse'];

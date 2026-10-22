@@ -1,5 +1,5 @@
 import { getApiJson, sendJson } from './transport.js';
-import type { Handoff, HandoffRevision, Run } from './types.js';
+import type { Handoff, HandoffRevision, Run, RunEvent, RunEventCreate } from './types.js';
 
 export const workbenchCapability = {
   listRuns: (workspaceId: string, projectId: string, status = '', search = '') =>
@@ -10,6 +10,15 @@ export const workbenchCapability = {
     getApiJson<Run>({
       path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}`,
     }),
+  listRunEvents: (workspaceId: string, projectId: string, runId: string) =>
+    getApiJson<RunEvent[]>({
+      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}/events`,
+    }),
+  createRunEvent: (workspaceId: string, projectId: string, runId: string, values: RunEventCreate) =>
+    sendJson<RunEvent>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs/${runId}/events`,
+      { method: 'POST', body: JSON.stringify(values) },
+    ),
   createRun: (workspaceId: string, projectId: string, title: string, feature_id?: string) =>
     sendJson<Run>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/runs`, {
       method: 'POST',
