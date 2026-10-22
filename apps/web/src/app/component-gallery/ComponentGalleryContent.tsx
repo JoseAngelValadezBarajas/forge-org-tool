@@ -96,6 +96,7 @@ import { renderFormPreview } from './previews/forms';
 import { renderNavigationPreview } from './previews/navigation';
 import { renderSurfaceDataPreview } from './previews/surfaces-data';
 import { renderFeedbackPreview } from './previews/feedback-overlays';
+import { renderProductPatternPreview } from './previews/product-patterns';
 import { ComponentGalleryLayout } from './shell/ComponentGalleryLayout';
 
 const catalog: CatalogItem[] = [
@@ -549,6 +550,8 @@ function ComponentPreview({
   if (surfaceDataPreview !== null) return surfaceDataPreview;
   const feedbackPreview = renderFeedbackPreview(item.id);
   if (feedbackPreview !== null) return feedbackPreview;
+  const productPatternPreview = renderProductPatternPreview(item.id);
+  if (productPatternPreview !== null) return productPatternPreview;
 
   switch (item.id) {
     case 'tokens':
