@@ -10,75 +10,135 @@ export function TransferPage() {
     error,
     exportProject,
     exported,
+    fileName,
     importedProjectId,
     importProject,
     preview,
     previewImport,
+    selectSourceFile,
     updateDocumentText,
   } = useTransferController(workspaceId, projectId);
+  const currentStep = importedProjectId ? 3 : preview ? 2 : 1;
 
   return (
     <div className={styles.stack}>
       <SectionHeader title="Project transfer" eyebrow="FORGE / Planning-only transfer" />
       <p>
-        Import and export use a reviewed fingerprint. Transfer contains planning records only; it
-        never imports delivery truth.
+        Import and export use the versioned project document. Review the fingerprint before import;
+        only planning records are transferred. Evidence, verification and release records are
+        excluded.
       </p>
       {error && <p role="alert">{error}</p>}
-      <Card>
-        <div className={styles.actions}>
-          <Button onClick={() => void exportProject()}>Export project</Button>
-          <Button
-            variant="secondary"
-            onClick={() => void previewImport()}
-            disabled={!documentText.trim()}
-          >
-            Preview import
-          </Button>
-          <Button variant="secondary" onClick={() => void importProject()} disabled={!preview}>
-            Commit reviewed import
-          </Button>
-        </div>
-      </Card>
-      <Card>
-        <FormField label="Versioned project document">
-          <Textarea
-            id="transfer-document"
-            value={documentText}
-            onChange={(event) => {
-              updateDocumentText(event.target.value);
-            }}
-            placeholder="Paste a forge-project-import-v1 document"
-            rows={16}
-          />
-        </FormField>
-      </Card>
-      {exported && (
+
+      <ol className={styles.steps} aria-label="Transfer steps">
+        {['Select source', 'Review planning', 'Confirm'].map((step, index) => (
+          <li key={step} aria-current={currentStep === index + 1 ? 'step' : undefined}>
+            <span aria-hidden="true">0{index + 1}</span> {step}
+          </li>
+        ))}
+      </ol>
+
+      <div className={styles.workflowGrid}>
         <Card>
-          <h3>Export review</h3>
-          <StatusChip tone="success">forge-project-import-v1</StatusChip>
-          <p>Export is a planning document and has not changed project state.</p>
+          <section aria-labelledby="import-title" className={styles.panel}>
+            <h3 id="import-title">Import a project</h3>
+            <p>Select a previously exported `forge-project-import-v1` JSON file.</p>
+            <FormField label="Choose a project JSON file">
+              <input
+                className={styles.fileInput}
+                type="file"
+                accept="application/json,.json"
+                aria-label="Choose a project JSON file"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0];
+                  if (file) void selectSourceFile(file);
+                }}
+              />
+            </FormField>
+            {fileName && <p className={styles.fileName}>Selected source: {fileName}</p>}
+            <details className={styles.advanced}>
+              <summary>Advanced JSON paste</summary>
+              <FormField label="Advanced JSON document">
+                <Textarea
+                  id="transfer-document"
+                  value={documentText}
+                  onChange={(event) => updateDocumentText(event.target.value)}
+                  placeholder="Paste a forge-project-import-v1 document"
+                  rows={10}
+                />
+              </FormField>
+            </details>
+            <div className={styles.actions}>
+              <Button
+                type="button"
+                onClick={() => void previewImport()}
+                disabled={!documentText.trim()}
+              >
+                Review import
+              </Button>
+            </div>
+          </section>
         </Card>
-      )}
+
+        <Card>
+          <section aria-labelledby="export-title" className={styles.panel}>
+            <h3 id="export-title">Export current project</h3>
+            <p>Review and download the versioned planning document. Export does not change data.</p>
+            <Button type="button" onClick={() => void exportProject()}>
+              Download project export
+            </Button>
+            {exported && (
+              <div className={styles.review} role="status">
+                <h4>Export ready</h4>
+                <StatusChip tone="success">forge-project-import-v1</StatusChip>
+                <p>JSON download prepared from the selected project.</p>
+                {documentText && (
+                  <details>
+                    <summary>Review exported contents</summary>
+                    <pre className={styles.documentPreview}>{documentText}</pre>
+                  </details>
+                )}
+              </div>
+            )}
+          </section>
+        </Card>
+      </div>
+
       {preview && (
         <Card>
-          <h3>Reviewed import</h3>
-          <StatusChip tone="warning">FINGERPRINT_REQUIRED</StatusChip>
-          <p>{preview.project.name}</p>
-          <p>Fingerprint: {preview.fingerprint}</p>
-          <ul>
-            {Object.entries(preview.counts).map(([key, count]) => (
-              <li key={key}>
-                {key}: {count}
-              </li>
-            ))}
-          </ul>
+          <section aria-labelledby="review-title" className={styles.panel}>
+            <h3 id="review-title">Review planning changes</h3>
+            <StatusChip tone="warning">FINGERPRINT_REQUIRED</StatusChip>
+            <p>Project to create: {preview.project.name}</p>
+            <p className={styles.fingerprint}>
+              Fingerprint: <code>{preview.fingerprint}</code>
+            </p>
+            <h4>Validated planning records</h4>
+            <ul>
+              {Object.entries(preview.counts).map(([key, count]) => (
+                <li key={key}>
+                  {key.replaceAll('_', ' ')}: {String(count)}
+                </li>
+              ))}
+            </ul>
+            <p>
+              Only the reviewed fingerprint can be committed. Operational evidence and delivery
+              state are not imported.
+            </p>
+            <Button type="button" onClick={() => void importProject()}>
+              Confirm planning import
+            </Button>
+          </section>
         </Card>
       )}
+
       {importedProjectId && (
         <Card>
-          <StatusChip tone="success">IMPORTED_PLANNING_ONLY</StatusChip>
-          <p>Created project: {importedProjectId}</p>
+          <section aria-labelledby="import-success-title" className={styles.panel}>
+            <h3 id="import-success-title">Import complete</h3>
+            <StatusChip tone="success">IMPORTED_PLANNING_ONLY</StatusChip>
+            <p>Created project: {importedProjectId}</p>
+          </section>
         </Card>
       )}
     </div>
