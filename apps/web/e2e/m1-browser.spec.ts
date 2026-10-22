@@ -128,22 +128,42 @@ test('mobile gallery switches from dark to light with no browser errors', async 
       await expect(gallery).toHaveAttribute('data-theme', theme);
       const overflow = await page.evaluate(() => {
         const viewport = document.documentElement.clientWidth;
-        const offenders = [...document.querySelectorAll('body *')]
-          .map((element) => ({
+        const describe = (element: Element) => {
+          const rect = element.getBoundingClientRect();
+          return {
             element: `${element.tagName.toLowerCase()}${
               typeof element.className === 'string' && element.className
                 ? `.${element.className.trim().split(/\s+/).join('.')}`
                 : ''
             }`,
-            left: Math.round(element.getBoundingClientRect().left),
-            right: Math.round(element.getBoundingClientRect().right),
-          }))
-          .filter((element) => element.left < 0 || element.right > viewport)
-          .slice(0, 8);
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            clientWidth: element.clientWidth,
+            scrollWidth: element.scrollWidth,
+            overflowX: getComputedStyle(element).overflowX,
+          };
+        };
+        const offenders = [...document.querySelectorAll('body *')]
+          .filter((element) => {
+            const rect = element.getBoundingClientRect();
+            return rect.left < 0 || rect.right > viewport;
+          })
+          .slice(0, 8)
+          .map((element) => {
+            const ancestors = [];
+            let current: Element | null = element;
+            while (current && ancestors.length < 5) {
+              ancestors.push(describe(current));
+              current = current.parentElement;
+            }
+            return ancestors;
+          });
         return {
           hasNoOverflow: document.documentElement.scrollWidth <= viewport,
           documentWidth: document.documentElement.scrollWidth,
           viewport,
+          html: describe(document.documentElement),
+          body: describe(document.body),
           offenders,
         };
       });
