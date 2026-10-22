@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { Button, Card, Input, SectionHeader } from '@forge-org/ui';
+import { Button, Card, Input, SectionHeader, Textarea } from '@forge-org/ui';
 import styles from './PlanningPage.module.css';
 import { useFeatureDetailController } from './useFeatureDetailController';
 import { CriterionItem, FeatureOverview, TaskItem } from './components';
@@ -14,9 +14,18 @@ export function FeatureDetailPage() {
     criterion,
     dependencies,
     error,
+    feature,
+    featureDescription,
+    featureGoal,
+    featureTitle,
+    featureName,
     moveTask,
     readiness,
+    saveFeature,
     setCriterion,
+    setFeatureTitle,
+    setFeatureDescription,
+    setFeatureGoal,
     setTaskTitle,
     taskTitle,
     tasks,
@@ -33,6 +42,37 @@ export function FeatureDetailPage() {
         <Link to={`/planning/${workspaceId}/${projectId}`}>Back to planning board</Link> ·{' '}
         <Link to={`/context/${workspaceId}/${projectId}/${featureId}`}>Manage feature context</Link>
       </p>
+      {feature && (
+        <Card>
+          <form onSubmit={saveFeature} className={styles.featureForm}>
+            <label htmlFor="feature-detail-title">Feature title</label>
+            <Input
+              id="feature-detail-title"
+              aria-label="Edit feature title"
+              value={featureTitle}
+              onChange={(event) => setFeatureTitle(event.target.value)}
+              required
+            />
+            <label htmlFor="feature-detail-description">Feature description</label>
+            <Textarea
+              id="feature-detail-description"
+              aria-label="Edit feature description"
+              value={featureDescription}
+              onChange={(event) => setFeatureDescription(event.target.value)}
+              rows={3}
+            />
+            <label htmlFor="feature-detail-goal">Feature goal</label>
+            <Textarea
+              id="feature-detail-goal"
+              aria-label="Edit feature goal"
+              value={featureGoal}
+              onChange={(event) => setFeatureGoal(event.target.value)}
+              rows={3}
+            />
+            <Button type="submit">Save feature</Button>
+          </form>
+        </Card>
+      )}
       <FeatureOverview result={readiness}>
         <Link to={`/readiness/${workspaceId}/${projectId}/${featureId}`}>Manage readiness</Link>
       </FeatureOverview>
@@ -102,7 +142,8 @@ export function FeatureDetailPage() {
           <ul>
             {dependencies.map((item) => (
               <li key={item.id}>
-                {item.blocking_feature_id} blocks {item.blocked_feature_id}
+                {featureName(item.blocking_feature_id)} blocks{' '}
+                {featureName(item.blocked_feature_id)}
               </li>
             ))}
           </ul>

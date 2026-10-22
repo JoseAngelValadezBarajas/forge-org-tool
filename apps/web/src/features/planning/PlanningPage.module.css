@@ -12,6 +12,11 @@
   display: grid;
   gap: var(--forge-space-2);
 }
+.featureForm {
+  display: grid;
+  gap: var(--forge-space-2);
+  max-width: 520px;
+}
 .board {
   grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: start;

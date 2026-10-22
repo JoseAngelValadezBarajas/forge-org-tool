@@ -24,6 +24,7 @@ export function PlanningPage() {
     dependencies,
     epicFilter,
     error,
+    featureEpicId,
     featureName,
     featureTitle,
     features,
@@ -35,6 +36,7 @@ export function PlanningPage() {
     setBlockingFeatureId,
     setEpicFilter,
     setFeatureTitle,
+    setFeatureEpicId,
     setPriorityFilter,
     setSearch,
     setStatusFilter,
@@ -75,6 +77,20 @@ export function PlanningPage() {
                 onChange={(event) => setFeatureTitle(event.target.value)}
                 required
               />
+              <FormField label="Epic for new feature">
+                <Select
+                  aria-label="Epic for new feature"
+                  value={featureEpicId}
+                  onChange={(event) => setFeatureEpicId(event.target.value)}
+                >
+                  <option value="">Unassigned</option>
+                  {overview.epics.map((epic) => (
+                    <option key={epic.id} value={epic.id}>
+                      {epic.title}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
               <Button type="submit">Create Feature</Button>
             </form>
           </Card>

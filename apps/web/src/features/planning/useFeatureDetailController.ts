@@ -3,6 +3,7 @@ import {
   organizationApi,
   type Criterion,
   type Dependency,
+  type Feature,
   type ReadinessResult,
   type Task,
 } from '@forge-org/api-client';
@@ -15,6 +16,11 @@ export function useFeatureDetailController(
   const [tasks, setTasks] = useState<Task[]>([]);
   const [criteria, setCriteria] = useState<Criterion[]>([]);
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [feature, setFeature] = useState<Feature | null>(null);
+  const [featureTitle, setFeatureTitle] = useState('');
+  const [featureDescription, setFeatureDescription] = useState('');
+  const [featureGoal, setFeatureGoal] = useState('');
   const [readiness, setReadiness] = useState<ReadinessResult | null>(null);
   const [taskTitle, setTaskTitle] = useState('');
   const [criterion, setCriterion] = useState('');
@@ -23,16 +29,29 @@ export function useFeatureDetailController(
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
       try {
-        const [nextTasks, nextCriteria, nextDependencies, nextReadiness] = await Promise.all([
-          organizationApi.listTasks(workspaceId, projectId, featureId),
-          organizationApi.listCriteria(workspaceId, projectId, featureId),
-          organizationApi.listDependencies(workspaceId, projectId),
-          organizationApi.previewReadiness(workspaceId, projectId, featureId).catch(() => null),
-        ]);
+        const [nextTasks, nextCriteria, nextDependencies, nextReadiness, nextOverview] =
+          await Promise.all([
+            organizationApi.listTasks(workspaceId, projectId, featureId),
+            organizationApi.listCriteria(workspaceId, projectId, featureId),
+            organizationApi.listDependencies(workspaceId, projectId),
+            organizationApi.previewReadiness(workspaceId, projectId, featureId).catch(() => null),
+            organizationApi
+              .planningOverview(workspaceId, projectId)
+              .catch(() => ({ epics: [], unassigned_features: [] })),
+          ]);
         if (!isCurrent()) return;
         setTasks(nextTasks);
         setCriteria(nextCriteria);
         setDependencies(nextDependencies);
+        const nextFeatures = (nextOverview.epics ?? [])
+          .flatMap((epic) => epic.features)
+          .concat(nextOverview.unassigned_features ?? []);
+        setFeatures(nextFeatures);
+        const nextFeature = nextFeatures.find((item) => item.id === featureId) ?? null;
+        setFeature(nextFeature);
+        setFeatureTitle(nextFeature?.title ?? '');
+        setFeatureDescription(nextFeature?.description ?? '');
+        setFeatureGoal(nextFeature?.goal ?? '');
         setReadiness(nextReadiness);
       } catch (cause) {
         if (isCurrent()) {
@@ -60,6 +79,29 @@ export function useFeatureDetailController(
       await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to add task.');
+    }
+  }
+
+  function featureName(id: string) {
+    return features.find((feature) => feature.id === id)?.title ?? id;
+  }
+
+  async function saveFeature(event: FormEvent) {
+    event.preventDefault();
+    if (!feature || !featureTitle.trim()) return;
+    try {
+      const updated = await organizationApi.updateFeature(workspaceId, projectId, feature.id, {
+        title: featureTitle.trim(),
+        description: featureDescription.trim() || null,
+        goal: featureGoal.trim() || null,
+      });
+      setFeature(updated);
+      setFeatureTitle(updated.title);
+      setFeatureDescription(updated.description ?? '');
+      setFeatureGoal(updated.goal ?? '');
+      setFeatures((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to update feature.');
     }
   }
 
@@ -104,8 +146,17 @@ export function useFeatureDetailController(
     criterion,
     dependencies,
     error,
+    featureName,
     moveTask,
     readiness,
+    feature,
+    featureDescription,
+    featureGoal,
+    featureTitle,
+    saveFeature,
+    setFeatureTitle,
+    setFeatureDescription,
+    setFeatureGoal,
     setCriterion,
     setTaskTitle,
     taskTitle,

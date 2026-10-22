@@ -93,6 +93,44 @@ describe('PlanningPage', () => {
     );
   });
 
+  it('creates a feature inside the selected epic without changing manual planning semantics', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      if (String(input).endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (String(input).endsWith('/features') && init?.method === 'POST')
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...overview.unassigned_features[0], id: 'f3' }), {
+            status: 201,
+          }),
+        );
+      return Promise.resolve(new Response(JSON.stringify(overview), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('link', { name: 'Alpha' });
+    fireEvent.change(screen.getByLabelText('Epic for new feature'), { target: { value: 'e1' } });
+    fireEvent.change(screen.getByLabelText('Feature title'), { target: { value: 'Gamma' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Feature' }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/features',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ title: 'Gamma', epic_id: 'e1' }),
+        }),
+      ),
+    );
+    expect(screen.getByText(/manual product records only/i)).toBeInTheDocument();
+  });
+
   it('renders all six API-supported planning workflow columns', async () => {
     const sixColumnOverview = {
       ...overview,

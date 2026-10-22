@@ -13,6 +13,7 @@ export function usePlanningController(workspaceId: string, projectId: string) {
   });
   const [title, setTitle] = useState('');
   const [featureTitle, setFeatureTitle] = useState('');
+  const [featureEpicId, setFeatureEpicId] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -85,8 +86,14 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     event.preventDefault();
     if (!featureTitle.trim()) return;
     try {
-      await organizationApi.createFeature(workspaceId, projectId, featureTitle);
+      await organizationApi.createFeature(
+        workspaceId,
+        projectId,
+        featureTitle,
+        featureEpicId || undefined,
+      );
       setFeatureTitle('');
+      setFeatureEpicId('');
       await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to create feature.');
@@ -147,6 +154,7 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     error,
     featureName,
     featureTitle,
+    featureEpicId,
     features,
     load,
     overview,
@@ -157,6 +165,7 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     setBlockingFeatureId,
     setEpicFilter,
     setFeatureTitle,
+    setFeatureEpicId,
     setPriorityFilter,
     setSearch,
     setStatusFilter,
