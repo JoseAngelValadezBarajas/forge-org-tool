@@ -73,3 +73,12 @@ The final public repository was cloned into an isolated temporary directory. `np
 ## Verdict
 
 `M1_READY_FOR_REVIEW` for the focused audit corrections. Automated behavior, migration, packaging, and native-build verification are complete. Component parity remains `IMPLEMENTED_NOT_REVIEWED`; this does not claim CRUD, real-data migration, an installed product smoke, feature parity, or Figma pixel parity.
+
+## UX-01 follow-up
+
+UX-01 automated evidence and its separate delivery verdict are recorded in
+[docs/evidence/ux01/verification.md](../ux01/verification.md). The M1
+certification above remains scoped to its original commit; UX-01 is
+`UX_01_BLOCKED` pending completion of per-category host preview decomposition,
+Cargo/Windows checks, and GitHub Quality CI. No human visual certification is
+claimed.
