@@ -2,9 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-const config = JSON.parse(
-  await readFile('apps/desktop/src-tauri/tauri.conf.json', 'utf8'),
-);
+const config = JSON.parse(await readFile('apps/desktop/src-tauri/tauri.conf.json', 'utf8'));
 
 test('Tauri declares a visible, usable main FORGE window explicitly', () => {
   const [main, ...others] = config.app.windows ?? [];
