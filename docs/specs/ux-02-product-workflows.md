@@ -1,7 +1,7 @@
 # UX-02 Complete Product Workflows
 
-**Status:** Approved for autonomous implementation  
-**Baseline:** `05a135d2ec0eea2c9284bc35ca1869da0ad533b7`  
+**Status:** Approved for autonomous implementation
+**Baseline:** `05a135d2ec0eea2c9284bc35ca1869da0ad533b7`
 **Repository:** `JoseAngelValadezBarajas/forge-org-tool`, existing PR #1
 
 ## Outcome
