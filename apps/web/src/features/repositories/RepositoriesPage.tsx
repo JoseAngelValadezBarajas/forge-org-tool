@@ -1,8 +1,9 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Button, Card, FormField, Input, SectionHeader } from '@forge-org/ui';
 import styles from './RepositoriesPage.module.css';
 import { useRepositoriesController } from './useRepositoriesController';
 import { RepositoryCard } from './components';
+import { repositoryDisplayName } from './repositoryDisplayName';
 
 export function RepositoriesPage() {
   const { workspaceId = '', projectId = '' } = useParams();
@@ -41,13 +42,16 @@ export function RepositoriesPage() {
               repository={repository}
               observation={observations[repository.id]?.[0]}
             >
+              <Link to={`/repositories/${workspaceId}/${projectId}/${repository.id}`}>
+                View repository {repositoryDisplayName(repository.root_path)}
+              </Link>
               <Button variant="secondary" onClick={() => void observe(repository)}>
                 Observe metadata
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => void disconnect(repository)}
-                aria-label={`Disconnect ${repository.root_path}`}
+                aria-label={`Disconnect ${repositoryDisplayName(repository.root_path)}`}
               >
                 Disconnect
               </Button>
