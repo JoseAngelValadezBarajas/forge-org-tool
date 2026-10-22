@@ -2,6 +2,13 @@
   display: grid;
   gap: var(--forge-space-4);
 }
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--forge-space-3);
+  flex-wrap: wrap;
+}
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -68,6 +75,39 @@
   gap: var(--forge-space-4);
   border-top: 1px solid var(--forge-border);
   padding-top: var(--forge-space-3);
+}
+.dashboard {
+  display: grid;
+  gap: var(--forge-space-3);
+}
+.summaryProjects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--forge-space-3);
+}
+.activityList {
+  display: grid;
+  gap: var(--forge-space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.activityList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--forge-space-3);
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-3);
+}
+.activityList li > div {
+  display: grid;
+  gap: var(--forge-space-1);
+}
+.activityList small,
+.activityList time {
+  color: var(--forge-text-muted);
 }
 @media (max-width: 800px) {
   .summaryGrid {
