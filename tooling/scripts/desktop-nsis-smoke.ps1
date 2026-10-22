@@ -138,6 +138,7 @@ try {
 
   # A second invocation must activate the existing window without starting a second sidecar.
   $sidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
+  if ($sidecarPids.Count -eq 0) { throw 'The installed application has no ready sidecar process before the second launch.' }
   $null = [ForgeWindowNative]::ShowWindow($window.Handle, 6)
   if (-not [ForgeWindowNative]::IsIconic($window.Handle)) { throw 'The smoke test could not minimize the FORGE window.' }
   $second = Start-Process -FilePath $installedApp.FullName -PassThru
@@ -151,7 +152,10 @@ try {
   }
   if (-not $second.WaitForExit(15000)) { throw 'The second FORGE process did not hand off to the existing instance.' }
   $sidecarsAfterSecondLaunch = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue)
-  if ($sidecarsAfterSecondLaunch.Count -ne 1) { throw 'Single-instance activation created multiple sidecar processes.' }
+  $newSidecarPids = @($sidecarsAfterSecondLaunch | Where-Object { $sidecarPids -notcontains $_.Id } | ForEach-Object Id)
+  if ($newSidecarPids.Count -gt 0) {
+    throw "Single-instance activation created additional sidecar processes; baseline=[$($sidecarPids -join ',')] current=[$(($sidecarsAfterSecondLaunch.Id) -join ',')] new=[$($newSidecarPids -join ',')]."
+  }
 
   $workspaceName = "Installed UI smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
   $workspaceInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($workspaceName)
@@ -164,10 +168,14 @@ try {
   }
   if (-not $process.CloseMainWindow()) { throw 'The installed FORGE window did not accept a graceful close request.' }
   if (-not $process.WaitForExit(15000)) { throw 'The installed FORGE desktop did not exit after its window was closed.' }
-  Start-Sleep -Seconds 2
-  if (@(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue).Count -ne 0) {
-    throw 'The packaged sidecar remained alive after the desktop application closed.'
-  }
+  $sidecarCleanupDeadline = [DateTime]::UtcNow.AddSeconds(15)
+  do {
+    $remainingSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue |
+      Where-Object { $sidecarPids -contains $_.Id } | ForEach-Object Id)
+    if ($remainingSidecarPids.Count -eq 0) { break }
+    Start-Sleep -Milliseconds 250
+  } while ([DateTime]::UtcNow -lt $sidecarCleanupDeadline)
+  if ($remainingSidecarPids.Count -gt 0) { throw "Packaged sidecar processes remained after close: $($remainingSidecarPids -join ',')." }
 
   $process = Start-Process -FilePath $installedApp.FullName -PassThru
   $window = Get-ForgeWindow $process
