@@ -1,4 +1,5 @@
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
   Button,
   Card,
@@ -17,6 +18,7 @@ import { DownloadAction, ReleaseGate, TrustDisclosure, VerificationSummary } fro
 export function DeliveryPage() {
   const { workspaceId = '', projectId = '' } = useParams();
   const controller = useDeliveryController(workspaceId, projectId);
+  const [expandedEvidenceId, setExpandedEvidenceId] = useState<string | null>(null);
   const {
     addCandidate,
     addEvidence,
@@ -56,6 +58,8 @@ export function DeliveryPage() {
     verification,
     verifications,
     saveManifest,
+    selectCandidate,
+    setVerification,
   } = controller;
   const downloadPath = (format: 'json' | 'markdown') =>
     `/api/v1/workspaces/${workspaceId}/projects/${projectId}/release-candidates/${selectedCandidateId}/manifest/download?format=${format}`;
@@ -74,6 +78,13 @@ export function DeliveryPage() {
         candidateCount={candidates.length}
         ruleCount={rules.length}
       />
+      <nav className={styles.workflowNav} aria-label="Delivery workflows">
+        <a href="#delivery-evidence">Evidence detail &amp; provenance</a>
+        <a href="#delivery-verification">Verification center</a>
+        <a href="#delivery-candidate-create">Create candidate</a>
+        <a href="#delivery-candidates">Release candidates &amp; manifest</a>
+        <a href="#delivery-gates">Release gate evaluation</a>
+      </nav>
       <Card>
         <h2>Delivery verification</h2>
         <p>Candidate checks are deterministic and retained with their input fingerprint.</p>
@@ -82,7 +93,7 @@ export function DeliveryPage() {
       </Card>
       <div className={styles.forms}>
         <Card>
-          <form onSubmit={addEvidence}>
+          <form id="delivery-evidence-create" onSubmit={addEvidence}>
             <h3>Reported evidence</h3>
             <Input
               aria-label="Evidence title"
@@ -100,7 +111,7 @@ export function DeliveryPage() {
           </form>
         </Card>
         <Card>
-          <form onSubmit={addCandidate}>
+          <form id="delivery-candidate-create" onSubmit={addCandidate}>
             <h3>Release candidate</h3>
             <Input
               aria-label="New candidate title"
@@ -118,8 +129,8 @@ export function DeliveryPage() {
           </form>
         </Card>
       </div>
-      <Card>
-        <h3>Evidence</h3>
+      <Card id="delivery-evidence">
+        <h3>Evidence inventory</h3>
         <div className={styles.filters}>
           <SearchField
             aria-label="Evidence search"
@@ -168,6 +179,51 @@ export function DeliveryPage() {
                 <StatusChip tone="accent">
                   {item.provenance} / {item.status}
                 </StatusChip>
+                <div className={styles.provenanceDetails}>
+                  <Link to={`/delivery/${workspaceId}/${projectId}/evidence/${item.id}`}>
+                    Open evidence detail
+                  </Link>
+                  <button
+                    type="button"
+                    className={styles.provenanceToggle}
+                    aria-expanded={expandedEvidenceId === item.id}
+                    aria-controls={`evidence-details-${item.id}`}
+                    onClick={() =>
+                      setExpandedEvidenceId(expandedEvidenceId === item.id ? null : item.id)
+                    }
+                  >
+                    Evidence detail &amp; provenance
+                  </button>
+                  {expandedEvidenceId === item.id && (
+                    <div id={`evidence-details-${item.id}`}>
+                      <dl>
+                        <dt>Provenance</dt>
+                        <dd>{item.provenance}</dd>
+                        <dt>Evidence ID</dt>
+                        <dd className={styles.longValue}>{item.id}</dd>
+                        <dt>Related feature</dt>
+                        <dd>{item.feature_id ?? 'No feature linked'}</dd>
+                        <dt>Record status</dt>
+                        <dd>{item.status}</dd>
+                        <dt>Reference type</dt>
+                        <dd>{item.reference_kind}</dd>
+                        <dt>Declared reference</dt>
+                        <dd className={styles.longValue}>{item.reference_value}</dd>
+                        <dt>Summary</dt>
+                        <dd>{item.summary}</dd>
+                        <dt>Record created</dt>
+                        <dd>
+                          <time dateTime={item.created_at}>
+                            {new Date(item.created_at).toLocaleString()}
+                          </time>
+                        </dd>
+                      </dl>
+                      {item.provenance === 'REPORTED' && (
+                        <p>A reported reference is not an independently verified result.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
                 {item.status === 'ACTIVE' && (
                   <Button
                     type="button"
@@ -183,8 +239,8 @@ export function DeliveryPage() {
           ))
         )}
       </Card>
-      <Card>
-        <h3>Release candidates</h3>
+      <Card id="delivery-candidates">
+        <h3>Release candidates &amp; manifest</h3>
         {candidates.length === 0 ? (
           <p>No candidates.</p>
         ) : (
@@ -217,6 +273,17 @@ export function DeliveryPage() {
                 </small>
               </div>
               <div className={styles.actions}>
+                <Link to={`/candidates/${item.id}`} state={{ workspaceId, projectId }}>
+                  Candidate detail &amp; history
+                </Link>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void selectCandidate(item.id)}
+                  aria-label={`Inspect candidate ${item.title}`}
+                >
+                  Inspect candidate
+                </Button>
                 <Button
                   type="button"
                   variant="secondary"
@@ -241,7 +308,7 @@ export function DeliveryPage() {
         )}
       </Card>
       {selectedCandidate && (
-        <Card>
+        <Card id="delivery-candidates-history">
           <h3>Candidate history</h3>
           {candidateHistory.length === 0 ? (
             <p>No candidate revisions.</p>
@@ -264,73 +331,101 @@ export function DeliveryPage() {
           )}
         </Card>
       )}
-      {selectedCandidate && (
-        <Card>
-          <h3>Verification rules</h3>
-          <FormField label="Verification rule">
-            <Select
-              aria-label="Verification rule"
-              value={selectedRuleId}
-              onChange={(event) => setSelectedRuleId(event.target.value)}
-            >
-              {rules.map((rule) => (
-                <option key={rule.id} value={rule.id}>
-                  {rule.label}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-          <div className={styles.actions}>
-            <Button type="button" variant="secondary" onClick={() => void previewVerification()}>
-              Preview verification
-            </Button>
-            <Button type="button" onClick={() => void evaluateVerification()}>
-              Evaluate verification
-            </Button>
-          </div>
-          {verification && (
-            <div className={styles.result}>
-              <VerificationSummary
-                outcome={verification.outcome}
-                fingerprint={verification.input_fingerprint}
-                stale={verification.stale}
-                blockers={verification.blockers}
-              />
-            </div>
-          )}
-          {verifications.map((item) => (
-            <p key={item.id ?? item.rule_id}>
-              {item.rule_id}: {item.outcome}
-              {item.stale ? ' / STALE' : ''}
+      <Card id="delivery-verification">
+        <h3>Verification center</h3>
+        <p>Each deterministic result applies only to its named rule and recorded inputs.</p>
+        <FormField label="Verification rule">
+          <Select
+            aria-label="Verification rule"
+            value={selectedRuleId}
+            onChange={(event) => setSelectedRuleId(event.target.value)}
+          >
+            {rules.map((rule) => (
+              <option key={rule.id} value={rule.id}>
+                {rule.label}
+              </option>
+            ))}
+          </Select>
+        </FormField>
+        <div className={styles.actions}>
+          <Button type="button" variant="secondary" onClick={() => void previewVerification()}>
+            Preview verification
+          </Button>
+          <Button type="button" onClick={() => void evaluateVerification()}>
+            Evaluate verification
+          </Button>
+        </div>
+        {verification && (
+          <div className={styles.result}>
+            <h4>Verification result &amp; trace</h4>
+            <p>
+              Rule:{' '}
+              {rules.find((rule) => rule.id === verification.rule_id)?.label ??
+                verification.rule_id}
             </p>
-          ))}
-        </Card>
-      )}
-      {selectedCandidate && (
-        <ReleaseGate outcome={gate?.outcome ?? 'NOT_EVALUATED'}>
-          {gate ? (
-            <>
-              <p>Input fingerprint: {gate.input_fingerprint}</p>
-              {gate.blockers.map((blocker) => (
-                <p key={blocker}>{blocker}</p>
-              ))}
-              <div className={styles.actions}>
-                <Button type="button" variant="secondary" onClick={() => void evaluateGates()}>
-                  Evaluate gates
-                </Button>
+            <VerificationSummary
+              outcome={verification.outcome}
+              fingerprint={verification.input_fingerprint}
+              stale={verification.stale}
+              blockers={verification.blockers}
+            />
+          </div>
+        )}
+        {verifications.length > 0 && (
+          <section aria-labelledby="verification-history-title">
+            <h4 id="verification-history-title">Saved verification results</h4>
+            {verifications.map((item) => (
+              <article className={styles.verificationHistory} key={item.id ?? item.rule_id}>
+                <p>
+                  {item.rule_id}: {item.outcome}
+                  {item.stale ? ' / STALE' : ''}
+                </p>
                 <Button
                   type="button"
-                  onClick={() => void saveManifest()}
-                  disabled={gate.outcome !== 'PASS' || !gate.id}
+                  variant="secondary"
+                  onClick={() => setVerification(item)}
+                  aria-label={`Inspect saved verification for ${item.rule_id}`}
                 >
-                  Save NOT_PUBLISHED manifest
+                  Inspect result
                 </Button>
-              </div>
-            </>
-          ) : (
-            <p>Select Preview gates to inspect this candidate.</p>
-          )}
-        </ReleaseGate>
+                {item.id && (
+                  <Link to={`/verifications/${item.id}`} state={{ workspaceId, projectId }}>
+                    Open verification result
+                  </Link>
+                )}
+              </article>
+            ))}
+          </section>
+        )}
+      </Card>
+      {selectedCandidate && (
+        <div id="delivery-gates">
+          <h3>Release gate evaluation</h3>
+          <ReleaseGate outcome={gate?.outcome ?? 'NOT_EVALUATED'}>
+            {gate ? (
+              <>
+                <p>Input fingerprint: {gate.input_fingerprint}</p>
+                {gate.blockers.map((blocker) => (
+                  <p key={blocker}>{blocker}</p>
+                ))}
+                <div className={styles.actions}>
+                  <Button type="button" variant="secondary" onClick={() => void evaluateGates()}>
+                    Evaluate gates
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => void saveManifest()}
+                    disabled={gate.outcome !== 'PASS' || !gate.id}
+                  >
+                    Save NOT_PUBLISHED manifest
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p>Select Preview gates to inspect this candidate.</p>
+            )}
+          </ReleaseGate>
+        </div>
       )}
       {manifest && (
         <Card>

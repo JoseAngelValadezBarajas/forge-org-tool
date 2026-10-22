@@ -2,6 +2,32 @@
   display: grid;
   gap: var(--forge-space-4);
 }
+.workflowNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  border-bottom: 1px solid var(--forge-border);
+  padding-bottom: var(--forge-space-3);
+}
+.workflowNav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+  padding: 0 var(--forge-space-3);
+  color: var(--forge-text);
+  text-decoration: none;
+}
+.workflowNav a:hover {
+  border-color: var(--forge-accent);
+  color: var(--forge-accent);
+}
+.workflowNav a:focus-visible,
+.provenanceToggle:focus-visible {
+  outline: 2px solid var(--forge-accent);
+  outline-offset: 2px;
+}
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -88,6 +114,65 @@
   color: var(--forge-text-muted);
   overflow-wrap: anywhere;
 }
+.provenanceDetails {
+  margin: var(--forge-space-2) 0;
+  color: var(--forge-text-muted);
+}
+.provenanceToggle {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--forge-text);
+  font: inherit;
+}
+.provenanceDetails dl {
+  display: grid;
+  grid-template-columns: minmax(110px, auto) minmax(0, 1fr);
+  gap: var(--forge-space-1) var(--forge-space-3);
+  margin: var(--forge-space-2) 0;
+  font-size: 0.82rem;
+}
+.provenanceDetails dt {
+  color: var(--forge-text-muted);
+}
+.provenanceDetails dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--forge-text);
+}
+.longValue {
+  overflow-wrap: anywhere;
+}
+#delivery-candidate-create,
+#delivery-evidence-create,
+#delivery-evidence,
+#delivery-verification,
+#delivery-candidates {
+  scroll-margin-top: var(--forge-space-4);
+}
+.verificationHistory {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  border-top: 1px solid var(--forge-border);
+  padding: var(--forge-space-2) 0;
+}
+.verificationHistory p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+#delivery-gates {
+  scroll-margin-top: var(--forge-space-4);
+}
+#delivery-gates h3 {
+  margin: 0 0 var(--forge-space-3);
+}
 @media (max-width: 720px) {
   .forms {
     grid-template-columns: 1fr;
@@ -101,5 +186,16 @@
 @media (max-width: 720px) {
   .metricValue {
     font-size: 1rem;
+  }
+  .item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .provenanceDetails dl {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .provenanceDetails dd {
+    margin-bottom: var(--forge-space-2);
   }
 }

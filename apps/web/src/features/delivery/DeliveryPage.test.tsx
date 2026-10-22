@@ -51,6 +51,23 @@ describe('DeliveryPage', () => {
       input_fingerprint: 'gate-fp',
       blockers: ['A frozen candidate and active VERIFIED evidence are required'],
     };
+    const verification = {
+      id: 'v1',
+      project_id: 'p1',
+      candidate_id: 'c1',
+      rule_id: rule.id,
+      outcome: 'BLOCKED',
+      input_fingerprint: 'verification-fp',
+      stale: false,
+      blockers: ['No active VERIFIED evidence is available for this rule'],
+    };
+    const previousVerification = {
+      ...verification,
+      id: 'v0',
+      outcome: 'PASS',
+      input_fingerprint: 'historical-verification-fp',
+      blockers: [],
+    };
     const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
       const path = String(input);
       if (path.includes('/evidence') && init?.method === 'POST') {
@@ -61,8 +78,12 @@ describe('DeliveryPage', () => {
         return Promise.resolve(new Response(JSON.stringify([currentEvidence]), { status: 200 }));
       if (path.endsWith('/verifications/rules'))
         return Promise.resolve(new Response(JSON.stringify([rule]), { status: 200 }));
+      if (path.endsWith('/verifications/evaluate'))
+        return Promise.resolve(new Response(JSON.stringify(verification), { status: 201 }));
       if (path.endsWith('/verifications'))
-        return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+        return Promise.resolve(
+          new Response(JSON.stringify([previousVerification]), { status: 200 }),
+        );
       if (path.endsWith('/release-candidates/c1') && init?.method === 'PATCH') {
         const values = JSON.parse(String(init.body));
         currentCandidate = { ...currentCandidate, title: values.title, summary: values.summary };
@@ -102,7 +123,32 @@ describe('DeliveryPage', () => {
 
     expect(await screen.findByText('Human report')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Delivery overview' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Delivery workflows' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Candidate detail & history' })).toHaveAttribute(
+      'href',
+      '/candidates/c1',
+    );
+    expect(
+      screen
+        .getAllByRole('link', { name: 'Open verification result' })
+        .some((link) => link.getAttribute('href') === '/verifications/v0'),
+    ).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Evidence detail & provenance' }));
+    expect(screen.getByText('report-1')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Open evidence detail' })).toHaveAttribute(
+      'href',
+      '/delivery/w1/p1/evidence/e1',
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Release candidates & manifest' }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText('NOT_PUBLISHED').length).toBeGreaterThan(0);
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Inspect saved verification for verified-evidence-present',
+      }),
+    );
+    expect(screen.getByText('historical-verification-fp')).toBeInTheDocument();
     fireEvent.change(screen.getByRole('searchbox', { name: 'Evidence search' }), {
       target: { value: 'Human' },
     });
@@ -137,8 +183,17 @@ describe('DeliveryPage', () => {
         expect.objectContaining({ method: 'POST' }),
       ),
     );
+    fireEvent.click(screen.getByRole('button', { name: 'Inspect candidate Edited candidate' }));
+    expect(await screen.findByRole('heading', { name: 'Candidate history' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Preview gates for Edited candidate' }));
     expect(await screen.findByText('BLOCKED')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Verification center' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Evaluate verification' }));
+    expect(await screen.findByText('Verification result & trace')).toBeInTheDocument();
+    expect(screen.getByText('verification-fp')).toBeInTheDocument();
+    expect(
+      screen.getByText('No active VERIFIED evidence is available for this rule'),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Evaluate gates' }));
     expect(
       await screen.findByText('A frozen candidate and active VERIFIED evidence are required'),

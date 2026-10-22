@@ -247,6 +247,7 @@ export function useDeliveryController(workspaceId: string, projectId: string) {
     manifest,
     previewGates,
     previewVerification,
+    selectCandidate,
     provenance,
     rules,
     search,
@@ -265,6 +266,7 @@ export function useDeliveryController(workspaceId: string, projectId: string) {
     evaluateGates,
     evaluateVerification,
     verification,
+    setVerification,
     verifications,
     saveManifest,
   };
