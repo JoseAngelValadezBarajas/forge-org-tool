@@ -26,19 +26,44 @@ test('project navigation connects planning, readiness, context and product works
   await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: `Feature ${suffix}` })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Project');
-  if (test.info().project.name === 'chromium-desktop') {
-    await mkdir(evidenceDir, { recursive: true });
-    await page.screenshot({ path: resolve(evidenceDir, 'desktop-planning.png'), fullPage: true });
-  }
+  await mkdir(evidenceDir, { recursive: true });
+  const screenshotPrefix = test.info().project.name === 'chromium-mobile' ? 'mobile' : 'desktop';
+  const appearance = page.getByRole('combobox', { name: 'Appearance' });
+  await appearance.selectOption('dark');
+  await page.screenshot({
+    path: resolve(
+      evidenceDir,
+      screenshotPrefix === 'desktop' ? 'desktop-planning.png' : 'mobile-planning.png',
+    ),
+    fullPage: true,
+  });
+  await appearance.selectOption('light');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'light');
+  await page.screenshot({
+    path: resolve(evidenceDir, `${screenshotPrefix}-planning-light.png`),
+    fullPage: true,
+  });
+  await appearance.selectOption('dark');
 
   await page.getByRole('link', { name: `Feature ${suffix}` }).click();
   await expect(page.getByRole('heading', { name: 'Feature detail' })).toBeVisible();
   await page.getByRole('link', { name: 'Readiness', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Readiness', exact: true })).toBeVisible();
   await expect(page.getByText(/^Outcome:/)).toBeVisible();
-  if (test.info().project.name === 'chromium-desktop') {
-    await page.screenshot({ path: resolve(evidenceDir, 'desktop-readiness.png'), fullPage: true });
-  }
+  await page.screenshot({
+    path: resolve(
+      evidenceDir,
+      screenshotPrefix === 'desktop' ? 'desktop-readiness.png' : 'mobile-readiness.png',
+    ),
+    fullPage: true,
+  });
+  await appearance.selectOption('light');
+  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'light');
+  await page.screenshot({
+    path: resolve(evidenceDir, `${screenshotPrefix}-readiness-light.png`),
+    fullPage: true,
+  });
+  await appearance.selectOption('dark');
   await page.getByRole('link', { name: 'Context' }).click();
   await expect(page.getByRole('heading', { name: 'Feature context' })).toBeVisible();
 
