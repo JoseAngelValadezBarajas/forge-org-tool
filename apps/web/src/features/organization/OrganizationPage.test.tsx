@@ -223,7 +223,9 @@ describe('OrganizationPage', () => {
       target: { value: 'Discovery' },
     });
 
-    expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(2);
+    await waitFor(() => {
+      expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(2);
+    });
   });
 
   it('summarizes persisted planning and current readiness with real attention links', async () => {

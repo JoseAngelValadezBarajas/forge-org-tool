@@ -40,7 +40,7 @@ describe('ContextPackageDetailPage', () => {
     expect(
       await screen.findByRole('heading', { name: 'Context package snapshot' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('snapshot-fingerprint')).toBeInTheDocument();
+    expect(await screen.findByText('snapshot-fingerprint')).toBeInTheDocument();
     expect(screen.getByText(/Captured planning snapshot/)).toBeInTheDocument();
     expect(screen.getByText(/Historical feature/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Download JSON' })).toHaveAttribute(
