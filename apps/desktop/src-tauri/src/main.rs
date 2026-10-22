@@ -4,12 +4,47 @@ use forge_org_desktop_policy::{validate_request, MAX_JSON_BODY};
 use rand::{distr::Alphanumeric, Rng};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Manager, RunEvent, State};
 use tauri_plugin_shell::{process::CommandChild, ShellExt};
 
 const READINESS_TIMEOUT: Duration = Duration::from_secs(15);
+
+fn database_path(local_app_data: &Path) -> PathBuf {
+    local_app_data
+        .join("ForgeOrgTool")
+        .join("data")
+        .join("forge.db")
+}
+
+fn startup_log_path(local_app_data: &Path) -> PathBuf {
+    local_app_data
+        .join("ForgeOrgTool")
+        .join("logs")
+        .join("desktop.log")
+}
+
+fn record_startup_failure(message: &str) {
+    let Some(local_app_data) = std::env::var_os("LOCALAPPDATA") else {
+        eprintln!("FORGE desktop startup failed: {message}");
+        return;
+    };
+    let path = startup_log_path(Path::new(&local_app_data));
+    let result = (|| {
+        std::fs::create_dir_all(path.parent().expect("desktop log path has a parent"))?;
+        use std::io::Write as _;
+        let mut log = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)?;
+        writeln!(log, "FORGE desktop startup failed: {message}")
+    })();
+    if let Err(error) = result {
+        eprintln!("FORGE desktop startup failed; diagnostic log unavailable: {error}");
+    }
+}
 
 struct DesktopTransport {
     port: Mutex<u16>,
@@ -19,6 +54,11 @@ struct DesktopTransport {
 }
 
 fn start_sidecar(app: &AppHandle) -> Result<(u16, String, CommandChild), String> {
+    let local_app_data = std::env::var_os("LOCALAPPDATA")
+        .ok_or_else(|| "Windows LocalAppData is unavailable".to_string())?;
+    let database_path = database_path(Path::new(&local_app_data));
+    std::fs::create_dir_all(database_path.parent().expect("database path has a parent"))
+        .map_err(|error| format!("cannot prepare per-user database directory: {error}"))?;
     let port = TcpListener::bind("127.0.0.1:0")
         .map_err(|error| format!("cannot reserve sidecar port: {error}"))?
         .local_addr()
@@ -35,6 +75,7 @@ fn start_sidecar(app: &AppHandle) -> Result<(u16, String, CommandChild), String>
         .map_err(|error| format!("cannot locate sidecar: {error}"))?
         .args(["--port", &port.to_string()])
         .env("FORGE_SIDECAR_TOKEN", &token)
+        .env("FORGE_DATABASE_PATH", database_path.to_string_lossy().as_ref())
         .spawn()
         .map_err(|error| format!("cannot start sidecar: {error}"))?;
     tauri::async_runtime::spawn(async move { while events.recv().await.is_some() {} });
@@ -170,11 +211,23 @@ fn stop_sidecar(state: &DesktopTransport) {
 
 fn main() {
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.unminimize();
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![desktop_request])
         .setup(|app| {
-            let (port, token, child) =
-                start_sidecar(app.handle()).map_err(std::io::Error::other)?;
+            let (port, token, child) = match start_sidecar(app.handle()) {
+                Ok(session) => session,
+                Err(error) => {
+                    record_startup_failure(&error);
+                    return Err(std::io::Error::other(error).into());
+                }
+            };
             app.manage(DesktopTransport {
                 port: Mutex::new(port),
                 token: Mutex::new(token),
@@ -193,4 +246,26 @@ fn main() {
             }
         }
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{database_path, startup_log_path};
+    use std::path::Path;
+
+    #[test]
+    fn desktop_persistence_keeps_the_established_per_user_local_app_data_location() {
+        assert_eq!(
+            database_path(Path::new(r"C:\Users\test\AppData\Local")),
+            Path::new(r"C:\Users\test\AppData\Local\ForgeOrgTool\data\forge.db")
+        );
+    }
+
+    #[test]
+    fn startup_diagnostics_are_written_under_the_per_user_log_directory() {
+        assert_eq!(
+            startup_log_path(Path::new(r"C:\Users\test\AppData\Local")),
+            Path::new(r"C:\Users\test\AppData\Local\ForgeOrgTool\logs\desktop.log")
+        );
+    }
 }

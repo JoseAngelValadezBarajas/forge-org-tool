@@ -59,11 +59,14 @@ jobs:
       - run: cargo test --manifest-path apps/desktop/Cargo.toml
       - run: cargo test --manifest-path apps/desktop/src-tauri/Cargo.toml
       - run: uv run --project apps/api --locked python -m unittest discover -s apps/desktop/tests -p "test_*.py"
+      - run: node --test tooling/scripts/desktop-window-contract.test.mjs
       - run: cargo build --manifest-path apps/desktop/src-tauri/Cargo.toml --release
       - run: npm run desktop:build:nsis
       - run: powershell -NoProfile -ExecutionPolicy Bypass -File tooling/scripts/desktop-nsis-smoke.ps1
       - uses: actions/upload-artifact@v4
         with:
-          name: forge-org-tool-nsis
-          path: apps/desktop/src-tauri/target/release/bundle/nsis/*.exe
+          name: forge-org-desktop-hotfix-v0.1.1-${{ github.sha }}-windows-x64
+          path: |
+            apps/desktop/src-tauri/target/release/bundle/nsis/*.exe
+            apps/desktop/src-tauri/target/release/bundle/nsis/*smoke.png
           if-no-files-found: error
