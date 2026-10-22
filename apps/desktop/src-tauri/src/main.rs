@@ -79,6 +79,7 @@ fn start_sidecar(app: &AppHandle) -> Result<(u16, String, CommandChild), String>
             "FORGE_DATABASE_PATH",
             database_path.to_string_lossy().as_ref(),
         )
+        .set_process_group(true)
         .spawn()
         .map_err(|error| format!("cannot start sidecar: {error}"))?;
     tauri::async_runtime::spawn(async move { while events.recv().await.is_some() {} });

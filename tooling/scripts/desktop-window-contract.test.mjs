@@ -28,3 +28,10 @@ test('Windows desktop host uses the single-instance activation plugin', async ()
   assert.match(host, /\.unminimize\(\)/);
   assert.match(host, /\.set_focus\(\)/);
 });
+
+test('the packaged PyInstaller sidecar is launched as a killable process group', async () => {
+  const host = await readFile('apps/desktop/src-tauri/src/main.rs', 'utf8');
+  const launch = host.slice(host.indexOf('.sidecar("forge-sidecar")'), host.indexOf('.spawn()'));
+
+  assert.match(launch, /\.set_process_group\(true\)/);
+});

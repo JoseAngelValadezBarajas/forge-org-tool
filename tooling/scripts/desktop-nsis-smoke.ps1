@@ -170,8 +170,7 @@ try {
   if (-not $process.WaitForExit(15000)) { throw 'The installed FORGE desktop did not exit after its window was closed.' }
   $sidecarCleanupDeadline = [DateTime]::UtcNow.AddSeconds(15)
   do {
-    $remainingSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue |
-      Where-Object { $sidecarPids -contains $_.Id } | ForEach-Object Id)
+    $remainingSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
     if ($remainingSidecarPids.Count -eq 0) { break }
     Start-Sleep -Milliseconds 250
   } while ([DateTime]::UtcNow -lt $sidecarCleanupDeadline)
