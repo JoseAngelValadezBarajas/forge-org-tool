@@ -10,9 +10,8 @@ published to PR #1 for remote CI. No human Figma visual certification is
 claimed.
 
 Implementation branch: `ux-01-visual-interaction-parity`.
+Preview modularization and refreshed evidence: `3617ac01206ec9e16e15aea158c53bc4c14ae496`.
 Baseline shared with PR #1: `e9219be29ea2b97684a8ffe72964fa9b96975ddf`.
-The final implementation commit will be recorded after this verification
-update is committed.
 
 ## Completed corrections
 
