@@ -126,11 +126,30 @@ test('mobile gallery switches from dark to light with no browser errors', async 
     for (const theme of ['dark', 'light'] as const) {
       await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
       await expect(gallery).toHaveAttribute('data-theme', theme);
+      const overflow = await page.evaluate(() => {
+        const viewport = document.documentElement.clientWidth;
+        const offenders = [...document.querySelectorAll('body *')]
+          .map((element) => ({
+            element: `${element.tagName.toLowerCase()}${
+              typeof element.className === 'string' && element.className
+                ? `.${element.className.trim().split(/\s+/).join('.')}`
+                : ''
+            }`,
+            left: Math.round(element.getBoundingClientRect().left),
+            right: Math.round(element.getBoundingClientRect().right),
+          }))
+          .filter((element) => element.left < 0 || element.right > viewport)
+          .slice(0, 8);
+        return {
+          hasNoOverflow: document.documentElement.scrollWidth <= viewport,
+          documentWidth: document.documentElement.scrollWidth,
+          viewport,
+          offenders,
+        };
+      });
       expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-        ),
-        `Component Host overflows at ${width}px in ${theme} theme`,
+        overflow.hasNoOverflow,
+        `Component Host overflows at ${width}px in ${theme} theme: ${JSON.stringify(overflow)}`,
       ).toBe(true);
       await expect(page.getByRole('navigation', { name: 'Component host sections' })).toBeVisible();
     }
