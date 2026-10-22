@@ -2,6 +2,7 @@
 
 **Implementation:** `75b52a12edaf46a45df5138a9c7b74c6704fcf84`<br />
 **Follow-up API test lint fix:** `fca1e5a3615d3c1c1759ef2b641e8c811163829a`<br />
+**CI async assertion fix:** `6b7bea78e2e514046574377bc2d9964350772f17`<br />
 **Branch:** `codex/forge-reconstruction-vertical-slices` (PR #1 remains open)
 
 ## Automated evidence
@@ -20,9 +21,12 @@
 - `npx prettier --check .` and Ruff format check passed. `cargo` is not
   installed in this local environment, so rustfmt, Clippy, and native Desktop
   build could not be run locally.
-- The previously observed Quality CI failure was on `8fab5e1`, before the
-  repository detail prop and lint fixes in this implementation. A Quality run
-  for the commits listed above is still required; PR #1 was not merged.
+- Quality CI run `39843730344` on `33f4f942f64f620759915f995b4e5206fa3b2455`
+  passed API and Desktop, then exposed two asynchronous test assertions that
+  observed loading states in the web suite. The assertions now wait for the
+  package fingerprint and complete filtered result; the full `npm test` passes
+  locally after this correction. A new Quality run on the final PR commit is
+  required; PR #1 was not merged.
 
 ## Browser captures
 
