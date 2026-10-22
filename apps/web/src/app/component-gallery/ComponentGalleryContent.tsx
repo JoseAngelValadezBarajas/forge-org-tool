@@ -14,7 +14,6 @@ import {
   FilePicker,
   FormField,
   FormActions,
-  IconButton,
   Input,
   KeyValueRow,
   LoadingState,
@@ -41,7 +40,6 @@ import {
   Toast,
   Tooltip,
 } from '@forge-org/ui';
-import { Plus } from '@forge-org/icons';
 import { OrganizationEmptyState } from '../../features/organization';
 import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from '../shell';
 import {
@@ -93,6 +91,9 @@ import {
 } from './previews/fixtures';
 import { TokenPreview } from './previews/foundations';
 import { IconCatalogPreview } from './previews/icons';
+import { renderActionPreview } from './previews/actions';
+import { renderFormPreview } from './previews/forms';
+import { renderNavigationPreview } from './previews/navigation';
 import { ComponentGalleryLayout } from './shell/ComponentGalleryLayout';
 
 const catalog: CatalogItem[] = [
@@ -536,45 +537,16 @@ function ComponentPreview({
   onIncrement: () => void;
   count: number;
 }) {
+  const actionPreview = renderActionPreview(item.id, { count, onIncrement });
+  if (actionPreview !== null) return actionPreview;
+  const formPreview = renderFormPreview(item.id);
+  if (formPreview !== null) return formPreview;
+  const navigationPreview = renderNavigationPreview(item.id, onIncrement);
+  if (navigationPreview !== null) return navigationPreview;
+
   switch (item.id) {
     case 'tokens':
       return <TokenPreview />;
-    case 'button':
-      return (
-        <Card>
-          <div className={styles.previewRow}>
-            <Button onClick={onIncrement}>Increment {count}</Button>
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button variant="danger">Danger</Button>
-            <Button loading>Loading</Button>
-            <Button disabled>Disabled</Button>
-          </div>
-          <div className={styles.previewRow} data-component-id="button-size">
-            <Button size="small">Small</Button>
-            <Button size="medium" variant="secondary">
-              Medium
-            </Button>
-            <Button size="large" variant="secondary">
-              Large
-            </Button>
-          </div>
-        </Card>
-      );
-    case 'button-size':
-      return (
-        <Card>
-          <div className={styles.previewRow}>
-            <Button size="small">Small</Button>
-            <Button size="medium" variant="secondary">
-              Medium
-            </Button>
-            <Button size="large" variant="secondary">
-              Large
-            </Button>
-          </div>
-        </Card>
-      );
     case 'card':
       return (
         <div className={styles.previewRow}>
@@ -786,20 +758,6 @@ function ComponentPreview({
             actions={<Button variant="ghost">Action</Button>}
           />
         </Card>
-      );
-    case 'icon-button':
-      return (
-        <div className={styles.previewRow}>
-          <IconButton aria-label="Add item">
-            <Plus size={18} />
-          </IconButton>
-          <IconButton aria-label="Loading item" loading>
-            <Plus size={18} />
-          </IconButton>
-          <IconButton aria-label="Unavailable item" disabled>
-            <Plus size={18} />
-          </IconButton>
-        </div>
       );
     case 'multi-select':
       return (
