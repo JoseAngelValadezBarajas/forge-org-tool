@@ -17,13 +17,59 @@ Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
 Add-Type -TypeDefinition @'
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 public static class ForgeWindowNative {
   [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
+  [StructLayout(LayoutKind.Sequential)] struct BITMAPINFOHEADER {
+    public uint Size; public int Width, Height; public ushort Planes, BitCount; public uint Compression, ImageSize;
+    public int XPelsPerMeter, YPelsPerMeter; public uint ColorsUsed, ColorsImportant;
+  }
+  [StructLayout(LayoutKind.Sequential)] struct BITMAPINFO { public BITMAPINFOHEADER Header; public uint Color; }
   [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int command);
+  [DllImport("user32.dll")] static extern IntPtr GetWindowDC(IntPtr hWnd);
+  [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+  [DllImport("gdi32.dll")] static extern IntPtr CreateCompatibleDC(IntPtr hDC);
+  [DllImport("gdi32.dll")] static extern IntPtr CreateCompatibleBitmap(IntPtr hDC, int width, int height);
+  [DllImport("gdi32.dll")] static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
+  [DllImport("gdi32.dll")] static extern bool BitBlt(IntPtr dst, int x, int y, int width, int height, IntPtr src, int srcX, int srcY, uint operation);
+  [DllImport("gdi32.dll")] static extern int GetDIBits(IntPtr hDC, IntPtr bitmap, uint start, uint lines, byte[] pixels, ref BITMAPINFO info, uint usage);
+  [DllImport("gdi32.dll")] static extern bool DeleteObject(IntPtr hObject);
+  [DllImport("gdi32.dll")] static extern bool DeleteDC(IntPtr hDC);
+
+  public static bool CaptureWindow(IntPtr hWnd, string path) {
+    RECT rect;
+    if (!GetWindowRect(hWnd, out rect)) return false;
+    int width = rect.Right - rect.Left, height = rect.Bottom - rect.Top;
+    IntPtr source = GetWindowDC(hWnd), memory = IntPtr.Zero, bitmap = IntPtr.Zero, previous = IntPtr.Zero;
+    try {
+      memory = CreateCompatibleDC(source);
+      bitmap = CreateCompatibleBitmap(source, width, height);
+      previous = SelectObject(memory, bitmap);
+      if (!BitBlt(memory, 0, 0, width, height, source, 0, 0, 0x00CC0020 | 0x40000000)) return false;
+      BITMAPINFO info = new BITMAPINFO();
+      info.Header.Size = (uint)Marshal.SizeOf(typeof(BITMAPINFOHEADER)); info.Header.Width = width; info.Header.Height = -height;
+      info.Header.Planes = 1; info.Header.BitCount = 32; info.Header.ImageSize = (uint)(width * height * 4);
+      byte[] pixels = new byte[(int)info.Header.ImageSize];
+      if (GetDIBits(memory, bitmap, 0, (uint)height, pixels, ref info, 0) != height) return false;
+      using (BinaryWriter writer = new BinaryWriter(File.Create(path))) {
+        writer.Write((ushort)0x4D42); writer.Write((uint)(54 + pixels.Length)); writer.Write((uint)0); writer.Write((uint)54);
+        writer.Write(info.Header.Size); writer.Write(info.Header.Width); writer.Write(info.Header.Height); writer.Write(info.Header.Planes);
+        writer.Write(info.Header.BitCount); writer.Write(info.Header.Compression); writer.Write(info.Header.ImageSize);
+        writer.Write(info.Header.XPelsPerMeter); writer.Write(info.Header.YPelsPerMeter); writer.Write(info.Header.ColorsUsed); writer.Write(info.Header.ColorsImportant);
+        writer.Write(pixels);
+      }
+      return true;
+    } finally {
+      if (previous != IntPtr.Zero) SelectObject(memory, previous);
+      if (bitmap != IntPtr.Zero) DeleteObject(bitmap);
+      if (memory != IntPtr.Zero) DeleteDC(memory);
+      if (source != IntPtr.Zero) ReleaseDC(hWnd, source);
+    }
+  }
 }
 '@
 
@@ -85,13 +131,10 @@ try {
   $createButton = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Workspace'
   $bounds = New-Object ForgeWindowNative+RECT
   $null = [ForgeWindowNative]::GetWindowRect($window.Handle, [ref]$bounds)
-  $screenshotPath = Join-Path (Split-Path -Parent $installer.FullName) 'forge-desktop-startup-v0.1.1-smoke.png'
-  $bitmap = New-Object System.Drawing.Bitmap ($bounds.Right - $bounds.Left), ($bounds.Bottom - $bounds.Top)
-  $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-  $graphics.CopyFromScreen($bounds.Left, $bounds.Top, 0, 0, $bitmap.Size)
-  $bitmap.Save($screenshotPath, [System.Drawing.Imaging.ImageFormat]::Png)
-  $graphics.Dispose()
-  $bitmap.Dispose()
+  $screenshotPath = Join-Path (Split-Path -Parent $installer.FullName) 'forge-desktop-startup-v0.1.1-smoke.bmp'
+  if (-not [ForgeWindowNative]::CaptureWindow($window.Handle, $screenshotPath)) {
+    throw 'Windows native capture could not record the visible FORGE main window.'
+  }
 
   # A second invocation must activate the existing window without starting a second sidecar.
   $sidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
