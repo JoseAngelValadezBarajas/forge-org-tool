@@ -144,20 +144,27 @@ test('mobile gallery switches from dark to light with no browser errors', async 
           };
         };
         const offenders = [...document.querySelectorAll('body *')]
-          .filter((element) => {
-            const rect = element.getBoundingClientRect();
-            return rect.left < 0 || rect.right > viewport;
-          })
-          .slice(0, 8)
           .map((element) => {
+            const rect = element.getBoundingClientRect();
             const ancestors = [];
-            let current: Element | null = element;
-            while (current && ancestors.length < 5) {
+            let current = element.parentElement;
+            let clipped = false;
+            while (current && current !== document.body) {
+              const overflowX = getComputedStyle(current).overflowX;
+              clipped ||= ['auto', 'clip', 'hidden', 'scroll'].includes(overflowX);
               ancestors.push(describe(current));
               current = current.parentElement;
             }
-            return ancestors;
-          });
+            return {
+              element: describe(element),
+              ancestors,
+              clipped,
+              overflow: Math.max(0, rect.right - viewport, -rect.left),
+            };
+          })
+          .filter((item) => item.overflow > 0 && !item.clipped)
+          .sort((left, right) => right.overflow - left.overflow)
+          .slice(0, 12);
         return {
           hasNoOverflow: document.documentElement.scrollWidth <= viewport,
           documentWidth: document.documentElement.scrollWidth,
