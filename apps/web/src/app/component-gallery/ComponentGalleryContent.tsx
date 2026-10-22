@@ -94,6 +94,7 @@ import { IconCatalogPreview } from './previews/icons';
 import { renderActionPreview } from './previews/actions';
 import { renderFormPreview } from './previews/forms';
 import { renderNavigationPreview } from './previews/navigation';
+import { renderSurfaceDataPreview } from './previews/surfaces-data';
 import { ComponentGalleryLayout } from './shell/ComponentGalleryLayout';
 
 const catalog: CatalogItem[] = [
@@ -543,6 +544,8 @@ function ComponentPreview({
   if (formPreview !== null) return formPreview;
   const navigationPreview = renderNavigationPreview(item.id, onIncrement);
   if (navigationPreview !== null) return navigationPreview;
+  const surfaceDataPreview = renderSurfaceDataPreview(item.id);
+  if (surfaceDataPreview !== null) return surfaceDataPreview;
 
   switch (item.id) {
     case 'tokens':
