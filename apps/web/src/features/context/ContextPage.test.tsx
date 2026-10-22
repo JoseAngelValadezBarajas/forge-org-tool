@@ -89,4 +89,59 @@ describe('ContextPage', () => {
       '/context/w1/p1/f1/packages/pkg1',
     );
   });
+
+  it('lets a user inspect the immutable content of a saved context snapshot', async () => {
+    const savedPackage = {
+      ...packageRecord,
+      markdown: '# Historical context\n\nPlanning provenance only.',
+      payload_json: '{"source_content_included":false}',
+    };
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input).endsWith('/context/packages'))
+        return Promise.resolve(new Response(JSON.stringify([savedPackage]), { status: 200 }));
+      if (String(input).endsWith('/repositories'))
+        return Promise.resolve(new Response(JSON.stringify([repository]), { status: 200 }));
+      if (String(input).includes('/features/f1/repositories'))
+        return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/context/w1/p1/f1']}>
+        <Routes>
+          <Route path="/context/:workspaceId/:projectId/:featureId" element={<ContextPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('Historical context', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/source_content_included/)).toBeInTheDocument();
+  });
+
+  it('offers a retry after feature context loading fails', async () => {
+    let failed = false;
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input).endsWith('/context/packages') && !failed) {
+        failed = true;
+        return Promise.resolve(
+          new Response(JSON.stringify({ detail: 'Context service unavailable' }), { status: 503 }),
+        );
+      }
+      if (String(input).endsWith('/context/packages'))
+        return Promise.resolve(new Response(JSON.stringify([packageRecord]), { status: 200 }));
+      return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/context/w1/p1/f1']}>
+        <Routes>
+          <Route path="/context/:workspaceId/:projectId/:featureId" element={<ContextPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Context service unavailable');
+    fireEvent.click(screen.getByRole('button', { name: 'Retry loading context' }));
+    expect(await screen.findByText('Saved context package')).toBeInTheDocument();
+  });
 });
