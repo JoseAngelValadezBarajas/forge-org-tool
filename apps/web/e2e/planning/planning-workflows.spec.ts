@@ -316,7 +316,10 @@ test('PA-PLAN-004 creates a structured Bug with a durable screenshot from the pr
       response.url().includes(`/features/${bug.id}/attachments`) &&
       response.request().method() === 'POST',
   );
-  await page.getByLabel('Add Bug screenshot').setInputFiles({
+  const screenshotPicker = page.waitForEvent('filechooser');
+  await page.getByRole('button', { name: 'Add Bug screenshot' }).click();
+  const fileChooser = await screenshotPicker;
+  await fileChooser.setFiles({
     name: 'synthetic.png',
     mimeType: 'image/png',
     buffer: png,

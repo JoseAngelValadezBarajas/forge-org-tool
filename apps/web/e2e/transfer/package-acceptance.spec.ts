@@ -35,7 +35,10 @@ test('PA-TRN-002 ZIP export/import preserves a Bug screenshot across workspaces'
   await expect(page.getByRole('textbox', { name: 'Edit feature title' })).toHaveValue(
     `Screenshot bug ${suffix}`,
   );
-  await page.getByLabel('Add Bug screenshot').setInputFiles({
+  const screenshotPicker = page.waitForEvent('filechooser');
+  await page.getByRole('button', { name: 'Add Bug screenshot' }).click();
+  const fileChooser = await screenshotPicker;
+  await fileChooser.setFiles({
     name: 'crash-screen.png',
     mimeType: 'image/png',
     buffer: syntheticPng,

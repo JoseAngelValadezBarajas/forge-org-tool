@@ -168,7 +168,6 @@ export function FeatureDetailPage() {
               <input
                 ref={bugScreenshotInput}
                 id="bug-screenshot"
-                aria-label="Add Bug screenshot"
                 aria-hidden="true"
                 className={styles.visuallyHidden}
                 tabIndex={-1}

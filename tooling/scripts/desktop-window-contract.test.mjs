@@ -95,6 +95,8 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
   assert.match(smoke, /ToggleState\]::Off[\s\S]*?\.Toggle\(\)/);
   assert.match(smoke, /Unsupported UI Automation patterns for control/);
   assert.match(smoke, /Wait-ForgeAutomationNamedElement\s+\$root\s+\$buttonName/);
+  assert.match(smoke, /ClassName -in @\('#32770', 'CabinetWClass'\)/);
+  assert.match(smoke, /Top-level windows:/);
 });
 
 test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {

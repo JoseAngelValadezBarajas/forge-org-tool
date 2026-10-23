@@ -185,11 +185,21 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
   do {
     $windows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, [System.Windows.Automation.Condition]::TrueCondition)
     foreach ($candidate in $windows) {
-      if ($candidate.Current.Name -match '^(Open|Choose.*file|Select.*file)$') { $dialog = $candidate; break }
+      if (
+        $candidate.Current.ControlType -eq [System.Windows.Automation.ControlType]::Window -and
+        $candidate.Current.NativeWindowHandle -ne $root.Current.NativeWindowHandle -and
+        (
+          $candidate.Current.Name -match '(?i)(open|file|choose|select)' -or
+          $candidate.Current.ClassName -in @('#32770', 'CabinetWClass')
+        )
+      ) { $dialog = $candidate; break }
     }
     if ($null -eq $dialog) { Start-Sleep -Milliseconds 250 }
   } while ($null -eq $dialog -and [DateTime]::UtcNow -lt $deadline)
-  if ($null -eq $dialog) { throw 'Windows did not expose the screenshot file picker to UI Automation.' }
+  if ($null -eq $dialog) {
+    $visibleWindows = @($windows | ForEach-Object { "'$($_.Current.Name)' class='$($_.Current.ClassName)' type='$($_.Current.ControlType)' hwnd=$($_.Current.NativeWindowHandle)" })
+    throw "Windows did not expose the screenshot file picker to UI Automation. Top-level windows: $($visibleWindows -join '; ')"
+  }
   $fileName = $dialog.FindFirst(
     [System.Windows.Automation.TreeScope]::Descendants,
     [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Edit)
