@@ -13,7 +13,7 @@ export function ProjectCard({ project, workspaceId, children }: ProjectCardProps
       <header className={styles.header}>
         <div className={styles.titleGroup}>
           <h3>
-            <Link to={`/planning/${workspaceId}/${project.id}`}>{project.name}</Link>
+            <Link to={`/projects/${workspaceId}/${project.id}`}>{project.name}</Link>
           </h3>
           <StatusChip tone={archived ? 'neutral' : 'success'}>{project.status}</StatusChip>
         </div>

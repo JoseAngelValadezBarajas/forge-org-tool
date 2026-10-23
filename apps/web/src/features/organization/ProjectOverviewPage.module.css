@@ -1,0 +1,54 @@
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+  min-width: 0;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--forge-space-3);
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: var(--forge-space-3);
+}
+.metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--forge-space-3);
+}
+.metadata dt,
+.pending span {
+  color: var(--forge-text-muted);
+}
+.metadata dd {
+  margin: var(--forge-space-1) 0 0;
+  overflow-wrap: anywhere;
+}
+.description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.form {
+  display: grid;
+  gap: var(--forge-space-3);
+  max-width: 640px;
+  margin-top: var(--forge-space-4);
+}
+.pending {
+  display: grid;
+  gap: var(--forge-space-3);
+  padding: 0;
+  list-style: none;
+}
+.pending li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--forge-space-2);
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-3);
+  overflow-wrap: anywhere;
+}
