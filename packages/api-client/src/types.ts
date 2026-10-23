@@ -7,6 +7,7 @@ export type Workspace = Schema['WorkspaceResponse'];
 export type Project = Schema['ProjectResponse'];
 export type ProjectUpdate = Schema['ProjectUpdate'];
 export type Epic = Schema['EpicResponse'];
+export type EpicStatus = Epic['status'];
 export type Feature = Schema['FeatureResponse'];
 export type Decision = Schema['DecisionResponse'];
 export type DecisionRevision = Schema['DecisionRevisionResponse'];

@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@forge-org/ui';
 import { OrganizationPage, ProjectOverviewPage } from '../features/organization';
-import { FeatureDetailPage, PlanningPage } from '../features/planning';
+import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
 import { ReadinessPage } from '../features/readiness';
 import { HandoffDetailPage, RunDetailPage, WorkbenchPage } from '../features/workbench';
 import {
@@ -157,6 +157,10 @@ function ApplicationShell() {
               <Route path="/" element={<OrganizationPage />} />
               <Route path="/projects/:workspaceId/:projectId" element={<ProjectOverviewPage />} />
               <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+              <Route
+                path="/planning/:workspaceId/:projectId/epics/:epicId"
+                element={<EpicDetailPage />}
+              />
               <Route
                 path="/planning/:workspaceId/:projectId/features/:featureId"
                 element={<FeatureDetailPage />}

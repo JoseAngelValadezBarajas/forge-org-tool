@@ -99,7 +99,11 @@ export function PlanningPage() {
           <h2 id="planning-epics-heading">Epics</h2>
           <div className={styles.forms}>
             {overview.epics.map((epic) => (
-              <EpicCard key={epic.id} epic={epic}>
+              <EpicCard
+                key={epic.id}
+                epic={epic}
+                href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
+              >
                 {epic.features.map((feature: Feature) => (
                   <span key={feature.id}>{feature.title}</span>
                 ))}

@@ -38,6 +38,11 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('button', { name: /create workspace/i })).toBeEnabled();
   });
 
+  it('opens an Epic detail route with project context', async () => {
+    renderRoute('/planning/w1/p1/epics/e1');
+    expect(await screen.findByRole('heading', { name: 'Epic detail' })).toBeInTheDocument();
+  });
+
   it('exposes the product shell hierarchy without inventing project routes', () => {
     renderRoute('/');
 

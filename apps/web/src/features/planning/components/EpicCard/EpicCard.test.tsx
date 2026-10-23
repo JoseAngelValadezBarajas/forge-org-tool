@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/vitest';
 import { describe, expect, it } from 'vitest';
 import type { Epic, Feature } from '@forge-org/api-client';
@@ -38,5 +39,23 @@ describe('EpicCard', () => {
     expect(screen.getByText('Done')).toBeInTheDocument();
     expect(screen.getByText('1 feature')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Open feature' })).toBeInTheDocument();
+  });
+
+  it('links the title only when route context is provided', () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <EpicCard epic={epic} href="/planning/w1/p1/epics/e1" />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('link', { name: 'Launch' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1/epics/e1',
+    );
+    rerender(
+      <MemoryRouter>
+        <EpicCard epic={epic} />
+      </MemoryRouter>,
+    );
+    expect(screen.queryByRole('link', { name: 'Launch' })).not.toBeInTheDocument();
   });
 });
