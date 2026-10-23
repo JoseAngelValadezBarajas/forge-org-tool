@@ -119,10 +119,11 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
   assert.match(smoke, /\$fileNameControl[\s\S]*nombre de archivo/);
   assert.match(smoke, /ControlType\]::ComboBox/);
   assert.match(smoke, /AutomationId.*1148|1148.*AutomationId/);
-  assert.match(smoke, /SendWait\('%n'\)/);
   assert.match(smoke, /FORGE_DESKTOP_SMOKE_FORCE_SENDKEYS_PICKER/);
-  assert.match(smoke, /Replace\('_', '\{ASC 95\}'\)/);
-  assert.doesNotMatch(smoke, /SendWait\(\$filePath\)/);
+  assert.match(smoke, /Clipboard\]::SetText\(\$filePath\)/);
+  assert.match(smoke, /SendWait\('\^v'\)/);
+  assert.match(smoke, /Clipboard\]::SetDataObject\(\$previousClipboard, \$true\)/);
+  assert.doesNotMatch(smoke, /SendWait\(\$filePath\)|ASC 95/);
   assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
   assert.match(smoke, /PASS installed UI -> authenticated API -> SQLite -> restart/);
 });

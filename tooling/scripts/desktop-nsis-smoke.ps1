@@ -273,13 +273,22 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     $valuePattern.SetValue($filePath)
     try { $fileNameControl.SetFocus() } catch { }
   } else {
-    # Windows' common file picker exposes this field with Alt+N even when its
-    # UI Automation provider omits the Edit/ComboBox value pattern. SendKeys
-    # can drop underscores under some keyboard layouts, so emit them as
-    # explicit ASCII characters instead of shifted punctuation.
-    [System.Windows.Forms.SendKeys]::SendWait('%n')
-    $sendKeysPath = $filePath.Replace('_', '{ASC 95}')
-    [System.Windows.Forms.SendKeys]::SendWait($sendKeysPath)
+    # Some common-dialog providers expose no usable UIA value pattern or HWND.
+    # Paste through the native filename field so keyboard layout cannot alter
+    # the path; preserve and restore the operator's clipboard around the paste.
+    $previousClipboard = [System.Windows.Forms.Clipboard]::GetDataObject()
+    try {
+      [System.Windows.Forms.SendKeys]::SendWait('%n')
+      [System.Windows.Forms.Clipboard]::SetText($filePath)
+      [System.Windows.Forms.SendKeys]::SendWait('^v')
+      Start-Sleep -Milliseconds 250
+    } finally {
+      if ($null -ne $previousClipboard) {
+        [System.Windows.Forms.Clipboard]::SetDataObject($previousClipboard, $true)
+      } else {
+        [System.Windows.Forms.Clipboard]::Clear()
+      }
+    }
   }
   $open = $dialog.FindFirst(
     [System.Windows.Automation.TreeScope]::Descendants,

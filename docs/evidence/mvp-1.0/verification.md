@@ -46,6 +46,7 @@ The reviewed screenshot files in this directory document browser rendering only.
 - `npm run test:acceptance:local`: 24 passed, 0 failed, 0 flaky.
 - Windows `desktop-window-contract.test.mjs`: 12 passed; PowerShell parser passed.
 - Installed NSIS smoke was also executed locally against a CI-built installer with isolated `LOCALAPPDATA`; the full UI → API → SQLite → restart flow passed and its temporary install/data directory was cleaned by the test.
+- After CI run [39987153344](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39987153344) exposed unsupported `{ASC 95}` syntax in the missing-ValuePattern native picker fallback, the fallback now pastes the path and restores the prior clipboard contents. Forced that exact fallback against the CI-built installer locally: visible installed UI, authenticated sidecar/API, SQLite-backed workspace/project/Epic/Bug creation, attachment persistence after restart and process cleanup all passed at 1216×839. `desktop-window-contract.test.mjs`: 13/13 passed. The latest CI run itself remains failed at the installed smoke step; a fresh run is required to certify the change.
 
 ## Acceptance status and limits
 
