@@ -1,0 +1,22 @@
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 180px) auto;
+  align-items: center;
+  gap: var(--forge-space-3);
+  min-width: 0;
+  padding-block: var(--forge-space-3);
+  border-top: 1px solid var(--forge-border);
+}
+.title {
+  overflow-wrap: anywhere;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+}
+@media (max-width: 640px) {
+  .item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

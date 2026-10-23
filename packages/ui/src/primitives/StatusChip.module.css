@@ -1,6 +1,0 @@
-.chip { display: inline-flex; max-width: 100%; overflow-wrap: anywhere; border-radius: 999px; padding: 4px 10px; font: 500 0.73rem/1.4 var(--forge-font-mono); border: 1px solid var(--forge-border); color: var(--forge-text-muted); }
-.neutral { color: var(--forge-text-muted); }
-.accent { color: var(--forge-accent); border-color: currentColor; }
-.success { color: var(--forge-success); border-color: currentColor; }
-.warning { color: var(--forge-warning); border-color: currentColor; }
-.danger { color: var(--forge-danger); border-color: currentColor; }

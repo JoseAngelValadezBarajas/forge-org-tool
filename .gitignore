@@ -20,8 +20,10 @@ node_modules/
 **/playwright-report/
 **/target/
 **/src-tauri/gen/
+apps/desktop/src-tauri/binaries/
 .DS_Store
 *.log
 *.pem
 *.key
 !**/fixtures/*.key.example
+*/.superpowers/

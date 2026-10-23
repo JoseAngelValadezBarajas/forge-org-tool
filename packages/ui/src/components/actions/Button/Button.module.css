@@ -1,0 +1,91 @@
+.button {
+  /* Button master 173:27 state values remain component-scoped, not global tokens. */
+  --button-action-primary-hover: light-dark(#98461a, #e59b64);
+  --button-action-primary-pressed: light-dark(#78320f, #a65320);
+  --button-action-primary-pressed-foreground: #fff;
+  --button-surface-selected: light-dark(#f4e3d5, #30261e);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+  font-family: var(--forge-font-ui);
+  font-size: var(--forge-font-size-sm);
+  font-weight: var(--forge-font-weight-medium);
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+.loadingIndicator {
+  font-family: var(--forge-font-mono);
+  font-weight: var(--forge-font-weight-regular);
+}
+.small {
+  min-height: 2rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+}
+.medium {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.85rem;
+}
+.large {
+  min-height: 3rem;
+  padding: 0.6rem 1.1rem;
+}
+.button:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 3px;
+}
+.button:disabled {
+  cursor: not-allowed;
+}
+.button:disabled:not([aria-busy='true']) {
+  background: var(--forge-surface-tag);
+  color: var(--forge-text-subtle);
+  opacity: 0.58;
+}
+.button[aria-busy='true'] {
+  opacity: 0.82;
+}
+.secondary .loadingIndicator,
+.ghost .loadingIndicator {
+  color: var(--forge-text-secondary);
+}
+.primary {
+  border-color: transparent;
+  background: var(--forge-accent);
+  color: var(--forge-accent-contrast);
+}
+.primary:hover:not(:disabled) {
+  background: var(--button-action-primary-hover);
+}
+.secondary {
+  background: var(--forge-surface-tag);
+  color: var(--forge-text-primary);
+}
+.ghost {
+  background: var(--forge-surface);
+  color: var(--forge-text-primary);
+}
+.danger {
+  border-color: transparent;
+  background: var(--forge-status-error-bg);
+  color: var(--forge-danger);
+}
+.primary:active:not(:disabled) {
+  background: var(--button-action-primary-pressed);
+  color: var(--button-action-primary-pressed-foreground);
+}
+.secondary:active:not(:disabled),
+.ghost:active:not(:disabled) {
+  background: var(--button-surface-selected);
+}
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

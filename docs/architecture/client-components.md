@@ -2,14 +2,14 @@
 
 ## Exact directory responsibility
 
-| Directory | Owns | Must never own |
-| --- | --- | --- |
-| `packages/tokens/` | Semantic palette, type scale, spacing, radii, generated CSS | Product state, components |
-| `packages/ui/src/primitives/` | Accessible Button, IconButton, Field, Input, Card, Badge, Tabs etc. | API calls, business statuses |
-| `packages/ui/src/components/` | Domain-independent compositions: MetricCard, EmptyState, SectionHeader, StatusChip | Feature route logic, domain entities |
-| `apps/web/src/app/` | Routing, AppShell, providers, navigation integration, platform adapters | A second button library |
-| `apps/web/src/features/<domain>/` | Routes, hooks, `components/`, `model/`, `api/`, styles; domain-to-tone mapping | Shared primitives |
-| `packages/api-client/` | Typed HTTP facade, transport adapters and future generated OpenAPI models | UI and business transformations |
+| Directory                         | Owns                                                                               | Must never own                       |
+| --------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------ |
+| `packages/tokens/`                | Semantic palette, type scale, spacing, radii, generated CSS                        | Product state, components            |
+| `packages/ui/src/primitives/`     | Accessible Button, IconButton, Field, Input, Card, Badge, Tabs etc.                | API calls, business statuses         |
+| `packages/ui/src/components/`     | Domain-independent compositions: MetricCard, EmptyState, SectionHeader, StatusChip | Feature route logic, domain entities |
+| `apps/web/src/app/`               | Routing, AppShell, providers, navigation integration, platform adapters            | A second button library              |
+| `apps/web/src/features/<domain>/` | Routes, hooks, `components/`, `model/`, `api/`, styles; domain-to-tone mapping     | Shared primitives                    |
+| `packages/api-client/`            | Small compatibility facade over transport, errors, types and capability modules    | UI and business transformations      |
 
 **Import rules**: web features may import `@forge-org/ui`, `@forge-org/api-client` and `@forge-org/tokens`; shared UI may import React and tokens, but not app, features or api-client. Feature imports across capabilities must use `index.ts` public exports. No new `apps/web/src/shared/ui` or feature-local copies of generic primitives.
 

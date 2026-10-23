@@ -1,0 +1,43 @@
+.card {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: 0;
+}
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--forge-space-3);
+  flex-wrap: wrap;
+}
+.title {
+  color: var(--forge-text);
+  font-weight: var(--forge-font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+.chips,
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+}
+.description,
+.goal {
+  margin: 0;
+  color: var(--forge-text-muted);
+  overflow-wrap: anywhere;
+}
+.goal {
+  font-size: 0.9rem;
+}
+.readOnly {
+  color: var(--forge-text-muted);
+  font: 500 0.7rem var(--forge-font-mono);
+  text-transform: uppercase;
+}
+@media (max-width: 640px) {
+  .heading {
+    display: grid;
+  }
+}

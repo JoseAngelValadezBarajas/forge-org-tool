@@ -1,0 +1,36 @@
+.row {
+  border-bottom: 1px solid var(--forge-border-subtle);
+}
+.row[data-selected] {
+  background: color-mix(in srgb, var(--forge-accent) 10%, var(--forge-surface));
+}
+.row[data-read-only] {
+  background: var(--forge-surface-sunken);
+}
+.row[data-read-only] .primary {
+  color: var(--forge-text-muted);
+}
+.row th,
+.row td {
+  padding: 0.75rem;
+  text-align: start;
+  vertical-align: middle;
+}
+.primary {
+  color: var(--forge-text-primary);
+  font-weight: 600;
+}
+.primary span,
+.primary small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.primary small {
+  margin-top: 0.2rem;
+  color: var(--forge-text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.status {
+  color: var(--forge-text-secondary);
+}

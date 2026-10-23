@@ -1,0 +1,41 @@
+.field.field {
+  min-height: 160px;
+  padding: 17px;
+  border-radius: 11px;
+}
+.content {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+.title {
+  color: var(--forge-text-primary);
+  font-size: 15px;
+  font-weight: var(--forge-font-weight-semibold);
+  line-height: 1;
+}
+.state {
+  margin: 0;
+  color: var(--forge-accent);
+  font-family: var(--forge-font-mono);
+  font-size: 10px;
+  line-height: 1;
+}
+.value {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.description {
+  margin: 0;
+  color: var(--forge-text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.provenance {
+  overflow-wrap: anywhere;
+  color: var(--forge-text-secondary);
+  font-family: var(--forge-font-mono);
+  font-size: 9px;
+  line-height: 1.4;
+}

@@ -1,0 +1,32 @@
+.dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: min(85vh, 48rem);
+  padding: 1.25rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-primary);
+}
+.dialog::backdrop {
+  background: var(--forge-overlay);
+}
+.dialog h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.1rem;
+}
+.dialog p {
+  color: var(--forge-text-secondary);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+.destructive h2 {
+  color: var(--forge-danger);
+}
+.busy {
+  cursor: progress;
+}

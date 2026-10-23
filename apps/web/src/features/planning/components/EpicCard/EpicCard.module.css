@@ -1,0 +1,29 @@
+.card {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: 0;
+}
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--forge-space-3);
+  flex-wrap: wrap;
+}
+.header h3,
+.header p,
+.description {
+  margin: 0;
+}
+.header p,
+.description {
+  color: var(--forge-text-muted);
+}
+.description,
+.features {
+  overflow-wrap: anywhere;
+}
+.features {
+  display: grid;
+  gap: var(--forge-space-2);
+}

@@ -1,0 +1,34 @@
+.panel {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface);
+  color: var(--forge-text-secondary);
+}
+.panel h3,
+.panel p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.panel h3 {
+  color: var(--forge-text-primary);
+  font-size: 1rem;
+}
+.action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.error {
+  border-color: var(--forge-danger);
+}
+.readOnly {
+  border-color: var(--forge-warning);
+}
+.loading {
+  border-style: dashed;
+}

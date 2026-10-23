@@ -1,0 +1,15 @@
+.stack {
+  display: grid;
+  gap: var(--forge-space-5);
+}
+.form {
+  display: grid;
+  gap: var(--forge-space-3);
+}
+.connections {
+  display: grid;
+  gap: var(--forge-space-3);
+}
+.connections h3 {
+  margin: 0;
+}

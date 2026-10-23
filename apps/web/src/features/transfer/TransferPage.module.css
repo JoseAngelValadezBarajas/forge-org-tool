@@ -1,0 +1,109 @@
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+}
+.stack p {
+  color: var(--forge-text-muted);
+  line-height: 1.5;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--forge-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  min-width: 0;
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-muted);
+  padding: var(--forge-space-3);
+  font-size: 0.85rem;
+}
+.steps li[aria-current='step'] {
+  border-color: var(--forge-accent);
+  background: var(--forge-accent-soft);
+  color: var(--forge-accent);
+}
+.steps li span {
+  margin-right: var(--forge-space-2);
+  font-family: var(--forge-font-mono);
+}
+.workflowGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--forge-space-4);
+  align-items: start;
+}
+.panel {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: 0;
+}
+.panel h3,
+.panel h4,
+.panel p {
+  margin: 0;
+}
+.fileInput {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--forge-space-2);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface);
+  color: var(--forge-text);
+}
+.fileName,
+.fingerprint {
+  overflow-wrap: anywhere;
+}
+.advanced,
+.review {
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-3);
+}
+.advanced summary,
+.review summary {
+  cursor: pointer;
+  color: var(--forge-text);
+}
+.documentPreview {
+  max-height: 24rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: var(--forge-space-3);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface);
+  color: var(--forge-text-muted);
+  font: 0.78rem/1.5 var(--forge-font-mono);
+}
+.stack textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface);
+  color: var(--forge-text);
+  padding: var(--forge-space-3);
+  font: 0.8rem/1.5 var(--forge-font-mono);
+  resize: vertical;
+}
+@media (max-width: 720px) {
+  .steps,
+  .workflowGrid {
+    grid-template-columns: 1fr;
+  }
+}

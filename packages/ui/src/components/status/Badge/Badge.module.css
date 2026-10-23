@@ -1,0 +1,33 @@
+.badge {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font: 500 11px/14px var(--forge-font-ui);
+  overflow-wrap: anywhere;
+}
+.neutral {
+  color: var(--forge-text-muted);
+  background: var(--forge-status-neutral-bg);
+}
+.success {
+  color: var(--forge-success);
+  background: var(--forge-status-success-bg);
+}
+.warning {
+  color: var(--forge-warning);
+  background: var(--forge-status-warning-bg);
+}
+.danger {
+  color: var(--forge-danger);
+  background: var(--forge-status-error-bg);
+}
+.accent {
+  color: var(--forge-accent);
+  background: var(--forge-status-accent-bg);
+}
+.info {
+  color: var(--forge-info);
+  background: var(--forge-status-info-bg);
+}

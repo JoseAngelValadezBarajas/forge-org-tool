@@ -1,0 +1,26 @@
+{
+  "name": "@forge-org/icons",
+  "private": true,
+  "version": "0.1.0-bootstrap",
+  "license": "Apache-2.0",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck:consumer": "node ../../node_modules/typescript/bin/tsc --project tsconfig.consumer.json",
+    "test": "vitest run --config vitest.config.ts && npm run build && npm run typecheck:consumer && node --test scripts/package-exports.test.mjs"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

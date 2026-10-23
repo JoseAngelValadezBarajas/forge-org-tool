@@ -1,0 +1,15 @@
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+  min-width: 0;
+}
+.provenance {
+  color: var(--forge-text-muted);
+  line-height: 1.5;
+}
+.feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--forge-space-2);
+}

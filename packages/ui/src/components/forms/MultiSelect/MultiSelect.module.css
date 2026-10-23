@@ -1,0 +1,81 @@
+.control {
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.5rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-primary);
+  font: inherit;
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
+}
+
+.group {
+  display: flex;
+  width: 100%;
+  min-height: 125px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 14px 15px;
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-alert);
+  background: var(--forge-surface);
+  color: var(--forge-text);
+  font-family: Geist, sans-serif;
+}
+
+.group:focus-within {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
+}
+
+.legend {
+  padding: 0;
+  color: var(--forge-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.option {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 9px;
+  color: var(--forge-text);
+  font-size: 11px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.option span {
+  overflow-wrap: anywhere;
+}
+
+.option:has(input:disabled) {
+  color: var(--forge-text-muted);
+  cursor: not-allowed;
+}
+
+.empty {
+  margin: 0;
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.nativeValue {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

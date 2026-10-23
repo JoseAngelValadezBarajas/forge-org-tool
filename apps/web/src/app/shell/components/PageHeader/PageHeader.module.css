@@ -1,0 +1,43 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+}
+.copy {
+  min-width: 0;
+}
+.copy p,
+.copy h1 {
+  margin: 0;
+}
+.copy p {
+  color: var(--forge-text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.copy h1 {
+  font-size: 1rem;
+}
+.copy span {
+  display: block;
+  color: var(--forge-text-muted);
+  font-size: 0.8rem;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+@media (max-width: 720px) {
+  .header {
+    width: 100%;
+  }
+  .copy h1 {
+    font-size: 0.9rem;
+  }
+}

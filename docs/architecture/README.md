@@ -1,6 +1,6 @@
 # Architecture · RFC-001
 
-Status: **M1 scaffold**. This README describes the *target* architecture; the actual code implements only a React design-system preview and FastAPI health check.
+Status: **M1 scaffold**. This README describes the _target_ architecture; the actual code implements only a React design-system preview and FastAPI health check.
 
 ## Bounded contexts
 

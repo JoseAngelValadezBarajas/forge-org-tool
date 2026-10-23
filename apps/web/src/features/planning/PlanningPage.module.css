@@ -1,0 +1,39 @@
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+}
+.forms,
+.board {
+  display: grid;
+  gap: var(--forge-space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.forms form {
+  display: grid;
+  gap: var(--forge-space-2);
+}
+.featureForm {
+  display: grid;
+  gap: var(--forge-space-2);
+  max-width: 520px;
+}
+.board {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: start;
+}
+.board article {
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-2);
+  margin-top: var(--forge-space-2);
+}
+@media (max-width: 1100px) {
+  .board {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .forms,
+  .board {
+    grid-template-columns: 1fr;
+  }
+}

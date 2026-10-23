@@ -1,0 +1,34 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+}
+.content {
+  position: absolute;
+  z-index: 20;
+  inset-block-end: calc(100% + 0.45rem);
+  inset-inline-start: 50%;
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 2rem));
+  padding: 0.4rem 0.55rem;
+  transform: translate(-50%, 0.2rem);
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-primary);
+  box-shadow: var(--forge-shadow-tooltip);
+  font-size: 0.78rem;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow-wrap: anywhere;
+}
+.root:hover .content,
+.root:focus-within .content {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  visibility: visible;
+}
+.root:focus-within {
+  outline: 2px solid transparent;
+}

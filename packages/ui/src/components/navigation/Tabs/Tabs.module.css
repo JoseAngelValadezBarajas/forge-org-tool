@@ -1,0 +1,39 @@
+.root {
+  width: 100%;
+  min-width: 0;
+}
+.list {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  gap: 0.35rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--forge-border-subtle);
+}
+.tab {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--forge-text-secondary);
+  font: inherit;
+  cursor: pointer;
+}
+.tab[aria-selected='true'] {
+  border-bottom-color: var(--forge-accent);
+  color: var(--forge-text-primary);
+}
+.tab:focus-visible,
+.panel:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
+}
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.panel {
+  padding-block: 0.75rem;
+}

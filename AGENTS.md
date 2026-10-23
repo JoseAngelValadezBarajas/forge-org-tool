@@ -11,3 +11,5 @@
 9. Desktop IPC never exposes a port, process capability, shell, arbitrary URL or unrestricted filesystem access to React.
 10. Do not archive original FORGE until M0 preservation manifest and new public repository availability are verified. Archiving must require a separate deliberate operator step.
 11. Keep phase-scoped changes; no unrelated refactor cycles. Run tests and provide evidence for every milestone.
+12. Reusable package changes must pass their independent build and packed external-consumer test; consumers must not import package source paths.
+13. Backend route and persistence moves require OpenAPI and migration characterization tests before and after extraction.

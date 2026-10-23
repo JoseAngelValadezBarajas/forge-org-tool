@@ -1,0 +1,48 @@
+.alert {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: 360px;
+  min-height: 82px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: var(--forge-space-3) 14px;
+  border: 1px solid currentColor;
+  border-radius: var(--forge-radius-alert);
+  background: var(--forge-surface-raised);
+  overflow-wrap: anywhere;
+}
+.info {
+  border-color: var(--forge-info);
+  background: var(--forge-status-info-bg);
+  color: var(--forge-info);
+}
+.success {
+  border-color: var(--forge-success);
+  background: var(--forge-status-success-bg);
+  color: var(--forge-success);
+}
+.warning {
+  border-color: var(--forge-warning);
+  background: var(--forge-status-warning-bg);
+  color: var(--forge-warning);
+}
+.danger {
+  border-color: var(--forge-danger);
+  background: var(--forge-status-error-bg);
+  color: var(--forge-danger);
+}
+.error {
+  border-color: var(--forge-danger);
+  background: var(--forge-status-error-bg);
+  color: var(--forge-danger);
+}
+.title {
+  color: inherit;
+  font: 600 12px/1.2 var(--forge-font-ui);
+}
+.message {
+  color: var(--forge-text-primary);
+  font: 400 11px/1.2 var(--forge-font-ui);
+}

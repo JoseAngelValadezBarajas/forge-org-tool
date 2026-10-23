@@ -4,7 +4,29 @@
   "version": "0.1.0-bootstrap",
   "license": "Apache-2.0",
   "type": "module",
-  "exports": {".": "./src/index.ts"},
-  "dependencies": {"@forge-org/tokens": "*", "react": "^19.3.0"},
-  "peerDependencies": {"react": "^19.0.0"}
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": {
+      "types": "./dist/styles.css.d.ts",
+      "default": "./dist/styles.css"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run --config vitest.config.ts && npm run build && node scripts/css-distribution.test.mjs && node scripts/component-architecture.test.mjs && node --test scripts/shared-components.browser.test.mjs"
+  },
+  "dependencies": {
+    "@forge-org/icons": "0.1.0-bootstrap",
+    "@forge-org/tokens": "0.1.0-bootstrap"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
 }

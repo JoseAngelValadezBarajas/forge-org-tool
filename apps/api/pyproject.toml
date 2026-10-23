@@ -6,7 +6,9 @@ license = { text = "Apache-2.0" }
 requires-python = ">=3.12,<3.14"
 dependencies = [
   "fastapi>=0.115,<1",
+  "alembic>=1.14,<2",
   "pydantic>=2,<3",
+  "sqlalchemy>=2,<3",
   "uvicorn[standard]>=0.32,<1",
 ]
 [dependency-groups]
@@ -19,6 +21,13 @@ packages = ["src/forge_org"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
+lint.select = ["E4", "E7", "E9", "F", "I", "B"]
+lint.ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "lf"
 [tool.mypy]
 python_version = "3.12"
 strict = true

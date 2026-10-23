@@ -1,0 +1,52 @@
+.header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.titleGroup {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.eyebrow {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--forge-text-muted);
+  font: 0.68rem/1.3 var(--forge-font-mono);
+  text-transform: uppercase;
+}
+.title {
+  min-width: 0;
+  margin: 0;
+  color: var(--forge-text-primary);
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+.counter {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--forge-surface-sunken);
+  color: var(--forge-text-secondary);
+  font: 0.7rem/1.4 var(--forge-font-mono);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+@media (max-width: 32rem) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .actions {
+    justify-content: flex-start;
+  }
+}

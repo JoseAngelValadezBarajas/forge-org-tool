@@ -1,3 +1,12 @@
-.stack { display: grid; gap: var(--forge-space-4); }
-.stack h3 { margin: var(--forge-space-4) 0 var(--forge-space-2); }
-.stack p { max-width: 62ch; line-height: 1.6; color: var(--forge-text-muted); }
+.stack {
+  display: grid;
+  gap: var(--forge-space-4);
+}
+.stack h3 {
+  margin: var(--forge-space-4) 0 var(--forge-space-2);
+}
+.stack p {
+  max-width: 62ch;
+  line-height: 1.6;
+  color: var(--forge-text-muted);
+}

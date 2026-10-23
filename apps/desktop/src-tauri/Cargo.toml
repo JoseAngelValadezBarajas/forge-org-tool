@@ -1,0 +1,22 @@
+[package]
+name = "forge-org-desktop"
+version = "0.1.0"
+description = "FORGE Org Tool restricted Windows host"
+authors = ["FORGE Org Tool contributors"]
+license = "Apache-2.0"
+edition = "2021"
+rust-version = "1.77"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0" }
+
+[dependencies]
+forge-org-desktop-policy = { path = ".." }
+tauri = { version = "2.0.0" }
+tauri-plugin-single-instance = "2.0.0"
+tauri-plugin-shell = "2.0.0"
+rand = "0.9"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

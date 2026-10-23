@@ -1,0 +1,21 @@
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--forge-space-3);
+}
+.relationship {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.state {
+  margin: 0;
+  color: var(--forge-warning);
+  font-family: var(--forge-font-mono);
+  font-size: 10px;
+  line-height: 1;
+}
+.group[data-state='Clear'] .state {
+  color: var(--forge-accent);
+}

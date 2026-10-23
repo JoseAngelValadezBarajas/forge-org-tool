@@ -1,0 +1,34 @@
+.popover {
+  position: relative;
+  width: fit-content;
+  color: var(--forge-text-primary);
+}
+.popover summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  cursor: pointer;
+  list-style: none;
+}
+.popover summary::-webkit-details-marker {
+  display: none;
+}
+.popover summary:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
+}
+.content {
+  position: absolute;
+  z-index: 10;
+  inset-block-start: calc(100% + 0.35rem);
+  inset-inline-end: 0;
+  min-width: 12rem;
+  padding: 0.75rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  box-shadow: var(--forge-shadow-popover);
+}

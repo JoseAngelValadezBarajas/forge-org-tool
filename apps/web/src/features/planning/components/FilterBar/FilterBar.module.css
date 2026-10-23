@@ -1,0 +1,22 @@
+.filters {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: 0;
+}
+.controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: var(--forge-space-4);
+}
+.count {
+  margin: 0;
+  color: var(--forge-text-muted);
+  font-size: 0.8rem;
+}
+@media (max-width: 640px) {
+  .controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,7 +1,13 @@
-/** A narrow HTTP boundary. Generated OpenAPI operation types are planned for M2. */
-export type ApiRequest = { path: `/api/v1/${string}`; signal?: AbortSignal };
-export async function getApiJson<T>(request: ApiRequest): Promise<T> {
-  const res = await fetch(request.path, { signal: request.signal, credentials: 'same-origin' });
-  if (!res.ok) throw new Error(`API HTTP ${res.status}`);
-  return res.json() as Promise<T>;
-}
+import { organizationCapability } from './organization.js';
+import { legacyCapabilities } from './capabilities.js';
+
+export { ApiError } from './errors.js';
+export { getApiJson, sendJson } from './transport.js';
+export type { ApiRequest } from './transport.js';
+export type * from './types.js';
+
+/** Stable public facade retained while capability modules are extracted incrementally. */
+export const organizationApi = {
+  ...legacyCapabilities,
+  ...organizationCapability,
+};

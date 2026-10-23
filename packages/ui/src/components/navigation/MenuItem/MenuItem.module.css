@@ -1,0 +1,29 @@
+.item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  border-radius: var(--forge-radius-sm);
+  background: transparent;
+  color: var(--forge-text-primary);
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
+}
+.item:hover:not(:disabled),
+.item:focus-visible,
+.item[data-selected] {
+  background: var(--forge-surface-sunken);
+}
+.item:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 1px;
+}
+.item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.destructive {
+  color: var(--forge-danger);
+}

@@ -1,0 +1,16 @@
+.item {
+  display: block;
+  padding: var(--forge-space-3);
+  color: var(--forge-text-muted);
+  text-decoration: none;
+  border-radius: var(--forge-radius-sm);
+}
+.item:hover,
+.active {
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+}
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

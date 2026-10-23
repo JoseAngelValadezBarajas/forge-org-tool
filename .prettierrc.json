@@ -1,0 +1,10 @@
+{
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "css",
+  "printWidth": 100,
+  "singleAttributePerLine": false,
+  "singleQuote": true,
+  "trailingComma": "all"
+}

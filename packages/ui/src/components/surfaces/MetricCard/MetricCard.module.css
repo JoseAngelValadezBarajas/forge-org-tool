@@ -1,0 +1,20 @@
+.metric {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+}
+.label,
+.detail {
+  color: var(--forge-text-muted);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+.value {
+  color: var(--forge-text-primary);
+  font-size: 1.5rem;
+  overflow-wrap: anywhere;
+}

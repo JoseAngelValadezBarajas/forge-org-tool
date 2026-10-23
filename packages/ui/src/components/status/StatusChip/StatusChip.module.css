@@ -1,0 +1,41 @@
+.chip {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 6px 11px;
+  overflow-wrap: anywhere;
+  border-radius: 999px;
+  background: var(--forge-status-neutral-bg);
+  color: var(--forge-text-muted);
+  font: 400 11px/14px var(--forge-font-mono);
+}
+.neutral {
+  background: var(--forge-status-neutral-bg);
+  color: var(--forge-text-muted);
+}
+.accent {
+  background: var(--forge-status-accent-bg);
+  color: var(--forge-accent);
+}
+.success {
+  background: var(--forge-status-success-bg);
+  color: var(--forge-success);
+}
+.warning {
+  background: var(--forge-status-warning-bg);
+  color: var(--forge-warning);
+}
+.danger {
+  background: var(--forge-status-error-bg);
+  color: var(--forge-danger);
+}
+.info {
+  padding-inline: 10px;
+  background: var(--forge-status-info-bg);
+  color: var(--forge-info);
+  font-family: var(--forge-font-ui);
+  font-weight: 500;
+}
+.reported {
+  background: var(--forge-status-neutral-bg);
+  color: var(--forge-text-secondary);
+}

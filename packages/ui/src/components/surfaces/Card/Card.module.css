@@ -1,0 +1,12 @@
+.card {
+  min-width: 0;
+  padding: calc(var(--forge-space-4) + var(--forge-space-1) / 2) var(--forge-space-5);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-lg);
+  background: var(--forge-surface);
+  color: var(--forge-text-primary);
+}
+
+.elevated {
+  background: var(--forge-surface-raised);
+}
