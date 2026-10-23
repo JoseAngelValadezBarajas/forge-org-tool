@@ -1,8 +1,17 @@
+param([string]$InstallerPath)
+
 $ErrorActionPreference = 'Stop'
 
-$installerFiles = @(Get-ChildItem -LiteralPath 'apps/desktop/src-tauri/target/release/bundle/nsis' -Filter '*.exe')
-if ($installerFiles.Count -ne 1) { throw "Expected one NSIS installer, found $($installerFiles.Count)." }
-$installer = $installerFiles[0]
+if ($PSBoundParameters.ContainsKey('InstallerPath')) {
+  $installer = Get-Item -LiteralPath $InstallerPath
+  if ($installer.PSIsContainer -or $installer.Extension -ne '.exe') {
+    throw "The supplied Desktop installer path is not an executable file: $InstallerPath"
+  }
+} else {
+  $installerFiles = @(Get-ChildItem -LiteralPath 'apps/desktop/src-tauri/target/release/bundle/nsis' -Filter '*.exe')
+  if ($installerFiles.Count -ne 1) { throw "Expected one NSIS installer, found $($installerFiles.Count)." }
+  $installer = $installerFiles[0]
+}
 
 $temporaryBase = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { [System.IO.Path]::GetTempPath() }
 $temporaryBase = [System.IO.Path]::GetFullPath($temporaryBase)
@@ -185,12 +194,19 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
   $deadline = [DateTime]::UtcNow.AddSeconds(15)
   do {
     $windows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, [System.Windows.Automation.Condition]::TrueCondition)
-    foreach ($candidate in $windows) {
+    $candidates = @($windows)
+    if ($null -ne $root) {
+      $candidates += @($root.FindAll(
+        [System.Windows.Automation.TreeScope]::Descendants,
+        [System.Windows.Automation.Condition]::TrueCondition
+      ))
+    }
+    foreach ($candidate in $candidates) {
       if (
         $candidate.Current.ControlType -eq [System.Windows.Automation.ControlType]::Window -and
         $candidate.Current.NativeWindowHandle -ne $root.Current.NativeWindowHandle -and
         (
-          $candidate.Current.Name -match '(?i)(open|file|choose|select)' -or
+          $candidate.Current.Name -match '(?i)(open|abrir|file|choose|select)' -or
           $candidate.Current.ClassName -in @('#32770', 'CabinetWClass')
         )
       ) { $dialog = $candidate; break }
@@ -199,6 +215,17 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
   } while ($null -eq $dialog -and [DateTime]::UtcNow -lt $deadline)
   if ($null -eq $dialog) {
     $visibleWindows = @($windows | ForEach-Object { "'$($_.Current.Name)' class='$($_.Current.ClassName)' type='$($_.Current.ControlType)' hwnd=$($_.Current.NativeWindowHandle)" })
+    $rootControls = $root.FindAll(
+      [System.Windows.Automation.TreeScope]::Descendants,
+      [System.Windows.Automation.Condition]::TrueCondition
+    )
+    $rootSummary = @($rootControls | Select-Object -First 80 | ForEach-Object {
+      "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)'"
+    })
+    Write-Output "Native picker failure UIA elements: $($rootSummary -join '; ')"
+    if (-not [ForgeWindowNative]::CaptureWindow($root.Current.NativeWindowHandle, $screenshotPath)) {
+      Write-Output 'Could not capture the live window after the native picker failure.'
+    }
     throw "Windows did not expose the screenshot file picker to UI Automation. Top-level windows: $($visibleWindows -join '; ')"
   }
 
@@ -206,35 +233,28 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     [System.Windows.Automation.TreeScope]::Descendants,
     [System.Windows.Automation.Condition]::TrueCondition
   )
-  $controlSummary = @($dialogControls | Select-Object -First 80 | ForEach-Object {
-    "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)' class='$($_.Current.ClassName)'"
-  })
-  Write-Output "Native screenshot file picker Automation tree: $($controlSummary -join '; ')"
-
-  $fileName = $dialog.FindFirst(
-    [System.Windows.Automation.TreeScope]::Descendants,
-    [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Edit)
-  )
-  if ($null -ne $fileName) {
-    $fileName.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($filePath)
+  $fileNameControl = $dialogControls | Where-Object {
+    $_.Current.AutomationId -eq '1148' -or
+    $_.Current.Name -match '(?i)(file name|nombre de archivo)' -or
+    (
+      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Edit -and
+      $_.Current.Name -match '(?i)^nombre$' -and
+      $_.Current.AutomationId -ne 'System.ItemNameDisplay' -and
+      $_.Current.ClassName -eq 'Edit'
+    )
+  } | Select-Object -First 1
+  $valuePattern = $null
+  if ($null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
+      [System.Windows.Automation.ValuePattern]::Pattern,
+      [ref]$valuePattern
+    )) {
+    $valuePattern.SetValue($filePath)
+    try { $fileNameControl.SetFocus() } catch { }
   } else {
-    $fileNameCombo = $dialogControls | Where-Object {
-      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::ComboBox -and
-      ($_.Current.AutomationId -eq '1148' -or $_.Current.Name -match '(?i)file name')
-    } | Select-Object -First 1
-    $valuePattern = $null
-    if ($null -ne $fileNameCombo -and $fileNameCombo.TryGetCurrentPattern(
-        [System.Windows.Automation.ValuePattern]::Pattern,
-        [ref]$valuePattern
-      )) {
-      $valuePattern.SetValue($filePath)
-    } else {
-      # Windows' common file picker exposes this field with Alt+N even when its
-      # UI Automation provider omits the Edit/ComboBox value pattern.
-      $dialog.SetFocus()
-      [System.Windows.Forms.SendKeys]::SendWait('%n')
-      [System.Windows.Forms.SendKeys]::SendWait($filePath)
-    }
+    # Windows' common file picker exposes this field with Alt+N even when its
+    # UI Automation provider omits the Edit/ComboBox value pattern.
+    [System.Windows.Forms.SendKeys]::SendWait('%n')
+    [System.Windows.Forms.SendKeys]::SendWait($filePath)
   }
   $open = $dialog.FindFirst(
     [System.Windows.Automation.TreeScope]::Descendants,
@@ -243,8 +263,21 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
       [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::NameProperty, 'Open')
     ))
   )
-  if ($null -eq $open) { throw 'The screenshot file picker did not expose its Open button.' }
-  $open.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+  if ($null -eq $open) {
+    $open = $dialogControls | Where-Object {
+      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Button -and (
+        $_.Current.AutomationId -eq '1' -or
+        $_.Current.Name -match '(?i)(open|abrir)'
+      )
+    } | Select-Object -First 1
+  }
+  if ($null -ne $open) {
+    Invoke-ForgeAutomationElement $open 'Open screenshot'
+  } else {
+    # Enter activates the native picker's default Open/Abrir action even when
+    # its localized button is absent from the UI Automation subtree.
+    [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+  }
 }
 
 try {

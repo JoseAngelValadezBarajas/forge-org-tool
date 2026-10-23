@@ -101,10 +101,14 @@ test('installed Desktop acceptance preserves a Bug screenshot through restart', 
 test('native screenshot picker handles Windows dialog combo boxes without weakening persistence checks', async () => {
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
 
+  assert.match(smoke, /\$root\.FindAll\([\s\S]*TreeScope\]::Descendants/);
+  assert.match(smoke, /Current\.Name -match '\(\?i\)\(open\|abrir/);
+  assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
+  assert.match(smoke, /\$fileNameControl[\s\S]*nombre de archivo/);
   assert.match(smoke, /ControlType\]::ComboBox/);
   assert.match(smoke, /AutomationId.*1148|1148.*AutomationId/);
   assert.match(smoke, /SendWait\('%n'\)/);
-  assert.match(smoke, /Automation tree/);
+  assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
   assert.match(smoke, /PASS installed UI -> authenticated API -> SQLite -> restart/);
 });
 
@@ -132,4 +136,19 @@ test('local installed-app acceptance prepares current frontend and Python sideca
   assert.match(command, /npm run build/);
   assert.match(command, /package_sidecar\.ps1/);
   assert.match(command, /desktop:build:nsis/);
+});
+
+test('Desktop acceptance can verify an explicitly supplied installer without changing its CI default', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(smoke, /param\(\s*\[string\]\$InstallerPath\s*\)/);
+  assert.match(smoke, /PSBoundParameters\.ContainsKey\('InstallerPath'\)/);
+  assert.match(smoke, /bundle[\\/]nsis/);
+});
+
+test('Desktop acceptance captures the live Bug detail surface when the native picker is missing', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(smoke, /Native picker failure UIA elements/);
+  assert.match(smoke, /CaptureWindow\(\$root\.Current\.NativeWindowHandle, \$screenshotPath\)/);
 });
