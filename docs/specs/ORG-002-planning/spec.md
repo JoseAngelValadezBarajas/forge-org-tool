@@ -20,7 +20,11 @@ Epic. The detail route must resolve both the Project and Epic from the current
 workspace-scoped API response; an unknown or cross-Project Epic must not be
 shown as a valid detail. Archived Projects remain read-only. Editing changes
 the existing Epic record and must not imply implementation or delivery
-verification.
+verification. Epic status values include the original persisted states
+`planning` and `archived`, and must also retain the target API's already
+accepted states `planned`, `in_progress`, and `done`. Newly created Epics
+default to `planning`; PATCH must accept each supported value and the OpenAPI
+contract must expose the complete backward-compatible set as a typed enum.
 
 Acceptance is verified by the Epic detail feature tests and the user-driven
 planning acceptance journey recorded in the reconstruction evidence.

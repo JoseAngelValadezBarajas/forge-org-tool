@@ -69,17 +69,22 @@
 
 **Files:**
 - Create: `apps/web/src/features/planning/EpicDetailPage.tsx` and colocated CSS module/test.
-- Modify: `apps/web/src/features/planning/index.ts`, `apps/web/src/features/planning/components/EpicCard/EpicCard.tsx` and test, `apps/web/src/app/App.tsx`.
+- Modify: `apps/api/src/forge_org/api/schemas.py`, `apps/api/tests/test_planning.py`, generated `contracts/openapi/forge-org-v1.json` and `packages/api-client/src/generated/openapi.d.ts`, `apps/web/src/features/planning/index.ts`, `apps/web/src/features/planning/components/EpicCard/EpicCard.tsx` and test, `apps/web/src/app/App.tsx`.
 
 **Interfaces:**
 - Route: `/planning/:workspaceId/:projectId/epics/:epicId`.
 - Load the Project and Planning overview through the public API-client facade; select only the Epic matching both route Project and Epic IDs.
 - Support feature links and the original Epic edit/status workflow, guarded by the current Project's active status; preserve existing Epic summary behavior.
+- Epic status supports `planning | archived` from original persisted behavior and `planned | in_progress | done` already accepted by the target API. First characterize the contradictory PATCH schema with a failing integration test; then correct the Pydantic/OpenAPI contract to a backward-compatible generated `Literal` enum, regenerate checked OpenAPI and TypeScript declarations, and retain GET/create behavior and all previously accepted PATCH values.
 
-- [ ] Add focused route/page tests for selected Epic metadata, its Feature links, edit/save, archived-Project read-only behavior, unavailable Epic, and retry before implementation.
+- [ ] Add a failing API integration test proving newly created `planning` Epics can be updated and status can transition to `archived`, while previously accepted `planned`, `in_progress` and `done` values remain accepted; current schema should return 422 for the original valid state.
+- [ ] Run the focused API test and confirm the RED is the incorrect Epic status contract, not environment/setup.
+- [ ] Correct the `EpicUpdate` and `EpicResponse` schema using a backward-compatible typed Literal; regenerate `contracts/openapi/forge-org-v1.json` and `packages/api-client/src/generated/openapi.d.ts`.
+- [ ] Run the API test and OpenAPI/type-generation drift checks to verify all five supported statuses and the typed enum.
+- [ ] Add focused route/page tests for selected Epic metadata, its Feature links, edit/save, archived-Project read-only behavior, unavailable Epic, and retry before web implementation.
 - [ ] Verify RED is caused by the absent detail route and behavior.
 - [ ] Implement the feature-owned Epic page and a semantic detail link from each EpicCard.
-- [ ] Run focused tests, typecheck, and existing planning component/page tests.
+- [ ] Run focused API/UI tests, typecheck, lint/architecture checks, and existing planning component/page tests.
 
 ### Task 4: Certify the real-user journeys and update traceability
 
