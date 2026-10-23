@@ -364,6 +364,7 @@ try {
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
 
   $projectName = "Installed project smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New project'
   $projectInput = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Edit) 'Project name'
   $projectInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($projectName)
   $projectButton = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Project'
@@ -379,11 +380,13 @@ try {
   [System.IO.File]::WriteAllBytes($bugAttachmentPath, $pngBytes)
 
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
-  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Board'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New Epic'
   Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Epic title' $epicName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Epic'
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
 
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New work item'
   Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Feature title' $workItemName
   Select-ForgeOption $root 'Epic for new feature' $epicName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Bug'
@@ -431,7 +434,7 @@ try {
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
-  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Board'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName"

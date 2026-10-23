@@ -145,6 +145,31 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
   assert.match(smoke, /Top-level windows:/);
 });
 
+test('installed acceptance opens the contextual project form and follows its board link', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(
+    smoke,
+    /\$projectName = [\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New project'[\s\S]*?\$projectInput = Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Project name'/,
+  );
+  assert.match(
+    smoke,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$projectName[\s\S]*?Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) 'Project Board'/,
+  );
+  assert.doesNotMatch(
+    smoke,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) 'Open planning board'/,
+  );
+  assert.match(
+    smoke,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New Epic'[\s\S]*?Set-ForgeElementValue \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Epic title'/,
+  );
+  assert.match(
+    smoke,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New work item'[\s\S]*?Set-ForgeElementValue \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Feature title'/,
+  );
+});
+
 test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
   const command = packageJson.scripts['test:desktop:acceptance'];

@@ -1,12 +1,17 @@
 .stack {
   display: grid;
   gap: var(--forge-space-4);
+  min-width: 0;
 }
-.forms,
+.forms {
+  display: grid;
+  gap: var(--forge-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
 .board {
   display: grid;
   gap: var(--forge-space-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(250px, 1fr));
 }
 .forms form {
   display: grid;
@@ -41,8 +46,17 @@
   border: 0;
 }
 .board {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: start;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: var(--forge-space-2);
+  scrollbar-width: thin;
+}
+@media (min-width: 1400px) {
+  .board {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 .board [aria-label='Feature planning actions'] {
   border-top: 1px solid var(--forge-border);
@@ -63,14 +77,89 @@
   max-width: 100%;
   min-width: 0;
 }
-@media (max-width: 1100px) {
-  .board {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.creationActions,
+.boardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--forge-space-3);
+}
+.boardHeader h2,
+.boardHeader p {
+  margin: 0;
+}
+.mobileBoard {
+  display: none;
+}
+.legacyCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--forge-space-3);
+}
+.dialogForm {
+  display: grid;
+  gap: var(--forge-space-3);
+  min-width: min(100%, 340px);
+}
+dialog.createEpicDrawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  box-sizing: border-box;
+  width: min(560px, 100vw);
+  max-width: none;
+  height: 100vh;
+  max-height: 100vh;
+  margin: 0;
+  overflow-y: auto;
+  border-radius: var(--forge-radius-md) 0 0 var(--forge-radius-md);
+}
+.tagChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.tagChoice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--forge-space-2);
+  min-height: 40px;
+  padding: 0 var(--forge-space-3);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-lg);
+  background: var(--forge-surface);
 }
 @media (max-width: 720px) {
   .forms,
   .board {
     grid-template-columns: 1fr;
+  }
+  .board {
+    display: none;
+  }
+  .mobileBoard {
+    display: grid;
+    gap: var(--forge-space-3);
+  }
+  .mobileCards {
+    display: grid;
+    gap: var(--forge-space-3);
+  }
+  .mobileBoard select {
+    min-height: 44px;
+  }
+  .creationActions,
+  .boardHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  dialog.createEpicDrawer {
+    inset: auto 0 0;
+    width: 100vw;
+    height: min(90dvh, 720px);
+    max-height: 90dvh;
+    border-radius: var(--forge-radius-md) var(--forge-radius-md) 0 0;
   }
 }

@@ -6,6 +6,7 @@ import {
   type Dependency,
   type Feature,
   type Task,
+  type WorkspaceTag,
 } from '@forge-org/api-client';
 
 export function useFeatureDetailController(
@@ -28,6 +29,7 @@ export function useFeatureDetailController(
   const [featureTags, setFeatureTags] = useState('');
   const [notes, setNotes] = useState('');
   const [attachments, setAttachments] = useState<BugAttachment[]>([]);
+  const [workspaceTags, setWorkspaceTags] = useState<WorkspaceTag[]>([]);
   const [taskTitle, setTaskTitle] = useState('');
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
@@ -72,6 +74,9 @@ export function useFeatureDetailController(
         setActualResult(nextFeature?.actual_result ?? '');
         setFeatureTags(nextFeature?.tags?.join(', ') ?? '');
         setAttachments(nextAttachments);
+        const nextTags = await organizationApi.listWorkspaceTags(workspaceId).catch(() => []);
+        if (!isCurrent() || generation !== loadGeneration.current) return;
+        setWorkspaceTags(Array.isArray(nextTags) ? nextTags : []);
       } catch (cause) {
         if (isCurrent() && generation === loadGeneration.current) {
           setError(cause instanceof Error ? cause.message : 'Unable to load feature detail.');
@@ -105,9 +110,9 @@ export function useFeatureDetailController(
     return features.find((feature) => feature.id === id)?.title ?? id;
   }
 
-  async function saveFeature(event: FormEvent) {
+  async function saveFeature(event: FormEvent): Promise<boolean> {
     event.preventDefault();
-    if (!feature || !featureTitle.trim()) return;
+    if (!feature || !featureTitle.trim()) return false;
     try {
       const updated = await organizationApi.updateFeature(workspaceId, projectId, feature.id, {
         title: featureTitle.trim(),
@@ -133,8 +138,10 @@ export function useFeatureDetailController(
       setFeatureGoal(updated.goal ?? '');
       setNotes(updated.notes ?? '');
       setFeatures((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to update feature.');
+      return false;
     }
   }
 
@@ -259,6 +266,8 @@ export function useFeatureDetailController(
     moveTask,
     feature,
     attachments,
+    workspaceTags,
+    reload: load,
     uploadAttachment,
     removeAttachment,
     featureDescription,

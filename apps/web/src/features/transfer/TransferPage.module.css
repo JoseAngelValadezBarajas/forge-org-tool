@@ -2,6 +2,40 @@
   display: grid;
   gap: var(--forge-space-4);
 }
+.contextOverlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  background: color-mix(in srgb, var(--forge-overlay, #101820) 56%, transparent);
+}
+.contextDialog {
+  width: min(44rem, 100%);
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: clamp(var(--forge-space-4), 4vw, var(--forge-space-8));
+  border-left: 1px solid var(--forge-border);
+  background: var(--forge-surface);
+  box-shadow: var(--forge-shadow-popover);
+}
+.contextDialog:focus {
+  outline: none;
+}
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+}
+.destination {
+  margin: 0;
+  padding: var(--forge-space-3);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+  font-weight: 600;
+}
 .stack p {
   color: var(--forge-text-muted);
   line-height: 1.5;
@@ -42,6 +76,9 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--forge-space-4);
   align-items: start;
+}
+.contextDialog .workflowGrid {
+  grid-template-columns: 1fr;
 }
 .panel {
   display: grid;
@@ -105,5 +142,10 @@
   .steps,
   .workflowGrid {
     grid-template-columns: 1fr;
+  }
+  .contextDialog {
+    width: 100%;
+    padding: var(--forge-space-4);
+    border-left: 0;
   }
 }

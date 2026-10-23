@@ -6,12 +6,14 @@
 .shellGrid {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-columns: minmax(216px, 244px) minmax(0, 1fr);
 }
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: var(--forge-space-5);
+  min-width: 0;
+  min-height: 100vh;
   border-right: 1px solid var(--forge-border);
   padding: var(--forge-space-6) var(--forge-space-4);
 }
@@ -36,6 +38,46 @@
 .productNav {
   display: grid;
   gap: var(--forge-space-2);
+}
+.projectNav {
+  display: grid;
+  gap: var(--forge-space-1);
+  min-width: 0;
+}
+.projectNav h2 {
+  margin: 0;
+  padding: 0 var(--forge-space-3) var(--forge-space-1);
+  color: var(--forge-text-subtle);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.projectNav a {
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--forge-space-2) var(--forge-space-3);
+  border-radius: var(--forge-radius-sm);
+  color: var(--forge-text-muted);
+  text-overflow: ellipsis;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.projectNav a[aria-current='page'],
+.projectNav a:hover {
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+}
+.emptyProjects,
+.navigationError {
+  margin: 0;
+  padding: var(--forge-space-2) var(--forge-space-3);
+  color: var(--forge-text-muted);
+  font-size: 0.82rem;
+}
+.navigationError {
+  color: var(--forge-danger);
+  overflow-wrap: anywhere;
 }
 .productNav a {
   padding: var(--forge-space-3);
@@ -93,6 +135,10 @@
   border-radius: var(--forge-radius-sm);
 }
 .mobileBrand {
+  display: none;
+}
+.mobileHeader,
+.mobileNav {
   display: none;
 }
 .brand {
@@ -176,36 +222,110 @@
     display: block;
   }
   .sidebar {
-    gap: var(--forge-space-2);
-    padding: var(--forge-space-2) var(--forge-space-3);
-    border-right: 0;
-    border-bottom: 1px solid var(--forge-border);
-  }
-  .brand {
     display: none;
   }
-  .sidebar > :global(*) {
+  .mobileHeader {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--forge-space-2);
+    min-height: 56px;
+    padding: var(--forge-space-2) var(--forge-space-3);
+    border-bottom: 1px solid var(--forge-border);
+    background: var(--forge-surface);
+  }
+  .mobileHeader > .brand {
+    width: 28px;
+    overflow: hidden;
+    font-size: 0;
+  }
+  .mobileHeader .mark {
+    margin: 0;
+    font-size: 14px;
+  }
+  .mobileWorkspace {
     min-width: 0;
   }
-  .productNav {
-    display: flex;
-    gap: var(--forge-space-1);
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    padding-bottom: 2px;
+  .mobileWorkspace > div {
+    gap: 0;
   }
-  .productNav > * {
-    flex: 0 0 auto;
+  .mobileWorkspace > div > label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
   }
-  .localMode {
+  .mobileWorkspace select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding-inline: var(--forge-space-2);
+  }
+  .mobileTheme {
+    gap: 0;
+    font-size: 0;
+  }
+  .mobileTheme select {
+    box-sizing: border-box;
+    width: 72px;
+    min-height: 40px;
+    font-size: 0.75rem;
+  }
+  .mobileHeader > button {
+    min-width: 44px;
+    min-height: 40px;
+    padding-inline: var(--forge-space-2);
+    font-size: 0.75rem;
+  }
+  .contentColumn > .topbar {
     display: none;
   }
-  .mobileBrand {
-    display: block;
-    margin-right: auto;
+  .main {
+    width: calc(100% - 32px);
+    margin: var(--forge-space-4) auto 88px;
   }
-  .topbar {
-    justify-content: space-between;
+  .breadcrumb {
+    margin-bottom: var(--forge-space-3);
+  }
+  .mobileNav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 8;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    min-height: 60px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid var(--forge-border);
+    background: var(--forge-surface);
+  }
+  .mobileNav a,
+  .mobileNav span,
+  .mobileNav :global(button) {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 60px;
+    padding: 0 var(--forge-space-1);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--forge-text-muted);
+    font: inherit;
+    font-size: 0.78rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .mobileNav a[aria-current='page'] {
+    color: var(--forge-accent);
+    font-weight: 650;
+  }
+  .mobileNav span[aria-disabled='true'] {
+    opacity: 0.55;
   }
 }

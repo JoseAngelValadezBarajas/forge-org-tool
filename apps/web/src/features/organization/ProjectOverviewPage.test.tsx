@@ -134,6 +134,7 @@ describe('Project Overview route', () => {
   beforeEach(() => {
     vi.spyOn(organizationApi, 'getProject').mockResolvedValue(project);
     vi.spyOn(organizationApi, 'listWorkspaces').mockResolvedValue([workspace]);
+    vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([project]);
     vi.spyOn(organizationApi, 'planningOverview').mockResolvedValue(overview);
     vi.spyOn(organizationApi, 'listTasks').mockImplementation(async (_w, _p, id) =>
       tasks.filter((item) => item.feature_id === id),
@@ -410,19 +411,18 @@ describe('Project Overview route', () => {
       expect(nav.getByRole('link', { name: name! })).toHaveAttribute('href', `/${section}/w1/p1`);
     }
     const breadcrumb = within(screen.getByRole('navigation', { name: 'Breadcrumb' }));
-    expect(breadcrumb.getByRole('link', { name: 'Project' })).toHaveAttribute(
+    expect(breadcrumb.getByRole('link', { name: 'Project board' })).toHaveAttribute(
       'href',
-      '/projects/w1/p1',
+      '/planning/w1/p1',
     );
     expect(breadcrumb.getByText('Overview')).toHaveAttribute('aria-current', 'page');
   });
 
-  it('routes both Organization project names to Overview and retains direct board and management access', async () => {
+  it('routes Organization project entry points to the Board and retains Overview management access', async () => {
     vi.mocked(organizationApi.planningOverview).mockResolvedValue({
       epics: [],
       unassigned_features: [],
     });
-    vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([project]);
     render(
       <MemoryRouter>
         <App />
@@ -430,21 +430,18 @@ describe('Project Overview route', () => {
     );
     await waitFor(() => expect(screen.getAllByRole('link', { name: 'Atlas' })).toHaveLength(2));
     for (const link of screen.getAllByRole('link', { name: 'Atlas' })) {
-      expect(link).toHaveAttribute('href', '/projects/w1/p1');
+      expect(link).toHaveAttribute('href', '/planning/w1/p1');
     }
-    expect(screen.getByRole('link', { name: 'Open planning board' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Open Board' })).toHaveAttribute(
       'href',
       '/planning/w1/p1',
     );
     expect(screen.getByRole('button', { name: 'Archive' })).toBeEnabled();
-    for (const name of ['Transfer']) {
-      expect(screen.getByRole('link', { name })).toHaveAttribute(
-        'href',
-        `/${name.toLowerCase()}/w1/p1`,
-      );
-    }
-    fireEvent.click(screen.getAllByRole('link', { name: 'Atlas' })[0]!);
-    expect(await screen.findByRole('button', { name: 'Edit project' })).toBeEnabled();
-    expect(screen.getByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    fireEvent.click(screen.getByRole('link', { name: 'Open Board' }));
+    expect(await screen.findByRole('heading', { name: 'Project Board' })).toBeInTheDocument();
   });
 });

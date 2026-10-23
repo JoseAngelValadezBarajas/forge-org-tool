@@ -32,6 +32,7 @@ test('PA-TRN-002 ZIP export/import preserves a Bug screenshot across workspaces'
   ).json();
 
   await page.goto(`/planning/${workspace.id}/${project.id}/features/${bug.id}`);
+  await page.getByRole('button', { name: 'Edit details', exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Edit feature title' })).toHaveValue(
     `Screenshot bug ${suffix}`,
   );

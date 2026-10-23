@@ -23,6 +23,62 @@ describe('FeatureDetailPage', () => {
     readFileMock.mockReset();
   });
 
+  it('shows a readable Story by default and reveals its editor only on request', async () => {
+    const story = {
+      id: 'story-1',
+      project_id: 'p1',
+      epic_id: null,
+      title: 'Readable story',
+      description: 'A clear summary for the team.',
+      goal: 'Make the detail easy to scan.',
+      priority: 'high',
+      status: 'ready',
+      kind: 'story',
+      tags: ['Design'],
+      notes: 'Keep the existing notes.',
+      created_at: '',
+      updated_at: '',
+    };
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      const path = String(input);
+      if (path.endsWith('/planning/overview'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ epics: [], unassigned_features: [story] }), {
+            status: 200,
+          }),
+        );
+      if (
+        path.endsWith('/tasks') ||
+        path.endsWith('/acceptance-criteria') ||
+        path.endsWith('/dependencies')
+      )
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      return Promise.resolve(new Response('null', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1/features/story-1']}>
+        <Routes>
+          <Route
+            path="/planning/:workspaceId/:projectId/features/:featureId"
+            element={<FeatureDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('heading', { name: 'Readable story', level: 1 })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: 'Work item detail' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Description', level: 2 })).toBeVisible();
+    expect(screen.getByText('A clear summary for the team.')).toBeVisible();
+    expect(screen.getByText('Make the detail easy to scan.')).toBeVisible();
+    expect(screen.getByText('Design')).toBeVisible();
+    expect(screen.getByText('Keep the existing notes.')).toBeVisible();
+    expect(screen.queryByLabelText('Edit feature title')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Edit details' }));
+    expect(await screen.findByLabelText('Edit feature title')).toHaveValue('Readable story');
+  });
+
   it('reorders tasks through the planning API and keeps the action manual', async () => {
     const tasks = [
       {
@@ -63,6 +119,16 @@ describe('FeatureDetailPage', () => {
               failed_checks: ['R02'],
               blockers: [{ code: 'DEPENDENCY', message: 'A dependency is incomplete' }],
               results: [],
+            }),
+            { status: 200 },
+          ),
+        );
+      if (String(input).endsWith('/planning/overview'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              epics: [],
+              unassigned_features: [{ id: 'f1', title: 'Feature', kind: 'story', tags: [] }],
             }),
             { status: 200 },
           ),
@@ -112,6 +178,7 @@ describe('FeatureDetailPage', () => {
     );
 
     await screen.findByText('First');
+    fireEvent.click(screen.getByText('Add acceptance criterion'));
     fireEvent.change(screen.getByLabelText('Acceptance criterion'), {
       target: { value: 'Concurrent criterion' },
     });
@@ -142,7 +209,9 @@ describe('FeatureDetailPage', () => {
         .getAllByRole('article')
         .map((article) => within(article).getByText(/First|Second/).textContent),
     ).toEqual(['Second', 'First']);
-    expect(screen.getByText(/planning records only/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/status changes do not claim execution or delivery/i),
+    ).toBeInTheDocument();
   });
 
   it('renders dependency names from the persisted planning hierarchy', async () => {
@@ -285,6 +354,7 @@ describe('FeatureDetailPage', () => {
     );
 
     await screen.findByText('First');
+    fireEvent.click(screen.getByText('Add task', { selector: 'summary' }));
     fireEvent.change(screen.getByLabelText('Task title'), {
       target: { value: 'Created during reorder' },
     });
@@ -366,6 +436,11 @@ describe('FeatureDetailPage', () => {
       </MemoryRouter>,
     );
 
+    expect(await screen.findByText('Panel opens')).toBeVisible();
+    expect(screen.getByText('Application crashes')).toBeVisible();
+    expect(screen.getByText('high')).toBeVisible();
+    expect(screen.getByText('backlog')).toBeVisible();
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit details' }));
     fireEvent.change(await screen.findByLabelText('Edit feature title'), {
       target: { value: 'Workspace home' },
     });
@@ -381,7 +456,7 @@ describe('FeatureDetailPage', () => {
     fireEvent.change(screen.getByLabelText('Work item notes'), {
       target: { value: 'Reproduces after restart\nOnly on Windows' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Save feature' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(
@@ -402,13 +477,9 @@ describe('FeatureDetailPage', () => {
         }),
       ),
     );
-    expect(await screen.findByLabelText('Edit feature title')).toHaveValue('Workspace home');
-    expect(screen.getByLabelText('Edit feature description')).toHaveValue(
-      'Summarize actual records',
-    );
-    expect(screen.getByLabelText('Edit feature goal')).toHaveValue(
-      'Show projects and their current planning state',
-    );
+    expect(await screen.findByRole('heading', { name: 'Workspace home', level: 1 })).toBeVisible();
+    expect(screen.getByText('Summarize actual records')).toBeVisible();
+    expect(screen.getByText('Show projects and their current planning state')).toBeVisible();
   });
 
   it('uploads and displays a Bug screenshot using the scoped API endpoint', async () => {
@@ -584,5 +655,83 @@ describe('FeatureDetailPage', () => {
       data_base64: 'AQID',
     });
     expect(await screen.findByRole('img', { name: 'Bug screenshot: screen.png' })).toBeVisible();
+  });
+
+  it('removes a Bug screenshot through the durable attachment API', async () => {
+    const bug = {
+      id: 'f-bug',
+      project_id: 'p1',
+      epic_id: null,
+      title: 'Crash',
+      description: null,
+      goal: null,
+      priority: 'high',
+      status: 'backlog',
+      kind: 'bug',
+      bug_severity: 'high',
+      steps_to_reproduce: 'Open the menu',
+      expected_result: 'Menu opens',
+      actual_result: 'App exits',
+      tags: [],
+      created_at: '',
+      updated_at: '',
+    };
+    const attachment = {
+      id: 'a1',
+      feature_id: 'f-bug',
+      file_name: 'screen.png',
+      content_type: 'image/png',
+      byte_size: 12,
+      sha256: 'abc',
+      created_at: '',
+    };
+    let saved = true;
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      const path = String(input);
+      if (path.endsWith('/planning/overview'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ epics: [], unassigned_features: [bug] }), { status: 200 }),
+        );
+      if (path.endsWith('/attachments') && init?.method !== 'DELETE')
+        return Promise.resolve(
+          new Response(JSON.stringify(saved ? [attachment] : []), { status: 200 }),
+        );
+      if (path.endsWith('/attachments/a1') && init?.method === 'DELETE') {
+        saved = false;
+        return Promise.resolve(new Response(null, { status: 204 }));
+      }
+      if (
+        path.endsWith('/tasks') ||
+        path.endsWith('/acceptance-criteria') ||
+        path.endsWith('/dependencies')
+      )
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      return Promise.resolve(new Response('null', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1/features/f-bug']}>
+        <Routes>
+          <Route
+            path="/planning/:workspaceId/:projectId/features/:featureId"
+            element={<FeatureDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('img', { name: 'Bug screenshot: screen.png' })).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Remove screen.png' }));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/features/f-bug/attachments/a1',
+        expect.objectContaining({ method: 'DELETE' }),
+      ),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('img', { name: 'Bug screenshot: screen.png' }),
+      ).not.toBeInTheDocument(),
+    );
   });
 });

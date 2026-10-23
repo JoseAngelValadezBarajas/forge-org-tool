@@ -5,8 +5,10 @@ const ACTIVE_WORKSPACE_KEY = 'forge-active-workspace';
 
 type ProjectDashboardSummary = {
   project: Project;
+  epicCount: number;
   featureCount: number;
-  statusCounts: Record<string, number>;
+  completedFeatureCount: number;
+  progress: number;
   unavailable: boolean;
 };
 
@@ -107,6 +109,15 @@ export function useOrganizationController() {
   }, [loadProjects, workspaceId]);
 
   useEffect(() => {
+    function onWorkspaceChange(event: Event) {
+      const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
+      if (id) selectWorkspace(id);
+    }
+    window.addEventListener('forge:active-workspace-change', onWorkspaceChange);
+    return () => window.removeEventListener('forge:active-workspace-change', onWorkspaceChange);
+  }, [selectWorkspace]);
+
+  useEffect(() => {
     let current = true;
     const activeProjects = projects.filter(
       (project) => project.workspace_id === workspaceId && project.status === 'active',
@@ -124,21 +135,26 @@ export function useOrganizationController() {
             const features = overview.epics
               .flatMap((epic) => epic.features)
               .concat(overview.unassigned_features);
-            const statusCounts: Record<string, number> = {};
-            for (const feature of features) {
-              statusCounts[feature.status] = (statusCounts[feature.status] ?? 0) + 1;
-            }
+            const completedFeatureCount = features.filter(
+              (feature) => feature.status === 'done',
+            ).length;
             return {
               project,
+              epicCount: overview.epics.length,
               featureCount: features.length,
-              statusCounts,
+              completedFeatureCount,
+              progress: features.length
+                ? Math.round((completedFeatureCount / features.length) * 100)
+                : 0,
               unavailable: false,
             };
           } catch {
             return {
               project,
+              epicCount: 0,
               featureCount: 0,
-              statusCounts: {},
+              completedFeatureCount: 0,
+              progress: 0,
               unavailable: true,
             };
           }
@@ -164,7 +180,13 @@ export function useOrganizationController() {
       setWorkspaceName('');
       setWorkspaceDescription('');
       setWorkspaces((items) => [...items, created]);
+      window.dispatchEvent(
+        new CustomEvent('forge:workspace-created', { detail: { workspace: created } }),
+      );
       selectWorkspace(created.id);
+      window.dispatchEvent(
+        new CustomEvent('forge:active-workspace-change', { detail: { workspaceId: created.id } }),
+      );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to create workspace.');
     }
@@ -199,16 +221,20 @@ export function useOrganizationController() {
     }
   }
 
-  async function createProject(event: FormEvent) {
+  async function createProject(event: FormEvent): Promise<boolean> {
     event.preventDefault();
-    if (!workspaceId || !projectName.trim()) return;
+    if (!workspaceId || !projectName.trim()) return false;
     try {
       await organizationApi.createProject(workspaceId, projectName, projectDescription);
       setProjectName('');
       setProjectDescription('');
       await loadProjects(workspaceId);
+      window.dispatchEvent(new Event('forge:projects-changed'));
+      setError('');
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to create project.');
+      return false;
     }
   }
 
@@ -220,6 +246,7 @@ export function useOrganizationController() {
         project.status === 'active' ? 'archived' : 'active',
       );
       await loadProjects(workspaceId);
+      window.dispatchEvent(new Event('forge:projects-changed'));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to update project.');
     }

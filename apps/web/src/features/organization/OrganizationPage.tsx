@@ -1,21 +1,23 @@
+import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
   Card,
   Checkbox,
+  Dialog,
   FormField,
   Input,
   SearchField,
   SectionHeader,
   StatusChip,
+  Textarea,
 } from '@forge-org/ui';
 import styles from './OrganizationPage.module.css';
 import { useOrganizationController } from './useOrganizationController';
 import { ProjectCard } from '../planning/index';
-import { WorkspaceSwitcher } from '../../app/shell/index';
-import { WorkspaceTagsPanel } from './WorkspaceTagsPanel';
 
 export function OrganizationPage() {
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   const {
     activeProjects,
     archivedProjects,
@@ -35,30 +37,38 @@ export function OrganizationPage() {
     setProjectName,
     setSearch,
     setShowArchived,
-    setWorkspaceId,
     setWorkspaceName,
     showArchived,
     toggleProject,
-    toggleWorkspaceArchive,
     visibleProjects,
     workspaceId,
     workspaceName,
     workspaceDescription,
     setWorkspaceDescription,
-    workspaceEditName,
-    setWorkspaceEditName,
-    workspaceEditDescription,
-    setWorkspaceEditDescription,
-    updateWorkspace,
-    workspaces,
   } = useOrganizationController();
+  const continueProject = projects.find((project) => project.status === 'active');
+
+  async function submitProject(event: FormEvent) {
+    if (await createProject(event)) setProjectDialogOpen(false);
+  }
 
   return (
     <div className={styles.stack}>
-      <SectionHeader title="Organization" eyebrow="FORGE / Workspaces" />
-      {error && (
+      {loading ? (
         <Card>
-          <StatusChip tone="danger">Error</StatusChip>
+          <p role="status">Loading Workspace…</p>
+        </Card>
+      ) : !selectedWorkspace ? (
+        workspacesEmptyState(
+          workspaceName,
+          setWorkspaceName,
+          workspaceDescription,
+          setWorkspaceDescription,
+          createWorkspace,
+        )
+      ) : null}
+      {!loading && error && !selectedWorkspace && (
+        <Card>
           <div role="alert" className={styles.error}>
             <p>{error}</p>
             <Button variant="secondary" onClick={() => void retryWorkspaces()}>
@@ -67,210 +77,214 @@ export function OrganizationPage() {
           </div>
         </Card>
       )}
-      {loading ? (
-        <Card>
-          <p>Loading workspaces…</p>
-        </Card>
-      ) : workspaces.length === 0 ? (
-        <Card>
-          <StatusChip tone="warning">Getting started</StatusChip>
-          <h3>No workspaces yet</h3>
-          <p>Create a workspace to organize projects and keep the next decision visible.</p>
-          <form onSubmit={createWorkspace} className={styles.form}>
-            <FormField label="Workspace name">
-              <Input
-                id="workspace-name"
-                value={workspaceName}
-                onChange={(event) => setWorkspaceName(event.target.value)}
-                required
-              />
-            </FormField>
-            <FormField label="Workspace description">
-              <Input
-                id="workspace-description"
-                value={workspaceDescription}
-                onChange={(event) => setWorkspaceDescription(event.target.value)}
-              />
-            </FormField>
-            <Button type="submit">Create Workspace</Button>
-          </form>
-        </Card>
-      ) : (
+      {!loading && selectedWorkspace && (
         <>
-          <div className={styles.summaryGrid} aria-label="Workspace summary">
+          <SectionHeader
+            title="Your workspace, in focus"
+            eyebrow={selectedWorkspace.name}
+            actions={
+              <div className={styles.homeActions}>
+                {!selectedWorkspace.archived_at && (
+                  <Button onClick={() => setProjectDialogOpen(true)}>New project</Button>
+                )}
+                <Link to={`/workspaces/${workspaceId}/settings`}>Workspace settings</Link>
+              </div>
+            }
+          />
+          {selectedWorkspace.archived_at && (
             <Card>
-              <span className={styles.metricLabel}>Projects</span>
-              <strong className={styles.metricValue}>{projects.length}</strong>
-              <small>{projects.length} total</small>
+              <StatusChip tone="warning">Archived Workspace</StatusChip>
+              <p>This Workspace is archived. Restore it in settings to create projects.</p>
             </Card>
-            <Card>
-              <span className={styles.metricLabel}>Active</span>
-              <strong className={styles.metricValue}>{activeProjects}</strong>
-              <small>currently active</small>
-            </Card>
-            <Card>
-              <span className={styles.metricLabel}>Archived</span>
-              <strong className={styles.metricValue}>{archivedProjects}</strong>
-              <small>kept for history</small>
-            </Card>
-            <Card>
-              <span className={styles.metricLabel}>Workspace</span>
-              <strong className={styles.metricValue}>{selectedWorkspace?.name ?? 'Local'}</strong>
-              <small>private local mode</small>
-            </Card>
-          </div>
-          <p>
-            <Link to={`/transfer/workspaces/${workspaceId}`}>
-              Import project into this Workspace
-            </Link>
-          </p>
-          <section className={styles.dashboard} aria-labelledby="project-summaries-heading">
-            <h2 id="project-summaries-heading">Project summaries</h2>
-            {dashboardLoading ? (
-              <p role="status">Loading project planning summaries…</p>
-            ) : dashboardSummaries.length === 0 ? (
-              <p>No active projects to summarize.</p>
-            ) : (
-              <div className={styles.summaryProjects}>
-                {dashboardSummaries.map((summary) => (
-                  <Card key={summary.project.id}>
-                    <h3>
-                      <Link to={`/projects/${workspaceId}/${summary.project.id}`}>
-                        {summary.project.name}
-                      </Link>
-                    </h3>
-                    {summary.unavailable ? (
-                      <p>Planning summary is unavailable right now.</p>
-                    ) : (
-                      <>
-                        <p>{summary.featureCount} planned features</p>
-                        <p>
-                          Manual planning:{' '}
-                          {Object.entries(summary.statusCounts)
-                            .map(([status, count]) => `${status} ${count}`)
-                            .join(' · ') || 'no features yet'}
-                        </p>
-                      </>
+          )}
+          {error && <p role="alert">{error}</p>}
+          <section aria-label="Workspace summary" className={styles.summaryGrid}>
+            <Summary
+              label="Projects"
+              value={projects.length}
+              detail={`${activeProjects} active · ${archivedProjects} archived`}
+            />
+            <Summary
+              label="Epics"
+              value={dashboardSummaries.reduce((total, item) => total + item.epicCount, 0)}
+              detail={dashboardLoading ? 'Loading project summaries' : 'Across active projects'}
+            />
+            <Summary
+              label="Work items"
+              value={dashboardSummaries.reduce((total, item) => total + item.featureCount, 0)}
+              detail={dashboardLoading ? 'Loading project summaries' : 'Stories and Bugs'}
+            />
+          </section>
+          <section aria-labelledby="projects-heading" className={styles.projectSection}>
+            <header className={styles.projectToolbar}>
+              <div>
+                <h2 id="projects-heading">Projects</h2>
+                <p>Open a project to continue with its Epic board.</p>
+              </div>
+              <div className={styles.projectFilters}>
+                <SearchField
+                  id="project-search"
+                  aria-label="Search projects"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+                <div className={styles.archivedToggle}>
+                  <Checkbox
+                    checked={showArchived}
+                    onChange={(event) => setShowArchived(event.target.checked)}
+                    aria-label="Show archived"
+                  />
+                  <span>Show archived</span>
+                </div>
+                <Link to={`/transfer/workspaces/${workspaceId}`}>Import project</Link>
+              </div>
+            </header>
+            {visibleProjects.length === 0 ? (
+              <Card>
+                {projects.length === 0 ? (
+                  <div className={styles.empty}>
+                    <h3>No projects yet</h3>
+                    <p>Create a project to start organizing Epics and work items.</p>
+                    {!selectedWorkspace.archived_at && (
+                      <Button onClick={() => setProjectDialogOpen(true)}>
+                        Create your first project
+                      </Button>
                     )}
-                  </Card>
-                ))}
+                  </div>
+                ) : (
+                  <p>No projects match this search and archive filter.</p>
+                )}
+              </Card>
+            ) : (
+              <div className={styles.projects}>
+                {visibleProjects.map((project) => {
+                  const summary = dashboardSummaries.find((item) => item.project.id === project.id);
+                  return (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      workspaceId={workspaceId}
+                      href={`/planning/${workspaceId}/${project.id}`}
+                    >
+                      <div className={styles.projectSummary} aria-label={`${project.name} summary`}>
+                        {summary?.unavailable ? (
+                          <span>Planning summary unavailable</span>
+                        ) : summary ? (
+                          <>
+                            <span>{summary.epicCount} Epics</span>
+                            <span>{summary.featureCount} work items</span>
+                            <span>{summary.progress}% complete</span>
+                          </>
+                        ) : (
+                          <span>
+                            {dashboardLoading ? 'Loading summary…' : 'Summary unavailable'}
+                          </span>
+                        )}
+                      </div>
+                      <div className={styles.cardActions}>
+                        <Link to={`/planning/${workspaceId}/${project.id}`}>Open Board</Link>
+                        <Link to={`/projects/${workspaceId}/${project.id}`}>Overview</Link>
+                        <Button variant="secondary" onClick={() => void toggleProject(project)}>
+                          {project.status === 'active' ? 'Archive' : 'Restore'}
+                        </Button>
+                      </div>
+                    </ProjectCard>
+                  );
+                })}
               </div>
             )}
           </section>
-          {selectedWorkspace?.archived_at ? (
-            <Card>
-              <p>This workspace is archived. Restore it to create projects or edit its settings.</p>
-            </Card>
-          ) : (
-            <WorkspaceTagsPanel key={workspaceId} workspaceId={workspaceId} />
+          {continueProject && (
+            <section aria-labelledby="continue-working-heading" className={styles.continueWorking}>
+              <h2 id="continue-working-heading">Continue working</h2>
+              <p>Pick up where you left off in an active project.</p>
+              <Link to={`/planning/${workspaceId}/${continueProject.id}`}>
+                Open {continueProject.name}
+              </Link>
+            </section>
           )}
-          <Card>
-            <div className={styles.toolbar}>
-              <WorkspaceSwitcher
-                value={workspaceId}
-                workspaces={workspaces.map((workspace) => ({
-                  ...workspace,
-                  name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
-                }))}
-                onChange={setWorkspaceId}
-                currentName={selectedWorkspace?.name ?? 'Local Workspace'}
-              />
-            </div>
-            {selectedWorkspace && (
-              <form onSubmit={updateWorkspace} className={styles.form}>
-                <h3>Workspace settings</h3>
-                {selectedWorkspace.archived_at && <StatusChip tone="warning">Archived</StatusChip>}
-                <FormField label="Workspace name">
-                  <Input
-                    aria-label="Edit workspace name"
-                    value={workspaceEditName}
-                    onChange={(event) => setWorkspaceEditName(event.target.value)}
-                    required
-                    maxLength={120}
-                  />
-                </FormField>
-                <FormField label="Workspace description">
-                  <Input
-                    aria-label="Edit workspace description"
-                    value={workspaceEditDescription}
-                    onChange={(event) => setWorkspaceEditDescription(event.target.value)}
-                    maxLength={2000}
-                  />
-                </FormField>
-                <Button type="submit" disabled={Boolean(selectedWorkspace.archived_at)}>
-                  Save workspace
-                </Button>
+          <Dialog
+            title="Create project"
+            description="Give this project a name. You can add its Epics from the project board."
+            open={projectDialogOpen}
+            onClose={() => setProjectDialogOpen(false)}
+          >
+            <form onSubmit={(event) => void submitProject(event)} className={styles.form}>
+              <FormField label="Project name">
+                <Input
+                  aria-label="Project name"
+                  value={projectName}
+                  onChange={(event) => setProjectName(event.target.value)}
+                  required
+                />
+              </FormField>
+              <FormField label="Description">
+                <Textarea
+                  aria-label="Project description"
+                  rows={3}
+                  value={projectDescription}
+                  onChange={(event) => setProjectDescription(event.target.value)}
+                />
+              </FormField>
+              <div className={styles.formActions}>
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => void toggleWorkspaceArchive()}
+                  onClick={() => setProjectDialogOpen(false)}
                 >
-                  {selectedWorkspace.archived_at ? 'Restore workspace' : 'Archive workspace'}
+                  Cancel
                 </Button>
-              </form>
-            )}
-            {!selectedWorkspace?.archived_at && (
-              <form onSubmit={createProject} className={styles.form}>
-                <h3>Create project</h3>
-                <FormField label="Project name">
-                  <Input
-                    id="project-name"
-                    value={projectName}
-                    onChange={(event) => setProjectName(event.target.value)}
-                    required
-                  />
-                </FormField>
-                <FormField label="Description">
-                  <Input
-                    id="project-description"
-                    value={projectDescription}
-                    onChange={(event) => setProjectDescription(event.target.value)}
-                  />
-                </FormField>
-                <Button type="submit">Create Project</Button>
-              </form>
-            )}
-          </Card>
-          <Card>
-            <div className={styles.toolbar}>
-              <h3>Projects</h3>
-              <SearchField
-                id="project-search"
-                aria-label="Search projects"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-              <Checkbox
-                checked={showArchived}
-                onChange={(event) => setShowArchived(event.target.checked)}
-                aria-label="Show archived"
-              />{' '}
-              <span>Show archived</span>
-            </div>
-            {visibleProjects.length === 0 ? (
-              <p>
-                {projects.length === 0
-                  ? 'No projects in this workspace yet.'
-                  : 'No matching projects.'}
-              </p>
-            ) : (
-              <div className={styles.projects}>
-                {visibleProjects.map((project) => (
-                  <ProjectCard key={project.id} project={project} workspaceId={workspaceId}>
-                    <p>
-                      <Link to={`/planning/${workspaceId}/${project.id}`}>Open planning board</Link>{' '}
-                      · <Link to={`/transfer/${workspaceId}/${project.id}`}>Transfer</Link>
-                    </p>
-                    <Button variant="secondary" onClick={() => void toggleProject(project)}>
-                      {project.status === 'active' ? 'Archive' : 'Restore'}
-                    </Button>
-                  </ProjectCard>
-                ))}
+                <Button type="submit">Create project</Button>
               </div>
-            )}
-          </Card>
+            </form>
+          </Dialog>
         </>
       )}
     </div>
+  );
+}
+
+function Summary({ label, value, detail }: { label: string; value: number; detail: string }) {
+  return (
+    <Card>
+      <span className={styles.metricLabel}>{label}</span>
+      <strong className={styles.metricValue}>{value}</strong>
+      <small>{detail}</small>
+    </Card>
+  );
+}
+
+function workspacesEmptyState(
+  workspaceName: string,
+  setWorkspaceName: (value: string) => void,
+  workspaceDescription: string,
+  setWorkspaceDescription: (value: string) => void,
+  createWorkspace: (event: FormEvent) => void,
+) {
+  return (
+    <Card>
+      <StatusChip tone="warning">Getting started</StatusChip>
+      <h2>No workspaces yet</h2>
+      <p>Create a Workspace to organize projects and planning.</p>
+      <form onSubmit={createWorkspace} className={styles.form} aria-label="Create first workspace">
+        <FormField label="Workspace name">
+          <Input
+            aria-label="Workspace name"
+            value={workspaceName}
+            onChange={(event) => setWorkspaceName(event.target.value)}
+            required
+          />
+        </FormField>
+        <FormField label="Workspace description">
+          <Textarea
+            aria-label="Workspace description"
+            rows={3}
+            value={workspaceDescription}
+            onChange={(event) => setWorkspaceDescription(event.target.value)}
+          />
+        </FormField>
+        <Button type="submit">Create Workspace</Button>
+      </form>
+    </Card>
   );
 }

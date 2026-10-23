@@ -295,4 +295,97 @@ describe('TransferPage', () => {
       screen.queryByRole('button', { name: 'Confirm planning import' }),
     ).not.toBeInTheDocument();
   });
+
+  it('presents an Epic transfer as a destination-aware dialog and returns focus/navigation to its project', async () => {
+    const contextualPreview = {
+      ...preview,
+      destination: { scope: 'epics', id: 'p1' },
+    };
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input).endsWith('/transfer/epics/p1/export'))
+        return Promise.resolve(new Response(JSON.stringify(document), { status: 200 }));
+      if (String(input).endsWith('/transfer/epics/p1/preview'))
+        return Promise.resolve(new Response(JSON.stringify(contextualPreview), { status: 200 }));
+      if (String(input).endsWith('/transfer/epics/p1'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ project_id: 'p1', fingerprint: 'transfer-fp' }), {
+            status: 201,
+          }),
+        );
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/projects/w1/p1', '/transfer/w1/p1/epics/p1']}>
+        <Routes>
+          <Route path="/projects/:workspaceId/:projectId" element={<p>Project overview</p>} />
+          <Route path="/planning/:workspaceId/:projectId" element={<p>Project board</p>} />
+          <Route
+            path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+            element={<TransferPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const dialog = screen.getByRole('dialog', { name: /Import and export epics/i });
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(dialog).toHaveTextContent('Destination: epics (p1)');
+    const closeButton = screen.getByRole('button', { name: /close transfer/i });
+    expect(closeButton).toHaveFocus();
+    expect(screen.getByLabelText('Choose a project transfer file')).toHaveAttribute(
+      'accept',
+      'application/json,.json',
+    );
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
+    expect(screen.getByText('Advanced JSON paste')).toHaveFocus();
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(closeButton).toHaveFocus();
+
+    const file = new File([JSON.stringify(document)], 'epics.json', {
+      type: 'application/json',
+    });
+    Object.defineProperty(file, 'text', { value: async () => JSON.stringify(document) });
+    fireEvent.change(screen.getByLabelText('Choose a project transfer file'), {
+      target: { files: [file] },
+    });
+    await waitFor(() =>
+      expect(screen.getByText('Selected source: epics.json')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
+    expect(await screen.findByText('transfer-fp')).toBeInTheDocument();
+    expect(screen.getByText('features: 0')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm planning import' }));
+
+    const returnLink = await screen.findByRole('link', { name: 'Return to project board' });
+    expect(returnLink).toHaveAttribute('href', '/planning/w1/p1');
+    fireEvent.click(returnLink);
+    expect(await screen.findByText('Project board')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/workspaces/w1/projects/p1/transfer/epics/p1',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('closes a contextual transfer dialog with Escape and navigates to the owning Epic', async () => {
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1', '/transfer/w1/p1/work-items/e1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<p>Project board</p>} />
+          <Route
+            path="/planning/:workspaceId/:projectId/epics/:epicId"
+            element={<p>Epic board</p>}
+          />
+          <Route
+            path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+            element={<TransferPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('dialog', { name: /Import and export work-items/i })).toBeVisible();
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(await screen.findByText('Epic board')).toBeInTheDocument();
+  });
 });

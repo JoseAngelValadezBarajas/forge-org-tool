@@ -50,6 +50,7 @@ const overview = {
 describe('PlanningPage', () => {
   afterEach(() => {
     cleanup();
+    window.innerWidth = 1024;
     vi.restoreAllMocks();
   });
 
@@ -143,6 +144,139 @@ describe('PlanningPage', () => {
     );
   });
 
+  it('opens Epic creation contextually and assigns tags from the workspace catalog', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      if (String(input).endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (String(input).endsWith('/tags'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify([{ id: 't1', workspace_id: 'w1', name: 'Platform', color: '#456789' }]),
+            { status: 200 },
+          ),
+        );
+      if (String(input).endsWith('/epics') && init?.method === 'POST')
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...overview.epics[0], id: 'e2', title: 'Roadmap' }), {
+            status: 201,
+          }),
+        );
+      return Promise.resolve(new Response(JSON.stringify(overview), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('link', { name: 'Launch' });
+    expect(screen.queryByLabelText('Epic title')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'New Epic' }));
+    expect(screen.getByRole('dialog', { name: 'Create Epic' })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Epic title'), { target: { value: 'Roadmap' } });
+    fireEvent.click(await screen.findByLabelText('Epic tag Platform'));
+    fireEvent.click(screen.getByRole('button', { name: 'Create Epic' }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/epics',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            title: 'Roadmap',
+            description: null,
+            priority: 'medium',
+            tags: ['Platform'],
+          }),
+        }),
+      ),
+    );
+  });
+
+  it('keeps Epic creation open with the entered title when the API rejects the create', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string, init?: RequestInit) => {
+        if (String(input).endsWith('/dependencies')) return Promise.resolve(new Response('[]'));
+        if (String(input).endsWith('/tags')) return Promise.resolve(new Response('[]'));
+        if (String(input).endsWith('/epics') && init?.method === 'POST')
+          return Promise.resolve(
+            new Response(JSON.stringify({ detail: 'Create failed' }), { status: 500 }),
+          );
+        return Promise.resolve(new Response(JSON.stringify(overview)));
+      }),
+    );
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('link', { name: 'Launch' });
+    fireEvent.click(screen.getByRole('button', { name: 'New Epic' }));
+    fireEvent.change(screen.getByLabelText('Epic title'), { target: { value: 'Keep my draft' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Epic' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Create failed');
+    expect(screen.getByRole('dialog', { name: 'Create Epic' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Epic title')).toHaveValue('Keep my draft');
+  });
+
+  it('filters the mobile Epic list by a single selected workflow status', async () => {
+    window.innerWidth = 390;
+    const data = {
+      ...overview,
+      epics: [
+        overview.epics[0],
+        { ...overview.epics[0], id: 'e2', title: 'Ready item', status: 'ready', features: [] },
+      ],
+    };
+    const fetchMock = vi.fn((input: string, init?: RequestInit) =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify(
+            String(input).endsWith('/dependencies')
+              ? []
+              : String(input).endsWith('/tags')
+                ? []
+                : data,
+          ),
+          { status: init?.method === 'PATCH' ? 200 : 200 },
+        ),
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('link', { name: 'Launch' });
+    fireEvent.change(screen.getByLabelText('Mobile Epic status'), { target: { value: 'ready' } });
+    const mobileBoard = screen.getByRole('region', { name: 'Mobile Epic board' });
+    expect(within(mobileBoard).getByRole('link', { name: 'Ready item' })).toBeInTheDocument();
+    expect(within(mobileBoard).queryByRole('link', { name: 'Launch' })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('kanban-column-backlog')).not.toBeInTheDocument();
+    fireEvent.change(
+      within(mobileBoard).getByRole('combobox', { name: 'Status for Epic Ready item' }),
+      { target: { value: 'done' } },
+    );
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/epics/e2',
+        expect.objectContaining({ method: 'PATCH', body: JSON.stringify({ status: 'done' }) }),
+      ),
+    );
+  });
+
   it('persists a work item status when dragged into another workflow column', async () => {
     const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
       if (String(input).endsWith('/dependencies'))
@@ -210,6 +344,7 @@ describe('PlanningPage', () => {
     );
 
     await screen.findByRole('link', { name: 'Alpha' });
+    fireEvent.click(screen.getByRole('button', { name: 'New work item' }));
     fireEvent.change(screen.getByLabelText('Epic for new feature'), { target: { value: 'e1' } });
     fireEvent.change(screen.getByLabelText('Feature title'), { target: { value: 'Gamma' } });
     fireEvent.click(screen.getByRole('button', { name: 'Create Feature' }));
@@ -248,6 +383,7 @@ describe('PlanningPage', () => {
     );
 
     await screen.findByRole('link', { name: 'Alpha' });
+    fireEvent.click(screen.getByRole('button', { name: 'New work item' }));
     fireEvent.click(screen.getByRole('button', { name: 'Bug' }));
     expect(screen.getByLabelText('Bug severity')).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Epic for new feature'), { target: { value: 'e1' } });
@@ -328,6 +464,9 @@ describe('PlanningPage', () => {
     for (const column of ['Backlog', 'Ready', 'In progress', 'Verify', 'Done']) {
       expect(await screen.findAllByRole('heading', { name: column })).toHaveLength(2);
     }
+    expect(
+      within(screen.getByLabelText('Epic workflow board')).getAllByTestId(/^kanban-column-/),
+    ).toHaveLength(5);
     expect(screen.getByRole('region', { name: 'Legacy refining work items' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Gamma' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Delta' })).toBeInTheDocument();

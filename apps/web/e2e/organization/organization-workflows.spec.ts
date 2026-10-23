@@ -12,13 +12,21 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
 
   await page.goto('/');
 
-  await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
+  const main = page.getByRole('main');
+  await expect(
+    main.getByRole('heading', {
+      name: workspaces.length > 0 ? 'Your workspace, in focus' : 'No workspaces yet',
+      exact: true,
+    }),
+  ).toBeVisible();
+  if (workspaces[0]) await expect(main).toContainText(workspaces[0].name);
 
   let workspace: Workspace;
   if (workspaces.length === 0) {
     await expect(page.getByText('No workspaces yet')).toBeVisible();
-    await page.getByLabel('Workspace name').fill(`Acceptance ${suffix}`);
-    await page.getByRole('button', { name: 'Create Workspace' }).click();
+    const workspaceForm = page.getByRole('form', { name: 'Create first workspace' });
+    await workspaceForm.getByLabel('Workspace name').fill(`Acceptance ${suffix}`);
+    await workspaceForm.getByRole('button', { name: 'Create Workspace', exact: true }).click();
     await expect(page.getByRole('combobox', { name: 'Workspace' })).toBeVisible();
     const createdResponse = await page.request.get('/api/v1/workspaces');
     workspaces = (await createdResponse.json()) as Workspace[];
@@ -37,21 +45,32 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   }
 
   const projectName = `Lifecycle ${suffix}`;
-  await page.getByLabel('Project name').fill(projectName);
-  await page
-    .getByRole('textbox', { name: 'Description', exact: true })
+  const projectDialog = page.getByRole('dialog', { name: 'Create project', exact: true });
+  await page.getByRole('button', { name: 'Create your first project', exact: true }).click();
+  await expect(projectDialog).toBeVisible();
+  await projectDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(projectDialog).toBeHidden();
+  await page.getByRole('button', { name: 'New project', exact: true }).click();
+  await expect(projectDialog).toBeVisible();
+  await projectDialog.getByLabel('Project name', { exact: true }).fill(projectName);
+  await projectDialog
+    .getByRole('textbox', { name: 'Project description', exact: true })
     .fill('Created through Organization UI');
-  await page.getByRole('button', { name: 'Create Project' }).click();
+  await projectDialog.getByRole('button', { name: 'Create project', exact: true }).click();
+  await expect(projectDialog).toBeHidden();
   const projectHeading = page
-    .getByRole('region', { name: 'Project summaries' })
+    .getByRole('region', { name: 'Projects', exact: true })
     .getByRole('link', { name: projectName, exact: true });
   await expect(projectHeading).toBeVisible();
   const siblingProjectNames = [`FormiAI ${suffix}`, `Taringa 2.0 ${suffix}`];
   for (const siblingName of siblingProjectNames) {
-    await page.getByLabel('Project name').fill(siblingName);
-    await page.getByRole('button', { name: 'Create Project' }).click();
+    await page.getByRole('button', { name: 'New project', exact: true }).click();
+    await expect(projectDialog).toBeVisible();
+    await projectDialog.getByLabel('Project name', { exact: true }).fill(siblingName);
+    await projectDialog.getByRole('button', { name: 'Create project', exact: true }).click();
+    await expect(projectDialog).toBeHidden();
     await expect(
-      page.getByRole('region', { name: 'Project summaries' }).getByRole('link', {
+      page.getByRole('region', { name: 'Projects', exact: true }).getByRole('link', {
         name: siblingName,
         exact: true,
       }),
@@ -60,7 +79,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
 
   const search = page.getByRole('searchbox', { name: 'Search projects' });
   await search.fill('missing acceptance text');
-  await expect(page.getByText('No matching projects.')).toBeVisible();
+  await expect(page.getByText('No projects match this search and archive filter.')).toBeVisible();
   await search.fill(projectName);
   const card = page.locator('[data-state="Active"]').filter({
     has: page.getByRole('link', { name: projectName, exact: true }),
@@ -113,10 +132,13 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   await workspaceSelector.selectOption(secondWorkspace.id);
   await expect(projectHeading).toHaveCount(0);
   const secondProjectName = `Second workspace project ${suffix}`;
-  await page.getByLabel('Project name').fill(secondProjectName);
-  await page.getByRole('button', { name: 'Create Project' }).click();
+  await page.getByRole('button', { name: 'New project', exact: true }).click();
+  await expect(projectDialog).toBeVisible();
+  await projectDialog.getByLabel('Project name', { exact: true }).fill(secondProjectName);
+  await projectDialog.getByRole('button', { name: 'Create project', exact: true }).click();
+  await expect(projectDialog).toBeHidden();
   await expect(
-    page.getByRole('region', { name: 'Project summaries' }).getByRole('link', {
+    page.getByRole('region', { name: 'Projects', exact: true }).getByRole('link', {
       name: secondProjectName,
       exact: true,
     }),
@@ -125,32 +147,45 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   await expect(projectHeading).toBeVisible();
   for (const siblingName of siblingProjectNames) {
     await expect(
-      page.getByRole('region', { name: 'Project summaries' }).getByRole('link', {
+      page.getByRole('region', { name: 'Projects', exact: true }).getByRole('link', {
         name: siblingName,
         exact: true,
       }),
     ).toBeVisible();
   }
 
-  await page.getByRole('button', { name: 'Archive workspace' }).click();
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Workspace settings', exact: true })
+    .click();
+  await expect(page).toHaveURL(`/workspaces/${workspace.id}/settings`);
+  await page.getByRole('button', { name: 'Archive Workspace', exact: true }).click();
   await expect(
-    page.getByText(
-      'This workspace is archived. Restore it to create projects or edit its settings.',
-    ),
+    page.getByRole('region', { name: 'Workspace profile' }).getByText('Archived', { exact: true }),
   ).toBeVisible();
+  await page.getByRole('link', { name: 'Back to Projects', exact: true }).click();
+  await expect(
+    page.getByText('This Workspace is archived. Restore it in settings to create projects.'),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'New project', exact: true })).toHaveCount(0);
   expect(
     (await (await page.request.get(`/api/v1/workspaces/${workspace.id}`)).json()).archived_at,
   ).toEqual(expect.any(String));
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'Workspace settings', exact: true })
+    .click();
+  await expect(page.getByText('Restore this Workspace to manage its shared tags.')).toBeVisible();
   const restoreResponsePromise = page.waitForResponse(
     (response) =>
       response.url().endsWith(`/api/v1/workspaces/${workspace.id}/restore`) &&
       response.request().method() === 'POST',
   );
-  await page.getByRole('button', { name: 'Restore workspace' }).click();
+  await page.getByRole('button', { name: 'Restore Workspace', exact: true }).click();
   const restoreResponse = await restoreResponsePromise;
   expect(restoreResponse.ok()).toBeTruthy();
   expect((await restoreResponse.json()).archived_at).toBeNull();
-  await expect(page.getByRole('button', { name: 'Archive workspace' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Archive Workspace', exact: true })).toBeVisible();
   expect(
     (await (await page.request.get(`/api/v1/workspaces/${workspace.id}`)).json()).archived_at,
   ).toBeNull();
@@ -159,6 +194,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
 test('PA-ORG-002 Project Overview edits and status persist through Planning and Transfer navigation', async ({
   page,
 }) => {
+  const mobile = test.info().project.name === 'chromium-mobile';
   const suffix = `${test.info().project.name}-${Date.now()}`;
   const workspaceResponse = await page.request.post('/api/v1/workspaces', {
     data: { name: `Overview ${suffix}` },
@@ -171,14 +207,33 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
   expect(projectResponse.status()).toBe(201);
   const project = await projectResponse.json();
 
-  await page.goto(`/projects/${workspace.id}/${project.id}`);
+  await page.goto('/');
+  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+  const projectLink = page
+    .getByRole('region', { name: 'Projects', exact: true })
+    .getByRole('link', { name: project.name, exact: true });
+  await expect(projectLink).toHaveAttribute('href', `/planning/${workspace.id}/${project.id}`);
+  await projectLink.click();
+  await expect(page).toHaveURL(`/planning/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Project Board', exact: true })).toBeVisible();
+  const overviewLink = mobile
+    ? page.getByRole('link', { name: 'Project overview', exact: true })
+    : page
+        .getByRole('navigation', { name: 'Product navigation' })
+        .getByRole('link', { name: 'Overview', exact: true });
+  await overviewLink.click();
+  await expect(page).toHaveURL(`/projects/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Project Overview' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Edit project' })).toBeVisible();
   await page.screenshot({ path: test.info().outputPath('project-overview.png'), fullPage: true });
   await page.getByRole('button', { name: 'Edit project' }).click();
   await page.getByLabel('Project name').fill(`Renamed ${suffix}`);
   await page.getByRole('button', { name: 'Save project' }).click();
-  await expect(page.getByText(`Renamed ${suffix}`, { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole('region', { name: 'Project details' })
+      .getByRole('heading', { name: `Renamed ${suffix}`, exact: true }),
+  ).toBeVisible();
   expect(
     await (
       await page.request.get(`/api/v1/workspaces/${workspace.id}/projects/${project.id}`)
@@ -198,8 +253,11 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
   ).toMatchObject({ status: 'archived' });
 
   await page.getByRole('link', { name: 'Open planning board' }).click();
-  await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
-  await page.goto(`/projects/${workspace.id}/${project.id}`);
+  await expect(page).toHaveURL(`/planning/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Project Board', exact: true })).toBeVisible();
+  await overviewLink.click();
+  await expect(page.getByRole('heading', { name: 'Project Overview' })).toBeVisible();
   await page.getByRole('link', { name: 'Transfer / export' }).click();
+  await expect(page).toHaveURL(`/transfer/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Project transfer' })).toBeVisible();
 });
