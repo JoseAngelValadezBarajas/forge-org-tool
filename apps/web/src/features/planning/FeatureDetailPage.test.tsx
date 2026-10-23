@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -33,6 +33,8 @@ describe('FeatureDetailPage', () => {
         updated_at: '',
       },
     ];
+    let taskReads = 0;
+    let resolveStaleTaskRead: ((response: Response) => void) | undefined;
     const fetchMock = vi.fn().mockImplementation((input: string) => {
       if (String(input).endsWith('/readiness/preview'))
         return Promise.resolve(
@@ -53,8 +55,14 @@ describe('FeatureDetailPage', () => {
         );
       if (String(input).endsWith('/tasks/reorder'))
         return Promise.resolve(new Response(JSON.stringify([tasks[1], tasks[0]]), { status: 200 }));
-      if (String(input).endsWith('/tasks'))
+      if (String(input).endsWith('/tasks')) {
+        taskReads += 1;
+        if (taskReads === 2)
+          return new Promise<Response>((resolve) => {
+            resolveStaleTaskRead = resolve;
+          });
         return Promise.resolve(new Response(JSON.stringify(tasks), { status: 200 }));
+      }
       if (String(input).endsWith('/acceptance-criteria'))
         return Promise.resolve(new Response('[]', { status: 200 }));
       if (String(input).endsWith('/dependencies'))
@@ -82,6 +90,11 @@ describe('FeatureDetailPage', () => {
       'href',
       '/context/w1/p1/f1',
     );
+    fireEvent.change(screen.getByLabelText('Acceptance criterion'), {
+      target: { value: 'Concurrent criterion' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Add criterion' }));
+    await waitFor(() => expect(taskReads).toBe(2));
     fireEvent.click(screen.getByRole('button', { name: 'Move First down' }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(
@@ -89,6 +102,23 @@ describe('FeatureDetailPage', () => {
         expect.objectContaining({ method: 'POST', body: JSON.stringify({ ids: ['t2', 't1'] }) }),
       ),
     );
+    await waitFor(() => {
+      expect(
+        screen
+          .getAllByRole('article')
+          .map((article) => within(article).getByText(/First|Second/).textContent),
+      ).toEqual(['Second', 'First']);
+    });
+    expect(resolveStaleTaskRead).toBeDefined();
+    await act(async () => {
+      resolveStaleTaskRead?.(new Response(JSON.stringify(tasks), { status: 200 }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(
+      screen
+        .getAllByRole('article')
+        .map((article) => within(article).getByText(/First|Second/).textContent),
+    ).toEqual(['Second', 'First']);
     expect(screen.getByText(/planning records only/i)).toBeInTheDocument();
   });
 
