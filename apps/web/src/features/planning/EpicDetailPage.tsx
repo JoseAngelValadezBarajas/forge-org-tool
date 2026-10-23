@@ -9,9 +9,11 @@ import {
   type Project,
 } from '@forge-org/api-client';
 import { Button, Card, Input, SectionHeader, Select, Textarea } from '@forge-org/ui';
+import { FeatureCard } from './components/FeatureCard/FeatureCard';
+import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './EpicDetailPage.module.css';
 
-const statuses: EpicStatus[] = ['planning', 'archived', 'planned', 'in_progress', 'done'];
+const statuses: EpicStatus[] = ['backlog', 'ready', 'in_progress', 'verify', 'done'];
 
 export function EpicDetailPage() {
   const { workspaceId = '', projectId = '', epicId = '' } = useParams();
@@ -20,8 +22,11 @@ export function EpicDetailPage() {
   const [epic, setEpic] = useState<Epic | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<EpicStatus>('planning');
-  const [featureLinks, setFeatureLinks] = useState<Array<{ id: string; title: string }>>([]);
+  const [status, setStatus] = useState<string>('backlog');
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [featureSearch, setFeatureSearch] = useState('');
+  const [featurePriority, setFeaturePriority] = useState('all');
+  const [featureTag, setFeatureTag] = useState('');
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -49,9 +54,7 @@ export function EpicDetailPage() {
         setTitle(match.title);
         setDescription(match.description ?? '');
         setStatus(match.status);
-        setFeatureLinks(
-          match.features.map((feature: Feature) => ({ id: feature.id, title: feature.title })),
-        );
+        setFeatures(match.features);
       } catch (cause) {
         if (isCurrent())
           setError(cause instanceof Error ? cause.message : 'Unable to load Epic detail.');
@@ -79,7 +82,7 @@ export function EpicDetailPage() {
       const updated = await organizationApi.updateEpic(workspaceId, projectId, epic.id, {
         title: title.trim(),
         description: description.trim() || null,
-        status,
+        ...(statuses.includes(status as EpicStatus) ? { status: status as EpicStatus } : {}),
       });
       if (currentEpicId.current !== epic.id) return;
       setEpic(updated);
@@ -93,12 +96,47 @@ export function EpicDetailPage() {
     }
   }
 
-  const readOnly = project?.status !== 'active';
+  async function moveFeature(
+    feature: Feature,
+    values: { status?: Feature['status']; priority?: Feature['priority'] },
+  ) {
+    try {
+      const updated = await organizationApi.updateFeature(
+        workspaceId,
+        projectId,
+        feature.id,
+        values,
+      );
+      setFeatures((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to update Work Item.');
+    }
+  }
+
+  const filteredFeatures = features.filter((feature) => {
+    const query = featureSearch.trim().toLocaleLowerCase();
+    const tag = featureTag.trim().toLocaleLowerCase();
+    return (
+      (!query || feature.title.toLocaleLowerCase().includes(query)) &&
+      (featurePriority === 'all' || feature.priority === featurePriority) &&
+      (!tag || feature.tags?.some((value: string) => value.toLocaleLowerCase().includes(tag)))
+    );
+  });
+
+  const readOnly = project?.status !== 'active' || Boolean(epic?.archived_at);
   return (
     <div className={styles.stack}>
       <SectionHeader title="Epic detail" eyebrow="FORGE / Manual planning" />
       <p>
         <Link to={`/planning/${workspaceId}/${projectId}`}>Back to planning board</Link>
+        {' · '}
+        <Link to={`/transfer/${workspaceId}/${projectId}/epics/${epicId}`}>
+          Import / export Epic
+        </Link>
+        {' · '}
+        <Link to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}>
+          Import / export Stories and Bugs
+        </Link>
       </p>
       {loading && <p role="status">Loading Epic…</p>}
       {error && (
@@ -112,7 +150,11 @@ export function EpicDetailPage() {
       {epic?.id === epicId && !loading && (
         <>
           {readOnly && (
-            <p role="status">This is an archived project. Epic details are read-only.</p>
+            <p role="status">
+              {project?.status !== 'active'
+                ? 'This is an archived project. Epic details are read-only.'
+                : 'This Epic is archived. Epic details are read-only.'}
+            </p>
           )}
           {saved && <p role="status">Epic saved.</p>}
           <Card>
@@ -145,8 +187,11 @@ export function EpicDetailPage() {
                   id="epic-status"
                   aria-label="Epic status"
                   value={status}
-                  onChange={(event) => setStatus(event.target.value as EpicStatus)}
+                  onChange={(event) => setStatus(event.target.value)}
                 >
+                  {!statuses.includes(status as EpicStatus) && (
+                    <option value={status}>Unsupported: {status}</option>
+                  )}
                   {statuses.map((value) => (
                     <option key={value} value={value}>
                       {value}
@@ -157,22 +202,130 @@ export function EpicDetailPage() {
               </form>
             )}
           </Card>
-          <Card>
-            <h2>Features</h2>
-            {featureLinks.length === 0 ? (
-              <p>No Features linked to this Epic.</p>
-            ) : (
-              <ul>
-                {featureLinks.map((feature) => (
-                  <li key={feature.id}>
-                    <Link to={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}>
-                      {feature.title}
-                    </Link>
-                  </li>
+          <section aria-label="Epic Board">
+            <h2>Epic Board · Work Items</h2>
+            <div className={styles.form}>
+              <label htmlFor="epic-board-search">Find Work Items</label>
+              <Input
+                id="epic-board-search"
+                aria-label="Find Work Items"
+                value={featureSearch}
+                onChange={(event) => setFeatureSearch(event.target.value)}
+              />
+              <label htmlFor="epic-board-priority">Filter by priority</label>
+              <Select
+                id="epic-board-priority"
+                aria-label="Filter Work Items by priority"
+                value={featurePriority}
+                onChange={(event) => setFeaturePriority(event.target.value)}
+              >
+                <option value="all">All priorities</option>
+                {['low', 'medium', 'high', 'critical'].map((value) => (
+                  <option key={value}>{value}</option>
                 ))}
-              </ul>
+              </Select>
+              <label htmlFor="epic-board-tag">Filter by tag</label>
+              <Input
+                id="epic-board-tag"
+                aria-label="Filter Work Items by tag"
+                value={featureTag}
+                onChange={(event) => setFeatureTag(event.target.value)}
+              />
+            </div>
+            {features.length === 0 ? (
+              <p>No Work Items linked to this Epic.</p>
+            ) : (
+              <>
+                <div className={styles.board}>
+                  {PLANNING_COLUMN_STATUSES.map(({ value: boardStatus }) => (
+                    <KanbanColumn
+                      key={boardStatus}
+                      status={boardStatus}
+                      emptyMessage="No Work Items in this status."
+                    >
+                      {filteredFeatures
+                        .filter((feature) => feature.status === boardStatus)
+                        .map((feature) => (
+                          <FeatureCard
+                            key={feature.id}
+                            feature={feature}
+                            href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
+                          >
+                            {!readOnly && (
+                              <>
+                                <label>
+                                  Priority
+                                  <select
+                                    aria-label={`Priority for ${feature.title}`}
+                                    value={feature.priority}
+                                    onChange={(event) =>
+                                      void moveFeature(feature, { priority: event.target.value })
+                                    }
+                                  >
+                                    {['low', 'medium', 'high', 'critical'].map((value) => (
+                                      <option key={value}>{value}</option>
+                                    ))}
+                                  </select>
+                                </label>
+                                <label>
+                                  Move to status
+                                  <select
+                                    aria-label={`Status for ${feature.title}`}
+                                    value={feature.status}
+                                    onChange={(event) =>
+                                      void moveFeature(feature, { status: event.target.value })
+                                    }
+                                  >
+                                    {PLANNING_COLUMN_STATUSES.map((column) => (
+                                      <option key={column.value} value={column.value}>
+                                        {column.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </label>
+                              </>
+                            )}
+                          </FeatureCard>
+                        ))}
+                    </KanbanColumn>
+                  ))}
+                </div>
+                {filteredFeatures.some((feature) => feature.status === 'refining') && (
+                  <section aria-label="Legacy refining Work Items">
+                    <h3>Legacy status: Refining</h3>
+                    {filteredFeatures
+                      .filter((feature) => feature.status === 'refining')
+                      .map((feature) => (
+                        <FeatureCard
+                          key={feature.id}
+                          feature={feature}
+                          href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
+                        >
+                          {!readOnly && (
+                            <label>
+                              Move to workflow status
+                              <select
+                                aria-label={`Status for ${feature.title}`}
+                                value={feature.status}
+                                onChange={(event) =>
+                                  void moveFeature(feature, { status: event.target.value })
+                                }
+                              >
+                                {PLANNING_COLUMN_STATUSES.map((column) => (
+                                  <option key={column.value} value={column.value}>
+                                    {column.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          )}
+                        </FeatureCard>
+                      ))}
+                  </section>
+                )}
+              </>
             )}
-          </Card>
+          </section>
         </>
       )}
     </div>

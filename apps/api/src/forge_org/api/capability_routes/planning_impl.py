@@ -11,6 +11,7 @@ from forge_org.api.schemas import (
     AcknowledgeRequest,
     AcknowledgeResponse,
     CriterionCreate,
+    CriterionReorderRequest,
     CriterionResponse,
     CriterionUpdate,
     DecisionCreate,
@@ -32,12 +33,16 @@ from forge_org.api.schemas import (
     TaskCreate,
     TaskResponse,
     TaskUpdate,
+    WorkspaceTagCreate,
+    WorkspaceTagResponse,
+    WorkspaceTagUpdate,
 )
 from forge_org.application.knowledge import KnowledgeService
 from forge_org.application.organization import DuplicateName, InvalidInput, NotFound
 from forge_org.application.planning import PlanningService
 
 capability_router = APIRouter(prefix='/api/v1', tags=['organization'])
+_retired_knowledge_router = APIRouter(prefix='/api/v1', tags=['legacy-inactive'])
 
 
 @capability_router.get('/workspaces/{workspace_id}/projects/{project_id}/planning/overview')
@@ -74,11 +79,79 @@ def create_epic(
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
     try:
-        return planning.create_epic(workspace_id, project_id, payload.title, payload.description)
+        return planning.create_epic(
+            workspace_id,
+            project_id,
+            payload.title,
+            payload.description,
+            payload.priority,
+            payload.tags,
+        )
     except (LookupError, ValueError) as exc:
         raise service_error(
             NotFound(str(exc)) if isinstance(exc, LookupError) else InvalidInput(str(exc))
         ) from exc
+
+
+@capability_router.get('/workspaces/{workspace_id}/tags', response_model=list[WorkspaceTagResponse])
+def list_workspace_tags(
+    workspace_id: str, planning: PlanningService = Depends(planning_service)
+) -> list[dict[str, Any]]:
+    try:
+        return planning.workspace_tags(workspace_id)
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+
+
+@capability_router.post(
+    '/workspaces/{workspace_id}/tags', response_model=WorkspaceTagResponse, status_code=201
+)
+def create_workspace_tag(
+    workspace_id: str,
+    payload: WorkspaceTagCreate,
+    planning: PlanningService = Depends(planning_service),
+) -> dict[str, Any]:
+    try:
+        return planning.create_workspace_tag(workspace_id, payload.name, payload.color)
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+    except sqlite3.IntegrityError as exc:
+        raise service_error(DuplicateName('Tag name already exists in this workspace')) from exc
+
+
+@capability_router.patch(
+    '/workspaces/{workspace_id}/tags/{tag_id}', response_model=WorkspaceTagResponse
+)
+def update_workspace_tag(
+    workspace_id: str,
+    tag_id: str,
+    payload: WorkspaceTagUpdate,
+    planning: PlanningService = Depends(planning_service),
+) -> dict[str, Any]:
+    try:
+        return planning.update_workspace_tag(
+            workspace_id, tag_id, payload.model_dump(exclude_unset=True)
+        )
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+    except sqlite3.IntegrityError as exc:
+        raise service_error(DuplicateName('Tag name already exists in this workspace')) from exc
+
+
+@capability_router.delete('/workspaces/{workspace_id}/tags/{tag_id}', status_code=204)
+def delete_workspace_tag(
+    workspace_id: str,
+    tag_id: str,
+    planning: PlanningService = Depends(planning_service),
+) -> None:
+    try:
+        planning.delete_workspace_tag(workspace_id, tag_id)
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
 
 
 @capability_router.patch(
@@ -184,6 +257,46 @@ def update_criterion(
         )
     except LookupError as exc:
         raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+
+
+@capability_router.delete(
+    '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/acceptance-criteria/{criterion_id}',
+    status_code=204,
+)
+def delete_criterion(
+    workspace_id: str,
+    project_id: str,
+    feature_id: str,
+    criterion_id: str,
+    planning: PlanningService = Depends(planning_service),
+) -> None:
+    try:
+        planning.delete_criterion(workspace_id, project_id, feature_id, criterion_id)
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+
+
+@capability_router.post(
+    '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/acceptance-criteria/reorder',
+    response_model=list[CriterionResponse],
+)
+def reorder_criteria(
+    workspace_id: str,
+    project_id: str,
+    feature_id: str,
+    payload: CriterionReorderRequest,
+    planning: PlanningService = Depends(planning_service),
+) -> list[dict[str, Any]]:
+    try:
+        return planning.reorder_criteria(workspace_id, project_id, feature_id, payload.ids)
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
 
 
 @capability_router.get(
@@ -348,7 +461,7 @@ def create_criterion(
         raise service_error(InvalidInput(str(exc))) from exc
 
 
-@capability_router.get(
+@_retired_knowledge_router.get(
     '/workspaces/{workspace_id}/projects/{project_id}/decisions',
     response_model=list[DecisionResponse],
 )
@@ -361,7 +474,7 @@ def list_decisions(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.post(
+@_retired_knowledge_router.post(
     '/workspaces/{workspace_id}/projects/{project_id}/decisions',
     response_model=DecisionResponse,
     status_code=201,
@@ -380,7 +493,7 @@ def create_decision(
         raise service_error(InvalidInput(str(exc))) from exc
 
 
-@capability_router.patch(
+@_retired_knowledge_router.patch(
     '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}',
     response_model=DecisionResponse,
 )
@@ -399,7 +512,7 @@ def update_decision(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.get(
+@_retired_knowledge_router.get(
     '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/revisions',
     response_model=list[DecisionRevisionResponse],
 )
@@ -415,7 +528,7 @@ def decision_revisions(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.post(
+@_retired_knowledge_router.post(
     '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/accept',
     response_model=DecisionResponse,
 )
@@ -431,7 +544,7 @@ def accept_decision(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.post(
+@_retired_knowledge_router.post(
     '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/features/{feature_id}',
     status_code=204,
 )
@@ -450,7 +563,7 @@ def link_decision(
         raise service_error(DuplicateName('Decision already linked')) from exc
 
 
-@capability_router.post(
+@_retired_knowledge_router.post(
     '/workspaces/{workspace_id}/projects/{project_id}/invariants',
     response_model=InvariantResponse,
     status_code=201,
@@ -469,7 +582,7 @@ def create_invariant(
         raise service_error(InvalidInput(str(exc))) from exc
 
 
-@capability_router.get(
+@_retired_knowledge_router.get(
     '/workspaces/{workspace_id}/projects/{project_id}/invariants',
     response_model=list[InvariantResponse],
 )
@@ -485,7 +598,7 @@ def list_invariants(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.patch(
+@_retired_knowledge_router.patch(
     '/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}',
     response_model=InvariantResponse,
 )
@@ -504,7 +617,7 @@ def update_invariant(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.get(
+@_retired_knowledge_router.get(
     '/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}/revisions',
     response_model=list[InvariantRevisionResponse],
 )
@@ -520,7 +633,7 @@ def invariant_revisions(
         raise service_error(NotFound(str(exc))) from exc
 
 
-@capability_router.post(
+@_retired_knowledge_router.post(
     '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/invariants/{invariant_id}/acknowledge',
     response_model=AcknowledgeResponse,
 )

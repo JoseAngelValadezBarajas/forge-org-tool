@@ -13,12 +13,11 @@ import styles from './OrganizationPage.module.css';
 import { useOrganizationController } from './useOrganizationController';
 import { ProjectCard } from '../planning/index';
 import { WorkspaceSwitcher } from '../../app/shell/index';
+import { WorkspaceTagsPanel } from './WorkspaceTagsPanel';
 
 export function OrganizationPage() {
   const {
     activeProjects,
-    activity,
-    activityState,
     archivedProjects,
     createProject,
     createWorkspace,
@@ -40,9 +39,17 @@ export function OrganizationPage() {
     setWorkspaceName,
     showArchived,
     toggleProject,
+    toggleWorkspaceArchive,
     visibleProjects,
     workspaceId,
     workspaceName,
+    workspaceDescription,
+    setWorkspaceDescription,
+    workspaceEditName,
+    setWorkspaceEditName,
+    workspaceEditDescription,
+    setWorkspaceEditDescription,
+    updateWorkspace,
     workspaces,
   } = useOrganizationController();
 
@@ -78,6 +85,13 @@ export function OrganizationPage() {
                 required
               />
             </FormField>
+            <FormField label="Workspace description">
+              <Input
+                id="workspace-description"
+                value={workspaceDescription}
+                onChange={(event) => setWorkspaceDescription(event.target.value)}
+              />
+            </FormField>
             <Button type="submit">Create Workspace</Button>
           </form>
         </Card>
@@ -105,10 +119,15 @@ export function OrganizationPage() {
               <small>private local mode</small>
             </Card>
           </div>
+          <p>
+            <Link to={`/transfer/workspaces/${workspaceId}`}>
+              Import project into this Workspace
+            </Link>
+          </p>
           <section className={styles.dashboard} aria-labelledby="project-summaries-heading">
             <h2 id="project-summaries-heading">Project summaries</h2>
             {dashboardLoading ? (
-              <p role="status">Loading project summaries and current readiness…</p>
+              <p role="status">Loading project planning summaries…</p>
             ) : dashboardSummaries.length === 0 ? (
               <p>No active projects to summarize.</p>
             ) : (
@@ -131,28 +150,6 @@ export function OrganizationPage() {
                             .map(([status, count]) => `${status} ${count}`)
                             .join(' · ') || 'no features yet'}
                         </p>
-                        <p>
-                          Readiness evaluation preview: {summary.readiness.ready} ready to start ·{' '}
-                          {summary.readiness.notReady} not ready · {summary.readiness.unavailable}{' '}
-                          unavailable
-                        </p>
-                        {summary.attention.length > 0 && (
-                          <div>
-                            <h4>Needs attention</h4>
-                            <ul>
-                              {summary.attention.map((item) => (
-                                <li key={`${item.featureId}-${item.code}`}>
-                                  <Link
-                                    to={`/planning/${workspaceId}/${summary.project.id}/features/${item.featureId}`}
-                                  >
-                                    {item.featureTitle}
-                                  </Link>
-                                  : {item.message}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
                       </>
                     )}
                   </Card>
@@ -160,34 +157,79 @@ export function OrganizationPage() {
               </div>
             )}
           </section>
+          {selectedWorkspace?.archived_at ? (
+            <Card>
+              <p>This workspace is archived. Restore it to create projects or edit its settings.</p>
+            </Card>
+          ) : (
+            <WorkspaceTagsPanel key={workspaceId} workspaceId={workspaceId} />
+          )}
           <Card>
             <div className={styles.toolbar}>
               <WorkspaceSwitcher
                 value={workspaceId}
-                workspaces={workspaces}
+                workspaces={workspaces.map((workspace) => ({
+                  ...workspace,
+                  name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
+                }))}
                 onChange={setWorkspaceId}
                 currentName={selectedWorkspace?.name ?? 'Local Workspace'}
               />
             </div>
-            <form onSubmit={createProject} className={styles.form}>
-              <h3>Create project</h3>
-              <FormField label="Project name">
-                <Input
-                  id="project-name"
-                  value={projectName}
-                  onChange={(event) => setProjectName(event.target.value)}
-                  required
-                />
-              </FormField>
-              <FormField label="Description">
-                <Input
-                  id="project-description"
-                  value={projectDescription}
-                  onChange={(event) => setProjectDescription(event.target.value)}
-                />
-              </FormField>
-              <Button type="submit">Create Project</Button>
-            </form>
+            {selectedWorkspace && (
+              <form onSubmit={updateWorkspace} className={styles.form}>
+                <h3>Workspace settings</h3>
+                {selectedWorkspace.archived_at && <StatusChip tone="warning">Archived</StatusChip>}
+                <FormField label="Workspace name">
+                  <Input
+                    aria-label="Edit workspace name"
+                    value={workspaceEditName}
+                    onChange={(event) => setWorkspaceEditName(event.target.value)}
+                    required
+                    maxLength={120}
+                  />
+                </FormField>
+                <FormField label="Workspace description">
+                  <Input
+                    aria-label="Edit workspace description"
+                    value={workspaceEditDescription}
+                    onChange={(event) => setWorkspaceEditDescription(event.target.value)}
+                    maxLength={2000}
+                  />
+                </FormField>
+                <Button type="submit" disabled={Boolean(selectedWorkspace.archived_at)}>
+                  Save workspace
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void toggleWorkspaceArchive()}
+                >
+                  {selectedWorkspace.archived_at ? 'Restore workspace' : 'Archive workspace'}
+                </Button>
+              </form>
+            )}
+            {!selectedWorkspace?.archived_at && (
+              <form onSubmit={createProject} className={styles.form}>
+                <h3>Create project</h3>
+                <FormField label="Project name">
+                  <Input
+                    id="project-name"
+                    value={projectName}
+                    onChange={(event) => setProjectName(event.target.value)}
+                    required
+                  />
+                </FormField>
+                <FormField label="Description">
+                  <Input
+                    id="project-description"
+                    value={projectDescription}
+                    onChange={(event) => setProjectDescription(event.target.value)}
+                  />
+                </FormField>
+                <Button type="submit">Create Project</Button>
+              </form>
+            )}
           </Card>
           <Card>
             <div className={styles.toolbar}>
@@ -217,10 +259,7 @@ export function OrganizationPage() {
                   <ProjectCard key={project.id} project={project} workspaceId={workspaceId}>
                     <p>
                       <Link to={`/planning/${workspaceId}/${project.id}`}>Open planning board</Link>{' '}
-                      · <Link to={`/repositories/${workspaceId}/${project.id}`}>Repositories</Link>{' '}
-                      · <Link to={`/workbench/${workspaceId}/${project.id}`}>Workbench</Link> ·{' '}
-                      <Link to={`/delivery/${workspaceId}/${project.id}`}>Delivery</Link> ·{' '}
-                      <Link to={`/transfer/${workspaceId}/${project.id}`}>Transfer</Link>
+                      · <Link to={`/transfer/${workspaceId}/${project.id}`}>Transfer</Link>
                     </p>
                     <Button variant="secondary" onClick={() => void toggleProject(project)}>
                       {project.status === 'active' ? 'Archive' : 'Restore'}
@@ -228,38 +267,6 @@ export function OrganizationPage() {
                   </ProjectCard>
                 ))}
               </div>
-            )}
-          </Card>
-          <Card>
-            <h2>Recent activity</h2>
-            {activityState === 'loading' ? (
-              <p role="status">Loading recent activity…</p>
-            ) : activityState === 'error' ? (
-              <p role="alert">Recent activity could not be loaded.</p>
-            ) : activity.length === 0 ? (
-              <p>No recent activity for this workspace.</p>
-            ) : (
-              <ul className={styles.activityList}>
-                {activity.map((item) => (
-                  <li key={item.id}>
-                    <div>
-                      <strong>{item.kind === 'run' ? 'Reported run' : 'Handoff status'}</strong>
-                      <span>{item.title}</span>
-                      <small>
-                        {item.projectName} · {item.status}
-                      </small>
-                    </div>
-                    <time dateTime={item.occurredAt}>
-                      {Number.isNaN(Date.parse(item.occurredAt))
-                        ? item.occurredAt
-                        : new Intl.DateTimeFormat(undefined, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          }).format(new Date(item.occurredAt))}
-                    </time>
-                  </li>
-                ))}
-              </ul>
             )}
           </Card>
         </>

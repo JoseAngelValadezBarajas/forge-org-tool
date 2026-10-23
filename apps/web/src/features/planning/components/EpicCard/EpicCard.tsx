@@ -1,36 +1,62 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, StatusChip } from '@forge-org/ui';
-import type { Epic, Feature } from '@forge-org/api-client';
+import type { Epic, EpicStatus, Feature } from '@forge-org/api-client';
 import styles from './EpicCard.module.css';
 
 type EpicCardProps = { epic: Epic & { features: Feature[] }; children?: ReactNode; href?: string };
 
-function progressState(features: Feature[]): 'Backlog' | 'InProgress' | 'Done' {
-  if (features.length > 0 && features.every((feature) => feature.status === 'done')) return 'Done';
-  if (features.some((feature) => feature.status !== 'backlog')) return 'InProgress';
-  return 'Backlog';
-}
+const labels: Record<EpicStatus, string> = {
+  backlog: 'Backlog',
+  ready: 'Ready',
+  in_progress: 'In progress',
+  verify: 'Verify',
+  done: 'Done',
+};
 
 export function EpicCard({ epic, children, href }: EpicCardProps) {
-  const state = progressState(epic.features);
-  const label = state === 'InProgress' ? 'In progress' : state;
+  const knownStatus = epic.status in labels;
+  const label = epic.archived_at
+    ? 'Archived'
+    : knownStatus
+      ? labels[epic.status as EpicStatus]
+      : `Legacy status: ${epic.status}`;
+  const state = epic.archived_at ? 'Archived' : knownStatus ? epic.status : 'legacy';
+  const total = epic.feature_count ?? epic.features.length;
+  const completed =
+    epic.completed_feature_count ??
+    epic.features.filter((item: Feature) => item.status === 'done').length;
+  const progress = epic.progress ?? (total ? Math.round((completed / total) * 100) : 0);
   return (
     <Card className={styles.card} data-state={state}>
       <header className={styles.header}>
         <div>
           <h3>{href ? <Link to={href}>{epic.title}</Link> : epic.title}</h3>
           <p>
-            {epic.features.length} {epic.features.length === 1 ? 'feature' : 'features'}
+            {total} {total === 1 ? 'work item' : 'work items'} · {progress}% complete
           </p>
         </div>
         <StatusChip
-          tone={state === 'Done' ? 'success' : state === 'InProgress' ? 'accent' : 'neutral'}
+          tone={
+            state === 'done'
+              ? 'success'
+              : state === 'in_progress' || state === 'verify'
+                ? 'accent'
+                : 'neutral'
+          }
         >
           {label}
         </StatusChip>
       </header>
+      <p>Priority: {epic.priority ?? 'medium'}</p>
       {epic.description && <p className={styles.description}>{epic.description}</p>}
+      {epic.tags?.length ? (
+        <ul aria-label={`${epic.title} tags`}>
+          {epic.tags.map((tag: string) => (
+            <li key={tag}>{tag}</li>
+          ))}
+        </ul>
+      ) : null}
       {children && <div className={styles.features}>{children}</div>}
     </Card>
   );

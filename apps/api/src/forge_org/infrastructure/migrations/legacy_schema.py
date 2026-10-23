@@ -1,14 +1,10 @@
-"""Legacy-compatible base schema migration.
-
-Kept byte-for-byte at the SQL level during the persistence decomposition.
-"""
+"""Shared 1.0 schema plus optional legacy tables for existing databases."""
 
 import sqlite3
 
 
-def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
-    connection.executescript(
-        """
+def _apply_legacy_schema(connection: sqlite3.Connection, *, include_legacy: bool = True) -> None:
+    schema = """
         CREATE TABLE IF NOT EXISTS schema_version (
             version INTEGER PRIMARY KEY
         );
@@ -35,7 +31,7 @@ def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
             ON projects(workspace_id, lower(name));
         CREATE TABLE IF NOT EXISTS epics (
             id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-            title TEXT NOT NULL, description TEXT, status TEXT NOT NULL DEFAULT 'planning',
+            title TEXT NOT NULL, description TEXT, status TEXT NOT NULL DEFAULT 'backlog',
             created_at TEXT NOT NULL, updated_at TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS features (
@@ -62,6 +58,7 @@ def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
             created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
             UNIQUE(blocking_feature_id, blocked_feature_id)
         );
+        -- LEGACY_TABLES_BEGIN
         CREATE TABLE IF NOT EXISTS decisions (
             id TEXT PRIMARY KEY, project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
             title TEXT NOT NULL, context TEXT NOT NULL, decision TEXT NOT NULL, rationale TEXT NOT NULL,
@@ -188,7 +185,17 @@ def _apply_legacy_schema(connection: sqlite3.Connection) -> None:
             payload_json TEXT NOT NULL, markdown TEXT NOT NULL, created_at TEXT NOT NULL,
             UNIQUE(candidate_id, gate_evaluation_id)
         );
+        -- LEGACY_TABLES_END
         INSERT OR IGNORE INTO schema_version(version) VALUES (1);
         """
-    )
+    if not include_legacy:
+        schema = schema.replace(
+            schema[
+                schema.index('        -- LEGACY_TABLES_BEGIN') : schema.index(
+                    '        -- LEGACY_TABLES_END'
+                )
+            ],
+            '',
+        )
+    connection.executescript(schema)
     connection.commit()

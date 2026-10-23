@@ -35,7 +35,7 @@ test('PA-TRN-001 exports real planning data, downloads bytes, imports through UI
   const rawBytes = await (await import('node:fs/promises')).readFile(path!);
   const document = JSON.parse(rawBytes.toString('utf8'));
   expect(document).toMatchObject({
-    schema_version: 'forge-project-import-v1',
+    schema_version: 'forge-project-transfer-v2',
     project: { name: `Export ${suffix}` },
   });
   expect(document.features[0].title).toBe(`Feature ${suffix}`);
@@ -45,7 +45,7 @@ test('PA-TRN-001 exports real planning data, downloads bytes, imports through UI
     await page.request.post('/api/v1/workspaces', { data: { name: `Transfer target ${suffix}` } })
   ).json();
   await page.goto(`/transfer/${targetWorkspace.id}/${project.id}`);
-  await page.getByLabel('Choose a project JSON file').setInputFiles({
+  await page.getByLabel('Choose a project transfer file').setInputFiles({
     name: download.suggestedFilename(),
     mimeType: 'application/json',
     buffer: rawBytes,

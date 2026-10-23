@@ -1,0 +1,32 @@
+# FORGE Org Tool 1.0 Acceptance Traceability
+
+Statuses reflect executed evidence, not estimated completeness. Browser captures document rendering; they are not human Figma visual certification. The product contract is in `docs/product/mvp-1.0.md`.
+
+| AC  | Scope                           | Status                             | Evidence                                                                                                                                                                                                                      |
+| --- | ------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Workspace and Projects          | AUTOMATED PASS                     | `PA-ORG-001/002` on Chromium desktop/mobile: create/switch workspaces, three projects, isolation, reload selection, archive/restore.                                                                                          |
+| 2   | Project and Epic management     | AUTOMATED PASS                     | `PA-PLAN-001/003/005`: Epic create/edit, priority, tags, progress, navigation and five persisted workflow states.                                                                                                             |
+| 3   | Epic Board and Stories          | AUTOMATED PASS                     | `PA-PLAN-001/003/004/005`: Stories/Bugs, detail navigation, API state and five Work Item states; API migration/contract tests preserve Feature compatibility.                                                                 |
+| 4   | Criteria, Notes, Tags           | AUTOMATED PASS                     | `PA-PLAN-001` verifies criterion create/edit/reorder, multiline notes, Story tags/filtering; API tests verify normalized tag CRUD and Workspace isolation.                                                                    |
+| 5   | Bugs and screenshot attachments | AUTOMATED PASS                     | Browser `PA-PLAN-004`; installed NSIS UI → authenticated API → SQLite → restart verifies a synthetic PNG upload and that it renders again after relaunch. API validation and `PA-TRN-002` ZIP screenshot transfer are tested. |
+| 6   | Two five-column Boards          | AUTOMATED PASS                     | `PA-PLAN-001/005`: desktop drag/drop, mobile accessible status selection, and persisted Epic/Work Item transitions through all five states.                                                                                   |
+| 7   | Durable persistence and restart | AUTOMATED PASS                     | Installed NSIS acceptance creates records, confirms the per-user SQLite path, closes the app and sidecar, restarts, and verifies records plus screenshot.                                                                     |
+| 8   | Contextual import/export        | AUTOMATED PASS                     | `PA-TRN-001/002/003`: Project, Epic, Work Item and Task scopes, previews/fingerprints/destinations, UI import/export, and ZIP v2 screenshot transfer; API contract/validation tests.                                          |
+| 9   | Component Host                  | AUTOMATED PASS; VISUAL REVIEW OPEN | Desktop/mobile Dark/Light browser smoke and production route/UI/fixture exclusion. Human Figma visual certification is not claimed.                                                                                           |
+
+## Latest browser and native evidence
+
+The isolated Chromium acceptance run passed 24/24 journeys, 0 failed and 0 flaky, in desktop and mobile projects. It covers Organization (2), Planning (5), Transfer (3), accessibility/shell (1), and Component Host (1) per project. Playwright uses isolated loopback servers and disposable SQLite.
+
+Quality CI [39968176409](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409) passed `web`, `api`, and `desktop` on final implementation commit `534686ae38f9730aacff12c2dc0ea69e0fcef634`. The Windows job's installed NSIS test reported `PASS installed UI -> authenticated API -> SQLite -> restart`, including Bug screenshot `forge-desktop-bug.png`, visible `FORGE Org Tool` window at 1044×788, isolated `%LOCALAPPDATA%\ForgeOrgTool\data\forge.db`, and restart verification.
+
+Retained browser captures in `docs/evidence/mvp-1.0/`:
+
+- `component-host-desktop-dark.png`, `component-host-desktop-light.png`
+- `component-host-mobile-dark.png`, `component-host-mobile-light.png`
+- `project-overview-desktop.png`, `project-overview-mobile.png`
+- `epic-detail-desktop.png`, `epic-detail-mobile.png`
+
+The CI artifact [product acceptance evidence](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12507523428) includes the latest Playwright reports, traces and screenshots. The [Windows installer evidence artifact](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12508766702) includes the NSIS installer and native startup smoke screenshot. See [`verification.md`](../evidence/mvp-1.0/verification.md) for local commands and detailed results.
+
+Overall delivery status: `MVP_READY_FOR_REVIEW`. This means automated acceptance is complete and human product/design review can proceed. Figma visual review remains open; PR #3 is open and unmerged. No merge or release is implied.

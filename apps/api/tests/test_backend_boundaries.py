@@ -8,14 +8,10 @@ from fastapi.testclient import TestClient
 
 from forge_org.api import routes as legacy_routes
 from forge_org.api.capability_routes import (
-    context,
-    delivery,
+    attachments,
     organization,
     planning,
-    readiness,
-    repositories,
     transfer,
-    workbench,
 )
 from forge_org.api.capability_routes.organization_impl import list_workspaces
 from forge_org.api.routes import router as legacy_router
@@ -37,13 +33,9 @@ def _routes(router: APIRouter):
 
 def test_capability_routers_partition_the_existing_http_surface() -> None:
     routers = {
+        'attachments': attachments.build_router(legacy_router),
         'planning': planning.build_router(legacy_router),
         'organization': organization.build_router(legacy_router),
-        'readiness': readiness.build_router(legacy_router),
-        'repositories': repositories.build_router(legacy_router),
-        'context': context.build_router(legacy_router),
-        'workbench': workbench.build_router(legacy_router),
-        'delivery': delivery.build_router(legacy_router),
         'transfer': transfer.build_router(legacy_router),
     }
 
@@ -102,6 +94,30 @@ def test_legacy_router_matches_authoritative_openapi_surface_and_order() -> None
     assert len(legacy_order) == len(set(legacy_order))
 
 
+def test_mvp_1_0_openapi_excludes_retired_capabilities_and_keeps_core() -> None:
+    from forge_org.main import create_app
+
+    paths = set(create_app().openapi()['paths'])
+    retired_segments = (
+        '/readiness/',
+        '/repositories',
+        '/context/',
+        '/runs',
+        '/handoffs',
+        '/evidence',
+        '/verifications',
+        '/release-candidates',
+        '/decisions',
+        '/invariants',
+    )
+
+    assert not [path for path in paths if any(segment in path for segment in retired_segments)]
+    assert '/api/v1/workspaces' in paths
+    assert '/api/v1/workspaces/{workspace_id}/projects/{project_id}/epics' in paths
+    assert '/api/v1/workspaces/{workspace_id}/projects/{project_id}/export' in paths
+    assert any(path.endswith('/import/preview') for path in paths)
+
+
 def test_connection_exposes_migration_and_repository_boundaries() -> None:
     from forge_org.infrastructure.connection import connect
     from forge_org.infrastructure.migrations.runner import migrate
@@ -114,12 +130,25 @@ def test_connection_exposes_migration_and_repository_boundaries() -> None:
 
 def test_remaining_capabilities_own_their_handler_implementations() -> None:
     capability_handlers = {
-        'planning': planning._HANDLERS,
-        'readiness': readiness._HANDLERS,
-        'repositories': repositories._HANDLERS,
-        'context': context._HANDLERS,
-        'workbench': workbench._HANDLERS,
-        'delivery': delivery._HANDLERS,
+        'planning': tuple(
+            handler
+            for handler in planning._HANDLERS
+            if not handler.startswith(
+                (
+                    'list_decision',
+                    'create_decision',
+                    'update_decision',
+                    'decision_',
+                    'accept_decision',
+                    'link_decision',
+                    'create_invariant',
+                    'list_invariant',
+                    'update_invariant',
+                    'invariant_',
+                )
+            )
+        ),
+        'organization': organization._HANDLERS,
         'transfer': transfer._HANDLERS,
     }
     for handlers in capability_handlers.values():
@@ -133,11 +162,9 @@ def test_repository_facade_delegates_to_cohesive_persistence_mixins() -> None:
     assert OrganizationRepository.list_workspaces.__qualname__.startswith(
         'OrganizationPlanningPersistence.'
     )
-    assert OrganizationRepository.list_repositories.__qualname__.startswith(
-        'RepositoryContextPersistence.'
+    assert OrganizationRepository.list_epics.__qualname__.startswith(
+        'OrganizationPlanningPersistence.'
     )
-    assert OrganizationRepository.list_runs.__qualname__.startswith('WorkbenchPersistence.')
-    assert OrganizationRepository.list_evidence.__qualname__.startswith('DeliveryPersistence.')
 
 
 def test_representative_http_status_and_openapi_metadata_are_preserved(

@@ -1,6 +1,7 @@
 """OrganizationPlanningPersistence persistence methods."""
 
 import sqlite3
+import unicodedata
 from typing import Any
 from uuid import uuid4
 
@@ -8,8 +9,121 @@ from ..connection import utc_now
 from .common import row_dict
 
 
+def _normalized_tag_name(raw_name: str) -> tuple[str, str]:
+    name = unicodedata.normalize('NFKC', raw_name).strip()
+    normalized = unicodedata.normalize('NFKC', name).casefold()
+    if not name or len(name) > 40:
+        raise ValueError('Tags must contain 1 to 40 characters')
+    return name, normalized
+
+
 class OrganizationPlanningPersistence:
     connection: sqlite3.Connection
+
+    def list_workspace_tags(self, workspace_id: str) -> list[dict[str, Any]]:
+        return [
+            dict(row)
+            for row in self.connection.execute(
+                'SELECT * FROM tags WHERE workspace_id = ? ORDER BY normalized_name, id',
+                (workspace_id,),
+            ).fetchall()
+        ]
+
+    def create_workspace_tag(self, workspace_id: str, name: str, color: str) -> dict[str, Any]:
+        safe_name, normalized = _normalized_tag_name(name)
+        tag_id = str(uuid4())
+        self.connection.execute(
+            'INSERT INTO tags(id, workspace_id, name, normalized_name, color, created_at) '
+            'VALUES (?, ?, ?, ?, ?, ?)',
+            (tag_id, workspace_id, safe_name, normalized, color, utc_now()),
+        )
+        self.connection.commit()
+        return dict(
+            self.connection.execute('SELECT * FROM tags WHERE id = ?', (tag_id,)).fetchone()
+        )
+
+    def update_workspace_tag(
+        self, workspace_id: str, tag_id: str, values: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        tag = self.connection.execute(
+            'SELECT * FROM tags WHERE workspace_id = ? AND id = ?', (workspace_id, tag_id)
+        ).fetchone()
+        if tag is None:
+            return None
+        assignments: dict[str, Any] = {}
+        if 'name' in values:
+            name, normalized = _normalized_tag_name(values['name'])
+            assignments.update(name=name, normalized_name=normalized)
+        if 'color' in values:
+            assignments['color'] = values['color']
+        if assignments:
+            columns = ', '.join(f'{key} = ?' for key in assignments)
+            self.connection.execute(
+                f'UPDATE tags SET {columns} WHERE workspace_id = ? AND id = ?',
+                [*assignments.values(), workspace_id, tag_id],
+            )
+            self.connection.commit()
+        return dict(
+            self.connection.execute('SELECT * FROM tags WHERE id = ?', (tag_id,)).fetchone()
+        )
+
+    def delete_workspace_tag(self, workspace_id: str, tag_id: str) -> bool:
+        cursor = self.connection.execute(
+            'DELETE FROM tags WHERE workspace_id = ? AND id = ?', (workspace_id, tag_id)
+        )
+        if cursor.rowcount:
+            self.connection.commit()
+            return True
+        return False
+
+    def _set_work_item_tags(
+        self, workspace_id: str, item_type: str, item_id: str, names: list[str]
+    ) -> list[str]:
+        relations = {
+            'epic': ('epic_tags', 'epic_id'),
+            'feature': ('feature_tags', 'feature_id'),
+        }
+        if item_type not in relations:
+            raise ValueError('Unsupported tagged item type')
+        relation_table, item_column = relations[item_type]
+        self.connection.execute(f'DELETE FROM {relation_table} WHERE {item_column} = ?', (item_id,))
+        normalized_names: dict[str, str] = {}
+        for raw_name in names:
+            if not isinstance(raw_name, str):
+                raise ValueError('Tags must be text')
+            name, normalized = _normalized_tag_name(raw_name)
+            normalized_names.setdefault(normalized, name)
+
+        assigned: list[str] = []
+        for normalized, name in normalized_names.items():
+            self.connection.execute(
+                'INSERT OR IGNORE INTO tags(id, workspace_id, name, normalized_name, created_at) VALUES (?, ?, ?, ?, ?)',
+                (str(uuid4()), workspace_id, name, normalized, utc_now()),
+            )
+            tag = self.connection.execute(
+                'SELECT id, name FROM tags WHERE workspace_id = ? AND normalized_name = ?',
+                (workspace_id, normalized),
+            ).fetchone()
+            self.connection.execute(
+                f'INSERT INTO {relation_table}({item_column}, tag_id) VALUES (?, ?)',
+                (item_id, tag['id']),
+            )
+            assigned.append(tag['name'])
+        return assigned
+
+    def _work_item_tags(self, item_type: str, item_id: str) -> list[str]:
+        relations = {
+            'epic': ('epic_tags', 'epic_id'),
+            'feature': ('feature_tags', 'feature_id'),
+        }
+        relation_table, item_column = relations[item_type]
+        return [
+            row[0]
+            for row in self.connection.execute(
+                f'SELECT tags.name FROM {relation_table} JOIN tags ON tags.id = {relation_table}.tag_id WHERE {item_column} = ? ORDER BY tags.normalized_name',
+                (item_id,),
+            ).fetchall()
+        ]
 
     def list_workspaces(self) -> list[dict[str, Any]]:
         rows = self.connection.execute(
@@ -41,6 +155,16 @@ class OrganizationPlanningPersistence:
         params = [*values.values(), utc_now(), workspace_id]
         self.connection.execute(
             f'UPDATE workspaces SET {assignments}, updated_at = ? WHERE id = ?', params
+        )
+        self.connection.commit()
+        return self.get_workspace(workspace_id)
+
+    def set_workspace_archive(
+        self, workspace_id: str, archived_at: str | None
+    ) -> dict[str, Any] | None:
+        self.connection.execute(
+            'UPDATE workspaces SET archived_at = ?, updated_at = ? WHERE id = ?',
+            (archived_at, utc_now(), workspace_id),
         )
         self.connection.commit()
         return self.get_workspace(workspace_id)
@@ -98,40 +222,74 @@ class OrganizationPlanningPersistence:
         return self.get_project(workspace_id, project_id)
 
     def list_epics(self, project_id: str) -> list[dict[str, Any]]:
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT * FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
-            ).fetchall()
-        ]
+        rows = self.connection.execute(
+            'SELECT id FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
+        ).fetchall()
+        return [self.get_epic(project_id, row['id']) or {} for row in rows]
 
     def get_epic(self, project_id: str, epic_id: str) -> dict[str, Any] | None:
-        return row_dict(
+        item = row_dict(
             self.connection.execute(
                 'SELECT * FROM epics WHERE project_id = ? AND id = ?', (project_id, epic_id)
             ).fetchone()
         )
-
-    def create_epic(self, project_id: str, title: str, description: str | None) -> dict[str, Any]:
-        now, epic_id = utc_now(), str(uuid4())
-        self.connection.execute(
-            'INSERT INTO epics(id, project_id, title, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-            (epic_id, project_id, title, description, now, now),
+        if item is None:
+            return None
+        item['tags'] = self._work_item_tags('epic', epic_id)
+        totals = self.connection.execute(
+            "SELECT count(*) AS total, sum(CASE WHEN status = 'done' THEN 1 ELSE 0 END) AS completed FROM features WHERE epic_id = ?",
+            (epic_id,),
+        ).fetchone()
+        item['feature_count'] = totals['total']
+        item['completed_feature_count'] = totals['completed'] or 0
+        item['progress'] = (
+            round(100 * item['completed_feature_count'] / item['feature_count'])
+            if item['feature_count']
+            else 0
         )
-        self.connection.commit()
+        return item
+
+    def create_epic(
+        self,
+        workspace_id: str,
+        project_id: str,
+        title: str,
+        description: str | None,
+        priority: str,
+        tags: list[str],
+    ) -> dict[str, Any]:
+        now, epic_id = utc_now(), str(uuid4())
+        try:
+            self.connection.execute(
+                "INSERT INTO epics(id, project_id, title, description, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, 'backlog', ?, ?, ?)",
+                (epic_id, project_id, title, description, priority, now, now),
+            )
+            self._set_work_item_tags(workspace_id, 'epic', epic_id, tags)
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
         return self.get_epic(project_id, epic_id) or {}
 
     def update_epic(
-        self, project_id: str, epic_id: str, values: dict[str, Any]
+        self, workspace_id: str, project_id: str, epic_id: str, values: dict[str, Any]
     ) -> dict[str, Any] | None:
-        if not values:
+        tags = values.pop('tags', None)
+        if not values and tags is None:
             return self.get_epic(project_id, epic_id)
-        assignments = ', '.join(f'{key} = ?' for key in values)
-        self.connection.execute(
-            f'UPDATE epics SET {assignments}, updated_at = ? WHERE project_id = ? AND id = ?',
-            [*values.values(), utc_now(), project_id, epic_id],
-        )
-        self.connection.commit()
+        try:
+            if values:
+                assignments = ', '.join(f'{key} = ?' for key in values)
+                self.connection.execute(
+                    f'UPDATE epics SET {assignments}, updated_at = ? WHERE project_id = ? AND id = ?',
+                    [*values.values(), utc_now(), project_id, epic_id],
+                )
+            if tags is not None:
+                self._set_work_item_tags(workspace_id, 'epic', epic_id, tags)
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
         return self.get_epic(project_id, epic_id)
 
     def list_features(
@@ -156,64 +314,89 @@ class OrganizationPlanningPersistence:
         if epic_id:
             clauses.append('epic_id = ?')
             params.append(epic_id)
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                f'SELECT * FROM features WHERE {" AND ".join(clauses)} ORDER BY created_at', params
-            ).fetchall()
-        ]
+        rows = self.connection.execute(
+            f'SELECT id FROM features WHERE {" AND ".join(clauses)} ORDER BY created_at', params
+        ).fetchall()
+        return [self.feature(project_id, row['id']) or {} for row in rows]
 
-    def create_feature(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
+    def create_feature(
+        self, workspace_id: str, project_id: str, values: dict[str, Any]
+    ) -> dict[str, Any]:
         now, feature_id = utc_now(), str(uuid4())
-        self.connection.execute(
-            'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                feature_id,
-                project_id,
-                values.get('epic_id'),
-                values['title'],
-                values.get('description'),
-                values.get('goal'),
-                values.get('priority', 'medium'),
-                values.get('status', 'backlog'),
-                now,
-                now,
-            ),
-        )
-        self.connection.commit()
-        return (
-            row_dict(
-                self.connection.execute(
-                    'SELECT * FROM features WHERE id = ?', (feature_id,)
-                ).fetchone()
+        tags = values.pop('tags', [])
+        try:
+            self.connection.execute(
+                'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, kind, bug_severity, steps_to_reproduce, expected_result, actual_result, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (
+                    feature_id,
+                    project_id,
+                    values.get('epic_id'),
+                    values['title'],
+                    values.get('description'),
+                    values.get('goal'),
+                    values.get('priority', 'medium'),
+                    values.get('status', 'backlog'),
+                    values.get('kind', 'story'),
+                    values.get('bug_severity'),
+                    values.get('steps_to_reproduce'),
+                    values.get('expected_result'),
+                    values.get('actual_result'),
+                    values.get('notes'),
+                    now,
+                    now,
+                ),
             )
-            or {}
-        )
+            self._set_work_item_tags(workspace_id, 'feature', feature_id, tags)
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
+        return self.feature(project_id, feature_id) or {}
 
     def feature(self, project_id: str, feature_id: str) -> dict[str, Any] | None:
-        return row_dict(
+        item = row_dict(
             self.connection.execute(
                 'SELECT * FROM features WHERE project_id = ? AND id = ?', (project_id, feature_id)
             ).fetchone()
         )
+        if item is not None:
+            item['tags'] = self._work_item_tags('feature', feature_id)
+        return item
 
     def update_feature(
-        self, project_id: str, feature_id: str, values: dict[str, Any]
+        self,
+        workspace_id: str,
+        project_id: str,
+        feature_id: str,
+        values: dict[str, Any],
     ) -> dict[str, Any] | None:
-        if not values:
+        tags = values.pop('tags', None)
+        if not values and tags is None:
             return self.feature(project_id, feature_id)
-        assignments = ', '.join(f'{key} = ?' for key in values)
-        self.connection.execute(
-            f'UPDATE features SET {assignments}, updated_at = ? WHERE project_id = ? AND id = ?',
-            [*values.values(), utc_now(), project_id, feature_id],
-        )
-        self.connection.commit()
+        try:
+            if values:
+                assignments = ', '.join(f'{key} = ?' for key in values)
+                self.connection.execute(
+                    f'UPDATE features SET {assignments}, updated_at = ? WHERE project_id = ? AND id = ?',
+                    [*values.values(), utc_now(), project_id, feature_id],
+                )
+            if tags is not None:
+                self._set_work_item_tags(workspace_id, 'feature', feature_id, tags)
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
         return self.feature(project_id, feature_id)
 
     def create_criterion(
-        self, feature_id: str, description: str, position: int = 0
+        self, feature_id: str, description: str, position: int | None = None
     ) -> dict[str, Any]:
         now, criterion_id = utc_now(), str(uuid4())
+        if position is None:
+            position = self.connection.execute(
+                'SELECT COALESCE(MAX(position) + 1, 0) FROM acceptance_criteria WHERE feature_id = ?',
+                (feature_id,),
+            ).fetchone()[0]
         self.connection.execute(
             'INSERT INTO acceptance_criteria(id, feature_id, description, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
             (criterion_id, feature_id, description.strip(), position, now, now),
@@ -259,6 +442,33 @@ class OrganizationPlanningPersistence:
                 'SELECT * FROM acceptance_criteria WHERE id = ?', (criterion_id,)
             ).fetchone()
         )
+
+    def delete_criterion(self, feature_id: str, criterion_id: str) -> bool:
+        cursor = self.connection.execute(
+            'DELETE FROM acceptance_criteria WHERE feature_id = ? AND id = ?',
+            (feature_id, criterion_id),
+        )
+        if cursor.rowcount:
+            self.connection.commit()
+            return True
+        return False
+
+    def reorder_criteria(self, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
+        existing = [item['id'] for item in self.list_criteria(feature_id)]
+        if len(ids) != len(existing) or len(set(ids)) != len(ids) or set(ids) != set(existing):
+            raise ValueError('Criterion ordering must contain every criterion exactly once')
+        try:
+            for position, criterion_id in enumerate(ids):
+                self.connection.execute(
+                    'UPDATE acceptance_criteria SET position = ?, updated_at = ? '
+                    'WHERE feature_id = ? AND id = ?',
+                    (position, utc_now(), feature_id, criterion_id),
+                )
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
+        return self.list_criteria(feature_id)
 
     def create_task(self, feature_id: str, values: dict[str, Any]) -> dict[str, Any]:
         now, task_id = utc_now(), str(uuid4())

@@ -1,32 +1,48 @@
 import { useParams } from 'react-router-dom';
+import type { ContextualTransferScope } from '@forge-org/api-client';
 import { Button, Card, FormField, SectionHeader, StatusChip, Textarea } from '@forge-org/ui';
 import styles from './TransferPage.module.css';
 import { useTransferController } from './useTransferController';
 
 export function TransferPage() {
-  const { workspaceId = '', projectId = '' } = useParams();
+  const { workspaceId = '', projectId = '', scope, destinationId } = useParams();
+  const contextualScope = ['epics', 'work-items', 'tasks'].includes(scope ?? '')
+    ? (scope as ContextualTransferScope)
+    : undefined;
   const {
     documentText,
     error,
     exportProject,
+    exportProjectPackage,
     exported,
     fileName,
     importedProjectId,
     importProject,
+    packageBase64,
     preview,
     previewImport,
     selectSourceFile,
     updateDocumentText,
-  } = useTransferController(workspaceId, projectId);
+  } = useTransferController(workspaceId, projectId, contextualScope, destinationId);
   const currentStep = importedProjectId ? 3 : preview ? 2 : 1;
 
   return (
     <div className={styles.stack}>
-      <SectionHeader title="Project transfer" eyebrow="FORGE / Planning-only transfer" />
+      <SectionHeader
+        title={
+          contextualScope
+            ? `Import / export ${contextualScope}`
+            : projectId
+              ? 'Project transfer'
+              : 'Import project'
+        }
+        eyebrow="FORGE / Planning-only transfer"
+      />
       <p>
-        Import and export use the versioned project document. Review the fingerprint before import;
-        only planning records are transferred. Evidence, verification and release records are
-        excluded.
+        {contextualScope
+          ? `Transfer versioned JSON for the selected ${contextualScope} destination. Review the destination and fingerprint before import.`
+          : 'Import and export use versioned project JSON or a ZIP package that includes Bug screenshots.'}{' '}
+        Operational evidence, verification and release records are excluded.
       </p>
       {error && <p role="alert">{error}</p>}
 
@@ -41,14 +57,24 @@ export function TransferPage() {
       <div className={styles.workflowGrid}>
         <Card>
           <section aria-labelledby="import-title" className={styles.panel}>
-            <h3 id="import-title">Import a project</h3>
-            <p>Select a previously exported `forge-project-import-v1` JSON file.</p>
-            <FormField label="Choose a project JSON file">
+            <h3 id="import-title">
+              {contextualScope ? `Import ${contextualScope}` : 'Import a project'}
+            </h3>
+            <p>
+              {contextualScope
+                ? 'Choose a v2 JSON document or paste it below. Preview validates references before confirmation.'
+                : 'Import versioned project JSON or a v2 ZIP package with Bug screenshots. Existing `forge-project-import-v1` JSON files remain supported.'}
+            </p>
+            <FormField label="Choose a project transfer file">
               <input
                 className={styles.fileInput}
                 type="file"
-                accept="application/json,.json"
-                aria-label="Choose a project JSON file"
+                accept={
+                  contextualScope
+                    ? 'application/json,.json'
+                    : 'application/json,.json,application/zip,.zip'
+                }
+                aria-label="Choose a project transfer file"
                 onChange={(event) => {
                   const file = event.currentTarget.files?.[0];
                   if (file) void selectSourceFile(file);
@@ -63,7 +89,7 @@ export function TransferPage() {
                   id="transfer-document"
                   value={documentText}
                   onChange={(event) => updateDocumentText(event.target.value)}
-                  placeholder="Paste a forge-project-import-v1 document"
+                  placeholder={`Paste a versioned ${contextualScope ?? 'project'} transfer document`}
                   rows={10}
                 />
               </FormField>
@@ -72,7 +98,7 @@ export function TransferPage() {
               <Button
                 type="button"
                 onClick={() => void previewImport()}
-                disabled={!documentText.trim()}
+                disabled={!documentText.trim() && !packageBase64}
               >
                 Review import
               </Button>
@@ -80,28 +106,45 @@ export function TransferPage() {
           </section>
         </Card>
 
-        <Card>
-          <section aria-labelledby="export-title" className={styles.panel}>
-            <h3 id="export-title">Export current project</h3>
-            <p>Review and download the versioned planning document. Export does not change data.</p>
-            <Button type="button" onClick={() => void exportProject()}>
-              Download project export
-            </Button>
-            {exported && (
-              <div className={styles.review} role="status">
-                <h4>Export ready</h4>
-                <StatusChip tone="success">forge-project-import-v1</StatusChip>
-                <p>JSON download prepared from the selected project.</p>
-                {documentText && (
-                  <details>
-                    <summary>Review exported contents</summary>
-                    <pre className={styles.documentPreview}>{documentText}</pre>
-                  </details>
-                )}
-              </div>
-            )}
-          </section>
-        </Card>
+        {projectId && (
+          <Card>
+            <section aria-labelledby="export-title" className={styles.panel}>
+              <h3 id="export-title">
+                {contextualScope ? `Export ${contextualScope}` : 'Export current project'}
+              </h3>
+              <p>
+                Review and download the versioned planning document. Export does not change data.
+              </p>
+              {!(contextualScope === 'epics' && destinationId === projectId) && (
+                <Button type="button" onClick={() => void exportProject()}>
+                  Download {contextualScope ?? 'project'} export (JSON)
+                </Button>
+              )}
+              {!contextualScope && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void exportProjectPackage()}
+                >
+                  Download ZIP package with screenshots
+                </Button>
+              )}
+              {exported && (
+                <div className={styles.review} role="status">
+                  <h4>Export ready</h4>
+                  <StatusChip tone="success">forge-project-transfer-v2</StatusChip>
+                  <p>JSON download prepared from the selected project.</p>
+                  {documentText && (
+                    <details>
+                      <summary>Review exported contents</summary>
+                      <pre className={styles.documentPreview}>{documentText}</pre>
+                    </details>
+                  )}
+                </div>
+              )}
+            </section>
+          </Card>
+        )}
       </div>
 
       {preview && (
@@ -109,7 +152,11 @@ export function TransferPage() {
           <section aria-labelledby="review-title" className={styles.panel}>
             <h3 id="review-title">Review planning changes</h3>
             <StatusChip tone="warning">FINGERPRINT_REQUIRED</StatusChip>
-            <p>Project to create: {preview.project.name}</p>
+            <p>
+              {preview.destination
+                ? `Destination: ${preview.destination.scope} (${preview.destination.id})`
+                : `Project to create: ${preview.project.name}`}
+            </p>
             <p className={styles.fingerprint}>
               Fingerprint: <code>{preview.fingerprint}</code>
             </p>
@@ -137,7 +184,11 @@ export function TransferPage() {
           <section aria-labelledby="import-success-title" className={styles.panel}>
             <h3 id="import-success-title">Import complete</h3>
             <StatusChip tone="success">IMPORTED_PLANNING_ONLY</StatusChip>
-            <p>Created project: {importedProjectId}</p>
+            <p>
+              {contextualScope
+                ? `Imported into project: ${importedProjectId}`
+                : `Created project: ${importedProjectId}`}
+            </p>
           </section>
         </Card>
       )}

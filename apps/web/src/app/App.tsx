@@ -3,16 +3,6 @@ import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@forge-org/ui';
 import { OrganizationPage, ProjectOverviewPage } from '../features/organization';
 import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
-import { ReadinessPage } from '../features/readiness';
-import { HandoffDetailPage, RunDetailPage, WorkbenchPage } from '../features/workbench';
-import {
-  CandidateDetailPage,
-  DeliveryPage,
-  EvidenceDetailPage,
-  VerificationResultPage,
-} from '../features/delivery';
-import { RepositoriesPage, RepositoryDetailPage } from '../features/repositories';
-import { ContextPackageDetailPage, ContextPage } from '../features/context';
 import { TransferPage } from '../features/transfer';
 import styles from './App.module.css';
 import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from './shell';
@@ -64,35 +54,6 @@ function ApplicationShell() {
       id: 'planning',
       label: 'Planning',
       path: context && `/planning/${context.workspaceId}/${context.projectId}`,
-    },
-    {
-      id: 'readiness',
-      label: 'Readiness',
-      path:
-        context?.featureId &&
-        `/readiness/${context.workspaceId}/${context.projectId}/${context.featureId}`,
-    },
-    {
-      id: 'workbench',
-      label: 'Workbench',
-      path: context && `/workbench/${context.workspaceId}/${context.projectId}`,
-    },
-    {
-      id: 'delivery',
-      label: 'Delivery',
-      path: context && `/delivery/${context.workspaceId}/${context.projectId}`,
-    },
-    {
-      id: 'repositories',
-      label: 'Repositories',
-      path: context && `/repositories/${context.workspaceId}/${context.projectId}`,
-    },
-    {
-      id: 'context',
-      label: 'Context',
-      path:
-        context?.featureId &&
-        `/context/${context.workspaceId}/${context.projectId}/${context.featureId}`,
     },
     {
       id: 'transfer',
@@ -165,43 +126,17 @@ function ApplicationShell() {
                 path="/planning/:workspaceId/:projectId/features/:featureId"
                 element={<FeatureDetailPage />}
               />
-              <Route
-                path="/readiness/:workspaceId/:projectId/:featureId"
-                element={<ReadinessPage />}
-              />
-              <Route path="/workbench/:workspaceId/:projectId" element={<WorkbenchPage />} />
-              <Route
-                path="/workbench/:workspaceId/:projectId/runs/:runId"
-                element={<RunDetailPage />}
-              />
-              <Route
-                path="/workbench/:workspaceId/:projectId/handoffs/:handoffId"
-                element={<HandoffDetailPage />}
-              />
-              <Route path="/delivery/:workspaceId/:projectId" element={<DeliveryPage />} />
-              <Route
-                path="/delivery/:workspaceId/:projectId/evidence/:evidenceId"
-                element={<EvidenceDetailPage />}
-              />
-              <Route
-                path="/delivery/:workspaceId/:projectId/verifications/:verificationId"
-                element={<VerificationResultPage />}
-              />
-              <Route
-                path="/delivery/:workspaceId/:projectId/candidates/:candidateId"
-                element={<CandidateDetailPage />}
-              />
-              <Route path="/repositories/:workspaceId/:projectId" element={<RepositoriesPage />} />
-              <Route
-                path="/repositories/:workspaceId/:projectId/:repositoryId"
-                element={<RepositoryDetailPage />}
-              />
-              <Route path="/context/:workspaceId/:projectId/:featureId" element={<ContextPage />} />
-              <Route
-                path="/context/:workspaceId/:projectId/:featureId/packages/:packageId"
-                element={<ContextPackageDetailPage />}
-              />
               <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
+              <Route path="/transfer/workspaces/:workspaceId" element={<TransferPage />} />
+              <Route
+                path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+                element={<TransferPage />}
+              />
+              <Route path="/transfer/workspaces/:workspaceId" element={<TransferPage />} />
+              <Route
+                path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+                element={<TransferPage />}
+              />
               {ComponentGallery && (
                 <Route
                   path="/__components"
@@ -250,11 +185,6 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
   const labelBySection: Record<string, string> = {
     projects: 'Overview',
     planning: context.featureId ? 'Feature' : 'Planning',
-    readiness: 'Readiness',
-    workbench: 'Workbench',
-    delivery: 'Delivery',
-    repositories: 'Repositories',
-    context: 'Context',
     transfer: 'Transfer',
   };
   const crumbs = [
@@ -286,25 +216,9 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
 function getProjectContext(pathname: string) {
   const [section, workspaceId, projectId, fourth, fifth] = pathname.split('/').filter(Boolean);
   if (!section || !workspaceId || !projectId) return null;
-  if (
-    ![
-      'projects',
-      'planning',
-      'readiness',
-      'workbench',
-      'delivery',
-      'repositories',
-      'context',
-      'transfer',
-    ].includes(section)
-  ) {
+  if (!['projects', 'planning', 'transfer'].includes(section)) {
     return null;
   }
-  const featureId =
-    section === 'readiness' || section === 'context'
-      ? fourth
-      : section === 'planning' && fourth === 'features'
-        ? fifth
-        : undefined;
+  const featureId = section === 'planning' && fourth === 'features' ? fifth : undefined;
   return { workspaceId, projectId, featureId };
 }

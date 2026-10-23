@@ -74,15 +74,17 @@ class InstalledSmokeTests(unittest.TestCase):
             legacy.close()
             with patch.dict(os.environ, {'FORGE_DATABASE_PATH': str(database)}, clear=False):
                 upgraded = connect()
-                self.assertEqual(
-                    upgraded.execute("SELECT name FROM workspaces WHERE id = 'legacy'").fetchone()[0],
-                    'Legacy synthetic',
-                )
-                self.assertEqual(
-                    upgraded.execute("SELECT max(version) FROM schema_migrations").fetchone()[0],
-                    2,
-                )
-                upgraded.close()
+                try:
+                    self.assertEqual(
+                        upgraded.execute("SELECT name FROM workspaces WHERE id = 'legacy'").fetchone()[0],
+                        'Legacy synthetic',
+                    )
+                    self.assertEqual(
+                        upgraded.execute("SELECT max(version) FROM schema_migrations").fetchone()[0],
+                        5,
+                    )
+                finally:
+                    upgraded.close()
 
 
 if __name__ == '__main__':

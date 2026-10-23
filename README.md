@@ -2,7 +2,7 @@
 
 A new, public, local-first organizational tool for software work, with a self-contained visual system based on the existing FORGE Figma file.
 
-**Status:** Active reconstruction baseline. The repository contains the local-first web product slices, versioned API contract, distributable shared packages, SQLite migrations, and a reserved Tauri desktop boundary. Figma visual parity and production desktop certification remain separately reviewed concerns.
+**Status:** FORGE Org Tool 1.0 local-first MVP implementation. Product scope and acceptance are defined in [`docs/product/mvp-1.0.md`](docs/product/mvp-1.0.md); see [`docs/quality/mvp-1.0-acceptance.md`](docs/quality/mvp-1.0-acceptance.md) for testable delivery evidence. Automated behavior checks do not certify human-reviewed Figma visual parity.
 
 **Figma:** https://www.figma.com/design/r10szKLgiIPVi2NBmbjTpm
 
@@ -22,28 +22,26 @@ source reference under its own license; see [reconstruction provenance](docs/rec
 
 See [architecture](docs/architecture/README.md), [client component contracts](docs/architecture/client-components.md), [migration checkpoints](docs/migration/plan.md), and [safety policy](SECURITY.md).
 
-The functional reconstruction inventory and staged implementation plan are in
-[`docs/reconstruction`](docs/reconstruction/functional-parity.md). Stage 1
-functionality remains subject to M1 review and explicit owner approval.
+The 1.0 implementation keeps Organization, Planning, Project Transfer and shared UI in scope. Advanced capabilities from the original reconstruction inventory are not part of the active 1.0 product; see the compatibility matrix in [`docs/migration/plan.md`](docs/migration/plan.md). The original FORGE repository and PRs are not modified or archived by this work.
+
+Project Transfer supports legacy v1 JSON import, v2 JSON planning export/import, and v2 ZIP packages that include validated Bug screenshots. Package transfer is limited to 5 MiB compressed to remain within the Desktop sidecar request boundary; see [`docs/import-export/README.md`](docs/import-export/README.md) for the package manifest, checksums and rejected archive conditions.
 
 ## Local bootstrap (Windows PowerShell)
 
-Prerequisites: Node.js 24, npm 11, Python 3.12, uv and git. GitHub CLI (`gh`) is required only for repository publication and archival.
+Prerequisites: Node.js 24, npm 11, Python 3.12, uv and git. Rust toolchain is required for native Tauri development/builds.
 
 ```powershell
-npm install
+npm ci
 npm run generate:tokens
 npm run test
 npm run dev
 # separate PowerShell:
 uv sync --project apps/api --group dev
 uv run --project apps/api uvicorn forge_org.main:app --app-dir apps/api/src --reload
-uv run --project apps/api pytest apps/api/tests
-uv run --project apps/api python tooling/scripts/export-openapi.py --check
+uv run --project apps/api pytest -q
+python tooling/scripts/export-openapi.py --check
 ```
 
-Open Vite's local URL for the shell. In development only, `/__components` showcases the actual public UI components and Component Host catalog. The backend exposes `GET /api/v1/health` and the local feature API. Package portability is verified with `npm run test:packages`, which builds and consumes packed artifacts outside workspace resolution.
+Open Vite's local URL for the shell. In development only, `/__components` previews shared UI and in-scope product compositions. The backend exposes the local feature API and owns durable SQLite data. Package portability is verified with `npm run test:packages`, which builds and consumes packed artifacts outside workspace resolution.
 
-**Before first public push:** generate and commit `package-lock.json` and `apps/api/uv.lock`; run the quality checks, review changes for secrets and personal data, and verify that local databases and backups are not tracked.
-
-The original repository should not be archived until its refs, PR #30, contracts and any required _local_ data are preserved and signed off. Never push local data to the public repository.
+Never commit credentials, local paths, operator databases or private backups. The original repository is a separate preserved source reference; this MVP work does not archive or rewrite it. Never upload local user data to the public repository or CI.

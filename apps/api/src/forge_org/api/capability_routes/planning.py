@@ -6,6 +6,10 @@ from .planning_impl import capability_router
 
 _HANDLERS = (
     'planning_overview',
+    'list_workspace_tags',
+    'create_workspace_tag',
+    'update_workspace_tag',
+    'delete_workspace_tag',
     'list_epics',
     'create_epic',
     'update_epic',
@@ -13,6 +17,8 @@ _HANDLERS = (
     'create_feature',
     'update_feature',
     'update_criterion',
+    'delete_criterion',
+    'reorder_criteria',
     'list_tasks',
     'create_task',
     'update_task',
@@ -22,17 +28,6 @@ _HANDLERS = (
     'delete_dependency',
     'list_criteria',
     'create_criterion',
-    'list_decisions',
-    'create_decision',
-    'update_decision',
-    'decision_revisions',
-    'accept_decision',
-    'link_decision',
-    'create_invariant',
-    'list_invariants',
-    'update_invariant',
-    'invariant_revisions',
-    'acknowledge_invariant',
 )
 
 

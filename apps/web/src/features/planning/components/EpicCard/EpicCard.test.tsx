@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/vitest';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import type { Epic, Feature } from '@forge-org/api-client';
 import { EpicCard } from './EpicCard';
 
@@ -10,7 +10,13 @@ const epic: Epic & { features: Feature[] } = {
   project_id: 'p1',
   title: 'Launch',
   description: null,
-  status: 'planning',
+  status: 'backlog',
+  archived_at: null,
+  priority: 'critical',
+  tags: ['Platform'],
+  feature_count: 2,
+  completed_feature_count: 1,
+  progress: 50,
   created_at: '',
   updated_at: '',
   features: [
@@ -30,15 +36,24 @@ const epic: Epic & { features: Feature[] } = {
 };
 
 describe('EpicCard', () => {
-  it('derives progress from child feature records and lists those records', () => {
+  afterEach(cleanup);
+  it('keeps Epic workflow state explicit while showing progress from child work items', () => {
     render(
       <EpicCard epic={epic}>
         <a href="/feature">Open feature</a>
       </EpicCard>,
     );
-    expect(screen.getByText('Done')).toBeInTheDocument();
-    expect(screen.getByText('1 feature')).toBeInTheDocument();
+    expect(screen.getByText('Backlog')).toBeInTheDocument();
+    expect(screen.getByText('2 work items · 50% complete')).toBeInTheDocument();
+    expect(screen.getByText('Priority: critical')).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Launch tags' })).toHaveTextContent('Platform');
     expect(screen.getByRole('link', { name: 'Open feature' })).toBeInTheDocument();
+  });
+
+  it('shows an explicitly completed Epic without inferring it from child completion', () => {
+    render(<EpicCard epic={{ ...epic, status: 'done' }} />);
+    expect(screen.getByText('Done')).toBeInTheDocument();
+    expect(screen.getByText('2 work items · 50% complete')).toBeInTheDocument();
   });
 
   it('links the title only when route context is provided', () => {

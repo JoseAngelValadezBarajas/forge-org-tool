@@ -211,6 +211,19 @@ test('rejects unknown statuses and visual certification', () => {
   invalid((r) => (r.inventory[0].visualReviewStatus = 'PASS'), /visualReviewStatus/);
   invalid((r) => (r.inventory[0].componentHost.status = 'DONE'), /componentHost/);
 });
+test('retains out-of-scope Figma rows without claiming implementation or host coverage', () => {
+  const registry = fixture();
+  const row = registry.inventory[0];
+  row.implementationStatus = 'OUT_OF_SCOPE';
+  row.componentHost.status = 'PLANNED';
+  for (const field of ['component', 'publicApi', 'styles', 'tests']) row[field].current = [];
+  assert.deepEqual(validateParity(registry), []);
+  row.componentHost.status = 'AVAILABLE';
+  assert.ok(validateParity(registry).some((error) => /out-of-scope previews/.test(error)));
+  row.componentHost.status = 'PLANNED';
+  row.component.current = ['packages/ui/src/components/actions/Button/Button.tsx'];
+  assert.ok(validateParity(registry).some((error) => /must not claim current files/.test(error)));
+});
 test('host IDs must be non-empty and unique including planned previews', () => {
   invalid((r) => (r.inventory[0].componentHost.id = ' '), /preview ID/);
   invalid(

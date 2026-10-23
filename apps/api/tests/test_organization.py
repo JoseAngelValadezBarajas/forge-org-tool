@@ -68,3 +68,41 @@ def test_invalid_names_and_missing_resources_are_explicit(tmp_path: Path, monkey
         assert client.post('/api/v1/workspaces', json={'name': ' '}).status_code == 422
         assert client.get('/api/v1/workspaces/missing').status_code == 404
         assert client.get('/api/v1/workspaces/missing/projects').status_code == 404
+
+
+def test_workspace_archive_and_restore_preserve_projects_and_gate_writes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv('FORGE_DATABASE_PATH', str(tmp_path / 'forge.db'))
+
+    with TestClient(app) as client:
+        workspace = client.post('/api/v1/workspaces', json={'name': 'Archive me'}).json()
+        workspace_id = workspace['id']
+        project = client.post(
+            f'/api/v1/workspaces/{workspace_id}/projects', json={'name': 'Keep my data'}
+        ).json()
+
+        archived = client.post(f'/api/v1/workspaces/{workspace_id}/archive')
+        assert archived.status_code == 200
+        assert archived.json()['archived_at'] is not None
+        assert client.get('/api/v1/workspaces').json()[0]['id'] == workspace_id
+        assert (
+            client.post(
+                f'/api/v1/workspaces/{workspace_id}/projects', json={'name': 'Blocked'}
+            ).status_code
+            == 422
+        )
+        assert (
+            client.get(f'/api/v1/workspaces/{workspace_id}/projects/{project["id"]}').status_code
+            == 200
+        )
+
+        restored = client.post(f'/api/v1/workspaces/{workspace_id}/restore')
+        assert restored.status_code == 200
+        assert restored.json()['archived_at'] is None
+        assert (
+            client.post(
+                f'/api/v1/workspaces/{workspace_id}/projects', json={'name': 'Allowed again'}
+            ).status_code
+            == 201
+        )

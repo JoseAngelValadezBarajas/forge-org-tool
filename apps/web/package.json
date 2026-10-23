@@ -9,12 +9,16 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "node ../../tooling/scripts/run-playwright-isolated.mjs",
+    "test:e2e:legacy-epic": "node ../../tooling/scripts/run-legacy-epic-e2e.mjs"
   },
   "dependencies": {
     "@forge-org/api-client": "*",
     "@forge-org/tokens": "*",
     "@forge-org/ui": "*",
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-dialog": "^2.8.3",
+    "@tauri-apps/plugin-fs": "^2.7.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"

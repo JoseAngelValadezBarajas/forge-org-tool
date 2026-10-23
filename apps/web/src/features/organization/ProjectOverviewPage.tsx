@@ -23,11 +23,10 @@ type Overview = {
   features: Feature[];
   tasks: number;
   epics: number;
+  epicBreakdown: { workflow: number; archived: number; legacy: number };
   criteria: number;
   satisfiedCriteria: number;
   dependencies: number;
-  decisions: number;
-  activeInvariants: number;
 };
 type Mutation = 'save' | 'archive' | 'restore';
 type MutationError = { message: string; action: Mutation };
@@ -47,11 +46,9 @@ async function loadOverview(workspaceId: string, projectId: string): Promise<Ove
   assertProjectScope(project, workspaceId, projectId);
   const workspace = workspaces.find((item) => item.id === workspaceId);
   if (!workspace) throw new Error('Owning Workspace not found.');
-  const [planning, dependencies, decisions, invariants] = await Promise.all([
+  const [planning, dependencies] = await Promise.all([
     organizationApi.planningOverview(workspaceId, projectId),
     organizationApi.listDependencies(workspaceId, projectId),
-    organizationApi.listDecisions(workspaceId, projectId),
-    organizationApi.listInvariants(workspaceId, projectId),
   ]);
   const features = planning.epics
     .flatMap((epic) => epic.features)
@@ -66,17 +63,25 @@ async function loadOverview(workspaceId: string, projectId: string): Promise<Ove
     }),
   );
   const criteria = records.flatMap((record) => record.criteria);
+  const supportedEpicStatuses = new Set(['backlog', 'ready', 'in_progress', 'verify', 'done']);
   return {
     project,
     workspace,
     features,
     tasks: records.reduce((total, record) => total + record.tasks.length, 0),
     epics: planning.epics.length,
+    epicBreakdown: {
+      workflow: planning.epics.filter(
+        (epic) => !epic.archived_at && supportedEpicStatuses.has(epic.status),
+      ).length,
+      archived: planning.epics.filter((epic) => Boolean(epic.archived_at)).length,
+      legacy: planning.epics.filter(
+        (epic) => !epic.archived_at && !supportedEpicStatuses.has(epic.status),
+      ).length,
+    },
     criteria: criteria.length,
     satisfiedCriteria: criteria.filter((criterion) => criterion.satisfied).length,
     dependencies: dependencies.length,
-    decisions: decisions.length,
-    activeInvariants: invariants.filter((invariant) => invariant.status === 'active').length,
   };
 }
 
@@ -190,6 +195,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
         <Link to="/">Back to Organization</Link>
         <Link to={`/planning/${workspaceId}/${projectId}`}>Open planning board</Link>
         <Link to={`/transfer/${workspaceId}/${projectId}`}>Transfer / export</Link>
+        <Link to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}>Import Epic</Link>
       </nav>
       {loadError ? (
         <ErrorState
@@ -338,15 +344,17 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
             <div className={styles.metrics}>
               <MetricCard label="Features" value={overview.features.length} />
               <MetricCard label="Tasks" value={overview.tasks} />
-              <MetricCard label="Epics" value={overview.epics} />
+              <MetricCard
+                label="Epics"
+                value={overview.epics}
+                detail={`${overview.epicBreakdown.workflow} in workflow · ${overview.epicBreakdown.archived} archived · ${overview.epicBreakdown.legacy} legacy`}
+              />
               <MetricCard
                 label="Acceptance criteria"
                 value={`${overview.satisfiedCriteria} / ${overview.criteria}`}
                 detail="Declared satisfied / total"
               />
               <MetricCard label="Dependencies" value={overview.dependencies} />
-              <MetricCard label="Decisions" value={overview.decisions} />
-              <MetricCard label="Active Invariants" value={overview.activeInvariants} />
             </div>
           </section>
           <section aria-label="Pending Features">

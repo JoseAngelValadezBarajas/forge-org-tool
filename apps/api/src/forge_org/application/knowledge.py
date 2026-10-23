@@ -29,6 +29,8 @@ class KnowledgeService:
         self, workspace_id: str, project_id: str, feature_id: str, description: str
     ) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id)
+        if self.project(workspace_id, project_id)['status'] != 'active':
+            raise ValueError('Archived projects are read-only')
         if not description.strip():
             raise ValueError('Description is required')
         return self.repository.create_criterion(feature_id, description)

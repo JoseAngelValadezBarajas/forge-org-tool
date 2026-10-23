@@ -63,6 +63,26 @@ def update_workspace(
         raise service_error(exc) from exc
 
 
+@organization_router.post('/workspaces/{workspace_id}/archive', response_model=WorkspaceResponse)
+def archive_workspace(
+    workspace_id: str, organization: OrganizationService = Depends(service)
+) -> dict[str, Any]:
+    try:
+        return organization.set_workspace_status(workspace_id, True)
+    except NotFound as exc:
+        raise service_error(exc) from exc
+
+
+@organization_router.post('/workspaces/{workspace_id}/restore', response_model=WorkspaceResponse)
+def restore_workspace(
+    workspace_id: str, organization: OrganizationService = Depends(service)
+) -> dict[str, Any]:
+    try:
+        return organization.set_workspace_status(workspace_id, False)
+    except NotFound as exc:
+        raise service_error(exc) from exc
+
+
 @organization_router.get(
     '/workspaces/{workspace_id}/projects', response_model=list[ProjectResponse]
 )

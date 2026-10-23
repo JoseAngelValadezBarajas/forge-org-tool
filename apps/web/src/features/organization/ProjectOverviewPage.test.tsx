@@ -5,10 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   organizationApi,
   type Criterion,
-  type Decision,
   type Dependency,
   type Feature,
-  type Invariant,
   type PlanningOverview,
   type Project,
   type Task,
@@ -61,7 +59,7 @@ const overview: PlanningOverview = {
       project_id: 'p1',
       title: 'First epic',
       description: null,
-      status: 'active',
+      status: 'backlog',
       ...dates,
       features: [features[3]!],
     },
@@ -123,32 +121,6 @@ const dependencies: Dependency[] = [
     ...dates,
   },
 ];
-const decisions: Decision[] = ['proposed', 'accepted', 'superseded'].map((status, index) => ({
-  id: `d${index}`,
-  project_id: 'p1',
-  title: 'Decision',
-  context: 'Context',
-  decision: 'Choice',
-  rationale: 'Reason',
-  alternatives_considered: null,
-  tradeoffs: null,
-  revision: 1,
-  status,
-  superseded_by_id: null,
-  ...dates,
-}));
-const invariants: Invariant[] = ['active', 'active', 'retired'].map((status, index) => ({
-  id: `i${index}`,
-  project_id: 'p1',
-  feature_id: null,
-  title: 'Invariant',
-  statement: 'Constraint',
-  rationale: 'Reason',
-  revision: 1,
-  acknowledged_revision: null,
-  status,
-  ...dates,
-}));
 
 function renderOverview() {
   return render(
@@ -170,8 +142,6 @@ describe('Project Overview route', () => {
       criteria.filter((item) => item.feature_id === id),
     );
     vi.spyOn(organizationApi, 'listDependencies').mockResolvedValue(dependencies);
-    vi.spyOn(organizationApi, 'listDecisions').mockResolvedValue(decisions);
-    vi.spyOn(organizationApi, 'listInvariants').mockResolvedValue(invariants);
     vi.spyOn(organizationApi, 'updateProject').mockResolvedValue(project);
     vi.spyOn(organizationApi, 'setProjectStatus').mockResolvedValue(project);
   });
@@ -199,8 +169,6 @@ describe('Project Overview route', () => {
       ['Epics', '1'],
       ['Acceptance criteria', '1 / 3'],
       ['Dependencies', '1'],
-      ['Decisions', '3'],
-      ['Active Invariants', '2'],
     ]) {
       expect(summary.getByText(label!).closest('article')).toHaveTextContent(value!);
     }
@@ -230,9 +198,37 @@ describe('Project Overview route', () => {
       expect(organizationApi.listTasks).toHaveBeenCalledWith('w1', 'p1', item.id);
       expect(organizationApi.listCriteria).toHaveBeenCalledWith('w1', 'p1', item.id);
     }
-    for (const operation of ['listDependencies', 'listDecisions', 'listInvariants'] as const) {
+    for (const operation of ['listDependencies'] as const) {
       expect(organizationApi[operation]).toHaveBeenCalledWith('w1', 'p1');
     }
+  });
+
+  it('reconciles total Epic count across workflow, archived, and unsupported records', async () => {
+    vi.mocked(organizationApi.planningOverview).mockResolvedValue({
+      epics: [
+        { ...overview.epics[0]!, status: 'backlog' },
+        {
+          ...overview.epics[0]!,
+          id: 'e-archived',
+          title: 'Archived Epic',
+          archived_at: '2026-10-01T00:00:00Z',
+        },
+        {
+          ...overview.epics[0]!,
+          id: 'e-legacy',
+          title: 'Custom state Epic',
+          status: 'custom_legacy',
+        },
+      ],
+      unassigned_features: overview.unassigned_features,
+    });
+    renderOverview();
+    await screen.findByRole('heading', { name: 'Atlas' });
+    const summary = within(screen.getByRole('region', { name: 'Project summary' }));
+    expect(summary.getByText('Epics').closest('article')).toHaveTextContent('3');
+    expect(summary.getByText('Epics').closest('article')).toHaveTextContent(
+      '1 in workflow · 1 archived · 1 legacy',
+    );
   });
 
   it('supports all priority levels when fewer than four Features are pending', async () => {
@@ -410,12 +406,7 @@ describe('Project Overview route', () => {
     const nav = within(screen.getByRole('navigation', { name: 'Product navigation' }));
     expect(nav.getByRole('link', { name: 'Overview' })).toHaveAttribute('href', '/projects/w1/p1');
     expect(nav.getByRole('link', { name: 'Planning' })).toHaveAttribute('href', '/planning/w1/p1');
-    for (const [name, section] of [
-      ['Workbench', 'workbench'],
-      ['Delivery', 'delivery'],
-      ['Repositories', 'repositories'],
-      ['Transfer', 'transfer'],
-    ]) {
+    for (const [name, section] of [['Transfer', 'transfer']]) {
       expect(nav.getByRole('link', { name: name! })).toHaveAttribute('href', `/${section}/w1/p1`);
     }
     const breadcrumb = within(screen.getByRole('navigation', { name: 'Breadcrumb' }));
@@ -432,8 +423,6 @@ describe('Project Overview route', () => {
       unassigned_features: [],
     });
     vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([project]);
-    vi.spyOn(organizationApi, 'listRuns').mockResolvedValue([]);
-    vi.spyOn(organizationApi, 'listHandoffs').mockResolvedValue([]);
     render(
       <MemoryRouter>
         <App />
@@ -448,7 +437,7 @@ describe('Project Overview route', () => {
       '/planning/w1/p1',
     );
     expect(screen.getByRole('button', { name: 'Archive' })).toBeEnabled();
-    for (const name of ['Repositories', 'Workbench', 'Delivery', 'Transfer']) {
+    for (const name of ['Transfer']) {
       expect(screen.getByRole('link', { name })).toHaveAttribute(
         'href',
         `/${name.toLowerCase()}/w1/p1`,

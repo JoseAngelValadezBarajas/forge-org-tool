@@ -1,29 +1,13 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import {
-  organizationApi,
-  type Feature,
-  type Handoff,
-  type Project,
-  type Run,
-  type Workspace,
-} from '@forge-org/api-client';
+import { organizationApi, type Project, type Workspace } from '@forge-org/api-client';
+
+const ACTIVE_WORKSPACE_KEY = 'forge-active-workspace';
 
 type ProjectDashboardSummary = {
   project: Project;
   featureCount: number;
   statusCounts: Record<string, number>;
-  readiness: { ready: number; notReady: number; unavailable: number };
-  attention: Array<{ featureId: string; featureTitle: string; code: string; message: string }>;
   unavailable: boolean;
-};
-
-type ActivityItem = {
-  id: string;
-  kind: 'run' | 'handoff';
-  title: string;
-  status: string;
-  occurredAt: string;
-  projectName: string;
 };
 
 export function useOrganizationController() {
@@ -31,6 +15,9 @@ export function useOrganizationController() {
   const [workspaceId, setWorkspaceId] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [workspaceName, setWorkspaceName] = useState('');
+  const [workspaceDescription, setWorkspaceDescription] = useState('');
+  const [workspaceEditName, setWorkspaceEditName] = useState('');
+  const [workspaceEditDescription, setWorkspaceEditDescription] = useState('');
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
   const [search, setSearch] = useState('');
@@ -39,8 +26,6 @@ export function useOrganizationController() {
   const [loading, setLoading] = useState(true);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardSummaries, setDashboardSummaries] = useState<ProjectDashboardSummary[]>([]);
-  const [activity, setActivity] = useState<ActivityItem[]>([]);
-  const [activityState, setActivityState] = useState<'loading' | 'loaded' | 'error'>('loading');
 
   const selectedWorkspace = workspaces.find((item) => item.id === workspaceId);
   const activeProjects = projects.filter((item) => item.status === 'active').length;
@@ -61,9 +46,14 @@ export function useOrganizationController() {
       const next = await organizationApi.listWorkspaces();
       if (!isCurrent()) return;
       setWorkspaces(next);
-      setWorkspaceId((current) =>
-        next.some((item) => item.id === current) ? current : (next[0]?.id ?? ''),
-      );
+      const saved = localStorage.getItem(ACTIVE_WORKSPACE_KEY) ?? '';
+      const selected = next.some((item) => item.id === saved) ? saved : (next[0]?.id ?? '');
+      setWorkspaceId(selected);
+      const selectedItem = next.find((item) => item.id === selected);
+      setWorkspaceEditName(selectedItem?.name ?? '');
+      setWorkspaceEditDescription(selectedItem?.description ?? '');
+      if (selected) localStorage.setItem(ACTIVE_WORKSPACE_KEY, selected);
+      else localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
     } catch (cause) {
       if (isCurrent()) {
         setError(cause instanceof Error ? cause.message : 'Unable to load workspaces.');
@@ -72,6 +62,18 @@ export function useOrganizationController() {
       if (isCurrent()) setLoading(false);
     }
   }, []);
+
+  const selectWorkspace = useCallback(
+    (id: string) => {
+      setWorkspaceId(id);
+      const selected = workspaces.find((item) => item.id === id);
+      setWorkspaceEditName(selected?.name ?? '');
+      setWorkspaceEditDescription(selected?.description ?? '');
+      if (id) localStorage.setItem(ACTIVE_WORKSPACE_KEY, id);
+      else localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
+    },
+    [workspaces],
+  );
 
   const loadProjects = useCallback(async (id: string, isCurrent: () => boolean = () => true) => {
     if (!id) {
@@ -119,47 +121,17 @@ export function useOrganizationController() {
         activeProjects.map(async (project): Promise<ProjectDashboardSummary> => {
           try {
             const overview = await organizationApi.planningOverview(workspaceId, project.id);
-            const features: Feature[] = overview.epics
+            const features = overview.epics
               .flatMap((epic) => epic.features)
               .concat(overview.unassigned_features);
-            const readinessResults = await Promise.all(
-              features.map(async (feature) => {
-                try {
-                  return await organizationApi.previewReadiness(
-                    workspaceId,
-                    project.id,
-                    feature.id,
-                  );
-                } catch {
-                  return null;
-                }
-              }),
-            );
             const statusCounts: Record<string, number> = {};
             for (const feature of features) {
               statusCounts[feature.status] = (statusCounts[feature.status] ?? 0) + 1;
             }
-            const attention = readinessResults.flatMap((result, index) => {
-              if (result?.outcome !== 'NOT_READY') return [];
-              return (result.blockers ?? []).map((blocker) => ({
-                featureId: features[index]!.id,
-                featureTitle: features[index]!.title,
-                code: blocker.code,
-                message: blocker.message,
-              }));
-            });
             return {
               project,
               featureCount: features.length,
               statusCounts,
-              readiness: {
-                ready: readinessResults.filter((result) => result?.outcome === 'READY_TO_START')
-                  .length,
-                notReady: readinessResults.filter((result) => result?.outcome === 'NOT_READY')
-                  .length,
-                unavailable: readinessResults.filter((result) => result === null).length,
-              },
-              attention,
               unavailable: false,
             };
           } catch {
@@ -167,8 +139,6 @@ export function useOrganizationController() {
               project,
               featureCount: 0,
               statusCounts: {},
-              readiness: { ready: 0, notReady: 0, unavailable: 0 },
-              attention: [],
               unavailable: true,
             };
           }
@@ -186,74 +156,46 @@ export function useOrganizationController() {
     };
   }, [projects, workspaceId]);
 
-  useEffect(() => {
-    let current = true;
-    const activeProjects = projects.filter(
-      (project) => project.workspace_id === workspaceId && project.status === 'active',
-    );
-    queueMicrotask(() => {
-      if (current) setActivityState('loading');
-      if (activeProjects.length === 0) {
-        if (current) {
-          setActivity([]);
-          setActivityState('loaded');
-        }
-        return;
-      }
-      void Promise.all(
-        activeProjects.map(async (project) => {
-          const [runs, handoffs] = await Promise.all([
-            organizationApi.listRuns(workspaceId, project.id),
-            organizationApi.listHandoffs(workspaceId, project.id),
-          ]);
-          return { project, runs, handoffs };
-        }),
-      )
-        .then((records) => {
-          if (!current) return;
-          const items: ActivityItem[] = records.flatMap(({ project, runs, handoffs }) => [
-            ...runs.map((run: Run) => ({
-              id: `run-${run.id}`,
-              kind: 'run' as const,
-              title: run.title,
-              status: run.status,
-              occurredAt: run.updated_at || run.created_at,
-              projectName: project.name,
-            })),
-            ...handoffs.map((handoff: Handoff) => ({
-              id: `handoff-${handoff.id}`,
-              kind: 'handoff' as const,
-              title: handoff.title,
-              status: handoff.status,
-              occurredAt: handoff.updated_at || handoff.created_at,
-              projectName: project.name,
-            })),
-          ]);
-          items.sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt));
-          setActivity(items.slice(0, 8));
-          setActivityState('loaded');
-        })
-        .catch(() => {
-          if (!current) return;
-          setActivity([]);
-          setActivityState('error');
-        });
-    });
-    return () => {
-      current = false;
-    };
-  }, [projects, workspaceId]);
-
   async function createWorkspace(event: FormEvent) {
     event.preventDefault();
     if (!workspaceName.trim()) return;
     try {
-      const created = await organizationApi.createWorkspace(workspaceName);
+      const created = await organizationApi.createWorkspace(workspaceName, workspaceDescription);
       setWorkspaceName('');
+      setWorkspaceDescription('');
       setWorkspaces((items) => [...items, created]);
-      setWorkspaceId(created.id);
+      selectWorkspace(created.id);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to create workspace.');
+    }
+  }
+
+  async function updateWorkspace(event: FormEvent) {
+    event.preventDefault();
+    if (!selectedWorkspace || !workspaceEditName.trim()) return;
+    try {
+      const updated = await organizationApi.updateWorkspace(selectedWorkspace.id, {
+        name: workspaceEditName.trim(),
+        description: workspaceEditDescription.trim() || null,
+      });
+      setWorkspaces((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      setError('');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to update workspace.');
+    }
+  }
+
+  async function toggleWorkspaceArchive() {
+    if (!selectedWorkspace) return;
+    try {
+      const updated = await organizationApi.setWorkspaceStatus(
+        selectedWorkspace.id,
+        !selectedWorkspace.archived_at,
+      );
+      setWorkspaces((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      setError('');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to update workspace.');
     }
   }
 
@@ -285,8 +227,6 @@ export function useOrganizationController() {
 
   return {
     activeProjects,
-    activity,
-    activityState,
     archivedProjects,
     createProject,
     createWorkspace,
@@ -305,13 +245,21 @@ export function useOrganizationController() {
     setProjectName,
     setSearch,
     setShowArchived,
-    setWorkspaceId,
+    setWorkspaceId: selectWorkspace,
     setWorkspaceName,
     showArchived,
     toggleProject,
+    toggleWorkspaceArchive,
     visibleProjects,
     workspaceId,
     workspaceName,
+    workspaceDescription,
+    setWorkspaceDescription,
+    workspaceEditName,
+    setWorkspaceEditName,
+    workspaceEditDescription,
+    setWorkspaceEditDescription,
+    updateWorkspace,
     workspaces,
   };
 }

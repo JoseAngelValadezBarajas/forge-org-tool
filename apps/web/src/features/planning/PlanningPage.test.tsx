@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -11,7 +11,8 @@ const overview = {
       project_id: 'p1',
       title: 'Launch',
       description: null,
-      status: 'planning',
+      status: 'backlog',
+      archived_at: null,
       created_at: '',
       updated_at: '',
       features: [
@@ -93,6 +94,100 @@ describe('PlanningPage', () => {
     );
   });
 
+  it('shows unsupported and archived Epics outside workflow columns with a reconcilable total', async () => {
+    const data = {
+      ...overview,
+      epics: [
+        ...overview.epics,
+        {
+          ...overview.epics[0],
+          id: 'e-legacy',
+          title: 'Legacy state',
+          status: 'custom_legacy',
+        },
+        {
+          ...overview.epics[0],
+          id: 'e-archived',
+          title: 'Archived record',
+          status: 'backlog',
+          archived_at: '2026-10-01T00:00:00Z',
+        },
+      ],
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((input: string) =>
+        Promise.resolve(
+          new Response(JSON.stringify(String(input).endsWith('/dependencies') ? [] : data), {
+            status: 200,
+          }),
+        ),
+      ),
+    );
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('region', { name: 'Legacy Epics' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Legacy state' })).toBeInTheDocument();
+    expect(screen.getByText('Legacy status: custom_legacy')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Archived Epics' })).toHaveTextContent(
+      'Archived record',
+    );
+    expect(screen.getByRole('region', { name: 'Epic visibility summary' })).toHaveTextContent(
+      '3 total · 1 in workflow · 1 archived · 1 legacy',
+    );
+  });
+
+  it('persists a work item status when dragged into another workflow column', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      if (String(input).endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (init?.method === 'PATCH')
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...overview.epics[0].features[0], status: 'ready' }), {
+            status: 200,
+          }),
+        );
+      return Promise.resolve(new Response(JSON.stringify(overview), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const dataTransfer = {
+      data: new Map<string, string>(),
+      setData(type: string, value: string) {
+        this.data.set(type, value);
+      },
+      getData(type: string) {
+        return this.data.get(type) ?? '';
+      },
+    };
+    fireEvent.dragStart(await screen.findByTestId('work-item-card-f1'), { dataTransfer });
+    const readyColumn = within(screen.getByLabelText('Planning board')).getByRole('region', {
+      name: 'Ready',
+    });
+    fireEvent.dragOver(readyColumn, { dataTransfer });
+    fireEvent.drop(readyColumn, { dataTransfer });
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/features/f1',
+        expect.objectContaining({ method: 'PATCH', body: JSON.stringify({ status: 'ready' }) }),
+      ),
+    );
+  });
+
   it('creates a feature inside the selected epic without changing manual planning semantics', async () => {
     const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
       if (String(input).endsWith('/dependencies'))
@@ -124,14 +219,67 @@ describe('PlanningPage', () => {
         '/api/v1/workspaces/w1/projects/p1/features',
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify({ title: 'Gamma', epic_id: 'e1' }),
+          body: JSON.stringify({ title: 'Gamma', epic_id: 'e1', kind: 'story', tags: [] }),
         }),
       ),
     );
     expect(screen.getByText(/manual product records only/i)).toBeInTheDocument();
   });
 
-  it('renders all six API-supported planning workflow columns', async () => {
+  it('creates a Bug through the accessible work-item type buttons', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      if (String(input).endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (String(input).endsWith('/features') && init?.method === 'POST')
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...overview.unassigned_features[0], id: 'bug-1' }), {
+            status: 201,
+          }),
+        );
+      return Promise.resolve(new Response(JSON.stringify(overview), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('link', { name: 'Alpha' });
+    fireEvent.click(screen.getByRole('button', { name: 'Bug' }));
+    expect(screen.getByLabelText('Bug severity')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Epic for new feature'), { target: { value: 'e1' } });
+    fireEvent.change(screen.getByLabelText('Feature title'), {
+      target: { value: 'Regression bug' },
+    });
+    fireEvent.change(screen.getByLabelText('Steps to reproduce'), {
+      target: { value: 'Open the page.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Feature' }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/features',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            title: 'Regression bug',
+            epic_id: 'e1',
+            kind: 'bug',
+            tags: [],
+            bug_severity: 'medium',
+            steps_to_reproduce: 'Open the page.',
+            expected_result: '',
+            actual_result: '',
+          }),
+        }),
+      ),
+    );
+  });
+
+  it('renders both five-column Boards and preserves legacy refining items separately', async () => {
     const sixColumnOverview = {
       ...overview,
       unassigned_features: [
@@ -177,9 +325,10 @@ describe('PlanningPage', () => {
       </MemoryRouter>,
     );
 
-    for (const column of ['Backlog', 'Refining', 'Ready', 'In progress', 'Verify', 'Done']) {
-      expect(await screen.findByRole('heading', { name: column })).toBeInTheDocument();
+    for (const column of ['Backlog', 'Ready', 'In progress', 'Verify', 'Done']) {
+      expect(await screen.findAllByRole('heading', { name: column })).toHaveLength(2);
     }
+    expect(screen.getByRole('region', { name: 'Legacy refining work items' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Gamma' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Delta' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Filter planning by status' })).toHaveDisplayValue(

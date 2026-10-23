@@ -11,10 +11,10 @@
       "route": "/repositories/:workspaceId/:projectId",
       "user_action": "Connect an authorized local Git root, observe metadata, and disconnect it.",
       "expected_result": "Repository metadata is persisted; source content is not read; disconnect changes its status.",
-      "test_ids": ["PA-REPO-01"],
-      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "57:71",
@@ -25,10 +25,10 @@
       "route": "/repositories/:workspaceId/:projectId",
       "user_action": "Submit a local repository path in the Approved local Git root field.",
       "expected_result": "Only a Git root inside the configured authorized root is connected.",
-      "test_ids": ["PA-REPO-01"],
-      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "57:128",
@@ -39,10 +39,10 @@
       "route": "/repositories/:workspaceId/:projectId/:repositoryId",
       "user_action": "Open a connected repository detail.",
       "expected_result": "The page displays the stored Git metadata observation without source content.",
-      "test_ids": ["PA-REPO-01"],
-      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "58:89",
@@ -53,10 +53,10 @@
       "route": "/context/:workspaceId/:projectId/:featureId",
       "user_action": "Link an available repository to a feature and preview its context package.",
       "expected_result": "The feature context view shows its repository link and generated planning/metadata context.",
-      "test_ids": ["PA-CONTEXT-01"],
-      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "58:165",
@@ -67,10 +67,10 @@
       "route": "/context/:workspaceId/:projectId/:featureId",
       "user_action": "Preview and save the generated context package; download JSON and Markdown.",
       "expected_result": "The saved snapshot retains its fingerprint and both downloads contain the saved payload.",
-      "test_ids": ["PA-CONTEXT-01"],
-      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "58:235",
@@ -81,10 +81,10 @@
       "route": "/context/:workspaceId/:projectId/:featureId",
       "user_action": "Inspect saved context package history and open a snapshot.",
       "expected_result": "Earlier package records remain available and unchanged after newer context is saved.",
-      "test_ids": ["PA-CONTEXT-01"],
-      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "251:554",
@@ -151,10 +151,10 @@
       "route": "/workbench/:workspaceId/:projectId",
       "user_action": "Open the Workbench and inspect recorded Runs and Handoffs.",
       "expected_result": "Human-reported work and its provenance are shown without claiming agent execution.",
-      "test_ids": ["PA-RUN-01", "PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "67:92",
@@ -165,10 +165,10 @@
       "route": "/workbench/:workspaceId/:projectId",
       "user_action": "Review the Runs list.",
       "expected_result": "Recorded Runs appear with their reported execution mode and a detail link.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "67:170",
@@ -179,10 +179,10 @@
       "route": "/workbench/:workspaceId/:projectId",
       "user_action": "Submit a Run title using Record Run.",
       "expected_result": "A human-reported Run is stored and appears in the Runs list.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "67:242",
@@ -193,10 +193,10 @@
       "route": "/workbench/:workspaceId/:projectId/runs/:runId",
       "user_action": "Open the Run detail and report activity with occurrence times.",
       "expected_result": "Events are shown chronologically and remain persisted after reload.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "68:118",
@@ -207,10 +207,10 @@
       "route": "/workbench/:workspaceId/:projectId/runs/:runId",
       "user_action": "Submit a typed activity event in the Run detail form.",
       "expected_result": "The event is attributed as a human report and appended to the timeline.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "68:178",
@@ -221,10 +221,10 @@
       "route": "/workbench/:workspaceId/:projectId",
       "user_action": "Create a Handoff and save draft summary and next actions.",
       "expected_result": "The draft can be revised before it is made ready.",
-      "test_ids": ["PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "68:265",
@@ -235,10 +235,10 @@
       "route": "/workbench/:workspaceId/:projectId",
       "user_action": "Review draft and ready Handoffs in the project queue.",
       "expected_result": "Current Handoff state and available next actions are visible.",
-      "test_ids": ["PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "68:342",
@@ -249,10 +249,10 @@
       "route": "/workbench/:workspaceId/:projectId/handoffs/:handoffId",
       "user_action": "Inspect the immutable revision and acknowledge it as a named reviewer.",
       "expected_result": "Acknowledgement is bound to the current immutable revision and does not certify technical work.",
-      "test_ids": ["PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "70:234",
@@ -263,10 +263,10 @@
       "route": "/workbench/:workspaceId/:projectId/handoffs/:handoffId",
       "user_action": null,
       "expected_result": "The acknowledged revision is visibly identified as acknowledged.",
-      "test_ids": ["PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:75",
@@ -277,10 +277,10 @@
       "route": "/repositories/:workspaceId/:projectId",
       "user_action": "Connect an authorized synthetic local repository.",
       "expected_result": "The authorized repository appears in the project repository inventory.",
-      "test_ids": ["PA-REPO-01"],
-      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:129",
@@ -291,10 +291,10 @@
       "route": "/repositories/:workspaceId/:projectId",
       "user_action": "Submit a repository path outside the authorized local root.",
       "expected_result": "The path is rejected and no repository record is created.",
-      "test_ids": ["PA-REPO-01"],
-      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:170",
@@ -305,10 +305,10 @@
       "route": "/context/:workspaceId/:projectId/:featureId",
       "user_action": "Preview a feature Context Package.",
       "expected_result": "A generated schema and fingerprint are displayed for review before save.",
-      "test_ids": ["PA-CONTEXT-01"],
-      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:227",
@@ -319,10 +319,10 @@
       "route": "/workbench/:workspaceId/:projectId",
       "user_action": "Open the Workbench Runs registry.",
       "expected_result": "Recorded human-reported Runs are listed with their provenance.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:280",
@@ -333,10 +333,10 @@
       "route": "/workbench/:workspaceId/:projectId/handoffs/:handoffId",
       "user_action": "Open a ready Handoff for human review.",
       "expected_result": "The immutable revision and its reported provenance are available for review.",
-      "test_ids": ["PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:23",
@@ -347,10 +347,10 @@
       "route": "/repositories/:workspaceId/:projectId",
       "user_action": "Inspect connected repository metadata and authorization boundaries.",
       "expected_result": "Only the authorized synthetic root is connected and metadata is reported without reading source content.",
-      "test_ids": ["PA-REPO-01"],
-      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:90",
@@ -375,10 +375,10 @@
       "route": "/context/:workspaceId/:projectId/:featureId",
       "user_action": "Change feature context and request a fresh preview.",
       "expected_result": "The new preview fingerprint differs while the previously saved snapshot remains immutable.",
-      "test_ids": ["PA-CONTEXT-01"],
-      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Fingerprint change and prior snapshot immutability passed in both Chromium projects; no dedicated stale badge is asserted."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Fingerprint change and prior snapshot immutability passed in both Chromium projects; no dedicated stale badge is asserted. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:222",
@@ -389,10 +389,10 @@
       "route": "/context/:workspaceId/:projectId/:featureId",
       "user_action": "Preview and save a Context Package snapshot.",
       "expected_result": "Saved snapshot history preserves its payload and exposes JSON and Markdown downloads.",
-      "test_ids": ["PA-CONTEXT-01"],
-      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:291",
@@ -403,10 +403,10 @@
       "route": "/workbench/:workspaceId/:projectId/runs/:runId",
       "user_action": "Inspect a Run detail and its activity timeline.",
       "expected_result": "Events persist and render in chronological order as human-reported activity.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:357",
@@ -417,10 +417,10 @@
       "route": "/workbench/:workspaceId/:projectId/runs/:runId",
       "user_action": "Submit a valid activity event and attempt an invalid empty-title event.",
       "expected_result": "The valid event appears in order; invalid input returns validation failure without an extra event record.",
-      "test_ids": ["PA-RUN-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:431",
@@ -431,10 +431,10 @@
       "route": "/workbench/:workspaceId/:projectId/handoffs/:handoffId",
       "user_action": "Revise a draft, mark it ready, inspect revision history, and acknowledge it.",
       "expected_result": "An immutable ready revision is reviewed and acknowledged by a named person.",
-      "test_ids": ["PA-HANDOFF-01"],
-      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "141:500",
