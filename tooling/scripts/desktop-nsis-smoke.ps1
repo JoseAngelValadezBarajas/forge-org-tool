@@ -118,6 +118,61 @@ function Wait-ForgeAutomationElement($root, [System.Windows.Automation.ControlTy
   throw "FORGE UI did not expose the expected $controlType named '$name'."
 }
 
+function Invoke-ForgeElement($root, [System.Windows.Automation.ControlType]$controlType, [string]$name) {
+  $element = Wait-ForgeAutomationElement $root $controlType $name
+  $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+}
+
+function Set-ForgeElementValue($root, [System.Windows.Automation.ControlType]$controlType, [string]$name, [string]$value) {
+  $element = Wait-ForgeAutomationElement $root $controlType $name
+  $element.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($value)
+}
+
+function Select-ForgeOption($root, [string]$comboBoxName, [string]$optionName) {
+  $combo = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ComboBox) $comboBoxName
+  $combo.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern).Expand()
+  try {
+    $option = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ListItem) $optionName
+    try {
+      $option.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+    } catch {
+      $option.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select()
+    }
+  } finally {
+    $combo.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern).Collapse()
+  }
+}
+
+function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) $buttonName
+  $desktop = [System.Windows.Automation.AutomationElement]::RootElement
+  $dialog = $null
+  $deadline = [DateTime]::UtcNow.AddSeconds(15)
+  do {
+    $windows = $desktop.FindAll([System.Windows.Automation.TreeScope]::Children, [System.Windows.Automation.Condition]::TrueCondition)
+    foreach ($candidate in $windows) {
+      if ($candidate.Current.Name -match '^(Open|Choose.*file|Select.*file)$') { $dialog = $candidate; break }
+    }
+    if ($null -eq $dialog) { Start-Sleep -Milliseconds 250 }
+  } while ($null -eq $dialog -and [DateTime]::UtcNow -lt $deadline)
+  if ($null -eq $dialog) { throw 'Windows did not expose the screenshot file picker to UI Automation.' }
+  $fileName = $dialog.FindFirst(
+    [System.Windows.Automation.TreeScope]::Descendants,
+    [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Edit)
+  )
+  if ($null -eq $fileName) { throw 'The screenshot file picker did not expose its file-name field.' }
+  $fileName.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($filePath)
+  $open = $dialog.FindFirst(
+    [System.Windows.Automation.TreeScope]::Descendants,
+    [System.Windows.Automation.AndCondition]::new(@(
+      [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Button),
+      [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::NameProperty, 'Open')
+    ))
+  )
+  if ($null -eq $open) { throw 'The screenshot file picker did not expose its Open button.' }
+  $open.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+}
+
 try {
   $install = Start-Process -FilePath $installer.FullName -ArgumentList "/S", "/D=$installRoot" -Wait -PassThru
   if ($install.ExitCode -ne 0) { throw "NSIS installer exited with code $($install.ExitCode)." }
@@ -174,6 +229,32 @@ try {
   $projectButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
 
+  # Exercise a real Bug attachment through the installed React UI and local sidecar.
+  $epicName = "Installed Epic smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
+  $workItemName = "Installed Bug smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
+  $bugAttachmentName = 'forge-desktop-bug.png'
+  $bugAttachmentPath = Join-Path $testRoot $bugAttachmentName
+  $pngBytes = [Convert]::FromBase64String('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADUlEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC')
+  [System.IO.File]::WriteAllBytes($bugAttachmentPath, $pngBytes)
+
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Epic title' $epicName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Epic'
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
+
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Feature title' $workItemName
+  Select-ForgeOption $root 'Epic for new feature' $epicName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Bug'
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ComboBox) 'Bug severity'
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Steps to reproduce' 'Open the synthetic report.'
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Expected result' 'The report loads.'
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Actual result' 'A synthetic failure is shown.'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Feature'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
+  Choose-ForgeFile $root 'Add Bug screenshot' $bugAttachmentPath
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName"
+
   $databasePath = Join-Path $isolatedLocalAppData 'ForgeOrgTool/data/forge.db'
   if (-not (Test-Path -LiteralPath $databasePath -PathType Leaf)) {
     throw "The sidecar did not create the configured per-user SQLite database: $databasePath"
@@ -195,7 +276,12 @@ try {
   $root = Get-ForgeAutomationRoot $window.Handle
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
-  Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName"
+  Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' epic='$epicName' bug='$workItemName' attachment='$bugAttachmentName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
 }
 finally {
   if ($null -ne $process) {

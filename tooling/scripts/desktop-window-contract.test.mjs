@@ -66,6 +66,22 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
   );
 });
 
+test('installed Desktop acceptance preserves a Bug screenshot through restart', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(smoke, /Add Bug screenshot/);
+  assert.match(smoke, /Bug screenshot: \$bugAttachmentName/);
+  assert.match(
+    smoke,
+    /Invoke-ForgeElement\s+\$root\s+\(\[System\.Windows\.Automation\.ControlType\]::Button\)\s+'Bug'/,
+  );
+  assert.match(smoke, /Choose-ForgeFile\s+\$root\s+'Add Bug screenshot'/);
+  assert.match(
+    smoke,
+    /System\.Windows\.Automation\.ControlType\]::Image\)\s+"Bug screenshot: \$bugAttachmentName"/,
+  );
+});
+
 test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
   const command = packageJson.scripts['test:desktop:acceptance'];

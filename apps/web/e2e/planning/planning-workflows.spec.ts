@@ -278,7 +278,7 @@ test('PA-PLAN-004 creates a structured Bug with a durable screenshot from the pr
   const { workspace, project } = await createProject(page, `Bug ${suffix}`);
   await page.goto(`/planning/${workspace.id}/${project.id}`);
   await page.getByLabel('Feature title').fill(`Bug ${suffix}`);
-  await page.getByLabel('Work item type').selectOption('bug');
+  await page.getByRole('button', { name: 'Bug', exact: true }).click();
   await page.getByLabel('Feature tags').fill('Desktop, Regression');
   await page.getByLabel('Bug severity').selectOption('critical');
   await page.getByLabel('Steps to reproduce').fill('Open the workspace and select a project.');

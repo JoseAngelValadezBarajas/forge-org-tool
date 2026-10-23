@@ -177,6 +177,59 @@ describe('PlanningPage', () => {
     expect(screen.getByText(/manual product records only/i)).toBeInTheDocument();
   });
 
+  it('creates a Bug through the accessible work-item type buttons', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      if (String(input).endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (String(input).endsWith('/features') && init?.method === 'POST')
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...overview.unassigned_features[0], id: 'bug-1' }), {
+            status: 201,
+          }),
+        );
+      return Promise.resolve(new Response(JSON.stringify(overview), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('link', { name: 'Alpha' });
+    fireEvent.click(screen.getByRole('button', { name: 'Bug' }));
+    expect(screen.getByLabelText('Bug severity')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Epic for new feature'), { target: { value: 'e1' } });
+    fireEvent.change(screen.getByLabelText('Feature title'), {
+      target: { value: 'Regression bug' },
+    });
+    fireEvent.change(screen.getByLabelText('Steps to reproduce'), {
+      target: { value: 'Open the page.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Feature' }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/features',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            title: 'Regression bug',
+            epic_id: 'e1',
+            kind: 'bug',
+            tags: [],
+            bug_severity: 'medium',
+            steps_to_reproduce: 'Open the page.',
+            expected_result: '',
+            actual_result: '',
+          }),
+        }),
+      ),
+    );
+  });
+
   it('renders both five-column Boards and preserves legacy refining items separately', async () => {
     const sixColumnOverview = {
       ...overview,

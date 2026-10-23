@@ -139,16 +139,22 @@ export function PlanningPage() {
                   ))}
                 </Select>
               </FormField>
-              <FormField label="Work item type">
-                <Select
-                  aria-label="Work item type"
-                  value={featureKind}
-                  onChange={(event) => setFeatureKind(event.target.value as typeof featureKind)}
-                >
-                  <option value="story">Story</option>
-                  <option value="bug">Bug</option>
-                </Select>
-              </FormField>
+              <fieldset className={styles.workItemType}>
+                <legend>Work item type</legend>
+                <div className={styles.workItemTypeButtons}>
+                  {(['story', 'bug'] as const).map((kind) => (
+                    <Button
+                      key={kind}
+                      type="button"
+                      variant={featureKind === kind ? 'primary' : 'secondary'}
+                      aria-pressed={featureKind === kind}
+                      onClick={() => setFeatureKind(kind)}
+                    >
+                      {kind === 'story' ? 'Story' : 'Bug'}
+                    </Button>
+                  ))}
+                </div>
+              </fieldset>
               <FormField label="Feature tags (comma-separated)">
                 <Input
                   aria-label="Feature tags"

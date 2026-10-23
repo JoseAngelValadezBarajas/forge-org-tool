@@ -12,6 +12,18 @@
   display: grid;
   gap: var(--forge-space-2);
 }
+.workItemType {
+  display: grid;
+  gap: var(--forge-space-2);
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.workItemTypeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2);
+}
 .featureForm {
   display: grid;
   gap: var(--forge-space-2);
