@@ -360,7 +360,20 @@ try {
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Feature'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
   Choose-ForgeFile $root 'Add Bug screenshot' $bugAttachmentPath
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName"
+  try {
+    $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName" 45
+  } catch {
+    $visibleControls = $root.FindAll(
+      [System.Windows.Automation.TreeScope]::Descendants,
+      [System.Windows.Automation.Condition]::TrueCondition
+    )
+    $summary = @($visibleControls | Select-Object -First 100 | ForEach-Object {
+      "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)'"
+    })
+    $failureScreenshot = Join-Path (Split-Path -Parent $installer.FullName) 'forge-desktop-startup-v0.1.1-failure-smoke.bmp'
+    [ForgeWindowNative]::CaptureWindow($root.Current.NativeWindowHandle, $failureScreenshot) | Out-Null
+    throw "Bug screenshot did not render after upload. UIA elements: $($summary -join '; '). Original failure: $($_.Exception.Message)"
+  }
 
   $databasePath = Join-Path $isolatedLocalAppData 'ForgeOrgTool/data/forge.db'
   if (-not (Test-Path -LiteralPath $databasePath -PathType Leaf)) {
