@@ -1,6 +1,6 @@
 # FORGE Org Tool 1.0 local verification evidence
 
-Verification was run on the isolated `feature/forge-mvp-1.0` worktree based on `d0f111022bc570eb5b25e9fb16c21b7a216b862f`. Implementation commit is recorded in the final delivery; evidence distinguishes automated checks from missing native GUI and human visual review.
+Verification was run on the isolated `feature/forge-mvp-1.0` worktree based on `d0f111022bc570eb5b25e9fb16c21b7a216b862f`. Implementation commit: `d03437a3e022781b5933135a1ec736c07cc5c562`. Evidence distinguishes automated checks from missing native GUI and human visual review.
 
 ## Browser journeys
 

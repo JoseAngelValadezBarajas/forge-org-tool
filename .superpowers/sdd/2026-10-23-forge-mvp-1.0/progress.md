@@ -35,3 +35,4 @@
 - One frontend ESLint issue (synchronous effect state reset) was fixed by keying the workspace panel on workspace identity; no lint rule was weakened.
 - Component Host screenshots from the first smoke run are run-scoped/ignored. Refresh and retain review screenshots under `docs/evidence/mvp-1.0/` before final review.
 - Remaining product gaps are explicit: Workspace archive/restore, accessible drag-and-drop, transfer ZIP attachments and hostile-archive cases, explicit attachment size/count boundary tests, expanded current browser journeys, and native installed Tauri GUI acceptance. `cargo` is absent and GitHub CI has not run because branch has not been pushed. Do not report the product goal complete while these remain.
+- Local implementation commit: `d03437a3e022781b5933135a1ec736c07cc5c562`; evidence-record commit follows. Branch is still local and has not been pushed or opened as a PR.
