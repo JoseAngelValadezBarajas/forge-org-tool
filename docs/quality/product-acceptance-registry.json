@@ -563,10 +563,13 @@
       "route": "/transfer/{workspaceId}/{projectId}",
       "user_action": "Review schema, counts and fingerprint, then confirm import.",
       "expected_result": "Planning-only records are committed after explicit confirmation.",
-      "test_ids": ["PA-TRN-001"],
-      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
+      "test_ids": ["PA-TRN-001", "PA-TRN-002"],
+      "evidence": [
+        "apps/web/e2e/transfer/transfer-acceptance.spec.ts",
+        "apps/web/e2e/transfer/package-acceptance.spec.ts"
+      ],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile; preview counts/fingerprint and explicit commit were verified against imported planning records.",
+      "notes": "PA-TRN-001 verifies JSON preview/commit and PA-TRN-002 verifies ZIP package preview/commit with its Bug screenshot in chromium-desktop and chromium-mobile.",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -623,10 +626,13 @@
       "route": "/transfer/{workspaceId}/{projectId}",
       "user_action": "Download the prepared project planning snapshot.",
       "expected_result": "A ready state is shown and the browser downloads a real planning-only JSON snapshot without changing the source Project.",
-      "test_ids": ["PA-TRN-001"],
-      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
+      "test_ids": ["PA-TRN-001", "PA-TRN-002"],
+      "evidence": [
+        "apps/web/e2e/transfer/transfer-acceptance.spec.ts",
+        "apps/web/e2e/transfer/package-acceptance.spec.ts"
+      ],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 asserts the Export ready state and validates downloaded JSON bytes in both Chromium projects; local focused run passed 2/2.",
+      "notes": "PA-TRN-001 verifies downloaded JSON and PA-TRN-002 verifies downloaded ZIP bytes contain the stored screenshot and the complete round trip in both Chromium projects.",
       "domain": "delivery-transfer-desktop"
     },
     {

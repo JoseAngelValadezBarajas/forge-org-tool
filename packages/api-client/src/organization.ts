@@ -13,6 +13,11 @@ export const organizationCapability = {
       method: 'PATCH',
       body: JSON.stringify(values),
     }),
+  setWorkspaceStatus: (workspaceId: string, archived: boolean) =>
+    sendJson<Workspace>(`/api/v1/workspaces/${workspaceId}/${archived ? 'archive' : 'restore'}`, {
+      method: 'POST',
+      body: '{}',
+    }),
   listProjects: (
     workspaceId: string,
     search = '',

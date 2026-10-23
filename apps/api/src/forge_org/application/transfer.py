@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sqlite3
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -18,8 +19,9 @@ MAX_DOCUMENT_BYTES = 7 * 1024 * 1024
 
 
 class ProjectTransferService:
-    def __init__(self, connection: sqlite3.Connection) -> None:
+    def __init__(self, connection: sqlite3.Connection, storage_root: Path | None = None) -> None:
         self.connection = connection
+        self.storage_root = storage_root
 
     @staticmethod
     def canonical(document: dict[str, Any]) -> str:
@@ -203,7 +205,12 @@ class ProjectTransferService:
         }
 
     def import_project(
-        self, workspace_id: str, document: dict[str, Any], expected_fingerprint: str
+        self,
+        workspace_id: str,
+        document: dict[str, Any],
+        expected_fingerprint: str,
+        *,
+        commit: bool = True,
     ) -> dict[str, Any]:
         normalized = self.validate(document)
         canonical = self.canonical(normalized)
@@ -322,7 +329,8 @@ class ProjectTransferService:
                         now,
                     ),
                 )
-            self.connection.commit()
+            if commit:
+                self.connection.commit()
         except Exception:
             self.connection.rollback()
             raise

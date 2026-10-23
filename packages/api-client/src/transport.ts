@@ -11,6 +11,15 @@ export async function getApiJson<T>(request: ApiRequest): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+export async function getApiBlob(request: ApiRequest): Promise<Blob> {
+  const response = await fetch(request.path, {
+    signal: request.signal,
+    credentials: 'same-origin',
+  });
+  if (!response.ok) throw await apiErrorFromResponse(response);
+  return response.blob();
+}
+
 export async function sendJson<T>(path: `/api/v1/${string}`, init: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,

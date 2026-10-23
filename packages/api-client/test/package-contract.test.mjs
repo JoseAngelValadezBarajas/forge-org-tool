@@ -35,6 +35,9 @@ test('compatibility facade exposes only active 1.0 capabilities', async () => {
   assert.equal(typeof organizationApi.listWorkspaces, 'function');
   assert.equal(typeof organizationApi.planningOverview, 'function');
   assert.equal(typeof organizationApi.previewProjectImport, 'function');
+  assert.equal(typeof organizationApi.previewProjectPackageImport, 'function');
+  assert.equal(typeof organizationApi.importProjectPackage, 'function');
+  assert.equal(typeof organizationApi.exportProjectPackage, 'function');
   assert.equal('listRunEvents' in organizationApi, false);
   assert.equal('listHandoffs' in organizationApi, false);
   assert.equal('listEvidence' in organizationApi, false);

@@ -1,6 +1,6 @@
 # Project Transfer
 
-Project Transfer is a supported 1.0 capability. JSON v2 is the current format; v1 remains import-compatible. Preview and confirmation must call the same validation engine, with a fingerprint over the normalized payload and an explicit stale-preview rejection.
+Project Transfer currently supports complete-Project JSON v1/v2 import/export and complete-Project ZIP v2 import/export with Bug screenshots. JSON imports use a fingerprint over the normalized document. Preview and confirmation call the same validation engine, and stale fingerprints are rejected. Contextual Epic, Work Item and Task import/export is a required 1.0 capability but is not implemented yet; do not interpret the complete-Project flows as satisfying it.
 
 ## Validation boundary
 
@@ -8,7 +8,7 @@ Validate format version, required fields, identifier uniqueness, workspace/proje
 
 ## Attachments
 
-Only PNG, JPEG and WebP images are supported. ZIP imports must reject absolute paths, `..` traversal, symlinks, duplicate normalized paths, unsupported compression or entries, checksum mismatch, excessive entry count, and compressed or expanded payloads above configured limits. Files are written to a private staging directory, scanned/validated, then atomically moved into the application data area. Desktop request bodies must remain within the 8 MiB host limit; larger binary assets travel through bounded attachment APIs rather than unbounded IPC payloads.
+Only PNG, JPEG and WebP images are supported. ZIP package v2 contains a UTF-8 `manifest.json` plus screenshot entries under `attachments/feature-NNN/attachment-NNN.{png,jpg,webp}`. The manifest names each file, content type, byte size, and SHA-256. The current package bound is 5 MiB compressed, 25 MiB expanded, 100 entries, five images per Bug and 5 MiB per image. Package imports reject absolute paths, `..` traversal, symlinks, duplicate normalized paths, unsupported compression or entries, checksum mismatch, unsupported image bytes and unreferenced files. Package bytes are validated before database writes; import keeps project and attachment metadata in one SQLite transaction, publishes only generated safe storage names, and removes published files if the transaction fails. Browser-to-sidecar requests use bounded base64 JSON and remain below the Desktop 8 MiB body limit.
 
 ## Compatibility and fixtures
 

@@ -13,7 +13,7 @@ FORGE Org Tool 1.0 is a local-first project organization app. SQLite is the syst
 5. **Bugs and attachments:** Bugs have structured fields. Local PNG/JPEG/WebP attachments are bounded in count and size, staged safely, validated against traversal/symlink attacks, and persist across restarts within the desktop request-size limit.
 6. **Workflow status:** five persisted columns — BACKLOG, READY, IN PROGRESS, VERIFY, DONE — support drag-and-drop and an accessible status selector. Legacy statuses remain deliberate; archive is not a workflow status.
 7. **Durability:** product data survives browser/API/Desktop restarts using SQLite. Tests never seed or mutate operator production data.
-8. **Project Transfer:** support v2 JSON plus v1 compatibility through one validated engine; enforce schema, references, workspace scoping, tags and stale fingerprints atomically. ZIP attachments require checksums, safe paths, bounded sizes/counts and secure staged writes. Keep the required valid/invalid fixture set.
+8. **Project Transfer:** support v2 JSON plus v1 compatibility through one validated engine; enforce schema, references, workspace scoping, tags and stale fingerprints atomically. A v2 ZIP package carries Bug screenshots with checksums, canonical safe paths, bounded sizes/counts and transaction-compensated storage writes within the Desktop request budget. Keep the required valid/invalid fixture set.
 9. **Component Host:** retain `/__components` as development-only. Remove previews for retired capabilities and retain shared UI and product compositions still in scope.
 
 ## In scope / preserve

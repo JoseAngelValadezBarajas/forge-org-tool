@@ -39,6 +39,7 @@ export function OrganizationPage() {
     setWorkspaceName,
     showArchived,
     toggleProject,
+    toggleWorkspaceArchive,
     visibleProjects,
     workspaceId,
     workspaceName,
@@ -151,12 +152,21 @@ export function OrganizationPage() {
               </div>
             )}
           </section>
-          <WorkspaceTagsPanel key={workspaceId} workspaceId={workspaceId} />
+          {selectedWorkspace?.archived_at ? (
+            <Card>
+              <p>This workspace is archived. Restore it to create projects or edit its settings.</p>
+            </Card>
+          ) : (
+            <WorkspaceTagsPanel key={workspaceId} workspaceId={workspaceId} />
+          )}
           <Card>
             <div className={styles.toolbar}>
               <WorkspaceSwitcher
                 value={workspaceId}
-                workspaces={workspaces}
+                workspaces={workspaces.map((workspace) => ({
+                  ...workspace,
+                  name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
+                }))}
                 onChange={setWorkspaceId}
                 currentName={selectedWorkspace?.name ?? 'Local Workspace'}
               />
@@ -164,6 +174,7 @@ export function OrganizationPage() {
             {selectedWorkspace && (
               <form onSubmit={updateWorkspace} className={styles.form}>
                 <h3>Workspace settings</h3>
+                {selectedWorkspace.archived_at && <StatusChip tone="warning">Archived</StatusChip>}
                 <FormField label="Workspace name">
                   <Input
                     aria-label="Edit workspace name"
@@ -181,28 +192,39 @@ export function OrganizationPage() {
                     maxLength={2000}
                   />
                 </FormField>
-                <Button type="submit">Save workspace</Button>
+                <Button type="submit" disabled={Boolean(selectedWorkspace.archived_at)}>
+                  Save workspace
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void toggleWorkspaceArchive()}
+                >
+                  {selectedWorkspace.archived_at ? 'Restore workspace' : 'Archive workspace'}
+                </Button>
               </form>
             )}
-            <form onSubmit={createProject} className={styles.form}>
-              <h3>Create project</h3>
-              <FormField label="Project name">
-                <Input
-                  id="project-name"
-                  value={projectName}
-                  onChange={(event) => setProjectName(event.target.value)}
-                  required
-                />
-              </FormField>
-              <FormField label="Description">
-                <Input
-                  id="project-description"
-                  value={projectDescription}
-                  onChange={(event) => setProjectDescription(event.target.value)}
-                />
-              </FormField>
-              <Button type="submit">Create Project</Button>
-            </form>
+            {!selectedWorkspace?.archived_at && (
+              <form onSubmit={createProject} className={styles.form}>
+                <h3>Create project</h3>
+                <FormField label="Project name">
+                  <Input
+                    id="project-name"
+                    value={projectName}
+                    onChange={(event) => setProjectName(event.target.value)}
+                    required
+                  />
+                </FormField>
+                <FormField label="Description">
+                  <Input
+                    id="project-description"
+                    value={projectDescription}
+                    onChange={(event) => setProjectDescription(event.target.value)}
+                  />
+                </FormField>
+                <Button type="submit">Create Project</Button>
+              </form>
+            )}
           </Card>
           <Card>
             <div className={styles.toolbar}>

@@ -9,12 +9,12 @@ from fastapi.testclient import TestClient
 from forge_org.main import create_app
 
 
-def _png() -> bytes:
+def _png(pixel: int = 0) -> bytes:
     signature = b'\x89PNG\r\n\x1a\n'
     ihdr_data = struct.pack('>2I5B', 1, 1, 8, 6, 0, 0, 0)
     ihdr = struct.pack('>I', len(ihdr_data)) + b'IHDR' + ihdr_data
     ihdr += struct.pack('>I', zlib.crc32(ihdr[4:]) & 0xFFFFFFFF)
-    raw = b'\x00\x00\x00\x00\xff'
+    raw = bytes((0, pixel, 0, 0, 255))
     compressed = zlib.compress(raw)
     image_data = struct.pack('>I', len(compressed)) + b'IDAT' + compressed
     image_data += struct.pack('>I', zlib.crc32(image_data[4:]) & 0xFFFFFFFF)
@@ -75,6 +75,36 @@ def test_bug_attachments_are_validated_scoped_persistent_and_removable(tmp_path:
                 },
             )
             assert wrong_content_type.status_code == 422
+
+            for pixel in range(1, 5):
+                distinct = _png(pixel)
+                accepted = client.post(
+                    url,
+                    json={
+                        'file_name': f'screen-{pixel}.png',
+                        'content_type': 'image/png',
+                        'data_base64': base64.b64encode(distinct).decode('ascii'),
+                    },
+                )
+                assert accepted.status_code == 201
+            over_count = client.post(
+                url,
+                json={
+                    'file_name': 'sixth.png',
+                    'content_type': 'image/png',
+                    'data_base64': base64.b64encode(_png(5)).decode('ascii'),
+                },
+            )
+            assert over_count.status_code == 422
+            oversized = client.post(
+                url,
+                json={
+                    'file_name': 'oversized.png',
+                    'content_type': 'image/png',
+                    'data_base64': base64.b64encode(b'x' * (5 * 1024 * 1024 + 1)).decode('ascii'),
+                },
+            )
+            assert oversized.status_code == 422
 
             reopened = TestClient(create_app())
             assert reopened.get(url + f'/{attachment["id"]}/content').content == content

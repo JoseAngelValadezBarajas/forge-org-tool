@@ -2,7 +2,7 @@ import { organizationCapability } from './organization.js';
 import { legacyCapabilities } from './capabilities.js';
 
 export { ApiError } from './errors.js';
-export { getApiJson, sendJson } from './transport.js';
+export { getApiBlob, getApiJson, sendJson } from './transport.js';
 export type { ApiRequest } from './transport.js';
 export type * from './types.js';
 

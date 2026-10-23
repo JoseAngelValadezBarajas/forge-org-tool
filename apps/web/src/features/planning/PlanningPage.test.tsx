@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -90,6 +90,51 @@ describe('PlanningPage', () => {
           method: 'PATCH',
           body: JSON.stringify({ priority: 'critical' }),
         }),
+      ),
+    );
+  });
+
+  it('persists a work item status when dragged into another workflow column', async () => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      if (String(input).endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (init?.method === 'PATCH')
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...overview.epics[0].features[0], status: 'ready' }), {
+            status: 200,
+          }),
+        );
+      return Promise.resolve(new Response(JSON.stringify(overview), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const dataTransfer = {
+      data: new Map<string, string>(),
+      setData(type: string, value: string) {
+        this.data.set(type, value);
+      },
+      getData(type: string) {
+        return this.data.get(type) ?? '';
+      },
+    };
+    fireEvent.dragStart(await screen.findByTestId('work-item-card-f1'), { dataTransfer });
+    const readyColumn = within(screen.getByLabelText('Planning board')).getByRole('region', {
+      name: 'Ready',
+    });
+    fireEvent.dragOver(readyColumn, { dataTransfer });
+    fireEvent.drop(readyColumn, { dataTransfer });
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/projects/p1/features/f1',
+        expect.objectContaining({ method: 'PATCH', body: JSON.stringify({ status: 'ready' }) }),
       ),
     );
   });

@@ -9,10 +9,12 @@ export function TransferPage() {
     documentText,
     error,
     exportProject,
+    exportProjectPackage,
     exported,
     fileName,
     importedProjectId,
     importProject,
+    packageBase64,
     preview,
     previewImport,
     selectSourceFile,
@@ -24,9 +26,9 @@ export function TransferPage() {
     <div className={styles.stack}>
       <SectionHeader title="Project transfer" eyebrow="FORGE / Planning-only transfer" />
       <p>
-        Import and export use the versioned project document. Review the fingerprint before import;
-        only planning records are transferred. Evidence, verification and release records are
-        excluded.
+        Import and export use versioned project JSON or a ZIP package that includes Bug screenshots.
+        Review the fingerprint before import; operational evidence, verification and release records
+        are excluded.
       </p>
       {error && <p role="alert">{error}</p>}
 
@@ -43,15 +45,15 @@ export function TransferPage() {
           <section aria-labelledby="import-title" className={styles.panel}>
             <h3 id="import-title">Import a project</h3>
             <p>
-              Import versioned project JSON. Existing `forge-project-import-v1` files remain
-              supported.
+              Import versioned project JSON or a v2 ZIP package with Bug screenshots. Existing
+              `forge-project-import-v1` JSON files remain supported.
             </p>
-            <FormField label="Choose a project JSON file">
+            <FormField label="Choose a project transfer file">
               <input
                 className={styles.fileInput}
                 type="file"
-                accept="application/json,.json"
-                aria-label="Choose a project JSON file"
+                accept="application/json,.json,application/zip,.zip"
+                aria-label="Choose a project transfer file"
                 onChange={(event) => {
                   const file = event.currentTarget.files?.[0];
                   if (file) void selectSourceFile(file);
@@ -75,7 +77,7 @@ export function TransferPage() {
               <Button
                 type="button"
                 onClick={() => void previewImport()}
-                disabled={!documentText.trim()}
+                disabled={!documentText.trim() && !packageBase64}
               >
                 Review import
               </Button>
@@ -88,7 +90,10 @@ export function TransferPage() {
             <h3 id="export-title">Export current project</h3>
             <p>Review and download the versioned planning document. Export does not change data.</p>
             <Button type="button" onClick={() => void exportProject()}>
-              Download project export
+              Download project export (JSON)
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => void exportProjectPackage()}>
+              Download ZIP package with screenshots
             </Button>
             {exported && (
               <div className={styles.review} role="status">

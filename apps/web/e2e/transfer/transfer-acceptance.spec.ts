@@ -45,7 +45,7 @@ test('PA-TRN-001 exports real planning data, downloads bytes, imports through UI
     await page.request.post('/api/v1/workspaces', { data: { name: `Transfer target ${suffix}` } })
   ).json();
   await page.goto(`/transfer/${targetWorkspace.id}/${project.id}`);
-  await page.getByLabel('Choose a project JSON file').setInputFiles({
+  await page.getByLabel('Choose a project transfer file').setInputFiles({
     name: download.suggestedFilename(),
     mimeType: 'application/json',
     buffer: rawBytes,

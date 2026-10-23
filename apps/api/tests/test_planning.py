@@ -26,6 +26,7 @@ def test_acceptance_criteria_edit_satisfy_reorder_and_delete(tmp_path: Path) -> 
                 client.post(root, json={'description': name}).json()
                 for name in ('First', 'Second', 'Third')
             ]
+            assert [item['position'] for item in client.get(root).json()] == [0, 1, 2]
             criterion_url = f'{root}/{created[1]["id"]}'
             updated = client.patch(
                 criterion_url, json={'description': 'Updated second', 'satisfied': True}

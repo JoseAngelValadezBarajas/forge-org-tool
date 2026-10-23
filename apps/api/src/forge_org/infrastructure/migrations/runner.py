@@ -8,8 +8,10 @@ from .v0002_metadata import VERSION as METADATA_MIGRATION_VERSION
 from .v0002_metadata import upgrade as upgrade_metadata
 from .v0003_core_work_items import VERSION as CORE_WORK_ITEMS_MIGRATION_VERSION
 from .v0003_core_work_items import upgrade as upgrade_core_work_items
+from .v0004_workspace_archive import VERSION as WORKSPACE_ARCHIVE_MIGRATION_VERSION
+from .v0004_workspace_archive import upgrade as upgrade_workspace_archive
 
-CURRENT_SCHEMA_VERSION = CORE_WORK_ITEMS_MIGRATION_VERSION
+CURRENT_SCHEMA_VERSION = WORKSPACE_ARCHIVE_MIGRATION_VERSION
 
 
 def migrate(connection: sqlite3.Connection) -> None:
@@ -57,6 +59,12 @@ def migrate(connection: sqlite3.Connection) -> None:
         connection.execute(
             'INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)',
             (CORE_WORK_ITEMS_MIGRATION_VERSION, utc_now()),
+        )
+    if WORKSPACE_ARCHIVE_MIGRATION_VERSION not in applied:
+        upgrade_workspace_archive(connection)
+        connection.execute(
+            'INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)',
+            (WORKSPACE_ARCHIVE_MIGRATION_VERSION, utc_now()),
         )
     connection.execute(
         'INSERT OR IGNORE INTO schema_version(version) VALUES (?)',

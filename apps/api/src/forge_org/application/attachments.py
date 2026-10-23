@@ -164,7 +164,12 @@ class BugAttachmentService:
         if not re.fullmatch(r'[0-9a-f-]{36}\.(png|jpg|webp)', relative_path):
             raise RuntimeError('Screenshot storage reference is invalid')
         path = self.storage_root / relative_path
-        if path.parent != self.storage_root or not path.is_file():
+        if (
+            self.storage_root.is_symlink()
+            or path.parent != self.storage_root
+            or path.is_symlink()
+            or not path.is_file()
+        ):
             raise LookupError('Screenshot content not found')
         return dict(row), path
 

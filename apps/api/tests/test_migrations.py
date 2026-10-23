@@ -19,8 +19,11 @@ def test_fresh_database_records_explicit_migration_versions(tmp_path, monkeypatc
             'SELECT version FROM schema_migrations ORDER BY version'
         ).fetchall()
     ]
-    assert versions == [1, 2, 3]
-    assert connection.execute('PRAGMA user_version').fetchone()[0] == 3
+    assert versions == [1, 2, 3, 4]
+    assert connection.execute('PRAGMA user_version').fetchone()[0] == 4
+    assert 'archived_at' in {
+        row[1] for row in connection.execute('PRAGMA table_info(workspaces)').fetchall()
+    }
     assert (
         connection.execute(
             "SELECT value FROM database_metadata WHERE key = 'migration_state'"
@@ -154,7 +157,13 @@ def test_previous_synthetic_schema_is_upgraded_without_losing_records(tmp_path, 
         connection.execute("SELECT name FROM workspaces WHERE id = 'workspace-1'").fetchone()[0]
         == 'Synthetic workspace'
     )
-    assert connection.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] == 3
+    assert connection.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] == 4
+    assert (
+        connection.execute(
+            "SELECT archived_at FROM workspaces WHERE id = 'workspace-1'"
+        ).fetchone()[0]
+        is None
+    )
     connection.close()
     backups = list(tmp_path.glob('upgrade.db.pre-migration-*.bak'))
     assert len(backups) == 1
@@ -167,7 +176,7 @@ def test_previous_synthetic_schema_is_upgraded_without_losing_records(tmp_path, 
     backup.close()
     connection.close()
     replayed = connect()
-    assert replayed.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 3
+    assert replayed.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 4
     assert len(list(tmp_path.glob('upgrade.db.pre-migration-*.bak'))) == 1
     replayed.close()
 
@@ -207,7 +216,7 @@ def test_interrupted_backup_is_cleaned_and_migration_can_retry(tmp_path, monkeyp
 
     monkeypatch.setattr(Path, 'replace', original_replace)
     connection = connect()
-    assert connection.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 3
+    assert connection.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 4
     connection.close()
     assert len(list(tmp_path.glob('retry.db.pre-migration-*.bak'))) == 1
 

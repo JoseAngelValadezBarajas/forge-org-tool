@@ -1,4 +1,4 @@
-import { getApiJson, sendJson } from './transport.js';
+import { getApiBlob, getApiJson, sendJson } from './transport.js';
 import type { ProjectTransferPreview } from './types.js';
 
 export const transferCapability = {
@@ -20,5 +20,23 @@ export const transferCapability = {
   ) =>
     getApiJson<unknown>({
       path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export?schema_version=${schemaVersion}`,
+    }),
+  previewProjectPackageImport: (workspaceId: string, archive_base64: string) =>
+    sendJson<ProjectTransferPreview>(
+      `/api/v1/workspaces/${workspaceId}/projects/import/package/preview`,
+      { method: 'POST', body: JSON.stringify({ archive_base64 }) },
+    ),
+  importProjectPackage: (
+    workspaceId: string,
+    archive_base64: string,
+    expected_fingerprint: string,
+  ) =>
+    sendJson<{ project_id: string; fingerprint: string }>(
+      `/api/v1/workspaces/${workspaceId}/projects/import/package`,
+      { method: 'POST', body: JSON.stringify({ archive_base64, expected_fingerprint }) },
+    ),
+  exportProjectPackage: (workspaceId: string, projectId: string) =>
+    getApiBlob({
+      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export/package`,
     }),
 };

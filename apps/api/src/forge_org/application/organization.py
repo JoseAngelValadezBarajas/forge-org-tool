@@ -53,6 +53,12 @@ class OrganizationService:
         except sqlite3.IntegrityError as exc:
             raise DuplicateName('Workspace name already exists') from exc
 
+    def set_workspace_status(self, workspace_id: str, archived: bool) -> dict[str, Any]:
+        self.workspace(workspace_id)
+        return self.repository.set_workspace_archive(
+            workspace_id, utc_now() if archived else None
+        ) or self.workspace(workspace_id)
+
     def projects(self, workspace_id: str, search: str | None, status: str) -> list[dict[str, Any]]:
         self.workspace(workspace_id)
         try:
@@ -72,7 +78,7 @@ class OrganizationService:
     def create_project(
         self, workspace_id: str, name: str, description: str | None
     ) -> dict[str, Any]:
-        self.workspace(workspace_id)
+        self._writable_workspace(workspace_id)
         try:
             return self.repository.create_project(workspace_id, normalized_name(name), description)
         except ValueError as exc:
@@ -83,6 +89,7 @@ class OrganizationService:
     def update_project(
         self, workspace_id: str, project_id: str, values: dict[str, Any]
     ) -> dict[str, Any]:
+        self._writable_workspace(workspace_id)
         self.project(workspace_id, project_id)
         if 'name' in values:
             try:
@@ -106,3 +113,9 @@ class OrganizationService:
             project_id,
             {'status': status, 'archived_at': None if status == ACTIVE else utc_now()},
         )
+
+    def _writable_workspace(self, workspace_id: str) -> dict[str, Any]:
+        workspace = self.workspace(workspace_id)
+        if workspace.get('archived_at'):
+            raise InvalidInput('Workspace is archived and read-only')
+        return workspace

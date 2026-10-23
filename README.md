@@ -24,6 +24,8 @@ See [architecture](docs/architecture/README.md), [client component contracts](do
 
 The 1.0 implementation keeps Organization, Planning, Project Transfer and shared UI in scope. Advanced capabilities from the original reconstruction inventory are not part of the active 1.0 product; see the compatibility matrix in [`docs/migration/plan.md`](docs/migration/plan.md). The original FORGE repository and PRs are not modified or archived by this work.
 
+Project Transfer supports legacy v1 JSON import, v2 JSON planning export/import, and v2 ZIP packages that include validated Bug screenshots. Package transfer is limited to 5 MiB compressed to remain within the Desktop sidecar request boundary; see [`docs/import-export/README.md`](docs/import-export/README.md) for the package manifest, checksums and rejected archive conditions.
+
 ## Local bootstrap (Windows PowerShell)
 
 Prerequisites: Node.js 24, npm 11, Python 3.12, uv and git. Rust toolchain is required for native Tauri development/builds.

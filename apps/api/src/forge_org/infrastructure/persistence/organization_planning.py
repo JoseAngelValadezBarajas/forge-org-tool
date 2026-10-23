@@ -159,6 +159,16 @@ class OrganizationPlanningPersistence:
         self.connection.commit()
         return self.get_workspace(workspace_id)
 
+    def set_workspace_archive(
+        self, workspace_id: str, archived_at: str | None
+    ) -> dict[str, Any] | None:
+        self.connection.execute(
+            'UPDATE workspaces SET archived_at = ?, updated_at = ? WHERE id = ?',
+            (archived_at, utc_now(), workspace_id),
+        )
+        self.connection.commit()
+        return self.get_workspace(workspace_id)
+
     def workspace_projects(
         self, workspace_id: str, search: str | None, status: str
     ) -> list[dict[str, Any]]:
@@ -379,9 +389,14 @@ class OrganizationPlanningPersistence:
         return self.feature(project_id, feature_id)
 
     def create_criterion(
-        self, feature_id: str, description: str, position: int = 0
+        self, feature_id: str, description: str, position: int | None = None
     ) -> dict[str, Any]:
         now, criterion_id = utc_now(), str(uuid4())
+        if position is None:
+            position = self.connection.execute(
+                'SELECT COALESCE(MAX(position) + 1, 0) FROM acceptance_criteria WHERE feature_id = ?',
+                (feature_id,),
+            ).fetchone()[0]
         self.connection.execute(
             'INSERT INTO acceptance_criteria(id, feature_id, description, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
             (criterion_id, feature_id, description.strip(), position, now, now),

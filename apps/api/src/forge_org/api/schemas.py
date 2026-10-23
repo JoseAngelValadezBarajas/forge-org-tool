@@ -28,6 +28,7 @@ class WorkspaceResponse(BaseModel):
     description: str | None
     created_at: datetime
     updated_at: datetime
+    archived_at: datetime | None = None
 
 
 class WorkspaceTagResponse(BaseModel):
@@ -509,6 +510,14 @@ class ImportPreviewResponse(BaseModel):
 class ImportCommitRequest(BaseModel):
     document: dict[str, Any]
     expected_fingerprint: str
+
+
+class ProjectPackagePreviewRequest(BaseModel):
+    archive_base64: str = Field(min_length=1, max_length=7_000_000)
+
+
+class ProjectPackageImportRequest(ProjectPackagePreviewRequest):
+    expected_fingerprint: str = Field(min_length=64, max_length=64)
 
 
 class ImportResponse(BaseModel):

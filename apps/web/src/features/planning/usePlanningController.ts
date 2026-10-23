@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   organizationApi,
   type Dependency,
@@ -9,12 +9,15 @@ import {
 } from '@forge-org/api-client';
 
 export function usePlanningController(workspaceId: string, projectId: string) {
+  const latestLoad = useRef(0);
   const [overview, setOverview] = useState<PlanningOverview>({
     epics: [],
     unassigned_features: [],
   });
   const [title, setTitle] = useState('');
-  const [epicPriority, setEpicPriority] = useState<'low' | 'medium' | 'high' | 'critical'>('medium');
+  const [epicPriority, setEpicPriority] = useState<'low' | 'medium' | 'high' | 'critical'>(
+    'medium',
+  );
   const [epicTags, setEpicTags] = useState('');
   const [featureTitle, setFeatureTitle] = useState('');
   const [featureEpicId, setFeatureEpicId] = useState('');
@@ -55,16 +58,17 @@ export function usePlanningController(workspaceId: string, projectId: string) {
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      const requestId = ++latestLoad.current;
       try {
         const [nextOverview, nextDependencies] = await Promise.all([
           organizationApi.planningOverview(workspaceId, projectId),
           organizationApi.listDependencies(workspaceId, projectId),
         ]);
-        if (!isCurrent()) return;
+        if (!isCurrent() || requestId !== latestLoad.current) return;
         setOverview(nextOverview);
         setDependencies(nextDependencies);
       } catch (cause) {
-        if (isCurrent()) {
+        if (isCurrent() && requestId === latestLoad.current) {
           setError(cause instanceof Error ? cause.message : 'Unable to load planning.');
         }
       }
@@ -86,7 +90,10 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     try {
       await organizationApi.createEpic(workspaceId, projectId, title, undefined, {
         priority: epicPriority,
-        tags: epicTags.split(',').map((tag) => tag.trim()).filter(Boolean),
+        tags: epicTags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
       });
       setTitle('');
       setEpicPriority('medium');
@@ -108,9 +115,17 @@ export function usePlanningController(workspaceId: string, projectId: string) {
         featureEpicId || undefined,
         {
           kind: featureKind,
-          tags: featureTags.split(',').map((tag) => tag.trim()).filter(Boolean),
+          tags: featureTags
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean),
           ...(featureKind === 'bug'
-            ? { bug_severity: bugSeverity, steps_to_reproduce: stepsToReproduce, expected_result: expectedResult, actual_result: actualResult }
+            ? {
+                bug_severity: bugSeverity,
+                steps_to_reproduce: stepsToReproduce,
+                expected_result: expectedResult,
+                actual_result: actualResult,
+              }
             : {}),
         },
       );
@@ -142,7 +157,22 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     values: Parameters<typeof organizationApi.updateFeature>[3],
   ) {
     try {
-      await organizationApi.updateFeature(workspaceId, projectId, feature.id, values);
+      const updated = await organizationApi.updateFeature(
+        workspaceId,
+        projectId,
+        feature.id,
+        values,
+      );
+      setOverview((current) => ({
+        ...current,
+        epics: current.epics.map((epic: Epic & { features: Feature[] }) => ({
+          ...epic,
+          features: epic.features.map((item: Feature) => (item.id === updated.id ? updated : item)),
+        })),
+        unassigned_features: current.unassigned_features.map((item: Feature) =>
+          item.id === updated.id ? updated : item,
+        ),
+      }));
       await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to update feature.');

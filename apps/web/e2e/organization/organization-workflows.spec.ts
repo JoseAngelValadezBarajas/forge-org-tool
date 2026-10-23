@@ -57,7 +57,6 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   await expect(card).toContainText('Created through Organization UI');
 
   await card.getByRole('button', { name: 'Archive' }).click();
-  await expect(page.getByRole('button', { name: 'Archive' })).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Show archived' }).check();
   const archivedCard = page.locator('[data-state="Archived"]').filter({
     has: page.getByRole('link', { name: projectName, exact: true }),
@@ -79,8 +78,8 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   );
 
   await archivedCard.getByRole('button', { name: 'Restore' }).click();
-  await expect(page.getByRole('button', { name: 'Restore' })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Archive' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Restore', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Archive', exact: true })).toBeVisible();
   const persisted = await page.request.get(
     `/api/v1/workspaces/${workspace.id}/projects?search=${encodeURIComponent(projectName)}&status=all`,
   );
@@ -88,7 +87,33 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   await page.reload();
   await expect(page.getByRole('combobox', { name: 'Workspace' })).toHaveValue(workspace.id);
   await search.fill(projectName);
-  await expect(page.getByRole('button', { name: 'Archive' })).toBeVisible();
+  const restoredCard = page.locator('[data-state="Active"]').filter({
+    has: page.getByRole('link', { name: projectName, exact: true }),
+  });
+  await expect(restoredCard.getByRole('button', { name: 'Archive' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Archive workspace' }).click();
+  await expect(
+    page.getByText(
+      'This workspace is archived. Restore it to create projects or edit its settings.',
+    ),
+  ).toBeVisible();
+  expect(
+    (await (await page.request.get(`/api/v1/workspaces/${workspace.id}`)).json()).archived_at,
+  ).toEqual(expect.any(String));
+  const restoreResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().endsWith(`/api/v1/workspaces/${workspace.id}/restore`) &&
+      response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: 'Restore workspace' }).click();
+  const restoreResponse = await restoreResponsePromise;
+  expect(restoreResponse.ok()).toBeTruthy();
+  expect((await restoreResponse.json()).archived_at).toBeNull();
+  await expect(page.getByRole('button', { name: 'Archive workspace' })).toBeVisible();
+  expect(
+    (await (await page.request.get(`/api/v1/workspaces/${workspace.id}`)).json()).archived_at,
+  ).toBeNull();
 });
 
 test('PA-ORG-002 Project Overview edits and status persist through Planning and Transfer navigation', async ({

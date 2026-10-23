@@ -309,73 +309,95 @@ export function PlanningPage() {
           {PLANNING_COLUMN_STATUSES.map(({ value: status }) => {
             const columnFeatures = visibleFeatures.filter((feature) => feature.status === status);
             return (
-              <KanbanColumn key={status} status={status}>
+              <KanbanColumn
+                key={status}
+                status={status}
+                onDrop={(event, destination) => {
+                  event.preventDefault();
+                  const featureId =
+                    event.dataTransfer.getData('text/forge-feature-id') ||
+                    event.dataTransfer.getData('text/plain');
+                  const feature = visibleFeatures.find((item) => item.id === featureId);
+                  if (feature && feature.status !== destination)
+                    void updateFeature(feature, { status: destination });
+                }}
+              >
                 {columnFeatures.map((feature) => (
-                  <FeatureCard
+                  <div
                     key={feature.id}
-                    feature={feature}
-                    href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
+                    draggable
+                    data-testid={`work-item-card-${feature.id}`}
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData('text/forge-feature-id', feature.id);
+                      event.dataTransfer.setData('text/plain', feature.id);
+                      event.dataTransfer.effectAllowed = 'move';
+                    }}
                   >
-                    <div>
-                      <label>
-                        Priority
-                        <select
-                          aria-label={`Priority for ${feature.title}`}
-                          value={feature.priority}
-                          onChange={(event) =>
-                            void updateFeature(feature, {
-                              priority: event.target.value as Feature['priority'],
-                            })
-                          }
-                        >
-                          <option value="low">low</option>
-                          <option value="medium">medium</option>
-                          <option value="high">high</option>
-                          <option value="critical">critical</option>
-                        </select>
-                      </label>
-                      <label>
-                        Status
-                        <select
-                          aria-label={`Status for ${feature.title}`}
-                          value={feature.status}
-                          onChange={(event) =>
-                            void updateFeature(feature, {
-                              status: event.target.value as Feature['status'],
-                            })
-                          }
-                        >
-                          {PLANNING_COLUMN_STATUSES.map((column) => (
-                            <option key={column.value} value={column.value}>
-                              {column.label.toLowerCase()}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label>
-                        Epic
-                        <select
-                          aria-label={`Epic for ${feature.title}`}
-                          value={feature.epic_id ?? 'unassigned'}
-                          onChange={(event) =>
-                            void updateFeature(
-                              feature,
-                              event.target.value === 'unassigned'
-                                ? { clear_epic: true }
-                                : { epic_id: event.target.value },
-                            )
-                          }
-                        >
-                          <option value="unassigned">unassigned</option>
-                          {overview.epics.map((epic) => (
-                            <option key={epic.id} value={epic.id}>
-                              {epic.title}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-                  </FeatureCard>
+                    <FeatureCard
+                      feature={feature}
+                      href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
+                    >
+                      <div>
+                        <label>
+                          Priority
+                          <select
+                            aria-label={`Priority for ${feature.title}`}
+                            value={feature.priority}
+                            onChange={(event) =>
+                              void updateFeature(feature, {
+                                priority: event.target.value as Feature['priority'],
+                              })
+                            }
+                          >
+                            <option value="low">low</option>
+                            <option value="medium">medium</option>
+                            <option value="high">high</option>
+                            <option value="critical">critical</option>
+                          </select>
+                        </label>
+                        <label>
+                          Status
+                          <select
+                            aria-label={`Status for ${feature.title}`}
+                            value={feature.status}
+                            onChange={(event) =>
+                              void updateFeature(feature, {
+                                status: event.target.value as Feature['status'],
+                              })
+                            }
+                          >
+                            {PLANNING_COLUMN_STATUSES.map((column) => (
+                              <option key={column.value} value={column.value}>
+                                {column.label.toLowerCase()}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Epic
+                          <select
+                            aria-label={`Epic for ${feature.title}`}
+                            value={feature.epic_id ?? 'unassigned'}
+                            onChange={(event) =>
+                              void updateFeature(
+                                feature,
+                                event.target.value === 'unassigned'
+                                  ? { clear_epic: true }
+                                  : { epic_id: event.target.value },
+                              )
+                            }
+                          >
+                            <option value="unassigned">unassigned</option>
+                            {overview.epics.map((epic) => (
+                              <option key={epic.id} value={epic.id}>
+                                {epic.title}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                    </FeatureCard>
+                  </div>
                 ))}
               </KanbanColumn>
             );

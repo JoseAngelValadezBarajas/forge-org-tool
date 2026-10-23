@@ -1,8 +1,13 @@
+import base64
+import io
 import json
 import os
+import stat
+import zipfile
 from pathlib import Path
 
 from fastapi.testclient import TestClient
+from test_attachments import _png
 
 from forge_org.main import create_app
 
@@ -160,5 +165,121 @@ def test_project_transfer_v2_preserves_tags_notes_bug_fields_and_v1_compatibilit
             assert second.status_code == 201
             second_tags = client.get(f'/api/v1/workspaces/{other_workspace["id"]}/tags').json()
             assert [tag['name'] for tag in second_tags] == ['Desktop', 'Platform']
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_project_package_round_trips_bug_screenshots_and_rejects_traversal_atomically(
+    tmp_path: Path,
+) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'transfer-package.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Source'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'With bug'}
+            ).json()
+            bug = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/features',
+                json={
+                    'title': 'Crash',
+                    'kind': 'bug',
+                    'bug_severity': 'medium',
+                    'actual_result': 'Screenshot missing',
+                },
+            ).json()
+            attachment_url = (
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+                f'/features/{bug["id"]}/attachments'
+            )
+            image = _png()
+            uploaded = client.post(
+                attachment_url,
+                json={
+                    'file_name': 'startup.png',
+                    'content_type': 'image/png',
+                    'data_base64': base64.b64encode(image).decode('ascii'),
+                },
+            )
+            assert uploaded.status_code == 201
+
+            archive_response = client.get(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/export/package'
+            )
+            assert archive_response.status_code == 200, archive_response.text
+            archive = archive_response.content
+            with zipfile.ZipFile(io.BytesIO(archive)) as package:
+                manifest = json.loads(package.read('manifest.json'))
+                exported_bug = manifest['features'][0]
+                assert exported_bug['kind'] == 'bug'
+                asset = exported_bug['attachments'][0]
+                assert package.read(asset['path']) == image
+                assert asset['sha256'] == uploaded.json()['sha256']
+
+            target = client.post('/api/v1/workspaces', json={'name': 'Target'}).json()
+            preview_url = f'/api/v1/workspaces/{target["id"]}/projects/import/package/preview'
+            payload = {'archive_base64': base64.b64encode(archive).decode('ascii')}
+            preview = client.post(preview_url, json=payload)
+            assert preview.status_code == 200, preview.text
+            imported = client.post(
+                f'/api/v1/workspaces/{target["id"]}/projects/import/package',
+                json={**payload, 'expected_fingerprint': preview.json()['fingerprint']},
+            )
+            assert imported.status_code == 201, imported.text
+            target_project_id = imported.json()['project_id']
+            target_bug = client.get(
+                f'/api/v1/workspaces/{target["id"]}/projects/{target_project_id}/features'
+            ).json()[0]
+            target_attachment_url = (
+                f'/api/v1/workspaces/{target["id"]}/projects/{target_project_id}'
+                f'/features/{target_bug["id"]}/attachments'
+            )
+            saved = client.get(target_attachment_url).json()
+            assert len(saved) == 1
+            content = client.get(target_attachment_url + f'/{saved[0]["id"]}/content')
+            assert content.content == image
+
+            bad = io.BytesIO()
+            with zipfile.ZipFile(bad, 'w') as malicious:
+                malicious.writestr('manifest.json', json.dumps(manifest))
+                malicious.writestr('../outside.png', image)
+            bad_payload = {'archive_base64': base64.b64encode(bad.getvalue()).decode('ascii')}
+            projects_before = client.get(f'/api/v1/workspaces/{target["id"]}/projects').json()
+            rejected = client.post(preview_url, json=bad_payload)
+            assert rejected.status_code == 422
+            assert (
+                client.get(f'/api/v1/workspaces/{target["id"]}/projects').json() == projects_before
+            )
+
+            with zipfile.ZipFile(io.BytesIO(archive)) as source_package:
+                tampered_manifest = json.loads(source_package.read('manifest.json'))
+                tampered_manifest['features'][0]['attachments'][0]['sha256'] = '0' * 64
+                asset_path = tampered_manifest['features'][0]['attachments'][0]['path']
+                asset_bytes = source_package.read(asset_path)
+            tampered = io.BytesIO()
+            with zipfile.ZipFile(tampered, 'w') as package:
+                package.writestr('manifest.json', json.dumps(tampered_manifest))
+                package.writestr(asset_path, asset_bytes)
+            checksum_rejected = client.post(
+                preview_url,
+                json={'archive_base64': base64.b64encode(tampered.getvalue()).decode('ascii')},
+            )
+            assert checksum_rejected.status_code == 422
+
+            symlink = io.BytesIO()
+            with zipfile.ZipFile(symlink, 'w') as package:
+                package.writestr('manifest.json', json.dumps(manifest))
+                link = zipfile.ZipInfo('attachments/link.png')
+                link.create_system = 3
+                link.external_attr = (stat.S_IFLNK | 0o777) << 16
+                package.writestr(link, '../outside.png')
+            symlink_rejected = client.post(
+                preview_url,
+                json={'archive_base64': base64.b64encode(symlink.getvalue()).decode('ascii')},
+            )
+            assert symlink_rejected.status_code == 422
+            assert (
+                client.get(f'/api/v1/workspaces/{target["id"]}/projects').json() == projects_before
+            )
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)

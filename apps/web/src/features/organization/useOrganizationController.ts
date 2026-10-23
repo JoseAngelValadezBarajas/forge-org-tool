@@ -185,6 +185,20 @@ export function useOrganizationController() {
     }
   }
 
+  async function toggleWorkspaceArchive() {
+    if (!selectedWorkspace) return;
+    try {
+      const updated = await organizationApi.setWorkspaceStatus(
+        selectedWorkspace.id,
+        !selectedWorkspace.archived_at,
+      );
+      setWorkspaces((items) => items.map((item) => (item.id === updated.id ? updated : item)));
+      setError('');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to update workspace.');
+    }
+  }
+
   async function createProject(event: FormEvent) {
     event.preventDefault();
     if (!workspaceId || !projectName.trim()) return;
@@ -235,6 +249,7 @@ export function useOrganizationController() {
     setWorkspaceName,
     showArchived,
     toggleProject,
+    toggleWorkspaceArchive,
     visibleProjects,
     workspaceId,
     workspaceName,

@@ -149,19 +149,83 @@ describe('OrganizationPage', () => {
     );
   });
 
+  it('archives and restores the selected Workspace through its API lifecycle', async () => {
+    const active = {
+      id: 'w1',
+      name: 'Research',
+      description: null,
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input) === '/api/v1/workspaces')
+        return Promise.resolve(new Response(JSON.stringify([active]), { status: 200 }));
+      if (String(input).endsWith('/archive'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ ...active, archived_at: '2026-10-23T00:00:00Z' }), {
+            status: 200,
+          }),
+        );
+      if (String(input).endsWith('/restore'))
+        return Promise.resolve(new Response(JSON.stringify(active), { status: 200 }));
+      if (String(input).endsWith('/projects?search=&status=all'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      return Promise.resolve(new Response('[]', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Archive workspace' }));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/archive',
+        expect.objectContaining({ method: 'POST' }),
+      ),
+    );
+    expect(
+      await screen.findByText(
+        'This workspace is archived. Restore it to create projects or edit its settings.',
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Restore workspace' }));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1/restore',
+        expect.objectContaining({ method: 'POST' }),
+      ),
+    );
+  });
+
   it('renders projects for the selected workspace', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockImplementation((input: string) => {
-      const path = String(input);
-      const payload = path === '/api/v1/workspaces'
-        ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
-        : path.endsWith('/tags')
-          ? []
-          : [{
-              id: 'p1', workspace_id: 'w1', name: 'Atlas', description: 'Map work',
-              status: 'active', created_at: '', updated_at: '', archived_at: null,
-            }];
-      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
-    }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
+            : path.endsWith('/tags')
+              ? []
+              : [
+                  {
+                    id: 'p1',
+                    workspace_id: 'w1',
+                    name: 'Atlas',
+                    description: 'Map work',
+                    status: 'active',
+                    created_at: '',
+                    updated_at: '',
+                    archived_at: null,
+                  },
+                ];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
     render(
       <MemoryRouter>
         <OrganizationPage />
@@ -252,9 +316,10 @@ describe('OrganizationPage', () => {
         return Promise.reject(new Error('Connection unavailable'));
       }
       const path = String(input);
-      const payload = path === '/api/v1/workspaces'
-        ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
-        : [];
+      const payload =
+        path === '/api/v1/workspaces'
+          ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
+          : [];
       return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
     });
     vi.stubGlobal('fetch', fetchMock);
