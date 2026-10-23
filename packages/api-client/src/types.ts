@@ -5,6 +5,7 @@ type Schema = components['schemas'];
 /** Response models are aliases to the generated backend OpenAPI contract. */
 export type Workspace = Schema['WorkspaceResponse'];
 export type Project = Schema['ProjectResponse'];
+export type ProjectUpdate = Schema['ProjectUpdate'];
 export type Epic = Schema['EpicResponse'];
 export type Feature = Schema['FeatureResponse'];
 export type Decision = Schema['DecisionResponse'];
