@@ -82,6 +82,12 @@ test('installed Desktop acceptance preserves a Bug screenshot through restart', 
   );
 });
 
+test('native combobox selection does not collapse an already closed dropdown', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(smoke, /ExpandCollapseState\]::Expanded[\s\S]*?\.Collapse\(\)/);
+});
+
 test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
   const command = packageJson.scripts['test:desktop:acceptance'];

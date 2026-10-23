@@ -130,7 +130,8 @@ function Set-ForgeElementValue($root, [System.Windows.Automation.ControlType]$co
 
 function Select-ForgeOption($root, [string]$comboBoxName, [string]$optionName) {
   $combo = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ComboBox) $comboBoxName
-  $combo.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern).Expand()
+  $expandPattern = $combo.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern)
+  $expandPattern.Expand()
   try {
     $option = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ListItem) $optionName
     try {
@@ -139,7 +140,9 @@ function Select-ForgeOption($root, [string]$comboBoxName, [string]$optionName) {
       $option.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select()
     }
   } finally {
-    $combo.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern).Collapse()
+    if ($expandPattern.Current.ExpandCollapseState -eq [System.Windows.Automation.ExpandCollapseState]::Expanded) {
+      $expandPattern.Collapse()
+    }
   }
 }
 
