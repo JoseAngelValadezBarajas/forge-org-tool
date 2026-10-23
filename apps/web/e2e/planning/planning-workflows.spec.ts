@@ -202,6 +202,54 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   await expect(page.getByText(safeCriterion, { exact: true })).toBeVisible();
 });
 
+test('PA-PLAN-LEGACY Epic creation remains visible after a legacy database upgrade @legacy-epic', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    process.env.FORGE_E2E_EPIC_LEGACY_FIXTURE !== '1',
+    'This acceptance runs only with its isolated upgraded legacy SQLite fixture.',
+  );
+  const workspaceId = 'legacy-workspace';
+  const projectId = 'legacy-project';
+  const overviewPath = `/api/v1/workspaces/${workspaceId}/projects/${projectId}/planning/overview`;
+  await page.goto(`/planning/${workspaceId}/${projectId}`);
+  await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Legacy planning Epic' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Legacy planned Epic' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Archived Epics' })).toContainText('Archived Epic');
+  await expect(page.getByRole('region', { name: 'Legacy Epics' })).toContainText('custom_legacy');
+  await expect(page.getByRole('region', { name: 'Epic visibility summary' })).toContainText(
+    '4 total · 2 in workflow · 1 archived · 1 legacy',
+  );
+
+  const before = await (await page.request.get(overviewPath)).json();
+  expect(before.epics).toHaveLength(4);
+  await page.getByLabel('Epic title').fill('testing');
+  const createdResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes(`/workspaces/${workspaceId}/projects/${projectId}/epics`) &&
+      response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: 'Create Epic' }).click();
+  expect((await createdResponse).status()).toBe(201);
+
+  const createdCard = page.locator('[data-state="backlog"]').filter({
+    has: page.getByRole('link', { name: 'testing', exact: true }),
+  });
+  await expect(createdCard).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Epic visibility summary' })).toContainText(
+    '5 total · 3 in workflow · 1 archived · 1 legacy',
+  );
+  await expect(page.getByLabel('Epic title')).toHaveValue('');
+  await expect(page).toHaveURL(`/planning/${workspaceId}/${projectId}`);
+  await page.screenshot({
+    path: process.env.FORGE_E2E_EVIDENCE_DIR
+      ? `${process.env.FORGE_E2E_EVIDENCE_DIR}/upgraded-epic-board.png`
+      : testInfo.outputPath('upgraded-epic-board.png'),
+    fullPage: true,
+  });
+});
+
 test('PA-PLAN-002 dependencies reject self-links and retain valid relationships', async ({
   page,
 }) => {

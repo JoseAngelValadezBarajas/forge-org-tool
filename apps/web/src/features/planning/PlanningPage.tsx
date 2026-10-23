@@ -9,7 +9,7 @@ import {
   Select,
   Textarea,
 } from '@forge-org/ui';
-import type { Feature } from '@forge-org/api-client';
+import type { EpicStatus, Feature } from '@forge-org/api-client';
 import styles from './PlanningPage.module.css';
 import { usePlanningController } from './usePlanningController';
 import {
@@ -74,6 +74,15 @@ export function PlanningPage() {
     updateEpic,
     visibleFeatures,
   } = usePlanningController(workspaceId, projectId);
+  const archivedEpics = overview.epics.filter((epic) => Boolean(epic.archived_at));
+  const workflowEpics = overview.epics.filter(
+    (epic) =>
+      !epic.archived_at && PLANNING_COLUMN_STATUSES.some((column) => column.value === epic.status),
+  );
+  const legacyEpics = overview.epics.filter(
+    (epic) =>
+      !epic.archived_at && !PLANNING_COLUMN_STATUSES.some((column) => column.value === epic.status),
+  );
   return (
     <ProjectPlanningHome>
       <div className={styles.stack}>
@@ -206,6 +215,12 @@ export function PlanningPage() {
         </div>
         <section aria-label="Project Board">
           <h2>Project Board · Epics</h2>
+          <section aria-label="Epic visibility summary">
+            <p>
+              {overview.epics.length} total · {workflowEpics.length} in workflow ·{' '}
+              {archivedEpics.length} archived · {legacyEpics.length} legacy
+            </p>
+          </section>
           <div className={styles.board}>
             {PLANNING_COLUMN_STATUSES.map(({ value: status }) => (
               <KanbanColumn
@@ -227,7 +242,7 @@ export function PlanningPage() {
                           aria-label={`Status for Epic ${epic.title}`}
                           value={epic.status}
                           onChange={(event) =>
-                            void updateEpic(epic, event.target.value as typeof epic.status)
+                            void updateEpic(epic, event.target.value as EpicStatus)
                           }
                         >
                           {PLANNING_COLUMN_STATUSES.map((column) => (
@@ -242,19 +257,53 @@ export function PlanningPage() {
               </KanbanColumn>
             ))}
           </div>
-          {overview.epics.some((epic) => epic.archived_at) && (
+          {archivedEpics.length > 0 && (
             <section aria-label="Archived Epics">
               <h3>Archived Epics</h3>
               <div className={styles.forms}>
-                {overview.epics
-                  .filter((epic) => epic.archived_at)
-                  .map((epic) => (
-                    <EpicCard
-                      key={epic.id}
-                      epic={epic}
-                      href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
-                    />
-                  ))}
+                {archivedEpics.map((epic) => (
+                  <EpicCard
+                    key={epic.id}
+                    epic={epic}
+                    href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+          {legacyEpics.length > 0 && (
+            <section aria-label="Legacy Epics">
+              <h3>Legacy Epics requiring review</h3>
+              <p>
+                These Epics have stored workflow states this version does not recognize. They are
+                preserved; choose a supported state to return one to the workflow board.
+              </p>
+              <div className={styles.forms}>
+                {legacyEpics.map((epic) => (
+                  <EpicCard
+                    key={epic.id}
+                    epic={epic}
+                    href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
+                  >
+                    <label>
+                      Recover Epic status
+                      <Select
+                        aria-label={`Status for Epic ${epic.title}`}
+                        value={epic.status}
+                        onChange={(event) =>
+                          void updateEpic(epic, event.target.value as EpicStatus)
+                        }
+                      >
+                        <option value={epic.status}>Unsupported: {epic.status}</option>
+                        {PLANNING_COLUMN_STATUSES.map((column) => (
+                          <option key={column.value} value={column.value}>
+                            {column.label}
+                          </option>
+                        ))}
+                      </Select>
+                    </label>
+                  </EpicCard>
+                ))}
               </div>
             </section>
           )}

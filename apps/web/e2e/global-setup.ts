@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   assertOwnedRunEnvironment,
   cleanupRunEnvironment,
@@ -66,6 +67,28 @@ export default async function globalSetup() {
       );
     } else if (!existsSync(readmePath)) {
       throw new Error(`Synthetic repository is missing its fixture file: ${run.repositoryRoot}`);
+    }
+    if (process.env.FORGE_E2E_EPIC_LEGACY_FIXTURE === '1') {
+      const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+      execFileSync(
+        'uv',
+        [
+          'run',
+          '--project',
+          join(repositoryRoot, 'apps', 'api'),
+          'python',
+          join(
+            repositoryRoot,
+            'apps',
+            'api',
+            'tests',
+            'fixtures',
+            'create_legacy_epic_database.py',
+          ),
+          configured.databasePath,
+        ],
+        { cwd: repositoryRoot, stdio: 'inherit' },
+      );
     }
   } catch (error) {
     cleanupRunEnvironment(run);

@@ -10,8 +10,10 @@ from .v0003_core_work_items import VERSION as CORE_WORK_ITEMS_MIGRATION_VERSION
 from .v0003_core_work_items import upgrade as upgrade_core_work_items
 from .v0004_workspace_archive import VERSION as WORKSPACE_ARCHIVE_MIGRATION_VERSION
 from .v0004_workspace_archive import upgrade as upgrade_workspace_archive
+from .v0005_epic_status_normalization import VERSION as EPIC_STATUS_MIGRATION_VERSION
+from .v0005_epic_status_normalization import upgrade as upgrade_epic_statuses
 
-CURRENT_SCHEMA_VERSION = WORKSPACE_ARCHIVE_MIGRATION_VERSION
+CURRENT_SCHEMA_VERSION = EPIC_STATUS_MIGRATION_VERSION
 
 
 def migrate(connection: sqlite3.Connection) -> None:
@@ -65,6 +67,12 @@ def migrate(connection: sqlite3.Connection) -> None:
         connection.execute(
             'INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)',
             (WORKSPACE_ARCHIVE_MIGRATION_VERSION, utc_now()),
+        )
+    if EPIC_STATUS_MIGRATION_VERSION not in applied:
+        upgrade_epic_statuses(connection)
+        connection.execute(
+            'INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)',
+            (EPIC_STATUS_MIGRATION_VERSION, utc_now()),
         )
     connection.execute(
         'INSERT OR IGNORE INTO schema_version(version) VALUES (?)',

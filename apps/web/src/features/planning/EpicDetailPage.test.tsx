@@ -96,6 +96,31 @@ describe('EpicDetailPage', () => {
     );
   });
 
+  it('shows an unsupported Epic state and preserves it when editing other fields', async () => {
+    vi.mocked(organizationApi.planningOverview).mockResolvedValue({
+      epics: [{ ...epic, status: 'custom_legacy', features: [feature] }],
+      unassigned_features: [],
+    });
+    vi.mocked(organizationApi.updateEpic).mockResolvedValue({
+      ...epic,
+      status: 'custom_legacy',
+      title: 'Legacy updated',
+    });
+    renderPage();
+    expect(await screen.findByLabelText('Epic status')).toHaveValue('custom_legacy');
+    expect(screen.getByRole('option', { name: 'Unsupported: custom_legacy' })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Epic title'), {
+      target: { value: 'Legacy updated' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save Epic' }));
+    await waitFor(() =>
+      expect(organizationApi.updateEpic).toHaveBeenCalledWith('w1', 'p1', 'e1', {
+        title: 'Legacy updated',
+        description: 'Ship carefully',
+      }),
+    );
+  });
+
   it('saves edited fields and retains submitted values from the response', async () => {
     renderPage();
     fireEvent.change(await screen.findByLabelText('Epic title'), {

@@ -117,7 +117,7 @@ class EpicResponse(BaseModel):
     project_id: str
     title: str
     description: str | None
-    status: EpicStatus
+    status: str
     priority: str = 'medium'
     tags: list[str] = Field(default_factory=list)
     feature_count: int = 0

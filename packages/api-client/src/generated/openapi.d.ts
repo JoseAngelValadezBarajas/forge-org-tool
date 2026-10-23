@@ -789,11 +789,8 @@ export interface components {
             progress: number;
             /** Project Id */
             project_id: string;
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "backlog" | "ready" | "in_progress" | "verify" | "done";
+            /** Status */
+            status: string;
             /** Tags */
             tags?: string[];
             /** Title */

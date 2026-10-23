@@ -358,13 +358,6 @@
             "type": "string"
           },
           "status": {
-            "enum": [
-              "backlog",
-              "ready",
-              "in_progress",
-              "verify",
-              "done"
-            ],
             "title": "Status",
             "type": "string"
           },

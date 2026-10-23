@@ -261,7 +261,7 @@ class OrganizationPlanningPersistence:
         now, epic_id = utc_now(), str(uuid4())
         try:
             self.connection.execute(
-                'INSERT INTO epics(id, project_id, title, description, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                "INSERT INTO epics(id, project_id, title, description, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, 'backlog', ?, ?, ?)",
                 (epic_id, project_id, title, description, priority, now, now),
             )
             self._set_work_item_tags(workspace_id, 'epic', epic_id, tags)

@@ -94,6 +94,55 @@ describe('PlanningPage', () => {
     );
   });
 
+  it('shows unsupported and archived Epics outside workflow columns with a reconcilable total', async () => {
+    const data = {
+      ...overview,
+      epics: [
+        ...overview.epics,
+        {
+          ...overview.epics[0],
+          id: 'e-legacy',
+          title: 'Legacy state',
+          status: 'custom_legacy',
+        },
+        {
+          ...overview.epics[0],
+          id: 'e-archived',
+          title: 'Archived record',
+          status: 'backlog',
+          archived_at: '2026-10-01T00:00:00Z',
+        },
+      ],
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((input: string) =>
+        Promise.resolve(
+          new Response(JSON.stringify(String(input).endsWith('/dependencies') ? [] : data), {
+            status: 200,
+          }),
+        ),
+      ),
+    );
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('region', { name: 'Legacy Epics' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Legacy state' })).toBeInTheDocument();
+    expect(screen.getByText('Legacy status: custom_legacy')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Archived Epics' })).toHaveTextContent(
+      'Archived record',
+    );
+    expect(screen.getByRole('region', { name: 'Epic visibility summary' })).toHaveTextContent(
+      '3 total · 1 in workflow · 1 archived · 1 legacy',
+    );
+  });
+
   it('persists a work item status when dragged into another workflow column', async () => {
     const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
       if (String(input).endsWith('/dependencies'))

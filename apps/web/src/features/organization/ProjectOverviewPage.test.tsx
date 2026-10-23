@@ -59,7 +59,7 @@ const overview: PlanningOverview = {
       project_id: 'p1',
       title: 'First epic',
       description: null,
-      status: 'active',
+      status: 'backlog',
       ...dates,
       features: [features[3]!],
     },
@@ -201,6 +201,34 @@ describe('Project Overview route', () => {
     for (const operation of ['listDependencies'] as const) {
       expect(organizationApi[operation]).toHaveBeenCalledWith('w1', 'p1');
     }
+  });
+
+  it('reconciles total Epic count across workflow, archived, and unsupported records', async () => {
+    vi.mocked(organizationApi.planningOverview).mockResolvedValue({
+      epics: [
+        { ...overview.epics[0]!, status: 'backlog' },
+        {
+          ...overview.epics[0]!,
+          id: 'e-archived',
+          title: 'Archived Epic',
+          archived_at: '2026-10-01T00:00:00Z',
+        },
+        {
+          ...overview.epics[0]!,
+          id: 'e-legacy',
+          title: 'Custom state Epic',
+          status: 'custom_legacy',
+        },
+      ],
+      unassigned_features: overview.unassigned_features,
+    });
+    renderOverview();
+    await screen.findByRole('heading', { name: 'Atlas' });
+    const summary = within(screen.getByRole('region', { name: 'Project summary' }));
+    expect(summary.getByText('Epics').closest('article')).toHaveTextContent('3');
+    expect(summary.getByText('Epics').closest('article')).toHaveTextContent(
+      '1 in workflow · 1 archived · 1 legacy',
+    );
   });
 
   it('supports all priority levels when fewer than four Features are pending', async () => {

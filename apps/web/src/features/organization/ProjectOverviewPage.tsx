@@ -23,6 +23,7 @@ type Overview = {
   features: Feature[];
   tasks: number;
   epics: number;
+  epicBreakdown: { workflow: number; archived: number; legacy: number };
   criteria: number;
   satisfiedCriteria: number;
   dependencies: number;
@@ -62,12 +63,22 @@ async function loadOverview(workspaceId: string, projectId: string): Promise<Ove
     }),
   );
   const criteria = records.flatMap((record) => record.criteria);
+  const supportedEpicStatuses = new Set(['backlog', 'ready', 'in_progress', 'verify', 'done']);
   return {
     project,
     workspace,
     features,
     tasks: records.reduce((total, record) => total + record.tasks.length, 0),
     epics: planning.epics.length,
+    epicBreakdown: {
+      workflow: planning.epics.filter(
+        (epic) => !epic.archived_at && supportedEpicStatuses.has(epic.status),
+      ).length,
+      archived: planning.epics.filter((epic) => Boolean(epic.archived_at)).length,
+      legacy: planning.epics.filter(
+        (epic) => !epic.archived_at && !supportedEpicStatuses.has(epic.status),
+      ).length,
+    },
     criteria: criteria.length,
     satisfiedCriteria: criteria.filter((criterion) => criterion.satisfied).length,
     dependencies: dependencies.length,
@@ -333,7 +344,11 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
             <div className={styles.metrics}>
               <MetricCard label="Features" value={overview.features.length} />
               <MetricCard label="Tasks" value={overview.tasks} />
-              <MetricCard label="Epics" value={overview.epics} />
+              <MetricCard
+                label="Epics"
+                value={overview.epics}
+                detail={`${overview.epicBreakdown.workflow} in workflow · ${overview.epicBreakdown.archived} archived · ${overview.epicBreakdown.legacy} legacy`}
+              />
               <MetricCard
                 label="Acceptance criteria"
                 value={`${overview.satisfiedCriteria} / ${overview.criteria}`}

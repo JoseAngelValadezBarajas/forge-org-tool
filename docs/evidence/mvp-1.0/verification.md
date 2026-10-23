@@ -1,5 +1,17 @@
 # FORGE Org Tool 1.0 verification evidence
 
+## Epic legacy-status regression hotfix (2026-10-23)
+
+Reproduced against a disposable v2 SQLite database with the old `epics.status DEFAULT 'planning'` schema, migrated using the production runner: `create_epic()` omitted status, SQLite persisted `planning`, and FastAPI raised `ResponseValidationError` at `('response', 'status')` because the response contract accepted only `backlog`, `ready`, `in_progress`, `verify`, or `done`. The POST returned HTTP 500 after the row had already been committed. This confirms the reported cause; the reproduction did not use or modify installed user data.
+
+Migration v5 (`v0005_epic_status_normalization`) is forward-only and UPDATE-only: `planning` becomes `backlog`, `planned` becomes `ready`; other values and row identities remain untouched. It does not delete or deduplicate Epics, modify archive metadata, or unarchive records. The existing integrity-checked pre-migration backup remains in use. New Epics explicitly insert `backlog`, regardless of the legacy SQLite column default. Response reads tolerate unknown persisted status strings, and Planning presents them in a recovery region rather than dropping them. Summary counts reconcile workflow, archived, and legacy Epics.
+
+The synthetic upgraded-browser fixture contained four existing Epics: two status remaps, one archived Epic, and one unsupported custom-state Epic. Migration affected exactly two records; it preserved all four rows, archive state, identity, and the unsupported state. Browser acceptance created `testing` as a fifth Epic, returned HTTP 201, immediately displayed it in Backlog without reload, and reconciled the summary to 5 total (3 workflow, 1 archived, 1 legacy). A failed invalid-tag create returned 422 and left no Epic or tag record. No duplicate or user record was removed.
+
+Retained upgraded-database browser screenshot: [epic-legacy/upgraded-epic-board.png](epic-legacy/upgraded-epic-board.png) (synthetic data; automated browser evidence, not human visual certification). The installed smoke implementation was traced to isolated temporary `LOCALAPPDATA`/disposable database setup; no product smoke path was changed, and no installed application database was used by these regression tests. PR #3 remains open and unmerged.
+
+Verification for this hotfix: API pytest 39 passed (one existing Starlette/httpx deprecation warning); frontend Vitest 141 passed; TypeScript typecheck passed; Ruff passed; mypy passed (58 source files); architecture checks passed; production build and development-route exclusion passed; isolated Playwright passed 24 journeys desktop/mobile, plus the dedicated upgraded legacy SQLite Chromium journey passed. GitHub Quality CI and commit SHA are pending for this implementation and will be recorded after push.
+
 Final implementation commit: `534686ae38f9730aacff12c2dc0ea69e0fcef634` (`feature/forge-mvp-1.0`). PR [#3](https://github.com/JoseAngelValadezBarajas/forge-org-tool/pull/3) remains open and unmerged.
 
 ## GitHub Quality CI

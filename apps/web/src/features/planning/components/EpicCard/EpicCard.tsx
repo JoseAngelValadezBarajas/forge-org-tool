@@ -15,8 +15,13 @@ const labels: Record<EpicStatus, string> = {
 };
 
 export function EpicCard({ epic, children, href }: EpicCardProps) {
-  const label = epic.archived_at ? 'Archived' : labels[epic.status];
-  const state = epic.archived_at ? 'Archived' : epic.status;
+  const knownStatus = epic.status in labels;
+  const label = epic.archived_at
+    ? 'Archived'
+    : knownStatus
+      ? labels[epic.status as EpicStatus]
+      : `Legacy status: ${epic.status}`;
+  const state = epic.archived_at ? 'Archived' : knownStatus ? epic.status : 'legacy';
   const total = epic.feature_count ?? epic.features.length;
   const completed =
     epic.completed_feature_count ??

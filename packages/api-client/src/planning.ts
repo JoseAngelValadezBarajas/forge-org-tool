@@ -4,6 +4,7 @@ import type {
   BugAttachment,
   Dependency,
   Epic,
+  EpicUpdate,
   Feature,
   PlanningOverview,
   Task,
@@ -80,12 +81,7 @@ export const planningCapability = {
         tags: options?.tags ?? [],
       }),
     }),
-  updateEpic: (
-    workspaceId: string,
-    projectId: string,
-    epicId: string,
-    values: Partial<Pick<Epic, 'title' | 'description' | 'status' | 'priority' | 'tags'>>,
-  ) =>
+  updateEpic: (workspaceId: string, projectId: string, epicId: string, values: EpicUpdate) =>
     sendJson<Epic>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/epics/${epicId}`, {
       method: 'PATCH',
       body: JSON.stringify(values),

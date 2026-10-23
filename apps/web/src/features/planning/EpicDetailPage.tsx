@@ -22,7 +22,7 @@ export function EpicDetailPage() {
   const [epic, setEpic] = useState<Epic | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<EpicStatus>('backlog');
+  const [status, setStatus] = useState<string>('backlog');
   const [features, setFeatures] = useState<Feature[]>([]);
   const [featureSearch, setFeatureSearch] = useState('');
   const [featurePriority, setFeaturePriority] = useState('all');
@@ -82,7 +82,7 @@ export function EpicDetailPage() {
       const updated = await organizationApi.updateEpic(workspaceId, projectId, epic.id, {
         title: title.trim(),
         description: description.trim() || null,
-        status,
+        ...(statuses.includes(status as EpicStatus) ? { status: status as EpicStatus } : {}),
       });
       if (currentEpicId.current !== epic.id) return;
       setEpic(updated);
@@ -187,8 +187,11 @@ export function EpicDetailPage() {
                   id="epic-status"
                   aria-label="Epic status"
                   value={status}
-                  onChange={(event) => setStatus(event.target.value as EpicStatus)}
+                  onChange={(event) => setStatus(event.target.value)}
                 >
+                  {!statuses.includes(status as EpicStatus) && (
+                    <option value={status}>Unsupported: {status}</option>
+                  )}
                   {statuses.map((value) => (
                     <option key={value} value={value}>
                       {value}
