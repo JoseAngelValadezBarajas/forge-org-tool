@@ -36,9 +36,20 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   const featureTitle = `Feature ${suffix}`;
   await page.getByLabel('Feature title').fill(featureTitle);
   await page.getByLabel('Epic for new feature').selectOption({ label: epicTitle });
+  await page.getByLabel('Feature tags').fill('AI, Research');
   await page.getByRole('button', { name: 'Create Feature' }).click();
   const featureLink = page.getByRole('link', { name: featureTitle, exact: true });
   await expect(featureLink).toBeVisible();
+  const untaggedTitle = `Untagged ${suffix}`;
+  await page.getByLabel('Feature title').fill(untaggedTitle);
+  await page.getByLabel('Epic for new feature').selectOption({ label: epicTitle });
+  await page.getByRole('button', { name: 'Create Feature' }).click();
+  const untaggedLink = page.getByRole('link', { name: untaggedTitle, exact: true });
+  await expect(untaggedLink).toBeVisible();
+  await page.getByLabel('Filter planning by tag').fill('research');
+  await expect(featureLink).toBeVisible();
+  await expect(untaggedLink).toHaveCount(0);
+  await page.getByLabel('Filter planning by tag').fill('');
 
   await page.getByRole('searchbox', { name: 'Search planning' }).fill('no such planning result');
   await expect(featureLink).toHaveCount(0);
@@ -170,7 +181,8 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   expect(feature).toMatchObject({ title: featureTitle, status: 'ready' });
   expect(feature.kind).toBe('story');
   const epic = planning.epics.find((item: { title: string }) => item.title === epicTitle);
-  expect(epic).toMatchObject({ priority: 'high', tags: ['AI', 'Research'], feature_count: 1 });
+  expect(epic).toMatchObject({ priority: 'high', tags: ['AI', 'Research'], feature_count: 2 });
+  expect(feature.tags).toEqual(['AI', 'Research']);
   const tasksResponse = await page.request.get(
     `/api/v1/workspaces/${workspace.id}/projects/${project.id}/features/${feature.id}/tasks`,
   );
@@ -316,4 +328,59 @@ test('PA-PLAN-004 creates a structured Bug with a durable screenshot from the pr
   await page.reload();
   await expect(page.getByRole('img', { name: 'Bug screenshot: synthetic.png' })).toBeVisible();
   await expect(page.getByLabel('Work item notes')).toHaveValue(`Bug report ${suffix}\nSecond line`);
+});
+
+test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns', async ({
+  page,
+}) => {
+  const suffix = `${test.info().project.name}-${Date.now()}`;
+  const { workspace, project } = await createProject(page, suffix);
+  await page.goto(`/planning/${workspace.id}/${project.id}`);
+  const epicTitle = `Workflow Epic ${suffix}`;
+  const storyTitle = `Workflow Story ${suffix}`;
+  await page.getByLabel('Epic title').fill(epicTitle);
+  await page.getByRole('button', { name: 'Create Epic' }).click();
+  await page.getByLabel('Feature title').fill(storyTitle);
+  await page.getByLabel('Epic for new feature').selectOption({ label: epicTitle });
+  await page.getByRole('button', { name: 'Create Feature' }).click();
+  await expect(page.getByRole('link', { name: storyTitle, exact: true })).toBeVisible();
+
+  const overviewPath = `/api/v1/workspaces/${workspace.id}/projects/${project.id}/planning/overview`;
+  const initialOverview = await (await page.request.get(overviewPath)).json();
+  const epic = initialOverview.epics.find((item: { title: string }) => item.title === epicTitle);
+  const feature = epic.features.find((item: { title: string }) => item.title === storyTitle);
+  const statuses = ['backlog', 'ready', 'in_progress', 'verify', 'done'];
+
+  for (const status of statuses) {
+    const response = page.waitForResponse(
+      (item) =>
+        item.url().includes(`/epics/${epic.id}`) &&
+        item.request().method() === 'PATCH' &&
+        item.request().postData()?.includes(`"status":"${status}"`) === true,
+    );
+    await page.getByLabel(`Status for Epic ${epicTitle}`).selectOption(status);
+    expect((await response).ok()).toBeTruthy();
+    const persisted = await (await page.request.get(overviewPath)).json();
+    expect(persisted.epics.find((item: { id: string }) => item.id === epic.id).status).toBe(status);
+  }
+
+  for (const status of statuses) {
+    const response = page.waitForResponse(
+      (item) =>
+        item.url().includes(`/features/${feature.id}`) &&
+        item.request().method() === 'PATCH' &&
+        item.request().postData()?.includes(`"status":"${status}"`) === true,
+    );
+    await page.getByLabel(`Status for ${storyTitle}`).selectOption(status);
+    expect((await response).ok()).toBeTruthy();
+    const persisted = await (await page.request.get(overviewPath)).json();
+    const storedEpic = persisted.epics.find((item: { id: string }) => item.id === epic.id);
+    expect(storedEpic.features.find((item: { id: string }) => item.id === feature.id).status).toBe(
+      status,
+    );
+  }
+
+  await page.reload();
+  await expect(page.getByLabel(`Status for Epic ${epicTitle}`)).toHaveValue('done');
+  await expect(page.getByLabel(`Status for ${storyTitle}`)).toHaveValue('done');
 });

@@ -20,7 +20,9 @@ export type ProjectTransferPreview = {
   fingerprint: Schema['ImportPreviewResponse']['fingerprint'];
   counts: Schema['ImportPreviewResponse']['counts'];
   project: { name: string; description?: string | null };
+  destination?: { scope: string; id: string };
 };
+export type ContextualTransferScope = 'epics' | 'work-items' | 'tasks';
 
 export type PlanningOverview = {
   epics: Array<Epic & { features: Feature[] }>;

@@ -60,6 +60,14 @@ export function FeatureDetailPage() {
       {error && <p role="alert">{error}</p>}
       <p>
         <Link to={`/planning/${workspaceId}/${projectId}`}>Back to planning board</Link>
+        {feature && (
+          <>
+            {' · '}
+            <Link to={`/transfer/${workspaceId}/${projectId}/tasks/${feature.id}`}>
+              Import / export Tasks
+            </Link>
+          </>
+        )}
       </p>
       {feature && (
         <Card>

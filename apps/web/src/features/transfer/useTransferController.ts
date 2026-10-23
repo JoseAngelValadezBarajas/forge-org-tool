@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { organizationApi, type ProjectTransferPreview } from '@forge-org/api-client';
+import {
+  organizationApi,
+  type ContextualTransferScope,
+  type ProjectTransferPreview,
+} from '@forge-org/api-client';
 
 function downloadProjectDocument(document: unknown) {
   const blob = new Blob([JSON.stringify(document, null, 2)], {
@@ -37,7 +41,12 @@ function toBase64(bytes: Uint8Array): string {
   return window.btoa(binary);
 }
 
-export function useTransferController(workspaceId: string, projectId: string) {
+export function useTransferController(
+  workspaceId: string,
+  projectId: string,
+  scope?: ContextualTransferScope,
+  destinationId?: string,
+) {
   const [documentText, setDocumentText] = useState('');
   const [fileName, setFileName] = useState('');
   const [preview, setPreview] = useState<ProjectTransferPreview | null>(null);
@@ -48,11 +57,14 @@ export function useTransferController(workspaceId: string, projectId: string) {
 
   async function exportProject() {
     try {
-      const document = await organizationApi.exportProject(
-        workspaceId,
-        projectId,
-        'forge-project-transfer-v2',
-      );
+      const document =
+        scope && destinationId
+          ? await organizationApi.exportContextual(workspaceId, projectId, scope, destinationId)
+          : await organizationApi.exportProject(
+              workspaceId,
+              projectId,
+              'forge-project-transfer-v2',
+            );
       const text = JSON.stringify(document, null, 2);
       downloadProjectDocument(document);
       setExported(true);
@@ -104,12 +116,24 @@ export function useTransferController(workspaceId: string, projectId: string) {
     setImportedProjectId('');
     try {
       if (packageBase64) {
+        if (scope)
+          throw new Error('ZIP packages are available for complete Project transfers only.');
         setPreview(await organizationApi.previewProjectPackageImport(workspaceId, packageBase64));
         setError('');
         return;
       }
       const document = JSON.parse(documentText) as unknown;
-      setPreview(await organizationApi.previewProjectImport(workspaceId, document));
+      setPreview(
+        scope && destinationId
+          ? await organizationApi.previewContextualImport(
+              workspaceId,
+              projectId,
+              scope,
+              destinationId,
+              document,
+            )
+          : await organizationApi.previewProjectImport(workspaceId, document),
+      );
       setError('');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to preview project import.');
@@ -120,6 +144,8 @@ export function useTransferController(workspaceId: string, projectId: string) {
     if (!preview) return;
     try {
       if (packageBase64) {
+        if (scope)
+          throw new Error('ZIP packages are available for complete Project transfers only.');
         const result = await organizationApi.importProjectPackage(
           workspaceId,
           packageBase64,
@@ -131,11 +157,17 @@ export function useTransferController(workspaceId: string, projectId: string) {
         return;
       }
       const document = JSON.parse(documentText) as unknown;
-      const result = await organizationApi.importProject(
-        workspaceId,
-        document,
-        preview.fingerprint,
-      );
+      const result =
+        scope && destinationId
+          ? await organizationApi.importContextual(
+              workspaceId,
+              projectId,
+              scope,
+              destinationId,
+              document,
+              preview.fingerprint,
+            )
+          : await organizationApi.importProject(workspaceId, document, preview.fingerprint);
       setImportedProjectId(result.project_id);
       setPreview(null);
       setError('');

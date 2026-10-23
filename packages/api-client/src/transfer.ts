@@ -1,5 +1,5 @@
 import { getApiBlob, getApiJson, sendJson } from './transport.js';
-import type { ProjectTransferPreview } from './types.js';
+import type { ContextualTransferScope, ProjectTransferPreview } from './types.js';
 
 export const transferCapability = {
   previewProjectImport: (workspaceId: string, document: unknown) =>
@@ -20,6 +20,38 @@ export const transferCapability = {
   ) =>
     getApiJson<unknown>({
       path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export?schema_version=${schemaVersion}`,
+    }),
+  previewContextualImport: (
+    workspaceId: string,
+    projectId: string,
+    scope: ContextualTransferScope,
+    destinationId: string,
+    document: unknown,
+  ) =>
+    sendJson<ProjectTransferPreview>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/transfer/${scope}/${destinationId}/preview`,
+      { method: 'POST', body: JSON.stringify(document) },
+    ),
+  importContextual: (
+    workspaceId: string,
+    projectId: string,
+    scope: ContextualTransferScope,
+    destinationId: string,
+    document: unknown,
+    expected_fingerprint: string,
+  ) =>
+    sendJson<{ project_id: string; fingerprint: string }>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/transfer/${scope}/${destinationId}`,
+      { method: 'POST', body: JSON.stringify({ document, expected_fingerprint }) },
+    ),
+  exportContextual: (
+    workspaceId: string,
+    projectId: string,
+    scope: ContextualTransferScope,
+    destinationId: string,
+  ) =>
+    getApiJson<unknown>({
+      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/transfer/${scope}/${destinationId}/export`,
     }),
   previewProjectPackageImport: (workspaceId: string, archive_base64: string) =>
     sendJson<ProjectTransferPreview>(

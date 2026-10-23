@@ -127,6 +127,16 @@ function ApplicationShell() {
                 element={<FeatureDetailPage />}
               />
               <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
+              <Route path="/transfer/workspaces/:workspaceId" element={<TransferPage />} />
+              <Route
+                path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+                element={<TransferPage />}
+              />
+              <Route path="/transfer/workspaces/:workspaceId" element={<TransferPage />} />
+              <Route
+                path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+                element={<TransferPage />}
+              />
               {ComponentGallery && (
                 <Route
                   path="/__components"

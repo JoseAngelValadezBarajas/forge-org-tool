@@ -46,6 +46,17 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
     .getByRole('region', { name: 'Project summaries' })
     .getByRole('link', { name: projectName, exact: true });
   await expect(projectHeading).toBeVisible();
+  const siblingProjectNames = [`FormiAI ${suffix}`, `Taringa 2.0 ${suffix}`];
+  for (const siblingName of siblingProjectNames) {
+    await page.getByLabel('Project name').fill(siblingName);
+    await page.getByRole('button', { name: 'Create Project' }).click();
+    await expect(
+      page.getByRole('region', { name: 'Project summaries' }).getByRole('link', {
+        name: siblingName,
+        exact: true,
+      }),
+    ).toBeVisible();
+  }
 
   const search = page.getByRole('searchbox', { name: 'Search projects' });
   await search.fill('missing acceptance text');
@@ -91,6 +102,35 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
     has: page.getByRole('link', { name: projectName, exact: true }),
   });
   await expect(restoredCard.getByRole('button', { name: 'Archive' })).toBeVisible();
+
+  const secondWorkspaceResponse = await page.request.post('/api/v1/workspaces', {
+    data: { name: `Isolated ${suffix}` },
+  });
+  expect(secondWorkspaceResponse.status()).toBe(201);
+  const secondWorkspace = await secondWorkspaceResponse.json();
+  await page.reload();
+  const workspaceSelector = page.getByRole('combobox', { name: 'Workspace' });
+  await workspaceSelector.selectOption(secondWorkspace.id);
+  await expect(projectHeading).toHaveCount(0);
+  const secondProjectName = `Second workspace project ${suffix}`;
+  await page.getByLabel('Project name').fill(secondProjectName);
+  await page.getByRole('button', { name: 'Create Project' }).click();
+  await expect(
+    page.getByRole('region', { name: 'Project summaries' }).getByRole('link', {
+      name: secondProjectName,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await workspaceSelector.selectOption(workspace.id);
+  await expect(projectHeading).toBeVisible();
+  for (const siblingName of siblingProjectNames) {
+    await expect(
+      page.getByRole('region', { name: 'Project summaries' }).getByRole('link', {
+        name: siblingName,
+        exact: true,
+      }),
+    ).toBeVisible();
+  }
 
   await page.getByRole('button', { name: 'Archive workspace' }).click();
   await expect(

@@ -119,6 +119,11 @@ export function OrganizationPage() {
               <small>private local mode</small>
             </Card>
           </div>
+          <p>
+            <Link to={`/transfer/workspaces/${workspaceId}`}>
+              Import project into this Workspace
+            </Link>
+          </p>
           <section className={styles.dashboard} aria-labelledby="project-summaries-heading">
             <h2 id="project-summaries-heading">Project summaries</h2>
             {dashboardLoading ? (

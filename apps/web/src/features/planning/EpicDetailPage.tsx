@@ -129,6 +129,14 @@ export function EpicDetailPage() {
       <SectionHeader title="Epic detail" eyebrow="FORGE / Manual planning" />
       <p>
         <Link to={`/planning/${workspaceId}/${projectId}`}>Back to planning board</Link>
+        {' · '}
+        <Link to={`/transfer/${workspaceId}/${projectId}/epics/${epicId}`}>
+          Import / export Epic
+        </Link>
+        {' · '}
+        <Link to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}>
+          Import / export Stories and Bugs
+        </Link>
       </p>
       {loading && <p role="status">Loading Epic…</p>}
       {error && (

@@ -92,6 +92,17 @@ def test_workspace_tags_can_be_created_renamed_colored_and_deleted_without_delet
             assert client.get(
                 f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/features'
             ).json()[0]['tags'] == ['Screenshots']
+            second_project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects',
+                json={'name': 'Second Board'},
+            ).json()
+            second_feature = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{second_project["id"]}/features',
+                json={'title': 'Shared tag consumer', 'tags': [' screenshots ']},
+            )
+            assert second_feature.status_code == 201
+            assert second_feature.json()['tags'] == ['Screenshots']
+            assert len(client.get(tag_url).json()) == 1
             assert (
                 client.patch(
                     f'/api/v1/workspaces/{other_workspace["id"]}/tags/{tag.json()["id"]}',

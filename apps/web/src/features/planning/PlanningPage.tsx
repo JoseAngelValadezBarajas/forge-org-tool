@@ -47,6 +47,8 @@ export function PlanningPage() {
     priorityFilter,
     removeDependency,
     search,
+    setTagFilter,
+    tagFilter,
     setBlockedFeatureId,
     setBlockingFeatureId,
     setEpicFilter,
@@ -302,6 +304,13 @@ export function PlanningPage() {
                   </option>
                 ))}
               </Select>
+            </FormField>
+            <FormField label="Tag">
+              <Input
+                aria-label="Filter planning by tag"
+                value={tagFilter}
+                onChange={(event) => setTagFilter(event.target.value)}
+              />
             </FormField>
           </div>
         </FilterBar>

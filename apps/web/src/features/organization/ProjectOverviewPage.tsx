@@ -184,6 +184,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
         <Link to="/">Back to Organization</Link>
         <Link to={`/planning/${workspaceId}/${projectId}`}>Open planning board</Link>
         <Link to={`/transfer/${workspaceId}/${projectId}`}>Transfer / export</Link>
+        <Link to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}>Import Epic</Link>
       </nav>
       {loadError ? (
         <ErrorState

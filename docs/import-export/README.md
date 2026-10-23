@@ -1,6 +1,8 @@
 # Project Transfer
 
-Project Transfer currently supports complete-Project JSON v1/v2 import/export and complete-Project ZIP v2 import/export with Bug screenshots. JSON imports use a fingerprint over the normalized document. Preview and confirmation call the same validation engine, and stale fingerprints are rejected. Contextual Epic, Work Item and Task import/export is a required 1.0 capability but is not implemented yet; do not interpret the complete-Project flows as satisfying it.
+Project Transfer supports complete-Project JSON v1/v2 import/export, contextual JSON v2 transfer, and complete-Project ZIP v2 import/export with Bug screenshots. Contextual scopes are: one Epic with its child Work Items into a Project; multiple Stories/Bugs into an existing Epic; and Tasks into an existing Work Item. UI entry points are available from Workspace, Project, Epic and Work Item contexts. The v1 adapter remains available for complete-Project imports; contextual scopes require v2.
+
+All JSON imports use a fingerprint over the normalized document and destination. Preview and confirmation share the validated engine; destination changes and stale fingerprints are rejected. Failed imports are atomic. Contextual JSON carries references, tags, statuses, notes, Bug fields, criteria and Tasks, but not binary screenshots. ZIP screenshot packages remain complete-Project-only.
 
 ## Validation boundary
 

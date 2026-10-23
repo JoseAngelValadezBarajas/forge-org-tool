@@ -18,9 +18,9 @@
 - [x] Task 1: contract and baseline characterization (docs + baseline test evidence; implementation tests pass at `d0f1110`)
 - [x] Task 2: retire unsupported active capabilities (active routes/API types/UI/product previews and retired tests removed; architecture/package contracts pass)
 - [x] Task 3: active schema and safe migrations (fresh DB excludes legacy tables; upgrade preserves historical rows; integrity-checked online backup, interrupted-backup retry, replay, and future-schema safety tested)
-- [x] Task 4: versioned Project Transfer (v1/v2 JSON and ZIP screenshot package; shared fingerprint guard, atomic project/attachment metadata import, path/symlink/checksum/image/size/count defenses, typed client, UI flow and desktop/mobile browser journey)
+- [x] Task 4: versioned Project and contextual Transfer (v1/v2 Project JSON, Epic/Work Item/Task JSON scopes, destination-bound preview fingerprints, shared validation/atomic writes, ZIP screenshot package, typed client, contextual UI entry points and desktop/mobile journeys)
 - [x] Task 5: Workspace and Project CRUD (create/update/select/reload persistence and archive/restore implemented; browser journeys pass on desktop/mobile)
-- [ ] Task 6: Planning, Criteria, Bugs, and status workflow (persisted Epics/Stories/Bugs, tags, criteria CRUD/reorder, notes, attachments and Work Item drag/accessibility selector implemented; all five transitions, Epic movement and complete tag lifecycle still need acceptance coverage)
+- [x] Task 6: Planning, Criteria, Bugs, and status workflow (persisted Epics/Stories/Bugs, workspace-scoped normalized tags and filtering, criteria CRUD/reorder, notes, attachments, drag/accessibility selector and all five Epic/Work Item transitions covered)
 - [x] Task 7: Component Host and capability inventory (host now covers retained patterns only; development route and production exclusion verified)
 - [ ] Task 8: clean-checkout and release verification (local web/API and isolated browser journeys pass; native Tauri GUI acceptance, Rust toolchain/GitHub CI and remaining product acceptance remain)
 
@@ -28,12 +28,12 @@
 
 - Existing-schema upgrade keeps a synthetic legacy Decision row. Online backup is SQLite-consistent, integrity-checked, and published atomically; simulated publication interruption leaves the original DB unchanged and retry succeeds. Reopening a migrated DB is safe. Future schema version remains unmodified.
 - Organization active workspace is restored from and written to `localStorage`; a focused RED test confirmed the default-selection bug before implementation. `PA-ORG-001` verifies reload persistence on desktop and mobile.
-- Retired UX-02 screenshots/journeys tied to removed modules were retired. Latest full isolated E2E run passes 20/20 across Chromium desktop/mobile; Component Host has four retained dark/light desktop/mobile captures.
+- Retired UX-02 screenshots/journeys tied to removed modules were retired. Latest full isolated E2E run passes 24/24 across Chromium desktop/mobile; Component Host, Project Overview and Epic detail captures are refreshed and retained.
 - `npm test`: pass (31 architecture tests, 14 acceptance-tooling tests, 136 web tests, shared packages, API client contracts and external consumer).
 - `npm run build`: pass, including `/__components` production exclusion. `npm run lint:frontend` (zero warnings) and `npm run typecheck`: pass.
-- Backend: `uv run --project apps/api --locked pytest -q` passes 40 tests + 1 subtest; Ruff check/format and mypy pass. Desktop synthetic sidecar/SQLite tests pass 9 tests + 1 subtest.
+- Backend: `uv run --project apps/api --locked pytest -q` passes 42 tests + 1 subtest; Ruff check/format and mypy pass. Desktop synthetic sidecar/SQLite tests pass 9 tests + 1 subtest.
 - One frontend ESLint issue (synchronous effect state reset) was fixed by keying the workspace panel on workspace identity; no lint rule was weakened.
-- Remaining blockers are contextual Epic/Work Item/Task import/export (AC-08), complete five-transition/Epic Board journey coverage (AC-06), installed native Desktop acceptance (AC-07), unavailable Rust toolchain checks and remote GitHub Quality CI. Do not report the product goal complete while these remain.
-- Local implementation commit: `d03437a3e022781b5933135a1ec736c07cc5c562`; evidence-record commit follows. Branch is still local and has not been pushed or opened as a PR.
-- Task 4 continuation: v2 ZIP package now exports/imports Bug screenshots through the Transfer UI. API round-trip, cross-workspace durability, traversal, symlink, checksum, attachment count/size, and isolated Chromium desktop/mobile PA-TRN-002 checks pass. Contextual imports remain unimplemented. OpenAPI contract and generated TypeScript types include package endpoints.
+- Remaining blockers are installed native Desktop persistence acceptance (AC-07), unavailable local Rust toolchain checks and remote GitHub Quality CI. Do not report the overall product goal complete until Windows evidence is available.
+- Implementation and verification evidence are committed on `feature/forge-mvp-1.0`; the branch remains unmerged. The current commit and remote CI state must be reported from live Git evidence.
+- Task 4 continuation: v2 ZIP package exports/imports Bug screenshots through the Transfer UI. API round-trip, cross-workspace durability, traversal, symlink, checksum, attachment count/size, and isolated Chromium desktop/mobile PA-TRN-002 checks pass. PA-TRN-003 verifies Project, Epic, Work Item and Task import/export through contextual UI destinations. OpenAPI contract and generated types include contextual endpoints.
 - The `executing-plans` task-start script is not runnable here because `bash` resolves to a Windows WSL launcher and the configured distro is unavailable. Plan task 4 was resumed directly from its checked-in task section; no task brief was fabricated.

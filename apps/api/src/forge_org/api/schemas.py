@@ -505,6 +505,7 @@ class ImportPreviewResponse(BaseModel):
     fingerprint: str
     project: dict[str, Any]
     counts: dict[str, int]
+    destination: dict[str, str] | None = None
 
 
 class ImportCommitRequest(BaseModel):

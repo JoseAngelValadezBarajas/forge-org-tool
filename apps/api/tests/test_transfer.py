@@ -36,7 +36,7 @@ def test_project_transfer_previews_fingerprints_and_imports_planning_only(tmp_pa
             preview = client.post(
                 f'/api/v1/workspaces/{workspace["id"]}/projects/import/preview', json=document
             )
-            assert preview.status_code == 200
+            assert preview.status_code == 200, preview.text
             fingerprint = preview.json()['fingerprint']
             imported = client.post(
                 f'/api/v1/workspaces/{workspace["id"]}/projects/import',
@@ -165,6 +165,179 @@ def test_project_transfer_v2_preserves_tags_notes_bug_fields_and_v1_compatibilit
             assert second.status_code == 201
             second_tags = client.get(f'/api/v1/workspaces/{other_workspace["id"]}/tags').json()
             assert [tag['name'] for tag in second_tags] == ['Desktop', 'Platform']
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_contextual_epic_transfer_imports_into_existing_project_atomically(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'context-epic.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Context'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'Destination'}
+            ).json()
+            destination = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/epics',
+                json={'title': 'Existing Epic'},
+            )
+            assert destination.status_code == 201
+            document = {
+                'schema_version': 'forge-project-transfer-v2',
+                'project': {'name': 'Context fixture'},
+                'epics': [{'ref': 'epic:import', 'title': 'Imported Epic', 'priority': 'high'}],
+                'features': [
+                    {
+                        'ref': 'feature:import',
+                        'title': 'Imported Story',
+                        'kind': 'story',
+                        'epic_ref': 'epic:import',
+                        'tasks': [{'ref': 'task:one', 'title': 'Imported task'}],
+                        'acceptance_criteria': [],
+                    }
+                ],
+                'dependencies': [],
+            }
+            base = (
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+                f'/transfer/epics/{project["id"]}'
+            )
+            preview = client.post(f'{base}/preview', json=document)
+            assert preview.status_code == 200, preview.text
+            imported = client.post(
+                base,
+                json={'document': document, 'expected_fingerprint': preview.json()['fingerprint']},
+            )
+            assert imported.status_code == 201
+            overview = client.get(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/planning/overview'
+            ).json()
+            imported_epic = next(
+                item for item in overview['epics'] if item['title'] == 'Imported Epic'
+            )
+            assert imported_epic['project_id'] == project['id']
+            assert imported_epic['features'][0]['title'] == 'Imported Story'
+            feature_id = next(
+                reference['generated_id']
+                for reference in imported.json()['references']
+                if reference['ref'] == 'feature:import'
+            )
+            tasks = client.get(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+                f'/features/{feature_id}/tasks'
+            )
+            assert tasks.json()[0]['title'] == 'Imported task'
+            exported = client.get(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+                f'/transfer/epics/{imported_epic["id"]}/export'
+            )
+            assert exported.status_code == 200
+            assert exported.json()['epics'][0]['title'] == 'Imported Epic'
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_contextual_work_item_and_task_transfer_use_existing_destinations(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'context-children.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Context children'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'Destination'}
+            ).json()
+            epic = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/epics',
+                json={'title': 'Existing Epic'},
+            ).json()
+            other_epic = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/epics',
+                json={'title': 'Other Epic'},
+            ).json()
+            work_item_document = {
+                'schema_version': 'forge-project-transfer-v2',
+                'project': {'name': 'Work item fixture'},
+                'epics': [],
+                'features': [
+                    {
+                        'ref': 'feature:bug',
+                        'title': 'Imported Bug',
+                        'kind': 'bug',
+                        'bug_severity': 'high',
+                        'tasks': [],
+                        'acceptance_criteria': [],
+                    }
+                ],
+                'dependencies': [],
+            }
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/transfer'
+            work_preview = client.post(
+                f'{root}/work-items/{epic["id"]}/preview', json=work_item_document
+            )
+            assert work_preview.status_code == 200
+            stale_destination = client.post(
+                f'{root}/work-items/{other_epic["id"]}',
+                json={
+                    'document': work_item_document,
+                    'expected_fingerprint': work_preview.json()['fingerprint'],
+                },
+            )
+            assert stale_destination.status_code == 409
+            overview_url = (
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/planning/overview'
+            )
+            overview = client.get(overview_url).json()
+            assert (
+                next(item for item in overview['epics'] if item['id'] == other_epic['id'])[
+                    'features'
+                ]
+                == []
+            )
+            imported_item = client.post(
+                f'{root}/work-items/{epic["id"]}',
+                json={
+                    'document': work_item_document,
+                    'expected_fingerprint': work_preview.json()['fingerprint'],
+                },
+            )
+            assert imported_item.status_code == 201
+            feature_id = next(
+                item['generated_id']
+                for item in imported_item.json()['references']
+                if item['ref'] == 'feature:bug'
+            )
+            exported_items = client.get(f'{root}/work-items/{epic["id"]}/export')
+            assert exported_items.status_code == 200
+            assert exported_items.json()['features'][0]['title'] == 'Imported Bug'
+
+            task_document = {
+                'schema_version': 'forge-project-transfer-v2',
+                'project': {'name': 'Task fixture'},
+                'epics': [],
+                'features': [
+                    {
+                        'ref': 'feature:tasks',
+                        'title': 'Task fixture',
+                        'kind': 'story',
+                        'tasks': [{'ref': 'task:one', 'title': 'Imported follow-up'}],
+                        'acceptance_criteria': [],
+                    }
+                ],
+                'dependencies': [],
+            }
+            task_preview = client.post(f'{root}/tasks/{feature_id}/preview', json=task_document)
+            assert task_preview.status_code == 200
+            task_import = client.post(
+                f'{root}/tasks/{feature_id}',
+                json={
+                    'document': task_document,
+                    'expected_fingerprint': task_preview.json()['fingerprint'],
+                },
+            )
+            assert task_import.status_code == 201
+            exported_tasks = client.get(f'{root}/tasks/{feature_id}/export')
+            assert exported_tasks.status_code == 200, exported_tasks.text
+            assert exported_tasks.json()['features'][0]['tasks'][0]['title'] == 'Imported follow-up'
+            assert exported_tasks.json()['features'][0]['acceptance_criteria'] == []
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
 

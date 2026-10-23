@@ -78,6 +78,80 @@ def export_project(
         raise service_error(InvalidInput(str(exc))) from exc
 
 
+@capability_router.post(
+    '/workspaces/{workspace_id}/projects/{project_id}/transfer/{scope}/{destination_id}/preview',
+    response_model=ImportPreviewResponse,
+)
+def preview_contextual_import(
+    workspace_id: str,
+    project_id: str,
+    scope: str,
+    destination_id: str,
+    payload: dict[str, Any],
+    transfer: ProjectTransferService = Depends(transfer_service),
+) -> dict[str, Any]:
+    try:
+        return transfer.preview_contextual_import(
+            workspace_id, project_id, scope, destination_id, payload
+        )
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except (ValueError, TypeError) as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+
+
+@capability_router.post(
+    '/workspaces/{workspace_id}/projects/{project_id}/transfer/{scope}/{destination_id}',
+    response_model=ImportResponse,
+    status_code=201,
+)
+def import_contextual(
+    workspace_id: str,
+    project_id: str,
+    scope: str,
+    destination_id: str,
+    payload: ImportCommitRequest,
+    transfer: ProjectTransferService = Depends(transfer_service),
+) -> dict[str, Any]:
+    try:
+        return transfer.import_contextual(
+            workspace_id,
+            project_id,
+            scope,
+            destination_id,
+            payload.document,
+            payload.expected_fingerprint,
+        )
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except (ValueError, TypeError) as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+    except RuntimeError as exc:
+        raise service_error(exc) from exc
+    except sqlite3.IntegrityError as exc:
+        raise service_error(
+            DuplicateName('Contextual import conflicts with existing records')
+        ) from exc
+
+
+@capability_router.get(
+    '/workspaces/{workspace_id}/projects/{project_id}/transfer/{scope}/{destination_id}/export'
+)
+def export_contextual(
+    workspace_id: str,
+    project_id: str,
+    scope: str,
+    destination_id: str,
+    transfer: ProjectTransferService = Depends(transfer_service),
+) -> dict[str, Any]:
+    try:
+        return transfer.export_contextual(workspace_id, project_id, scope, destination_id)
+    except LookupError as exc:
+        raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc
+
+
 def _decode_package(encoded: str) -> bytes:
     try:
         package = base64.b64decode(encoded, validate=True)

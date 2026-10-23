@@ -31,6 +31,7 @@ export function usePlanningController(workspaceId: string, projectId: string) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [epicFilter, setEpicFilter] = useState('all');
+  const [tagFilter, setTagFilter] = useState('');
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
   const [blockingFeatureId, setBlockingFeatureId] = useState('');
   const [blockedFeatureId, setBlockedFeatureId] = useState('');
@@ -50,6 +51,10 @@ export function usePlanningController(workspaceId: string, projectId: string) {
       matchesSearch &&
       (statusFilter === 'all' || feature.status === statusFilter) &&
       (priorityFilter === 'all' || feature.priority === priorityFilter) &&
+      (!tagFilter.trim() ||
+        feature.tags?.some((tag: string) =>
+          tag.toLowerCase().includes(tagFilter.trim().toLowerCase()),
+        )) &&
       (epicFilter === 'all' ||
         feature.epic_id === epicFilter ||
         (epicFilter === 'unassigned' && feature.epic_id === null))
@@ -252,8 +257,10 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     setPriorityFilter,
     setSearch,
     setStatusFilter,
+    setTagFilter,
     setTitle,
     statusFilter,
+    tagFilter,
     title,
     updateFeature,
     updateEpic,

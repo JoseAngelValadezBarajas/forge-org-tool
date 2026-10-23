@@ -101,6 +101,13 @@ class ProjectTransferService:
             ):
                 raise ValueError('Task entries require a title')
             if any(
+                task.get('status', 'todo') not in {'todo', 'in_progress', 'done'}
+                or not isinstance(task.get('position', 0), int)
+                or task.get('position', 0) < 0
+                for task in feature.get('tasks', [])
+            ):
+                raise ValueError('Task status or position is invalid')
+            if any(
                 not isinstance(child, dict) or not str(child.get('description', '')).strip()
                 for child in feature.get('acceptance_criteria', [])
             ):
@@ -463,6 +470,290 @@ class ProjectTransferService:
                 'dependencies': exported_dependencies,
             }
         )
+
+    def _contextual_payload(
+        self,
+        workspace_id: str,
+        project_id: str,
+        scope: str,
+        destination_id: str,
+        document: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+        project = self.connection.execute(
+            'SELECT status FROM projects WHERE workspace_id = ? AND id = ?',
+            (workspace_id, project_id),
+        ).fetchone()
+        if project is None:
+            raise LookupError('Project not found')
+        if project['status'] != 'active':
+            raise ValueError('Archived projects do not accept imports')
+        if scope == 'epics':
+            if (
+                destination_id != project_id
+                and self.connection.execute(
+                    'SELECT 1 FROM epics WHERE project_id = ? AND id = ?',
+                    (project_id, destination_id),
+                ).fetchone()
+                is None
+            ):
+                raise LookupError('Destination Epic not found in this project')
+            target_epic = None
+            target_feature = None
+        elif scope == 'work-items':
+            target_epic = self.connection.execute(
+                'SELECT id FROM epics WHERE project_id = ? AND id = ?',
+                (project_id, destination_id),
+            ).fetchone()
+            if target_epic is None:
+                raise LookupError('Destination Epic not found in this project')
+            target_feature = None
+        elif scope == 'tasks':
+            target_feature = self.connection.execute(
+                'SELECT id FROM features WHERE project_id = ? AND id = ?',
+                (project_id, destination_id),
+            ).fetchone()
+            if target_feature is None:
+                raise LookupError('Destination Work Item not found in this project')
+            target_epic = None
+        else:
+            raise ValueError('Unsupported contextual transfer scope')
+        if document is None:
+            return None
+        normalized = self.validate(document)
+        if normalized['schema_version'] != SCHEMA_VERSION_V2:
+            raise ValueError('Contextual transfer requires forge-project-transfer-v2')
+        if scope == 'epics':
+            if len(normalized['epics']) != 1:
+                raise ValueError('Epic transfer must contain exactly one Epic')
+            epic_ref = normalized['epics'][0]['ref']
+            if any(feature.get('epic_ref') != epic_ref for feature in normalized['features']):
+                raise ValueError('Epic transfer Work Items must reference its Epic')
+        elif scope == 'work-items':
+            if normalized['epics'] or not normalized['features']:
+                raise ValueError('Work Item transfer must contain Work Items and no Epics')
+        else:
+            if (
+                normalized['epics']
+                or len(normalized['features']) != 1
+                or not normalized['features'][0].get('tasks')
+                or normalized['features'][0].get('acceptance_criteria')
+            ):
+                raise ValueError('Task transfer must contain Tasks for exactly one Work Item')
+        canonical = self.canonical(normalized)
+        if len(canonical.encode('utf-8')) > MAX_DOCUMENT_BYTES:
+            raise ValueError('Import document exceeds the 7 MiB limit')
+        return normalized
+
+    def preview_contextual_import(
+        self,
+        workspace_id: str,
+        project_id: str,
+        scope: str,
+        destination_id: str,
+        document: dict[str, Any],
+    ) -> dict[str, Any]:
+        normalized = self._contextual_payload(
+            workspace_id, project_id, scope, destination_id, document
+        )
+        assert normalized is not None
+        preview = self.preview(workspace_id, normalized)
+        envelope = self.canonical(
+            {
+                'scope': scope,
+                'workspace_id': workspace_id,
+                'project_id': project_id,
+                'destination_id': destination_id,
+                'document': normalized,
+            }
+        )
+        preview['fingerprint'] = hashlib.sha256(envelope.encode()).hexdigest()
+        preview['destination'] = {'scope': scope, 'id': destination_id}
+        return preview
+
+    def import_contextual(
+        self,
+        workspace_id: str,
+        project_id: str,
+        scope: str,
+        destination_id: str,
+        document: dict[str, Any],
+        expected_fingerprint: str,
+    ) -> dict[str, Any]:
+        preview = self.preview_contextual_import(
+            workspace_id, project_id, scope, destination_id, document
+        )
+        if preview['fingerprint'] != expected_fingerprint:
+            raise RuntimeError(
+                'Import fingerprint does not match the reviewed destination and document'
+            )
+        normalized = self.validate(document)
+        now = utc_now()
+        references: list[dict[str, str]] = []
+        if scope == 'tasks':
+            feature_id = destination_id
+            position = self.connection.execute(
+                'SELECT COALESCE(MAX(position) + 1, 0) FROM tasks WHERE feature_id = ?',
+                (feature_id,),
+            ).fetchone()[0]
+            try:
+                for task in normalized['features'][0]['tasks']:
+                    task_id = str(uuid4())
+                    self.connection.execute(
+                        'INSERT INTO tasks(id, feature_id, title, description, status, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                        (
+                            task_id,
+                            feature_id,
+                            task['title'],
+                            task.get('description'),
+                            task.get('status', 'todo'),
+                            position,
+                            now,
+                            now,
+                        ),
+                    )
+                    references.append({'ref': task['ref'], 'generated_id': task_id})
+                    position += 1
+                self.connection.commit()
+            except Exception:
+                self.connection.rollback()
+                raise
+            return {
+                'schema_version': normalized['schema_version'],
+                'workspace_id': workspace_id,
+                'project_id': project_id,
+                'fingerprint': expected_fingerprint,
+                'references': references,
+                'counts': preview['counts'],
+            }
+
+        staged_document = {
+            **normalized,
+            'project': {
+                'name': f'__contextual_{uuid4()}__',
+                'description': normalized['project'].get('description'),
+            },
+        }
+        staged_preview = self.preview(workspace_id, staged_document)
+        try:
+            imported = self.import_project(
+                workspace_id, staged_document, staged_preview['fingerprint'], commit=False
+            )
+            staged_project_id = imported['project_id']
+            if scope == 'epics':
+                self.connection.execute(
+                    'UPDATE epics SET project_id = ? WHERE project_id = ?',
+                    (project_id, staged_project_id),
+                )
+                self.connection.execute(
+                    'UPDATE features SET project_id = ? WHERE project_id = ?',
+                    (project_id, staged_project_id),
+                )
+            else:
+                self.connection.execute(
+                    'UPDATE features SET project_id = ?, epic_id = ? WHERE project_id = ?',
+                    (project_id, destination_id, staged_project_id),
+                )
+            self.connection.execute(
+                'UPDATE feature_dependencies SET project_id = ? WHERE project_id = ?',
+                (project_id, staged_project_id),
+            )
+            self.connection.execute('DELETE FROM projects WHERE id = ?', (staged_project_id,))
+            self.connection.commit()
+        except Exception:
+            self.connection.rollback()
+            raise
+        return {
+            'schema_version': normalized['schema_version'],
+            'workspace_id': workspace_id,
+            'project_id': project_id,
+            'fingerprint': expected_fingerprint,
+            'references': imported['references'],
+            'counts': preview['counts'],
+        }
+
+    def export_contextual(
+        self,
+        workspace_id: str,
+        project_id: str,
+        scope: str,
+        destination_id: str,
+        schema_version: str = SCHEMA_VERSION_V2,
+    ) -> dict[str, Any]:
+        document = self.export_project(workspace_id, project_id, schema_version)
+        if scope == 'epics':
+            epic = self.connection.execute(
+                'SELECT id FROM epics WHERE project_id = ? AND id = ?', (project_id, destination_id)
+            ).fetchone()
+            if epic is None:
+                raise LookupError('Epic not found in this project')
+            epic_id_order = [
+                row['id']
+                for row in self.connection.execute(
+                    'SELECT id FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
+                ).fetchall()
+            ]
+            epic_ref = f'epic:{epic_id_order.index(destination_id) + 1:03d}'
+            document['epics'] = [item for item in document['epics'] if item['ref'] == epic_ref]
+            document['features'] = [
+                item for item in document['features'] if item.get('epic_ref') == epic_ref
+            ]
+        elif scope == 'work-items':
+            target = self.connection.execute(
+                'SELECT id FROM epics WHERE project_id = ? AND id = ?', (project_id, destination_id)
+            ).fetchone()
+            if target is None:
+                raise LookupError('Epic not found in this project')
+            epic_id_order = [
+                row['id']
+                for row in self.connection.execute(
+                    'SELECT id FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
+                ).fetchall()
+            ]
+            epic_ref = f'epic:{epic_id_order.index(destination_id) + 1:03d}'
+            document['epics'] = []
+            document['features'] = [
+                {key: value for key, value in item.items() if key != 'epic_ref'}
+                for item in document['features']
+                if item.get('epic_ref') == epic_ref
+            ]
+            if not document['features']:
+                raise ValueError('Epic has no Work Items to export')
+        elif scope == 'tasks':
+            if (
+                self.connection.execute(
+                    'SELECT 1 FROM features WHERE project_id = ? AND id = ?',
+                    (project_id, destination_id),
+                ).fetchone()
+                is None
+            ):
+                raise LookupError('Work Item not found in this project')
+            feature_ids = [
+                row['id']
+                for row in self.connection.execute(
+                    'SELECT id FROM features WHERE project_id = ? ORDER BY created_at',
+                    (project_id,),
+                ).fetchall()
+            ]
+            feature_ref = f'feature:{feature_ids.index(destination_id) + 1:03d}'
+            document['epics'] = []
+            document['dependencies'] = []
+            document['features'] = [
+                {
+                    **{key: value for key, value in item.items() if key != 'epic_ref'},
+                    'acceptance_criteria': [],
+                }
+                for item in document['features']
+                if item['ref'] == feature_ref
+            ]
+        else:
+            raise ValueError('Unsupported contextual transfer scope')
+        document['dependencies'] = [
+            item
+            for item in document['dependencies']
+            if any(f['ref'] == item['blocking_feature_ref'] for f in document['features'])
+            and any(f['ref'] == item['blocked_feature_ref'] for f in document['features'])
+        ]
+        return self.validate(document)
 
     def _tag_names(self, item_type: str, item_id: str) -> list[str]:
         table, column = {
