@@ -78,7 +78,7 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
   );
   assert.match(
     workflow,
-    /run: npm run test:desktop:acceptance\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
+    /run: npm run test:desktop:acceptance\s+env:\s+FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER: '1'\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
   );
 });
 
@@ -119,7 +119,7 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
   assert.match(smoke, /\$fileNameControl[\s\S]*nombre de archivo/);
   assert.match(smoke, /ControlType\]::ComboBox/);
   assert.match(smoke, /AutomationId.*1148|1148.*AutomationId/);
-  assert.match(smoke, /FORGE_DESKTOP_SMOKE_FORCE_SENDKEYS_PICKER/);
+  assert.match(smoke, /FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER/);
   assert.match(smoke, /Clipboard\]::SetText\(\$filePath\)/);
   assert.match(smoke, /SendWait\('\^v'\)/);
   assert.match(smoke, /Clipboard\]::SetDataObject\(\$previousClipboard, \$true\)/);

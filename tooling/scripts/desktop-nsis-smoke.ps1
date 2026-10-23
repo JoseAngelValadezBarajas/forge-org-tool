@@ -265,8 +265,8 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     )
   } | Select-Object -First 1
   $valuePattern = $null
-  $forceSendKeysPath = $env:FORGE_DESKTOP_SMOKE_FORCE_SENDKEYS_PICKER -eq '1'
-  if (-not $forceSendKeysPath -and $null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
+  $forceClipboardPath = $env:FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER -eq '1'
+  if (-not $forceClipboardPath -and $null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
       [System.Windows.Automation.ValuePattern]::Pattern,
       [ref]$valuePattern
     )) {
