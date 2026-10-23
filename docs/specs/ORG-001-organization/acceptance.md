@@ -7,7 +7,9 @@
 - [x] Persist records across API client sessions.
 - [x] Render actionable empty, loading, error, active, and archived states.
 - [ ] `REQ-ORG-001-PROJECT-OVERVIEW`: open a persisted Project overview from
-      Organization; edit name/description; archive and restore; navigate to the
+      Organization; show its Workspace/Project metadata, live planning counts,
+      active Decision/Invariant counts and up to four priority-ordered pending
+      Features; edit name/description; confirm archive and restore; navigate to the
       existing Planning board and Transfer export workflow; verify persistence
       and visible recovery for an unavailable Project (`PA-ORG-002`).
 - [x] Keep `/__components` deterministic and backend-free.

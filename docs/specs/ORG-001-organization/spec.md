@@ -25,14 +25,21 @@ are represented explicitly. This slice does not import legacy code or assets.
 
 `REQ-ORG-001-PROJECT-OVERVIEW` — A user who selects a Project from Organization
 can open a project overview before entering the planning board. The overview
-loads the Project through the public API client, presents its persisted name,
-description, and status, and provides navigation to planning and the existing
-Project transfer/export workflow. A user can update the Project name and
-description, archive an active Project, and restore an archived Project. These
-operations remain workspace-scoped and persisted by the API. Loading and API
-failure states are visible and retryable; an unavailable Project is not
-presented as a successful empty Project. The planning board remains directly
-reachable and retains its existing URL and behavior.
+loads the Project and owning Workspace through the public API client, presents
+persisted name, description, status and timestamps, and shows live planning
+counts (Features, Tasks, Epics, satisfied/total acceptance criteria,
+Dependencies),
+active Decisions, active Invariants, and a bounded priority-ordered list of
+pending Features. Counts must be derived from the owning Project's API records;
+the UI must not invent delivery or verification state. A user can update the
+Project name and description, archive an active Project after explicit
+confirmation, and restore an archived Project. Cancelling the confirmation
+performs no write. These operations remain workspace-scoped and persisted by
+the API. The overview provides navigation to the planning board and the
+existing Project transfer/export workflow. Loading and API failure states are
+visible and retryable; an unavailable Project is not presented as a successful
+empty Project. The planning board remains directly reachable and retains its
+existing URL and behavior.
 
 Acceptance: `docs/specs/ORG-001-organization/acceptance.md` and the
 `PA-ORG-002` browser journey. API response/request types must be sourced from
