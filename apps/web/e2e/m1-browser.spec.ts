@@ -2,236 +2,252 @@
 import { mkdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-const evidenceDir = resolve(process.cwd(), '../../docs/evidence/ux01');
+const evidenceDir =
+  process.env.FORGE_E2E_EVIDENCE_DIR ??
+  resolve(process.cwd(), '../../test-results/product-acceptance');
 
-test('desktop shell is truthful and has no horizontal overflow', async ({ page }) => {
-  const consoleErrors: string[] = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
-  });
-  page.on('pageerror', (error) => consoleErrors.push(error.message));
-  await mkdir(evidenceDir, { recursive: true });
-  const suffix = test.info().project.name;
-  const workspace = await (
-    await page.request.post('/api/v1/workspaces', { data: { name: `Evidence ${suffix}` } })
-  ).json();
-  expect(workspace.name).toBe(`Evidence ${test.info().project.name}`);
-  await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
-    data: { name: `Loaded project ${suffix}`, description: 'Synthetic browser evidence' },
-  });
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
-  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
-  await expect(page.getByLabel('Workspace summary').getByText(`Evidence ${suffix}`)).toBeVisible();
-  await expect(
-    page
-      .getByRole('region', { name: 'Project summaries' })
-      .getByRole('link', { name: `Loaded project ${suffix}`, exact: true }),
-  ).toBeVisible();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
-  expect(consoleErrors).toEqual([]);
-  const screenshotName =
-    test.info().project.name === 'chromium-mobile'
-      ? 'mobile-organization.png'
-      : 'desktop-organization.png';
-  await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
-});
+test(
+  'desktop shell is truthful and has no horizontal overflow',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    const consoleErrors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
+    page.on('pageerror', (error) => consoleErrors.push(error.message));
+    await mkdir(evidenceDir, { recursive: true });
+    const suffix = test.info().project.name;
+    const workspace = await (
+      await page.request.post('/api/v1/workspaces', { data: { name: `Evidence ${suffix}` } })
+    ).json();
+    expect(workspace.name).toBe(`Evidence ${test.info().project.name}`);
+    await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
+      data: { name: `Loaded project ${suffix}`, description: 'Synthetic browser evidence' },
+    });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Organization' })).toBeVisible();
+    await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+    await expect(
+      page.getByLabel('Workspace summary').getByText(`Evidence ${suffix}`),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole('region', { name: 'Project summaries' })
+        .getByRole('link', { name: `Loaded project ${suffix}`, exact: true }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    expect(consoleErrors).toEqual([]);
+    const screenshotName =
+      test.info().project.name === 'chromium-mobile'
+        ? 'mobile-organization.png'
+        : 'desktop-organization.png';
+    await page.screenshot({ path: resolve(evidenceDir, screenshotName), fullPage: true });
+  },
+);
 
-test('mobile gallery switches from dark to light with no browser errors', async ({ page }) => {
-  const consoleErrors: string[] = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
-  });
-  page.on('pageerror', (error) => consoleErrors.push(error.message));
-  await page.goto('/__components');
-  const gallery = page.locator('main [data-theme]').filter({
-    has: page.getByText('A development-only catalog of actual exported React components'),
-  });
-  await expect(gallery).toHaveAttribute('data-theme', 'dark');
-  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
-  const prefix =
-    test.info().project.name === 'chromium-mobile'
-      ? 'mobile-component-host'
-      : 'desktop-component-host';
-  const primary = page.locator('[data-component-preview="button"] button').first();
-  const captureCategories = async (theme: 'dark' | 'light') => {
-    await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
-    for (const category of [
-      'Foundations and tokens',
-      'Core UI primitives',
-      'Generic shared compositions',
-      'Product-specific components',
-      'Icon library',
-    ]) {
-      const heading = page.getByRole('heading', { name: category, exact: true }).first();
-      await heading.scrollIntoViewIfNeeded();
-      await expect(heading).toBeVisible();
-      const slug = category.toLowerCase().replaceAll(' ', '-');
-      await page.screenshot({
-        path: resolve(evidenceDir, `${prefix}-${theme}-${slug}.png`),
-        fullPage: false,
-      });
-    }
-  };
-  await expect(primary).toBeVisible();
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.locator('main').evaluate((element) => element.scrollTo(0, 0));
-  await page.screenshot({
-    path: resolve(evidenceDir, `${prefix}-dark.png`),
-    fullPage: false,
-  });
-  await captureCategories('dark');
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
-  await primary.scrollIntoViewIfNeeded();
-  if (test.info().project.name === 'chromium-mobile') {
-    await primary.tap();
-    await expect(primary).toHaveAccessibleName('Increment 1');
-  } else {
-    const defaultBackground = await primary.evaluate(
-      (element) => getComputedStyle(element).backgroundColor,
-    );
-    await primary.hover();
-    await page.waitForTimeout(150);
-    const hoverBackground = await primary.evaluate(
-      (element) => getComputedStyle(element).backgroundColor,
-    );
-    expect(hoverBackground).not.toBe(defaultBackground);
-    await primary.click();
-    await expect(primary).toHaveAccessibleName('Increment 1');
-  }
-  await page.getByRole('combobox', { name: 'Preview theme' }).selectOption('light');
-  await expect(gallery).toHaveAttribute('data-theme', 'light');
-  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await primary.scrollIntoViewIfNeeded();
-  await expect(primary).toBeVisible();
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.locator('main').evaluate((element) => element.scrollTo(0, 0));
-  await page.screenshot({
-    path: resolve(evidenceDir, `${prefix}-light.png`),
-    fullPage: false,
-  });
-  await captureCategories('light');
-  for (const width of [1440, 1280, 1024, 390, 375]) {
-    await page.setViewportSize({ width, height: 900 });
-    for (const theme of ['dark', 'light'] as const) {
+test(
+  'mobile gallery switches from dark to light with no browser errors',
+  { tag: '@visual' },
+  async ({ page }) => {
+    const consoleErrors: string[] = [];
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
+    page.on('pageerror', (error) => consoleErrors.push(error.message));
+    await page.goto('/__components');
+    const gallery = page.locator('main [data-theme]').filter({
+      has: page.getByText('A development-only catalog of actual exported React components'),
+    });
+    await expect(gallery).toHaveAttribute('data-theme', 'dark');
+    await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    const prefix =
+      test.info().project.name === 'chromium-mobile'
+        ? 'mobile-component-host'
+        : 'desktop-component-host';
+    const primary = page.locator('[data-component-preview="button"] button').first();
+    const captureCategories = async (theme: 'dark' | 'light') => {
       await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
-      await expect(gallery).toHaveAttribute('data-theme', theme);
-      const overflow = await page.evaluate(() => {
-        const viewport = document.documentElement.clientWidth;
-        const describe = (element: Element) => {
-          const rect = element.getBoundingClientRect();
-          return {
-            element: `${element.tagName.toLowerCase()}${
-              typeof element.className === 'string' && element.className
-                ? `.${element.className.trim().split(/\s+/).join('.')}`
-                : ''
-            }`,
-            left: Math.round(rect.left),
-            right: Math.round(rect.right),
-            clientWidth: element.clientWidth,
-            scrollWidth: element.scrollWidth,
-            overflowX: getComputedStyle(element).overflowX,
-            componentId: element
-              .closest('article[data-component-id]')
-              ?.getAttribute('data-component-id'),
-            text:
-              element.childElementCount === 0
-                ? element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80)
-                : undefined,
-          };
-        };
-        const offenders = [...document.querySelectorAll('body *')]
-          .map((element) => {
-            const rect = element.getBoundingClientRect();
-            const ancestors = [];
-            let current = element.parentElement;
-            let clipped = false;
-            while (current && current !== document.body) {
-              const overflowX = getComputedStyle(current).overflowX;
-              clipped ||= ['auto', 'clip', 'hidden', 'scroll'].includes(overflowX);
-              ancestors.push(describe(current));
-              current = current.parentElement;
-            }
-            return {
-              element: describe(element),
-              ancestors,
-              clipped,
-              overflow: Math.max(
-                0,
-                rect.right - viewport,
-                -rect.left,
-                getComputedStyle(element).overflowX === 'visible'
-                  ? element.scrollWidth - element.clientWidth
-                  : 0,
-              ),
-            };
-          })
-          .filter((item) => item.overflow > 0 && !item.clipped)
-          .sort((left, right) => right.overflow - left.overflow)
-          .slice(0, 12);
-        return {
-          hasNoOverflow: document.documentElement.scrollWidth <= viewport,
-          documentWidth: document.documentElement.scrollWidth,
-          viewport,
-          html: describe(document.documentElement),
-          body: describe(document.body),
-          offenders,
-        };
-      });
-      expect(
-        overflow.hasNoOverflow,
-        `Component Host overflows at ${width}px in ${theme} theme: ${JSON.stringify(overflow)}`,
-      ).toBe(true);
-      if (width === 375) {
-        const organizationOwner = page
-          .locator('[data-component-id="organization-empty-state"] > div:first-child p')
-          .first();
-        expect(
-          await organizationOwner.evaluate((element) => element.scrollWidth <= element.clientWidth),
-          'Long catalog owner metadata must wrap inside its card at 375px',
-        ).toBe(true);
+      for (const category of [
+        'Foundations and tokens',
+        'Core UI primitives',
+        'Generic shared compositions',
+        'Product-specific components',
+        'Icon library',
+      ]) {
+        const heading = page.getByRole('heading', { name: category, exact: true }).first();
+        await heading.scrollIntoViewIfNeeded();
+        await expect(heading).toBeVisible();
+        const slug = category.toLowerCase().replaceAll(' ', '-');
+        await page.screenshot({
+          path: resolve(evidenceDir, `${prefix}-${theme}-${slug}.png`),
+          fullPage: false,
+        });
       }
-      await expect(page.getByRole('navigation', { name: 'Component host sections' })).toBeVisible();
+    };
+    await expect(primary).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.locator('main').evaluate((element) => element.scrollTo(0, 0));
+    await page.screenshot({
+      path: resolve(evidenceDir, `${prefix}-dark.png`),
+      fullPage: false,
+    });
+    await captureCategories('dark');
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    await primary.scrollIntoViewIfNeeded();
+    if (test.info().project.name === 'chromium-mobile') {
+      await primary.tap();
+      await expect(primary).toHaveAccessibleName('Increment 1');
+    } else {
+      const defaultBackground = await primary.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      );
+      await primary.hover();
+      await page.waitForTimeout(150);
+      const hoverBackground = await primary.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      );
+      expect(hoverBackground).not.toBe(defaultBackground);
+      await primary.click();
+      await expect(primary).toHaveAccessibleName('Increment 1');
     }
-  }
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ),
-  ).toBe(true);
-  expect(consoleErrors).toEqual([]);
-  const screenshotName =
-    test.info().project.name === 'chromium-mobile'
-      ? 'mobile-gallery-light.png'
-      : 'desktop-component-host.png';
-  await page.screenshot({
-    path: resolve(evidenceDir, screenshotName),
-    fullPage: false,
-  });
-  const previewTheme = page.getByRole('combobox', { name: 'Preview theme' });
-  await previewTheme.selectOption('system');
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await expect(gallery).toHaveAttribute('data-theme', 'dark');
-  await page.emulateMedia({ colorScheme: 'light' });
-  await expect(gallery).toHaveAttribute('data-theme', 'light');
-  await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.evaluate(() => localStorage.getItem('forge-theme'))).resolves.toBeNull();
-});
+    await page.getByRole('combobox', { name: 'Preview theme' }).selectOption('light');
+    await expect(gallery).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await primary.scrollIntoViewIfNeeded();
+    await expect(primary).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.locator('main').evaluate((element) => element.scrollTo(0, 0));
+    await page.screenshot({
+      path: resolve(evidenceDir, `${prefix}-light.png`),
+      fullPage: false,
+    });
+    await captureCategories('light');
+    for (const width of [1440, 1280, 1024, 390, 375]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const theme of ['dark', 'light'] as const) {
+        await page.getByRole('combobox', { name: 'Preview theme' }).selectOption(theme);
+        await expect(gallery).toHaveAttribute('data-theme', theme);
+        const overflow = await page.evaluate(() => {
+          const viewport = document.documentElement.clientWidth;
+          const describe = (element: Element) => {
+            const rect = element.getBoundingClientRect();
+            return {
+              element: `${element.tagName.toLowerCase()}${
+                typeof element.className === 'string' && element.className
+                  ? `.${element.className.trim().split(/\s+/).join('.')}`
+                  : ''
+              }`,
+              left: Math.round(rect.left),
+              right: Math.round(rect.right),
+              clientWidth: element.clientWidth,
+              scrollWidth: element.scrollWidth,
+              overflowX: getComputedStyle(element).overflowX,
+              componentId: element
+                .closest('article[data-component-id]')
+                ?.getAttribute('data-component-id'),
+              text:
+                element.childElementCount === 0
+                  ? element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80)
+                  : undefined,
+            };
+          };
+          const offenders = [...document.querySelectorAll('body *')]
+            .map((element) => {
+              const rect = element.getBoundingClientRect();
+              const ancestors = [];
+              let current = element.parentElement;
+              let clipped = false;
+              while (current && current !== document.body) {
+                const overflowX = getComputedStyle(current).overflowX;
+                clipped ||= ['auto', 'clip', 'hidden', 'scroll'].includes(overflowX);
+                ancestors.push(describe(current));
+                current = current.parentElement;
+              }
+              return {
+                element: describe(element),
+                ancestors,
+                clipped,
+                overflow: Math.max(
+                  0,
+                  rect.right - viewport,
+                  -rect.left,
+                  getComputedStyle(element).overflowX === 'visible'
+                    ? element.scrollWidth - element.clientWidth
+                    : 0,
+                ),
+              };
+            })
+            .filter((item) => item.overflow > 0 && !item.clipped)
+            .sort((left, right) => right.overflow - left.overflow)
+            .slice(0, 12);
+          return {
+            hasNoOverflow: document.documentElement.scrollWidth <= viewport,
+            documentWidth: document.documentElement.scrollWidth,
+            viewport,
+            html: describe(document.documentElement),
+            body: describe(document.body),
+            offenders,
+          };
+        });
+        expect(
+          overflow.hasNoOverflow,
+          `Component Host overflows at ${width}px in ${theme} theme: ${JSON.stringify(overflow)}`,
+        ).toBe(true);
+        if (width === 375) {
+          const organizationOwner = page
+            .locator('[data-component-id="organization-empty-state"] > div:first-child p')
+            .first();
+          expect(
+            await organizationOwner.evaluate(
+              (element) => element.scrollWidth <= element.clientWidth,
+            ),
+            'Long catalog owner metadata must wrap inside its card at 375px',
+          ).toBe(true);
+        }
+        await expect(
+          page.getByRole('navigation', { name: 'Component host sections' }),
+        ).toBeVisible();
+      }
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    expect(consoleErrors).toEqual([]);
+    const screenshotName =
+      test.info().project.name === 'chromium-mobile'
+        ? 'mobile-gallery-light.png'
+        : 'desktop-component-host.png';
+    await page.screenshot({
+      path: resolve(evidenceDir, screenshotName),
+      fullPage: false,
+    });
+    const previewTheme = page.getByRole('combobox', { name: 'Preview theme' });
+    await previewTheme.selectOption('system');
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(gallery).toHaveAttribute('data-theme', 'dark');
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(gallery).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.evaluate(() => localStorage.getItem('forge-theme'))).resolves.toBeNull();
+  },
+);
 
 test('planning and readiness remain manual truth states', async ({ page }) => {
   const suffix = test.info().project.name;
@@ -469,12 +485,25 @@ test('readiness records explicit planning context and repository metadata only',
   await page.goto(`/readiness/${workspace.id}/${project.id}/${feature.id}`);
   await expect(page.getByRole('heading', { name: 'Readiness', exact: true })).toBeVisible();
   await page.getByLabel('Acceptance criterion').fill(`Criterion ${suffix}`);
+  const criterionResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes('/acceptance-criteria') && response.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: 'Add criterion' }).click();
+  expect((await criterionResponse).status()).toBe(201);
   await page.getByLabel('Decision title').fill(`Decision ${suffix}`);
+  const decisionResponse = page.waitForResponse(
+    (response) => response.url().endsWith('/decisions') && response.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: 'Link decision' }).click();
+  expect((await decisionResponse).status()).toBe(201);
   await expect(page.locator('strong').filter({ hasText: `Decision ${suffix}` })).toBeVisible();
   await page.getByLabel('Invariant title').fill(`Invariant ${suffix}`);
+  const invariantResponse = page.waitForResponse(
+    (response) => response.url().includes('/invariants') && response.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: 'Add invariant' }).click();
+  expect((await invariantResponse).status()).toBe(201);
   await expect(page.locator('strong').filter({ hasText: `Decision ${suffix}` })).toBeVisible();
   await expect(page.locator('strong').filter({ hasText: `Invariant ${suffix}` })).toBeVisible();
   await page.getByRole('button', { name: `Acknowledge invariant Invariant ${suffix}` }).click();

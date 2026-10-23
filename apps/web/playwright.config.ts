@@ -1,58 +1,103 @@
-﻿import { defineConfig, devices } from '@playwright/test';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { defineConfig, devices } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
+import { basename, dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  allocatePort,
+  assertOwnedRunEnvironment,
+  assertPortAvailable,
+  getRunEnvironmentPaths,
+} from '../../tooling/scripts/e2e-environment.mjs';
 
-const e2eDatabasePath = join(tmpdir(), `forge-org-e2e-${process.pid}-${Date.now()}.db`);
-const e2eTaskWorkspace = resolve(
-  process.cwd(),
-  '../..',
-  '.superpowers/sdd/2026-10-22-ux-01-visual-interaction-parity',
-);
-const e2eRunDirectory = join(e2eTaskWorkspace, 'e2e-fixture');
-const e2eRepositoryRoot = join(e2eRunDirectory, 'synthetic-repository');
-const webPort = Number(process.env.FORGE_E2E_WEB_PORT ?? 5173);
-const apiPort = Number(process.env.FORGE_E2E_API_PORT ?? 30000 + (process.pid % 30000));
+const webRoot = dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = resolve(webRoot, '../..');
+const apiRoot = join(repositoryRoot, 'apps', 'api');
 
-for (const [name, port] of [
-  ['FORGE_E2E_WEB_PORT', webPort],
-  ['FORGE_E2E_API_PORT', apiPort],
-] as const) {
+function configuredPort(name: string): number | undefined {
+  const raw = process.env[name];
+  if (raw === undefined) return undefined;
+  const port = Number(raw);
   if (!Number.isInteger(port) || port < 1024 || port > 65535) {
     throw new Error(`${name} must be an integer between 1024 and 65535`);
   }
+  return port;
 }
 
-process.env.FORGE_E2E_REPOSITORY_ROOT = e2eRepositoryRoot;
+const inheritedConfigToken = process.env.FORGE_E2E_CONFIG_RUN_TOKEN;
+const configuredWebPort = configuredPort('FORGE_E2E_WEB_PORT');
+const configuredApiPort = configuredPort('FORGE_E2E_API_PORT');
+if (inheritedConfigToken && (configuredWebPort === undefined || configuredApiPort === undefined)) {
+  throw new Error('Playwright worker did not inherit the isolated server ports from its runner.');
+}
+const webPort = configuredWebPort ?? (await allocatePort());
+let apiPort = configuredApiPort ?? (await allocatePort());
+if (apiPort === webPort && configuredApiPort === undefined) apiPort = await allocatePort();
+if (webPort === apiPort) {
+  throw new Error('Playwright isolation failed: web and API test ports must be different.');
+}
+if (!inheritedConfigToken) {
+  await assertPortAvailable(webPort);
+  await assertPortAvailable(apiPort);
+  process.env.FORGE_E2E_WEB_PORT = String(webPort);
+  process.env.FORGE_E2E_API_PORT = String(apiPort);
+  process.env.FORGE_E2E_CONFIG_RUN_TOKEN = randomUUID();
+} else {
+  assertOwnedRunEnvironment(getRunEnvironmentPaths(process.env.FORGE_E2E_RUN_ID ?? ''));
+}
+
+const runId = process.env.FORGE_E2E_RUN_ID ?? randomUUID();
+const runEnvironment = getRunEnvironmentPaths(runId);
+const outputRoot = join(repositoryRoot, 'test-results', 'product-acceptance');
+const runOutputDirectory = join(outputRoot, basename(runEnvironment.root));
+const evidenceDirectory =
+  process.env.FORGE_E2E_EVIDENCE_DIR ?? join(runOutputDirectory, 'evidence');
+process.env.FORGE_E2E_RUN_ROOT = runEnvironment.root;
+process.env.FORGE_E2E_RUN_ID = runId;
+process.env.FORGE_E2E_FIXTURE_DIRECTORY = runEnvironment.fixtureDirectory;
+process.env.FORGE_E2E_REPOSITORY_ROOT = runEnvironment.repositoryRoot;
+process.env.FORGE_E2E_DATABASE_PATH = runEnvironment.databasePath;
+process.env.FORGE_E2E_EVIDENCE_DIR = evidenceDirectory;
 
 export default defineConfig({
-  testDir: './e2e',
-  outputDir: '../../test-results/m1-browser',
-  globalSetup: './e2e/global-setup.ts',
-  globalTeardown: './e2e/global-teardown.ts',
-  // The API smoke uses one disposable SQLite database for the run; serialize
-  // write-heavy journeys so browser evidence cannot race schema migration.
+  testDir: join(webRoot, 'e2e'),
+  outputDir: join(runOutputDirectory, 'playwright'),
+  globalSetup: join(webRoot, 'e2e', 'global-setup.ts'),
+  globalTeardown: join(webRoot, 'e2e', 'global-teardown.ts'),
+  // All write-heavy journeys share one disposable SQLite database per run.
   workers: 1,
+  reporter: [
+    ['list'],
+    [
+      'json',
+      {
+        outputFile:
+          process.env.FORGE_E2E_JSON_REPORT ?? join(runOutputDirectory, 'playwright-results.json'),
+      },
+    ],
+  ],
   use: {
     baseURL: `http://127.0.0.1:${webPort}`,
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
   webServer: [
     {
       command: `npm run dev -- --host 127.0.0.1 --port ${webPort} --strictPort`,
+      cwd: webRoot,
       url: `http://127.0.0.1:${webPort}`,
-      // Never attach to an unrelated process already listening on the test port.
       reuseExistingServer: false,
       env: { FORGE_E2E_API_PORT: String(apiPort) },
     },
     {
-      command: `uv run --project ../../apps/api uvicorn forge_org.main:app --host 127.0.0.1 --port ${apiPort}`,
+      command: `uv run --project "${apiRoot}" uvicorn forge_org.main:app --host 127.0.0.1 --port ${apiPort}`,
+      cwd: repositoryRoot,
       url: `http://127.0.0.1:${apiPort}/api/v1/health`,
-      // Give every run a disposable database so stale local state cannot affect assertions.
       reuseExistingServer: false,
       env: {
         FORGE_E2E_API_PORT: String(apiPort),
-        FORGE_DATABASE_PATH: e2eDatabasePath,
-        FORGE_ALLOWED_REPOSITORY_ROOTS: JSON.stringify([e2eRepositoryRoot]),
+        FORGE_DATABASE_PATH: runEnvironment.databasePath,
+        FORGE_ALLOWED_REPOSITORY_ROOTS: JSON.stringify([runEnvironment.repositoryRoot]),
       },
     },
   ],
