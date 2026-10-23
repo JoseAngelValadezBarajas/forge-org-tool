@@ -98,6 +98,18 @@ test('installed Desktop acceptance preserves a Bug screenshot through restart', 
   );
 });
 
+test('Windows UI Automation matches the exact name before checking control type', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const wait = smoke.slice(
+    smoke.indexOf('function Wait-ForgeAutomationElement'),
+    smoke.indexOf('function Wait-ForgeAutomationNamedElement'),
+  );
+
+  assert.match(wait, /Condition\]::TrueCondition/);
+  assert.match(wait, /Current\.Name -eq \$name/);
+  assert.match(wait, /Current\.ControlType\.Id -eq \$controlType\.Id/);
+});
+
 test('native screenshot picker handles Windows dialog combo boxes without weakening persistence checks', async () => {
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
 
@@ -108,6 +120,9 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
   assert.match(smoke, /ControlType\]::ComboBox/);
   assert.match(smoke, /AutomationId.*1148|1148.*AutomationId/);
   assert.match(smoke, /SendWait\('%n'\)/);
+  assert.match(smoke, /FORGE_DESKTOP_SMOKE_FORCE_SENDKEYS_PICKER/);
+  assert.match(smoke, /Replace\('_', '\{ASC 95\}'\)/);
+  assert.doesNotMatch(smoke, /SendWait\(\$filePath\)/);
   assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
   assert.match(smoke, /PASS installed UI -> authenticated API -> SQLite -> restart/);
 });

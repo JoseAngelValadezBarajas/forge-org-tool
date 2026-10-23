@@ -114,18 +114,39 @@ function Get-ForgeAutomationRoot($handle) {
   return $root
 }
 
-function Wait-ForgeAutomationElement($root, [System.Windows.Automation.ControlType]$controlType, [string]$name, [int]$timeoutSeconds = 20) {
-  $condition = New-Object System.Windows.Automation.AndCondition @(
-    [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, $controlType),
-    [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::NameProperty, $name)
-  )
+function Wait-ForgeAutomationElement($root, [System.Windows.Automation.ControlType]$controlType, [string]$name, [int]$timeoutSeconds = 45) {
   $deadline = [DateTime]::UtcNow.AddSeconds($timeoutSeconds)
   do {
-    $element = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-    if ($null -ne $element) { return $element }
+    $elements = $root.FindAll(
+      [System.Windows.Automation.TreeScope]::Descendants,
+      [System.Windows.Automation.Condition]::TrueCondition
+    )
+    foreach ($element in $elements) {
+      if (
+        $element.Current.Name -eq $name -and
+        $element.Current.ControlType.Id -eq $controlType.Id
+      ) { return $element }
+    }
     Start-Sleep -Milliseconds 250
   } while ([DateTime]::UtcNow -lt $deadline)
-  throw "FORGE UI did not expose the expected $controlType named '$name'."
+  $visibleControls = $root.FindAll(
+    [System.Windows.Automation.TreeScope]::Descendants,
+    [System.Windows.Automation.Condition]::TrueCondition
+  )
+  $lastChance = @($visibleControls | Where-Object {
+    $_.Current.Name.Trim() -eq $name.Trim() -and $_.Current.ControlType.Id -eq $controlType.Id
+  } | Select-Object -First 1)
+  if ($lastChance.Count -gt 0) { return $lastChance[0] }
+  $sameNameControls = @($visibleControls | Where-Object { $_.Current.Name.Trim() -eq $name.Trim() })
+  $sameNameSummary = @($sameNameControls | ForEach-Object {
+    "type='$($_.Current.ControlType.ProgrammaticName)' typeId='$($_.Current.ControlType.Id)' name='$($_.Current.Name)'"
+  })
+  $summary = @($visibleControls | Select-Object -First 100 | ForEach-Object {
+    "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)'"
+  })
+  $failureScreenshot = Join-Path (Split-Path -Parent $installer.FullName) 'forge-desktop-startup-v0.1.1-failure-smoke.bmp'
+  [ForgeWindowNative]::CaptureWindow($root.Current.NativeWindowHandle, $failureScreenshot) | Out-Null
+  throw "FORGE UI did not expose the expected $controlType (typeId='$($controlType.Id)') named '$name'. Same-name controls: $($sameNameSummary -join '; '). UIA elements: $($summary -join '; '). Failure screenshot: $failureScreenshot"
 }
 
 function Wait-ForgeAutomationNamedElement($root, [string]$name, [int]$timeoutSeconds = 20) {
@@ -244,7 +265,8 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     )
   } | Select-Object -First 1
   $valuePattern = $null
-  if ($null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
+  $forceSendKeysPath = $env:FORGE_DESKTOP_SMOKE_FORCE_SENDKEYS_PICKER -eq '1'
+  if (-not $forceSendKeysPath -and $null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
       [System.Windows.Automation.ValuePattern]::Pattern,
       [ref]$valuePattern
     )) {
@@ -252,9 +274,12 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     try { $fileNameControl.SetFocus() } catch { }
   } else {
     # Windows' common file picker exposes this field with Alt+N even when its
-    # UI Automation provider omits the Edit/ComboBox value pattern.
+    # UI Automation provider omits the Edit/ComboBox value pattern. SendKeys
+    # can drop underscores under some keyboard layouts, so emit them as
+    # explicit ASCII characters instead of shifted punctuation.
     [System.Windows.Forms.SendKeys]::SendWait('%n')
-    [System.Windows.Forms.SendKeys]::SendWait($filePath)
+    $sendKeysPath = $filePath.Replace('_', '{ASC 95}')
+    [System.Windows.Forms.SendKeys]::SendWait($sendKeysPath)
   }
   $open = $dialog.FindFirst(
     [System.Windows.Automation.TreeScope]::Descendants,
@@ -402,6 +427,16 @@ try {
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName"
   Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' epic='$epicName' bug='$workItemName' attachment='$bugAttachmentName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
+}
+catch {
+  $sidecarLog = Join-Path $isolatedLocalAppData 'ForgeOrgTool/logs/sidecar.log'
+  if (Test-Path -LiteralPath $sidecarLog -PathType Leaf) {
+    $logLines = @(Get-Content -LiteralPath $sidecarLog -Tail 80 | ForEach-Object {
+      $_ -replace '(?i)Bearer\s+\S+', 'Bearer [redacted]'
+    })
+    Write-Output "Synthetic sidecar log tail: $($logLines -join [Environment]::NewLine)"
+  }
+  throw
 }
 finally {
   if ($null -ne $process) {
