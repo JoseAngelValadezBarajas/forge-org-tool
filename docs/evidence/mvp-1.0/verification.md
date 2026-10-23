@@ -1,45 +1,40 @@
-# FORGE Org Tool 1.0 local verification evidence
+# FORGE Org Tool 1.0 verification evidence
 
-Verification was run in the isolated `feature/forge-mvp-1.0` worktree based on `d0f111022bc570eb5b25e9fb16c21b7a216b862f`. The branch is not merged. It does not claim native Desktop or remote CI success.
+Final implementation commit: `534686ae38f9730aacff12c2dc0ea69e0fcef634` (`feature/forge-mvp-1.0`). PR [#3](https://github.com/JoseAngelValadezBarajas/forge-org-tool/pull/3) remains open and unmerged.
 
-## Browser journeys
+## GitHub Quality CI
 
-Command: `npm run test:e2e:full`.
+Quality run [39968176409](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409) passed all three jobs (`web`, `api`, `desktop`) for the final implementation commit. The run includes frontend formatting/lint/tests/build, isolated Chromium acceptance, Ruff/mypy/backend tests/OpenAPI compatibility, Rustfmt, Clippy, Rust tests, Tauri release build, and installed Windows NSIS acceptance.
 
-Result: 24 passed, 0 failed, 0 flaky, Chromium desktop and mobile. Run ID: `forge-product-acceptance-7086753f-03cd-4260-b0ea-d60579e52154`. Coverage: Organization (2), Planning (5), Transfer (3), accessibility/shell (1), and Component Host (1) per browser project. The run uses allocated loopback servers with `reuseExistingServer: false` and a run-scoped disposable SQLite database.
+The installed Windows test reported:
 
-Run-specific `playwright-results.json`, traces, and per-project screenshots are retained under ignored `test-results/product-acceptance/<run-id>/`. Updated review screenshots are retained here:
+`PASS installed UI -> authenticated API -> SQLite -> restart; ... attachment='forge-desktop-bug.png' window='FORGE Org Tool' 1044x788 database='...\local-app-data\ForgeOrgTool\data\forge.db' ...`
 
-- `component-host-desktop-dark.png`
-- `component-host-desktop-light.png`
-- `component-host-mobile-dark.png`
-- `component-host-mobile-light.png`
-- `project-overview-desktop.png` / `project-overview-mobile.png`
-- `epic-detail-desktop.png` / `epic-detail-mobile.png`
+It installed the NSIS package, confirmed the visible main window and title, used UI Automation to create a workspace, project, Epic and Bug, selected and uploaded a synthetic PNG through the native file picker, verified the per-user SQLite database, closed the application and sidecar, relaunched it, and verified the records and attachment rendered again. The recorded window size is runner/DPI-specific and exceeds the configured minimum dimensions.
 
-These images establish automated browser rendering only; they are not human Figma certification.
+Artifacts from that run:
 
-## Backend and frontend checks
+- [Windows NSIS installer and native smoke screenshot](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12508766702) — `FORGE Org Tool_0.1.1_x64-setup.exe` and `forge-desktop-startup-v0.1.1-smoke.bmp`.
+- [Browser acceptance evidence](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12507523428) — Playwright reports, traces, and screenshots.
 
-Final local quality results:
+## Browser and product acceptance
 
-- `npm test`: passed; architecture/design/token/API type checks, 31 architecture tests, 14 acceptance-tooling tests, 136 frontend tests, shared UI/token/icon/API-client suites and external package consumer.
-- `npm run typecheck`: passed.
-- `npm run lint:frontend`: passed with zero errors and warnings.
+`npm run test:acceptance:local` passed 24/24 Chromium journeys on desktop and mobile, including the Component Host in Dark and Light themes, Organization, Planning, Bug screenshot upload, contextual transfer, and accessibility/shell coverage. The run uses isolated loopback servers and disposable SQLite. Its report is retained under the ignored `test-results/product-acceptance/local-2026-10-23T14-14-16-081Z-17516/`; the CI evidence artifact above preserves the CI run's browser report and screenshots.
+
+The reviewed screenshot files in this directory document browser rendering only. Neither those captures nor the native smoke screenshot constitute human Figma visual certification. Figma visual review remains open.
+
+## Local verification
+
+- `npm test`: passed — architecture, design-system/token checks, OpenAPI type generation check, TypeScript, 38 architecture tests, 14 acceptance-tooling tests, 138 frontend tests, package/component tests, and external consumer test.
+- `npm run lint:frontend`: passed with zero errors or warnings.
 - `npm run format:check:web`: passed.
-- `npm run build`: passed; production Component Host route/UI/fixture exclusion passed.
-- `npm run check:acceptance:registry`: passed.
-- `uv run --project apps/api --locked pytest -q`: 42 passed, 1 subtest passed; one existing Starlette/httpx deprecation warning.
-- Ruff check, Ruff format check and mypy: passed.
-- `uv run --project apps/api --locked python -m pytest apps/desktop/tests -q`: 9 passed, 1 subtest passed; these are synthetic tests only.
-- `uv run --project apps/api --locked python tooling/scripts/export-openapi.py --check`: passed; generated TypeScript definitions match.
+- `npm run build`: passed, including production Component Host route/UI/fixture exclusion.
+- `npm run test:acceptance:local`: 24 passed, 0 failed, 0 flaky.
+- Windows `desktop-window-contract.test.mjs`: 12 passed; PowerShell parser passed.
+- Installed NSIS smoke was also executed locally against a CI-built installer with isolated `LOCALAPPDATA`; the full UI → API → SQLite → restart flow passed and its temporary install/data directory was cleaned by the test.
 
-## Limitations and acceptance
+## Acceptance status and limits
 
-- AC-08 contextual transfer is implemented and covered by `PA-TRN-003` and API tests: Project, Epic, Work Item and Task JSON scopes; preview/fingerprint/destination; UI imports/exports; and ZIP v2 project screenshots.
-- Native installed Desktop GUI → API → SQLite → restart acceptance was not run. The host lacks Rust `cargo`; Rustfmt, Clippy, Tauri packaging and installed native GUI checks remain pending.
-- GitHub Quality CI was not run yet. No CI result is inferred from local execution.
-- AC-05/AC-07 native persistence and overall delivery remain blocked until eligible Windows acceptance is executed.
-- Figma parity is not human-certified; screenshots are browser evidence only.
+Automated product acceptance is complete for AC-01–AC-09. AC-05 screenshot persistence and AC-07 durable restart persistence have installed Windows evidence, not just synthetic sidecar tests. AC-09's Component Host route exclusion and browser behavior are automated; visual Figma review is still a human review item.
 
-Overall status remains `MVP_BLOCKED` pending native Desktop/CI evidence.
+Overall status: `MVP_READY_FOR_REVIEW`. This is readiness for human product/design review, not a claim of human Figma certification, PR approval, merge, release, or operator acceptance. PR #3 remains open and unmerged.
