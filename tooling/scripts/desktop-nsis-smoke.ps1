@@ -118,8 +118,20 @@ function Wait-ForgeAutomationElement($root, [System.Windows.Automation.ControlTy
   throw "FORGE UI did not expose the expected $controlType named '$name'."
 }
 
-function Invoke-ForgeElement($root, [System.Windows.Automation.ControlType]$controlType, [string]$name) {
-  $element = Wait-ForgeAutomationElement $root $controlType $name
+function Wait-ForgeAutomationNamedElement($root, [string]$name, [int]$timeoutSeconds = 20) {
+  $condition = [System.Windows.Automation.PropertyCondition]::new(
+    [System.Windows.Automation.AutomationElement]::NameProperty, $name
+  )
+  $deadline = [DateTime]::UtcNow.AddSeconds($timeoutSeconds)
+  do {
+    $element = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+    if ($null -ne $element) { return $element }
+    Start-Sleep -Milliseconds 250
+  } while ([DateTime]::UtcNow -lt $deadline)
+  throw "FORGE UI did not expose an accessible control named '$name'."
+}
+
+function Invoke-ForgeAutomationElement($element, [string]$name) {
   $pattern = $null
   if ($element.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref]$pattern)) {
     $pattern.Invoke()
@@ -133,7 +145,12 @@ function Invoke-ForgeElement($root, [System.Windows.Automation.ControlType]$cont
     if ($pattern.Current.ToggleState -eq [System.Windows.Automation.ToggleState]::Off) { $pattern.Toggle() }
     return
   }
-  throw "Unsupported UI Automation patterns for control '$name' ($controlType)."
+  throw "Unsupported UI Automation patterns for control '$name' ($($element.Current.ControlType))."
+}
+
+function Invoke-ForgeElement($root, [System.Windows.Automation.ControlType]$controlType, [string]$name) {
+  $element = Wait-ForgeAutomationElement $root $controlType $name
+  Invoke-ForgeAutomationElement $element $name
 }
 
 function Set-ForgeElementValue($root, [System.Windows.Automation.ControlType]$controlType, [string]$name, [string]$value) {
@@ -160,7 +177,8 @@ function Select-ForgeOption($root, [string]$comboBoxName, [string]$optionName) {
 }
 
 function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
-  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) $buttonName
+  $fileControl = Wait-ForgeAutomationNamedElement $root $buttonName
+  Invoke-ForgeAutomationElement $fileControl $buttonName
   $desktop = [System.Windows.Automation.AutomationElement]::RootElement
   $dialog = $null
   $deadline = [DateTime]::UtcNow.AddSeconds(15)
