@@ -129,4 +129,3 @@
 - [ ] Run the complete deterministic acceptance suite locally and in the appropriate CI lane; keep smoke as the fast first gate and native GUI on Windows.
 - [ ] Run existing frontend, API, architecture, package, production build and relevant Desktop checks.
 - [ ] Generate the final matrix from actual executed evidence, record all product gaps/defects/blockers, and verify no false pass claims.
-

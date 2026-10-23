@@ -1,6 +1,6 @@
 # Product acceptance coverage matrix
 
-Source: live Figma metadata, file `r10szKLgiIPVi2NBmbjTpm`. 115 top-level frames are inventoried; this is not a claim of full functional or visual certification.
+Source: checked-in snapshot captured from live Figma metadata, file `r10szKLgiIPVi2NBmbjTpm`. CI validates this snapshot against the acceptance shards but does not refresh Figma. 115 top-level frames are inventoried; this is not a claim of full functional or visual certification.
 
 - AUTOMATED_PASS: 56
 - NOT_IMPLEMENTED_PRODUCT_GAP: 12

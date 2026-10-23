@@ -14,6 +14,7 @@ jobs:
           cache: npm
       - uses: astral-sh/setup-uv@v6
       - run: npm ci
+      - run: npm run check:acceptance:registry
       - run: npm run format:check:web
       - run: npm run lint:frontend
       - run: npm run build:packages

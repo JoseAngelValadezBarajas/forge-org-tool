@@ -96,7 +96,7 @@ function renderMarkdown(registry) {
   const lines = [
     '# Product acceptance coverage matrix',
     '',
-    `Source: live Figma metadata, file \`${registry.source.file_key}\`. ${registry.frame_count} top-level frames are inventoried; this is not a claim of full functional or visual certification.`,
+    `Source: checked-in snapshot captured from live Figma metadata, file \`${registry.source.file_key}\`. CI validates this snapshot against the acceptance shards but does not refresh Figma. ${registry.frame_count} top-level frames are inventoried; this is not a claim of full functional or visual certification.`,
     '',
     ...counts.map(([status, count]) => `- ${status}: ${count}`),
     '',
