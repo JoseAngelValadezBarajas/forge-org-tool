@@ -39,7 +39,12 @@ test('the packaged PyInstaller sidecar is launched as a killable process group',
 test('Desktop smoke waits for its owned sidecars and uploads the installer after failed smoke', async () => {
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
   const workflow = await readFile('.github/workflows/quality.yml', 'utf8');
+  const cleanup = smoke.slice(smoke.lastIndexOf('\nfinally {'));
 
+  assert.ok(
+    cleanup.indexOf('$process.CloseMainWindow()') < cleanup.indexOf('Stop-Process -Id $process.Id'),
+    'the restarted application gets a graceful shutdown before forced termination',
+  );
   assert.match(smoke, /\$ownedSidecarPids\s*\|\s*Sort-Object\s+-Unique/);
   assert.match(smoke, /\$sidecar\.Path\.StartsWith\(\$installRoot/);
   assert.match(smoke, /\$sidecar\.WaitForExit\(15000\)/);

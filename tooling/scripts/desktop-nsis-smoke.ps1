@@ -201,11 +201,27 @@ finally {
   if ($null -ne $process) {
     $process.Refresh()
     if (-not $process.HasExited) {
-      Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-      try { $process.WaitForExit(15000) | Out-Null } catch { }
+      if (-not $process.CloseMainWindow() -or -not $process.WaitForExit(15000)) {
+        $process.Refresh()
+        if (-not $process.HasExited) {
+          Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+          try { $process.WaitForExit(15000) | Out-Null } catch { }
+        }
+      }
     }
   }
-  foreach ($sidecarPid in @($ownedSidecarPids | Sort-Object -Unique)) {
+  $ownedSidecarIds = @($ownedSidecarPids | Sort-Object -Unique)
+  $sidecarShutdownDeadline = [DateTime]::UtcNow.AddSeconds(15)
+  do {
+    $remainingSidecarPids = @($ownedSidecarIds | Where-Object {
+      $candidate = Get-Process -Id $_ -ErrorAction SilentlyContinue
+      $null -ne $candidate -and $candidate.Path -and
+        $candidate.Path.StartsWith($installRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)
+    })
+    if ($remainingSidecarPids.Count -eq 0) { break }
+    Start-Sleep -Milliseconds 250
+  } while ([DateTime]::UtcNow -lt $sidecarShutdownDeadline)
+  foreach ($sidecarPid in $remainingSidecarPids) {
     $sidecar = Get-Process -Id $sidecarPid -ErrorAction SilentlyContinue
     if ($null -ne $sidecar -and $sidecar.Path -and
         $sidecar.Path.StartsWith($installRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
