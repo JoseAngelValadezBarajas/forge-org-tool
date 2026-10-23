@@ -5,18 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { organizationApi } from '@forge-org/api-client';
 import { EpicDetailPage } from './EpicDetailPage';
 
-vi.mock('@forge-org/api-client', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@forge-org/api-client')>();
-  return {
-    ...actual,
-    organizationApi: {
-      ...actual.organizationApi,
-      getProject: vi.fn(),
-      planningOverview: vi.fn(),
-      updateEpic: vi.fn(),
-    },
-  };
-});
+const api = vi.hoisted(() => ({
+  getProject: vi.fn(),
+  planningOverview: vi.fn(),
+  updateEpic: vi.fn(),
+}));
+vi.mock('@forge-org/api-client', () => ({ organizationApi: api }));
 
 const project = {
   id: 'p1',

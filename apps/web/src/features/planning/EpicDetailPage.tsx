@@ -59,7 +59,7 @@ export function EpicDetailPage() {
 
   useEffect(() => {
     let current = true;
-    void load(() => current);
+    queueMicrotask(() => void load(() => current));
     return () => {
       current = false;
     };
