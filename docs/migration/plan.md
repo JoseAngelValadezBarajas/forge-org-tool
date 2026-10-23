@@ -1,25 +1,35 @@
-# FORGE (legacy) -> FORGE Org Tool
+# FORGE Org Tool 1.0 Migration and Preservation Plan
 
-## M0 · Preserve before archive
+## Migration policy
 
-- Record main SHA, UI-RFX-01 PR #30 branch/ref and SHA, release tags, OpenAPI, migration revisions, and CI results.
-- Produce `git bundle --all` from an up-to-date local FORGE clone, run `git bundle verify`, and store archive + SHA-256 outside *both* public worktrees. Keep the original GitHub repo and PR browseable.
-- Back up `%LOCALAPPDATA%\\Forge` databases, attachments and migration artifacts locally only if migration of user data is desired; **never** commit, attach or upload those to a public repo. Test backup restore on a copy.
-- Preserve contracts and test fixtures as *references*. Copy code selectively with attribution and a compatibility test, not an unreviewed full tree transplant.
-- Make an explicit migration compatibility matrix for Workspaces, Projects, Planning, Knowledge, Readiness, Git, Collaboration and Delivery.
+- Migrations are forward-only. Never rewrite shared database history or silently downgrade.
+- Check `user_version` and migration ledger before writes; reject unsupported future versions without mutation.
+- Before the first schema mutation of an existing database, use SQLite's online backup API to create a consistent per-user backup, run `PRAGMA integrity_check` on it, and record source/backup identifiers and schema version in a local manifest. If backup or verification fails, abort migration.
+- Preserve every existing table and row, including retired advanced capabilities. Do not drop inactive tables or cascade-delete their data during 1.0 migration.
+- Fresh databases create only active 1.0 entities plus migration metadata; legacy tables are not created by default.
+- Apply each migration atomically where SQLite allows; use idempotent migration IDs and test interrupted startup/replay.
+- Tests use isolated temporary SQLite files. Never point migration tests or tooling at operator data.
 
-## M1 · Public bootstrap
+## Compatibility matrix
 
-- Generate npm and uv lockfiles; run security review and checks. Initialize an independent Git history, create `JoseAngelValadezBarajas/forge-org-tool` **public**, push `main`.
-- Keep source-client component architecture and the development-only UI gallery from the first commit.
-- Confirm clone from a clean folder and no private data. Publish versioned architecture decisions.
+| Data area | 1.0 handling |
+|---|---|
+| Workspaces and Projects | Active and preserved; add active workspace preference without changing project ownership or archive semantics. |
+| Epics and Features | Active Planning; retain existing Features as readable work items while enabling Story/Bug types. |
+| Tasks, criteria and dependencies | Active and preserved, including stable IDs, order and project scope. |
+| Decisions and Invariants | Legacy rows/tables retained, no active API/UI. |
+| Readiness evaluations | Legacy rows/tables retained, no active API/UI. |
+| Repositories and Git observations | Legacy rows/tables retained; remove active connection/observation surfaces. |
+| Context Packages | Legacy rows/tables retained; remove active context package UI/API. |
+| Runs and Handoffs | Legacy rows/tables retained; no active workbench surfaces. |
+| Evidence, Verification, Candidates, Gates, Manifests | Legacy rows/tables retained; no active delivery/release governance. |
+| Project Transfer | Active; read supported v1 payloads and support v2 export/import with atomic validation. |
+| Bug attachments and tags | Active 1.0 additions; bounded, workspace-scoped, safely staged and restart-persistent. |
 
-## M2–M7 · Vertical slices
+## Rollback and recovery
 
-- M2 Organization, M3 Planning and import/export, M4 Knowledge/Readiness, M5 Git/Collaboration, M6 Delivery, M7 Windows installed product and supported data migration.
-- Each phase has real use-case tests, contracts and domain invariants; do not claim legacy parity until evidenced.
+Do not reverse migrations or overwrite the live database with a backup automatically. On failure, leave the source unchanged when possible, report the verified backup location to the local operator, and require deliberate recovery. Test restore only against a separate disposable copy. User-facing app data and backups never enter source control, CI artifacts, or issue attachments.
 
-## Final archive gate
+## Test gates
 
-- New public repo accessible; M0 git bundle verified with hash and recovery owner; legacy PR #30 captured; local data backups (if applicable) verified; new migration roadmap and rollback documented; operator reviews open PRs/issues; explicit archive approval.
-- Only then run `gh repo archive JoseAngelValadezBarajas/Forge --yes` as a separate operator action. Do **not** delete, force-push, rewrite, or rename the legacy repository.
+Test fresh schema inventory, migration from every supported baseline, preservation of legacy rows and fingerprints, SQLite integrity of the backup, interruption/retry, replay safety, future-version rejection, foreign-key integrity, and ORG-001–007 behavior. Transfer and attachment data additionally require checksum, path traversal, size-bound and atomicity tests.

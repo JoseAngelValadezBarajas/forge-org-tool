@@ -1,19 +1,32 @@
-# Architecture · RFC-001
+# FORGE Org Tool 1.0 Architecture
 
-Status: **M1 scaffold**. This README describes the _target_ architecture; the actual code implements only a React design-system preview and FastAPI health check.
+Status: implementation target for the local-first 1.0 MVP. `docs/product/mvp-1.0.md` is the product contract; this document records the runtime and dependency boundaries.
 
-## Bounded contexts
+## Runtime and ownership
 
-Organization owns Workspaces and Projects. Planning owns Epics, Features, Tasks, Criteria, Dependencies and Board state. Knowledge owns Decisions/Invariants and their revisions. Readiness owns deterministic versioned rules and snapshots. Repositories owns bounded read-only Git observations and Context Packages. Collaboration owns Agent Runs and Handoffs, without agent execution claims. Delivery owns Evidence/Verification/ReleaseCandidates with explicit trust scope. Transfer owns versioned import/export previews and atomic confirmation.
+- **Web:** React + Vite + TypeScript. The app composes feature-owned workflows; feature modules own business UI and domain mapping.
+- **Shared UI:** `@forge-org/ui` owns generic controls and surfaces; `@forge-org/tokens` owns semantic design tokens. Shared UI must not import app, feature, API, or backend code.
+- **API client:** `@forge-org/api-client` owns generated OpenAPI types, transport, and typed capability operations. The compatibility `organizationApi` facade remains available during the public API transition.
+- **Backend:** FastAPI exposes Pydantic/OpenAPI adapters; application services coordinate domain actions and transaction boundaries; infrastructure owns SQLite connections, migrations, and persistence. Domain rules remain independent of the web framework.
+- **Desktop:** Tauri 2 hosts the same React app and a bounded Python sidecar. IPC does not expose arbitrary filesystem access, shell/process control, credentials, ports, or unrestricted URLs.
+- **Durable data:** SQLite is authoritative for workspaces, projects, epics, stories/features, bugs, criteria, tasks, tags, dependencies and transfer state. Browser storage is limited to presentation preferences.
 
 ## Dependency direction
 
-`web app -> web feature -> @forge-org/ui + @forge-org/api-client`, with `@forge-org/ui -> @forge-org/tokens` only. Domain-specific status-to-tone mapping belongs to the owning feature. The API follows adapters -> application -> domain, with infrastructure implementing domain ports. No direct React-to-filesystem access.
+`web app → feature → @forge-org/ui + @forge-org/api-client`; `@forge-org/ui → @forge-org/tokens`; backend `API → application → domain`, with infrastructure implementing persistence. Cross-feature imports use documented public feature barrels. No feature-specific product composition is moved into a generic package.
 
-## Contracts
+## Capability scope
 
-HTTP source of truth: backend Pydantic models and versioned OpenAPI. `packages/api-client` will use generated types and one transport boundary; do not hand-maintain duplicate DTOs. The initial health endpoint is public and non-sensitive. The desktop bridge requires a separate threat-model review before implementation.
+Active product scope is Organization, Planning, Project Transfer and shared UI. Decisions, Invariants, Readiness, repository connections/observation, Context Packages, Runs, Handoffs, Delivery and release/verification governance are retired from active navigation and API. Upgraded databases retain their legacy tables and records, but these capabilities are not exposed by the 1.0 API. New databases contain only current product tables and migration metadata.
 
-## Runtime
+## API and compatibility
 
-Windows desktop (Tauri 2 + Rust, PyInstaller sidecar) is the first release target; browser + Vite is a dev runtime. No hosted/SaaS access in M1. SQLite + Alembic are the persistence target, but deliberately not bootstrapped for the health-only scaffold.
+`contracts/openapi/forge-org-v1.json` is the checked-in HTTP contract generated from FastAPI. Changes require backend contract tests and generated client type verification. Legacy import/export remains supported while v2 uses the shared validated engine and fingerprint-guarded preview/confirm flow.
+
+## Migration and backup
+
+Database upgrades are forward-only and replay-safe. Before any migration mutates a pre-existing database, make a SQLite online backup and verify its integrity. Reject unknown future schema versions before creating or changing tables. Never drop legacy tables or alter operator data as part of this product simplification.
+
+## Development Component Host
+
+The `/__components` route is development-only, absent from production output, and previews only shared UI and in-scope product compositions. Automated interaction/contract evidence is not human Figma visual certification.
