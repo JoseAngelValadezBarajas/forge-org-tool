@@ -4,10 +4,23 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FeatureDetailPage } from './FeatureDetailPage';
 
+const { isTauriMock, openDialogMock, readFileMock } = vi.hoisted(() => ({
+  isTauriMock: vi.fn(() => false),
+  openDialogMock: vi.fn(),
+  readFileMock: vi.fn(),
+}));
+
+vi.mock('@tauri-apps/api/core', () => ({ isTauri: isTauriMock }));
+vi.mock('@tauri-apps/plugin-dialog', () => ({ open: openDialogMock }));
+vi.mock('@tauri-apps/plugin-fs', () => ({ readFile: readFileMock }));
+
 describe('FeatureDetailPage', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    isTauriMock.mockReset().mockReturnValue(false);
+    openDialogMock.mockReset();
+    readFileMock.mockReset();
   });
 
   it('reorders tasks through the planning API and keeps the action manual', async () => {
@@ -478,5 +491,98 @@ describe('FeatureDetailPage', () => {
       ([path, init]) => String(path).endsWith('/attachments') && init?.method === 'POST',
     );
     expect(call?.[1]?.body).toContain('data_base64');
+  });
+
+  it('uses the native, user-scoped Tauri file dialog to upload a Bug screenshot', async () => {
+    isTauriMock.mockReturnValue(true);
+    openDialogMock.mockResolvedValue('C:\\Users\\operator\\Pictures\\screen.png');
+    readFileMock.mockResolvedValue(new Uint8Array([1, 2, 3]));
+    const bug = {
+      id: 'f-bug',
+      project_id: 'p1',
+      epic_id: null,
+      title: 'Crash',
+      description: null,
+      goal: null,
+      priority: 'high',
+      status: 'backlog',
+      kind: 'bug',
+      bug_severity: 'high',
+      steps_to_reproduce: 'Open the menu',
+      expected_result: 'Menu opens',
+      actual_result: 'App exits',
+      tags: [],
+      created_at: '',
+      updated_at: '',
+    };
+    const attachment = {
+      id: 'a1',
+      feature_id: 'f-bug',
+      file_name: 'screen.png',
+      content_type: 'image/png',
+      byte_size: 3,
+      sha256: 'abc',
+      created_at: '',
+    };
+    let saved = false;
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      const path = String(input);
+      if (path.endsWith('/planning/overview'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ epics: [], unassigned_features: [bug] }), { status: 200 }),
+        );
+      if (path.endsWith('/attachments') && init?.method === 'POST') {
+        saved = true;
+        return Promise.resolve(new Response(JSON.stringify(attachment), { status: 201 }));
+      }
+      if (path.endsWith('/attachments'))
+        return Promise.resolve(
+          new Response(JSON.stringify(saved ? [attachment] : []), { status: 200 }),
+        );
+      if (
+        path.endsWith('/tasks') ||
+        path.endsWith('/acceptance-criteria') ||
+        path.endsWith('/dependencies')
+      )
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1/features/f-bug']}>
+        <Routes>
+          <Route
+            path="/planning/:workspaceId/:projectId/features/:featureId"
+            element={<FeatureDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Add Bug screenshot' }));
+
+    expect(openDialogMock).toHaveBeenCalledWith({
+      multiple: false,
+      directory: false,
+      filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+    });
+    await waitFor(() =>
+      expect(readFileMock).toHaveBeenCalledWith('C:\\Users\\operator\\Pictures\\screen.png'),
+    );
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining('/features/f-bug/attachments'),
+        expect.objectContaining({ method: 'POST' }),
+      ),
+    );
+    const upload = fetchMock.mock.calls.find(
+      ([path, init]) => String(path).endsWith('/attachments') && init?.method === 'POST',
+    );
+    expect(JSON.parse(String(upload?.[1]?.body))).toMatchObject({
+      file_name: 'screen.png',
+      content_type: 'image/png',
+      data_base64: 'AQID',
+    });
+    expect(await screen.findByRole('img', { name: 'Bug screenshot: screen.png' })).toBeVisible();
   });
 });

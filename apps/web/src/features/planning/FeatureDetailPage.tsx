@@ -1,5 +1,8 @@
 import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { isTauri } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-dialog';
+import { readFile } from '@tauri-apps/plugin-fs';
 import { Button, Card, Input, SectionHeader, Textarea } from '@forge-org/ui';
 import styles from './PlanningPage.module.css';
 import { useFeatureDetailController } from './useFeatureDetailController';
@@ -8,6 +11,7 @@ import { CriterionItem, TaskItem } from './components';
 export function FeatureDetailPage() {
   const [editingCriterionId, setEditingCriterionId] = useState<string | null>(null);
   const [criterionDraft, setCriterionDraft] = useState('');
+  const [screenshotPickerError, setScreenshotPickerError] = useState<string | null>(null);
   const bugScreenshotInput = useRef<HTMLInputElement>(null);
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
   const {
@@ -51,6 +55,46 @@ export function FeatureDetailPage() {
     taskTitle,
     tasks,
   } = useFeatureDetailController(workspaceId, projectId, featureId);
+
+  async function chooseBugScreenshot() {
+    setScreenshotPickerError(null);
+    if (!isTauri()) {
+      bugScreenshotInput.current?.click();
+      return;
+    }
+
+    try {
+      const selected = await open({
+        multiple: false,
+        directory: false,
+        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+      });
+      if (!selected || Array.isArray(selected)) return;
+
+      const fileName = selected.split(/[\\/]/).pop() || 'screenshot';
+      const extension = fileName.split('.').pop()?.toLowerCase();
+      const contentType =
+        extension === 'png'
+          ? 'image/png'
+          : extension === 'jpg' || extension === 'jpeg'
+            ? 'image/jpeg'
+            : extension === 'webp'
+              ? 'image/webp'
+              : null;
+      if (!contentType) {
+        setScreenshotPickerError('Choose a PNG, JPEG, or WebP screenshot.');
+        return;
+      }
+
+      const selectedBytes = await readFile(selected);
+      const bytes = new Uint8Array(selectedBytes.length);
+      bytes.set(selectedBytes);
+      await uploadAttachment(new File([bytes.buffer], fileName, { type: contentType }));
+    } catch {
+      setScreenshotPickerError('Unable to select or read screenshot.');
+    }
+  }
+
   return (
     <div className={styles.stack}>
       <SectionHeader title="Feature detail" eyebrow="FORGE / Manual planning" />
@@ -160,7 +204,7 @@ export function FeatureDetailPage() {
                 type="button"
                 variant="secondary"
                 aria-label="Add Bug screenshot"
-                onClick={() => bugScreenshotInput.current?.click()}
+                onClick={() => void chooseBugScreenshot()}
                 disabled={attachments.length >= 5}
               >
                 Add Bug screenshot
@@ -180,6 +224,7 @@ export function FeatureDetailPage() {
                   event.currentTarget.value = '';
                 }}
               />
+              {screenshotPickerError && <p role="alert">{screenshotPickerError}</p>}
               {attachments.length === 0 ? (
                 <p>No screenshots attached.</p>
               ) : (

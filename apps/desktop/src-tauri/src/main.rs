@@ -223,6 +223,8 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![desktop_request])
         .setup(|app| {
             let (port, token, child) = match start_sidecar(app.handle()) {
