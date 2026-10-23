@@ -450,7 +450,7 @@ describe('FeatureDetailPage', () => {
       return Promise.resolve(new Response('{}', { status: 200 }));
     });
     vi.stubGlobal('fetch', fetchMock);
-    render(
+    const { container } = render(
       <MemoryRouter initialEntries={['/planning/w1/p1/features/f-bug']}>
         <Routes>
           <Route
@@ -461,8 +461,13 @@ describe('FeatureDetailPage', () => {
       </MemoryRouter>,
     );
 
+    const nativeFilePicker = vi.spyOn(HTMLInputElement.prototype, 'click');
+    fireEvent.click(await screen.findByRole('button', { name: 'Add Bug screenshot' }));
+    expect(nativeFilePicker).toHaveBeenCalled();
     const file = new File([new Uint8Array([1, 2, 3])], 'screen.png', { type: 'image/png' });
-    fireEvent.change(await screen.findByLabelText('Add Bug screenshot'), {
+    const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]');
+    expect(fileInput).not.toBeNull();
+    fireEvent.change(fileInput!, {
       target: { files: [file] },
     });
     expect(await screen.findByRole('img', { name: 'Bug screenshot: screen.png' })).toHaveAttribute(

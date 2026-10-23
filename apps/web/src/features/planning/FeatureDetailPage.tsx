@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Card, Input, SectionHeader, Textarea } from '@forge-org/ui';
 import styles from './PlanningPage.module.css';
@@ -8,6 +8,7 @@ import { CriterionItem, TaskItem } from './components';
 export function FeatureDetailPage() {
   const [editingCriterionId, setEditingCriterionId] = useState<string | null>(null);
   const [criterionDraft, setCriterionDraft] = useState('');
+  const bugScreenshotInput = useRef<HTMLInputElement>(null);
   const { workspaceId = '', projectId = '', featureId = '' } = useParams();
   const {
     addCriterion,
@@ -155,10 +156,22 @@ export function FeatureDetailPage() {
           {feature.kind === 'bug' && (
             <section aria-labelledby="bug-screenshots-heading">
               <h3 id="bug-screenshots-heading">Screenshots</h3>
-              <label htmlFor="bug-screenshot">Add screenshot (PNG, JPEG, or WebP; max 5 MiB)</label>
+              <Button
+                type="button"
+                variant="secondary"
+                aria-label="Add Bug screenshot"
+                onClick={() => bugScreenshotInput.current?.click()}
+                disabled={attachments.length >= 5}
+              >
+                Add Bug screenshot
+              </Button>
               <input
+                ref={bugScreenshotInput}
                 id="bug-screenshot"
                 aria-label="Add Bug screenshot"
+                aria-hidden="true"
+                className={styles.visuallyHidden}
+                tabIndex={-1}
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 disabled={attachments.length >= 5}
