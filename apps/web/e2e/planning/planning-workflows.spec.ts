@@ -141,3 +141,36 @@ test('PA-PLAN-002 dependencies reject self-links and retain valid relationships'
     page.getByText(new RegExp(`Blocker ${suffix} blocks Blocked ${suffix}`)),
   ).toBeVisible();
 });
+
+test('PA-PLAN-003 Epic detail edits and linked Feature navigation persist', async ({ page }) => {
+  const suffix = `${test.info().project.name}-${Date.now()}`;
+  const { workspace, project } = await createProject(page, `Epic detail ${suffix}`);
+  await page.goto(`/planning/${workspace.id}/${project.id}`);
+  await page.getByLabel('Epic title').fill(`Epic ${suffix}`);
+  await page.getByRole('button', { name: 'Create Epic' }).click();
+  await page.getByLabel('Feature title').fill(`Feature ${suffix}`);
+  await page.getByLabel('Epic for new feature').selectOption({ label: `Epic ${suffix}` });
+  await page.getByRole('button', { name: 'Create Feature' }).click();
+
+  await page.getByRole('link', { name: `Epic ${suffix}` }).click();
+  await expect(page.getByRole('heading', { name: 'Epic detail' })).toBeVisible();
+  await expect(page.getByLabel('Epic title')).toHaveValue(`Epic ${suffix}`);
+  await page.screenshot({ path: test.info().outputPath('epic-detail.png'), fullPage: true });
+  await page.getByLabel('Epic title').fill(`Updated Epic ${suffix}`);
+  await page.getByLabel('Epic status').selectOption('in_progress');
+  await page.getByRole('button', { name: 'Save Epic' }).click();
+  await expect(page.getByText('Epic saved.')).toBeVisible();
+  const overviewPath = `/api/v1/workspaces/${workspace.id}/projects/${project.id}/planning/overview`;
+  let overview = await (await page.request.get(overviewPath)).json();
+  let epic = overview.epics.find(
+    (item: { title: string }) => item.title === `Updated Epic ${suffix}`,
+  );
+  expect(epic).toMatchObject({ status: 'in_progress' });
+  await page.reload();
+  await expect(page.getByLabel('Epic title')).toHaveValue(`Updated Epic ${suffix}`);
+  await page.getByRole('link', { name: `Feature ${suffix}` }).click();
+  await expect(page.getByRole('heading', { name: 'Feature detail' })).toBeVisible();
+  overview = await (await page.request.get(overviewPath)).json();
+  epic = overview.epics.find((item: { title: string }) => item.title === `Updated Epic ${suffix}`);
+  expect(epic.features.map((item: { title: string }) => item.title)).toContain(`Feature ${suffix}`);
+});

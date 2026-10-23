@@ -8,10 +8,11 @@
 - [x] Keep manual planning state distinct from delivery evidence.
 - [x] Tasks, acceptance criteria, and project-scoped dependencies.
 - [x] Filtering, epic/feature/task edits, task reorder, and dependency removal API contracts.
-- [ ] `REQ-ORG-002-EPIC-DETAIL`: preserve Epic statuses `planning | archived`
+- [x] `REQ-ORG-002-EPIC-DETAIL`: preserve Epic statuses `planning | archived`
       and existing target statuses `planned | in_progress | done` in the
       OpenAPI and persisted API contract; open, inspect, edit and navigate a
       specific Epic through its workspace-scoped detail route; an archived
       Project is read-only and a missing/cross-Project Epic is rejected
-      visibly.
+      visibly (`PA-PLAN-003`). API status contract tests cover all five
+      preserved values and reject unsupported `paused`.
 - [x] Chromium review of the planning route and responsive evidence.

@@ -88,3 +88,51 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   await search.fill(projectName);
   await expect(page.getByRole('button', { name: 'Archive' })).toBeVisible();
 });
+
+test('PA-ORG-002 Project Overview edits and status persist through Planning and Transfer navigation', async ({
+  page,
+}) => {
+  const suffix = `${test.info().project.name}-${Date.now()}`;
+  const workspaceResponse = await page.request.post('/api/v1/workspaces', {
+    data: { name: `Overview ${suffix}` },
+  });
+  expect(workspaceResponse.status()).toBe(201);
+  const workspace = await workspaceResponse.json();
+  const projectResponse = await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
+    data: { name: `Project ${suffix}` },
+  });
+  expect(projectResponse.status()).toBe(201);
+  const project = await projectResponse.json();
+
+  await page.goto(`/projects/${workspace.id}/${project.id}`);
+  await expect(page.getByRole('heading', { name: 'Project Overview' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Edit project' })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath('project-overview.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Edit project' }).click();
+  await page.getByLabel('Project name').fill(`Renamed ${suffix}`);
+  await page.getByRole('button', { name: 'Save project' }).click();
+  await expect(page.getByText(`Renamed ${suffix}`, { exact: true })).toBeVisible();
+  expect(
+    await (
+      await page.request.get(`/api/v1/workspaces/${workspace.id}/projects/${project.id}`)
+    ).json(),
+  ).toMatchObject({ name: `Renamed ${suffix}`, status: 'active' });
+
+  await page.getByRole('button', { name: 'Archive project' }).click();
+  await expect(page.getByRole('dialog', { name: 'Archive project?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Confirm archive' }).click();
+  await expect(page.getByText('Project archived')).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('archived', { exact: true })).toBeVisible();
+  expect(
+    await (
+      await page.request.get(`/api/v1/workspaces/${workspace.id}/projects/${project.id}`)
+    ).json(),
+  ).toMatchObject({ status: 'archived' });
+
+  await page.getByRole('link', { name: 'Open planning board' }).click();
+  await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
+  await page.goto(`/projects/${workspace.id}/${project.id}`);
+  await page.getByRole('link', { name: 'Transfer / export' }).click();
+  await expect(page.getByRole('heading', { name: 'Project transfer' })).toBeVisible();
+});

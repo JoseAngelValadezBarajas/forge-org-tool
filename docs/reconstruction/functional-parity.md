@@ -20,8 +20,8 @@ code and assets are therefore not copied into this Apache-2.0 reconstruction.
 
 | ID | Original capability observed | Evidence locations in legacy refs | New status | Target boundary |
 | --- | --- | --- | --- | --- |
-| ORG-001 | Workspaces contain projects; project CRUD and selection | `backend/app/api/routers/workspaces.py`, `projects.py`; `backend/tests/test_workspace_projects.py`; `feature/fnd01-workspace-project-management` | `VERIFIED` | `apps/api/src/forge_org/{domain,application,infrastructure,api}` and `apps/web/src/features/organization` |
-| ORG-002 | Epics, features, tasks, acceptance criteria, dependencies, board states | `backend/app/api/routers/planning.py`; `frontend/src/features/planning`; `backend/tests/test_planning.py`; FND-02 branch | `VERIFIED` | `apps/api/src/forge_org/application/planning.py`, planning routes, `apps/web/src/features/planning` |
+| ORG-001 | Workspaces contain projects; project CRUD, selection, and distinct Project Overview lifecycle | `backend/app/api/routers/workspaces.py`, `projects.py`; `backend/tests/test_workspace_projects.py`; `frontend/src/features/organization/pages/ProjectOverviewPage.tsx`; `PA-ORG-002` | `VERIFIED` automated behavior at target `d602bdd`; browser journey includes persisted edit/archive, Planning and Transfer navigation in Chromium desktop/mobile | `apps/api/src/forge_org/{domain,application,infrastructure,api}` and `apps/web/src/features/organization` |
+| ORG-002 | Epics, features, tasks, acceptance criteria, dependencies, board states, and independent Epic detail workflow | `backend/app/api/routers/planning.py`; `frontend/src/features/planning/pages/EpicDetailPage.tsx`; `backend/tests/test_planning.py`; `PA-PLAN-003` | `VERIFIED` automated behavior at target `d602bdd`; Epic status OpenAPI retains five values and browser edits/reloads/Feature navigation pass desktop/mobile | `apps/api/src/forge_org/application/planning.py`, planning routes, `apps/web/src/features/planning` |
 | ORG-003 | Decisions, invariants, revision-aware acknowledgements, readiness snapshots | routers `decisions.py`, `invariants.py`, `readiness.py`; `backend/tests/test_fnd03.py`; FND-03 branch | `VERIFIED` | `apps/api/src/forge_org/application/{knowledge,readiness}.py`, readiness feature |
 | ORG-004 | Read-only local Git observations and immutable `forge-context-v1` packages | `backend/app/application/git_context.py`, `context_packages.py`; `frontend/src/features/repositories`; FND-04 docs/tests | `VERIFIED` | `apps/api/src/forge_org/application/{repositories,context_packages}.py`; repository/context UI with metadata-only observer, feature links, package preview/save/download |
 | ORG-005 | Human-reported runs, append-only events, immutable handoffs and acknowledgements | `backend/app/application/runs`, `handoffs`; `frontend/src/features/workbench`; `docs/fnd05-runs-handoffs.md`; FND-05 branch | `VERIFIED` | `apps/api/src/forge_org/application/runs.py`; reported work UI with draft/ready/acknowledged handoffs and immutable revision downloads |
@@ -34,8 +34,8 @@ code and assets are therefore not copied into this Apache-2.0 reconstruction.
 
 Validated for the legacy source: the files, refs, migrations, tests, and
 acceptance documents named above exist in the local checkout. Validated for
-the new repository: M0 preservation, M1 foundation, and the ORG-001
-API/frontend slice documented in `docs/evidence/m1/verification.md`.
+the new repository: M0 preservation, M1 foundation, and ORG-001/ORG-002
+browser workflows documented in `docs/evidence/reconstruction/verification.md`.
 
 Assumptions requiring a slice-level contract before implementation include
 which legacy edge cases are user-critical, whether the desktop packaging is
