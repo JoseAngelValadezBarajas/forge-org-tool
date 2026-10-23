@@ -35,3 +35,20 @@ test('the packaged PyInstaller sidecar is launched as a killable process group',
 
   assert.match(launch, /\.set_process_group\(true\)/);
 });
+
+test('Desktop smoke waits for its owned sidecars and uploads the installer after failed smoke', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const workflow = await readFile('.github/workflows/quality.yml', 'utf8');
+
+  assert.match(smoke, /\$ownedSidecarPids\s*\|\s*Sort-Object\s+-Unique/);
+  assert.match(smoke, /\$sidecar\.Path\.StartsWith\(\$installRoot/);
+  assert.match(smoke, /\$sidecar\.WaitForExit\(15000\)/);
+  assert.match(
+    smoke,
+    /Remove-Item\s+-LiteralPath\s+\$resolvedTestRoot\s+-Recurse\s+-Force\s+-ErrorAction Stop/,
+  );
+  assert.match(
+    workflow,
+    /run: npm run test:desktop:acceptance\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
+  );
+});

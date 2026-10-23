@@ -198,10 +198,20 @@ try {
   Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
 }
 finally {
-  if ($null -ne $process -and -not $process.HasExited) { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue }
-  Start-Sleep -Milliseconds 500
-  foreach ($sidecar in Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue) {
-    if ($ownedSidecarPids -contains $sidecar.Id) { Stop-Process -Id $sidecar.Id -Force -ErrorAction SilentlyContinue }
+  if ($null -ne $process) {
+    $process.Refresh()
+    if (-not $process.HasExited) {
+      Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+      try { $process.WaitForExit(15000) | Out-Null } catch { }
+    }
+  }
+  foreach ($sidecarPid in @($ownedSidecarPids | Sort-Object -Unique)) {
+    $sidecar = Get-Process -Id $sidecarPid -ErrorAction SilentlyContinue
+    if ($null -ne $sidecar -and $sidecar.Path -and
+        $sidecar.Path.StartsWith($installRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+      Stop-Process -Id $sidecarPid -Force -ErrorAction SilentlyContinue
+      try { $sidecar.WaitForExit(15000) | Out-Null } catch { }
+    }
   }
   $env:LOCALAPPDATA = $previousLocalAppData
   $resolvedTestRoot = [System.IO.Path]::GetFullPath($testRoot)
@@ -211,6 +221,19 @@ finally {
     throw "Refusing to remove a Desktop smoke path outside its unique temporary directory: $resolvedTestRoot"
   }
   if (Test-Path -LiteralPath $resolvedTestRoot -PathType Container) {
-    Remove-Item -LiteralPath $resolvedTestRoot -Recurse -Force
+    $lastCleanupError = $null
+    for ($attempt = 0; $attempt -lt 10; $attempt++) {
+      try {
+        Remove-Item -LiteralPath $resolvedTestRoot -Recurse -Force -ErrorAction Stop
+        $lastCleanupError = $null
+        break
+      } catch {
+        $lastCleanupError = $_
+        Start-Sleep -Milliseconds 500
+      }
+    }
+    if ($null -ne $lastCleanupError) {
+      throw "Could not remove the isolated Desktop smoke directory after waiting for owned processes to exit: $resolvedTestRoot. $lastCleanupError"
+    }
   }
 }
