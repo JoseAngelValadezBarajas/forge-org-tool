@@ -28,8 +28,8 @@ can open a project overview before entering the planning board. The overview
 loads the Project and owning Workspace through the public API client, presents
 persisted name, description, status and timestamps, and shows live planning
 counts (Features, Tasks, Epics, satisfied/total acceptance criteria,
-Dependencies),
-active Decisions, active Invariants, and a bounded priority-ordered list of
+Dependencies), total Decisions, active Invariants, and a bounded
+priority-ordered list of
 pending Features. Counts must be derived from the owning Project's API records;
 the UI must not invent delivery or verification state. A user can update the
 Project name and description, archive an active Project after explicit

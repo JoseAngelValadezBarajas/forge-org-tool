@@ -56,7 +56,7 @@
 **Interfaces:**
 - Route: `/projects/:workspaceId/:projectId`.
 - Consume only `organizationApi`, the public `@forge-org/ui` exports, and workspace-scoped route parameters.
-- Provide owning Workspace and Project metadata/timestamps; real counts for Features, Tasks, Epics, satisfied/total declared criteria and Dependencies; active Decision/Invariant counts; and up to four pending Features ordered by priority then update time. Provide edit/save, archive after explicit confirmation, restore, retryable loading/error states, Planning navigation, and a link to existing Transfer export. Reuse API-client capability operations; make no delivery/evidence claims from planning state.
+- Provide owning Workspace and Project metadata/timestamps; real counts for Features, Tasks, Epics, satisfied/total declared criteria and Dependencies; total Decision and active Invariant counts; and up to four pending Features ordered by priority then update time. Provide edit/save, archive after explicit confirmation, restore, retryable loading/error states, Planning navigation, and a link to existing Transfer export. Reuse API-client capability operations; make no delivery/evidence claims from planning state.
 - Retain an explicit direct board link from the Organization project card.
 
 - [ ] Add focused feature and route tests for persisted project data, edit, archive/restore, retry/error, and navigation before production implementation.
