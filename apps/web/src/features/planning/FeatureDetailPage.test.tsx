@@ -35,7 +35,7 @@ describe('FeatureDetailPage', () => {
     ];
     let taskReads = 0;
     let resolveStaleTaskRead: ((response: Response) => void) | undefined;
-    const fetchMock = vi.fn().mockImplementation((input: string) => {
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
       if (String(input).endsWith('/readiness/preview'))
         return Promise.resolve(
           new Response(
@@ -63,8 +63,13 @@ describe('FeatureDetailPage', () => {
           });
         return Promise.resolve(new Response(JSON.stringify(tasks), { status: 200 }));
       }
-      if (String(input).endsWith('/acceptance-criteria'))
-        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (String(input).endsWith('/acceptance-criteria')) {
+        return Promise.resolve(
+          new Response(init?.method === 'POST' ? '{}' : '[]', {
+            status: init?.method === 'POST' ? 201 : 200,
+          }),
+        );
+      }
       if (String(input).endsWith('/dependencies'))
         return Promise.resolve(new Response('[]', { status: 200 }));
       return Promise.resolve(new Response('{}', { status: 200 }));
