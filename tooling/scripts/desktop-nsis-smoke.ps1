@@ -120,7 +120,20 @@ function Wait-ForgeAutomationElement($root, [System.Windows.Automation.ControlTy
 
 function Invoke-ForgeElement($root, [System.Windows.Automation.ControlType]$controlType, [string]$name) {
   $element = Wait-ForgeAutomationElement $root $controlType $name
-  $element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+  $pattern = $null
+  if ($element.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref]$pattern)) {
+    $pattern.Invoke()
+    return
+  }
+  if ($element.TryGetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern, [ref]$pattern)) {
+    $pattern.Select()
+    return
+  }
+  if ($element.TryGetCurrentPattern([System.Windows.Automation.TogglePattern]::Pattern, [ref]$pattern)) {
+    if ($pattern.Current.ToggleState -eq [System.Windows.Automation.ToggleState]::Off) { $pattern.Toggle() }
+    return
+  }
+  throw "Unsupported UI Automation patterns for control '$name' ($controlType)."
 }
 
 function Set-ForgeElementValue($root, [System.Windows.Automation.ControlType]$controlType, [string]$name, [string]$value) {

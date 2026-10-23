@@ -88,6 +88,14 @@ test('native combobox selection does not collapse an already closed dropdown', a
   assert.match(smoke, /ExpandCollapseState\]::Expanded[\s\S]*?\.Collapse\(\)/);
 });
 
+test('installed WebView UI Automation supports stateful accessible buttons', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(smoke, /TryGetCurrentPattern\([\s\S]*?TogglePattern/);
+  assert.match(smoke, /ToggleState\]::Off[\s\S]*?\.Toggle\(\)/);
+  assert.match(smoke, /Unsupported UI Automation patterns for control/);
+});
+
 test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {
   const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
   const command = packageJson.scripts['test:desktop:acceptance'];
