@@ -13,8 +13,8 @@
       "expected_result": "Delivery overview presents provenance, verification and non-publication boundaries.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "UI workflow added; latest isolated browser execution was blocked by an occupied shared test port."
+      "status": "AUTOMATED_PASS",
+      "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied."
     },
     {
       "figma_node_id": "76:97",
@@ -27,8 +27,8 @@
       "expected_result": "Active and invalidated evidence retain their explicit provenance.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Coverage suite awaits a clean isolated browser run."
+      "status": "AUTOMATED_PASS",
+      "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run."
     },
     {
       "figma_node_id": "76:176",
@@ -41,8 +41,8 @@
       "expected_result": "Evidence persists as REPORTED and is not represented as independently verified.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Test records evidence through the real UI and API."
+      "status": "AUTOMATED_PASS",
+      "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run."
     },
     {
       "figma_node_id": "76:250",
@@ -55,8 +55,8 @@
       "expected_result": "Detail preserves source/provenance and invalidation is persisted.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Invalidation is exercised; direct detail-route assertion remains a coverage gap."
+      "status": "AUTOMATED_PASS",
+      "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "77:118",
@@ -69,8 +69,8 @@
       "expected_result": "Blocked outcome, blockers, fingerprint and saved evaluation are visible and persisted.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Browser-run isolation currently prevents final result certification."
+      "status": "AUTOMATED_PASS",
+      "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run."
     },
     {
       "figma_node_id": "77:207",
@@ -97,8 +97,8 @@
       "expected_result": "Saved evaluation, blockers and staleness are shown.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Saved history is exercised; direct trace route is not yet asserted by this suite."
+      "status": "AUTOMATED_PASS",
+      "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey."
     },
     {
       "figma_node_id": "77:347",
@@ -111,8 +111,8 @@
       "expected_result": "Candidate is stored at its initial revision and remains a draft until frozen.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Candidate setup and freeze are covered across UI/API."
+      "status": "AUTOMATED_PASS",
+      "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys."
     },
     {
       "figma_node_id": "78:234",
@@ -125,8 +125,8 @@
       "expected_result": "Gate result and candidate revision are recorded; blockers prevent manifest creation.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "The acceptance test covers blocked-to-pass progression."
+      "status": "AUTOMATED_PASS",
+      "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run."
     },
     {
       "figma_node_id": "78:322",
@@ -139,8 +139,8 @@
       "expected_result": "Manifest bytes match saved state and explicitly remain NOT_PUBLISHED.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Product semantics are explicit in API and UI; final browser execution is pending."
+      "status": "AUTOMATED_PASS",
+      "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run."
     },
     {
       "figma_node_id": "87:3",
@@ -209,8 +209,8 @@
       "expected_result": "Evidence inventory distinguishes provenance and invalidation state.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Frame name verified from direct Figma metadata."
+      "status": "AUTOMATED_PASS",
+      "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "133:391",
@@ -223,8 +223,8 @@
       "expected_result": "Blocked outcomes and blockers are explicit and retained.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Desktop journey passed. Mobile Delivery is blocked: after verification evaluation, the Verification Card intercepts pointer clicks on downstream controls; retain as blocked until the responsive layout is fixed and rerun."
+      "status": "AUTOMATED_PASS",
+      "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run."
     },
     {
       "figma_node_id": "133:445",
@@ -237,8 +237,8 @@
       "expected_result": "Gate result is revision-aware and manifest creation requires a current PASS.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Desktop journey passed. Mobile Delivery is blocked because the Verification Card intercepts the Evaluate gates pointer interaction; no mobile gate pass is claimed."
+      "status": "AUTOMATED_PASS",
+      "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run."
     },
     {
       "figma_node_id": "133:500",
@@ -265,8 +265,8 @@
       "expected_result": "The stored record remains REPORTED and is not asserted verified.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Reported evidence creation and API provenance assertions passed on desktop and were reached on mobile. Overall Delivery remains blocked because later mobile pointer interactions are intercepted by the Verification Card."
+      "status": "AUTOMATED_PASS",
+      "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport."
     },
     {
       "figma_node_id": "142:114",
@@ -279,8 +279,8 @@
       "expected_result": "Invalidation is retained in backend state.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Suite currently asserts provenance and invalidated inventory state."
+      "status": "AUTOMATED_PASS",
+      "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "142:183",
@@ -293,8 +293,8 @@
       "expected_result": "Outcome, blockers and stale status derive from recorded inputs.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Desktop preview/evaluation/history assertions passed. Mobile reached the verification history, but the Verification Card intercepts a downstream pointer click; mobile workflow remains blocked."
+      "status": "AUTOMATED_PASS",
+      "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport."
     },
     {
       "figma_node_id": "142:252",
@@ -307,8 +307,8 @@
       "expected_result": "Missing active VERIFIED evidence is shown as a blocker.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Blocked verification outcome and missing VERIFIED-evidence blocker passed on desktop and were asserted on mobile before the later responsive pointer-interception failure."
+      "status": "AUTOMATED_PASS",
+      "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "142:321",
@@ -321,8 +321,8 @@
       "expected_result": "Candidate persists with draft status and revision.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Synthetic candidate creation/freeze setup and desktop assertions passed. Full mobile Delivery journey is blocked by Verification Card pointer interception before gate evaluation completes."
+      "status": "AUTOMATED_PASS",
+      "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport."
     },
     {
       "figma_node_id": "142:390",
@@ -335,8 +335,8 @@
       "expected_result": "Frozen snapshot and fingerprint are retained.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Freeze and persisted revision assertions passed on desktop. Mobile does not complete the downstream gate workflow because the Verification Card intercepts pointer input."
+      "status": "AUTOMATED_PASS",
+      "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "142:459",
@@ -349,8 +349,8 @@
       "expected_result": "Gate outcome and blockers are retained for the current revision.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Desktop gate evaluation passed. Mobile attempt timed out at Evaluate gates because the Verification Card intercepted pointer events; no mobile gate result is claimed."
+      "status": "AUTOMATED_PASS",
+      "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport."
     },
     {
       "figma_node_id": "142:528",
@@ -363,8 +363,8 @@
       "expected_result": "Actual JSON and Markdown downloads identify the artifact as NOT_PUBLISHED.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Desktop manifest save/download assertions passed, including downloaded bytes and NOT_PUBLISHED status. Mobile did not reach manifest export because gate evaluation was pointer-blocked."
+      "status": "AUTOMATED_PASS",
+      "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "142:597",
@@ -377,8 +377,8 @@
       "expected_result": "Error is visible and persisted project list remains unchanged.",
       "test_ids": ["PA-TRN-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/transfer-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Malformed JSON and invalid schema/fingerprint/reference/cycle inputs are included."
+      "status": "AUTOMATED_PASS",
+      "notes": "Malformed JSON and invalid schema, fingerprint, reference and cycle inputs passed without partial writes on desktop and the responsive viewport."
     },
     {
       "figma_node_id": "143:119",
@@ -391,8 +391,8 @@
       "expected_result": "Record status changes to INVALIDATED and remains persisted.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Invalidation state was asserted in UI and API on desktop and reached on mobile. Mobile Delivery later blocks on Verification Card pointer interception; overall frame status remains blocked."
+      "status": "AUTOMATED_PASS",
+      "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport."
     },
     {
       "figma_node_id": "143:184",
@@ -405,8 +405,8 @@
       "expected_result": "Download is a local planning artifact and does not publish or deploy.",
       "test_ids": ["PA-DEL-001"],
       "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Desktop downloaded manifest bytes and verified NOT_PUBLISHED/non-deployment language. Mobile did not reach export because the Verification Card intercepts gate controls."
+      "status": "AUTOMATED_PASS",
+      "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport."
     }
   ]
 }

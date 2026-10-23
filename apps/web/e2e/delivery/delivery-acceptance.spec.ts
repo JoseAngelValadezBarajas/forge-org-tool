@@ -20,6 +20,11 @@ test('evidence provenance, invalidation, verification trace, and release manifes
 
   await page.goto(`/delivery/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Delivery overview' })).toBeVisible();
+  if (test.info().project.name === 'chromium-mobile') {
+    await expect
+      .poll(() => page.evaluate(() => [window.innerWidth, window.innerHeight]))
+      .toEqual([390, 844]);
+  }
   await page.getByLabel('Evidence title').fill(`Reported ${suffix}`);
   await page
     .getByLabel('Evidence summary')
@@ -45,6 +50,9 @@ test('evidence provenance, invalidation, verification trace, and release manifes
     })
   ).json();
   await page.getByLabel('Verification rule').selectOption('verified-evidence-present');
+  if (test.info().project.name === 'chromium-mobile') {
+    await expect.poll(() => page.evaluate(() => window.visualViewport?.scale ?? 1)).toBe(1);
+  }
   await page.getByRole('button', { name: 'Preview verification' }).click();
   await expect(page.getByText('BLOCKED', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('No active VERIFIED evidence is present')).toBeVisible();
@@ -105,6 +113,15 @@ test('evidence provenance, invalidation, verification trace, and release manifes
   }
   await page.getByRole('button', { name: `Preview gates for Candidate ${suffix}` }).click();
   const evaluateGates = page.getByRole('button', { name: 'Evaluate gates' });
+  await evaluateGates.scrollIntoViewIfNeeded();
+  const evaluateGatesOwnsHitTarget = await evaluateGates.evaluate((button) => {
+    const bounds = button.getBoundingClientRect();
+    return (
+      document.elementFromPoint(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2) ===
+      button
+    );
+  });
+  expect(evaluateGatesOwnsHitTarget).toBe(true);
   await evaluateGates.click({ timeout: 8_000 });
   await expect(page.getByRole('button', { name: 'Save NOT_PUBLISHED manifest' })).toBeEnabled();
   const manifestSaveResponse = page.waitForResponse(

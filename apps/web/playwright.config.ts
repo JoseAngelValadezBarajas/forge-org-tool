@@ -106,9 +106,9 @@ export default defineConfig({
     {
       name: 'chromium-mobile',
       use: {
+        // Test the phone-width responsive layout without mobile viewport scaling.
         ...devices['Desktop Chrome'],
         viewport: { width: 390, height: 844 },
-        isMobile: true,
         hasTouch: true,
       },
     },
