@@ -2,6 +2,7 @@
 
 import os
 import sqlite3
+from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 from threading import RLock
@@ -25,7 +26,7 @@ def database_path() -> Path:
 def _schema_is_current(path: Path, current_version: int) -> bool:
     if not path.is_file() or path.stat().st_size == 0:
         return False
-    with sqlite3.connect(path) as probe:
+    with closing(sqlite3.connect(path)) as probe:
         tables = {
             row[0]
             for row in probe.execute(

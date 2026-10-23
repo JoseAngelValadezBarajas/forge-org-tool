@@ -91,3 +91,10 @@
 - [x] Review diff, migration backup behavior, and synthetic affected-record counts.
 - [ ] Commit on `feature/forge-mvp-1.0`, push to PR #3 without merging, and update PR with evidence and SHA.
 - [ ] Confirm PR remains open/unmerged and report exact verification outcomes.
+
+## Verification follow-up
+
+- Updated the pre-existing installed smoke schema-version assertion from v4 to v5.
+- Fixed Windows database cleanup by explicitly closing the schema probe connection; `with sqlite3.connect(...)` commits/rolls back but does not close it.
+- Re-ran installed smoke unit tests: 9 passed. Re-ran API tests (39 passed), Ruff, and mypy. Initial Quality run's API, Rustfmt, Clippy, and Rust tests passed; web and desktop smoke jobs require the follow-up commit's CI rerun.
+- The smoke tests use `TemporaryDirectory` and a patched temporary `LOCALAPPDATA`/`FORGE_DATABASE_PATH`; no operator app data is involved.
