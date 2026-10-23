@@ -41,7 +41,7 @@
     "acceptance:registry": "node tooling/scripts/product-acceptance-registry.mjs",
     "check:acceptance:registry": "node tooling/scripts/product-acceptance-registry.mjs --check",
     "test:acceptance:tooling": "node --test tooling/scripts/e2e-environment.test.mjs tooling/scripts/run-acceptance-local.test.mjs tooling/scripts/product-acceptance-registry.test.mjs",
-    "test:desktop:acceptance": "npm run desktop:build:nsis && powershell -NoProfile -ExecutionPolicy Bypass -File tooling/scripts/desktop-nsis-smoke.ps1",
+    "test:desktop:acceptance": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File apps/desktop/package_sidecar.ps1 && npm run desktop:build:nsis && powershell -NoProfile -ExecutionPolicy Bypass -File tooling/scripts/desktop-nsis-smoke.ps1",
     "test:packages": "npm run build --workspace=@forge-org/tokens && npm run build --workspace=@forge-org/icons && npm test --workspace=@forge-org/tokens && npm test --workspace=@forge-org/ui && npm test --workspace=@forge-org/icons && npm run test:contract --workspace=@forge-org/api-client && node --test tooling/scripts/package-consumer.test.mjs",
     "format": "prettier --write . && uv run --project apps/api --locked ruff format apps/api/src apps/api/tests && cargo fmt --manifest-path apps/desktop/Cargo.toml && cargo fmt --manifest-path apps/desktop/src-tauri/Cargo.toml",
     "format:check:web": "prettier --check .",

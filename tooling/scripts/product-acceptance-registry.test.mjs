@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { validateRegistry } from './product-acceptance-registry.mjs';
+import { buildRegistryFiles, validateRegistry } from './product-acceptance-registry.mjs';
 
 const manifest = {
   schema_version: 1,
@@ -72,6 +72,33 @@ test('rejects false automated passes without named tests and retained evidence',
   );
 });
 
+test('rejects automated coverage that references an acceptance test ID absent from the test suite', () => {
+  assert.throws(
+    () =>
+      validateRegistry(
+        manifest,
+        [{ domain: 'core', frames: [frame('4:32', ['PA-MISSING']), frame('4:158')] }],
+        new Set(['PA-001']),
+      ),
+    /unknown acceptance test ID.*PA-MISSING/i,
+  );
+});
+
+test('rejects evidence references that do not resolve to a retained repository artifact', () => {
+  const invalid = frame('4:32');
+  invalid.evidence = ['test-results/product-acceptance/<run>/playwright-results.json'];
+  assert.throws(
+    () =>
+      validateRegistry(
+        manifest,
+        [{ domain: 'core', frames: [invalid, frame('4:158')] }],
+        new Set(['PA-001']),
+        new Set(['apps/web/e2e/organization/organization-workflows.spec.ts']),
+      ),
+    /unknown evidence reference.*playwright-results\.json/i,
+  );
+});
+
 test('requires reasons for product gaps, manual reviews and blocked coverage', () => {
   const invalid = frame('4:32', [], 'BLOCKED_WITH_REASON');
   invalid.notes = null;
@@ -79,4 +106,15 @@ test('requires reasons for product gaps, manual reviews and blocked coverage', (
     () => validateRegistry(manifest, [{ domain: 'core', frames: [invalid, frame('4:158')] }]),
     /BLOCKED_WITH_REASON.*notes/i,
   );
+});
+
+test('generated matrix does not present a stale run result as current registry evidence', async () => {
+  const outputs = await buildRegistryFiles();
+  const markdown = [...outputs.entries()].find(([path]) =>
+    path.endsWith('product-acceptance-matrix.md'),
+  )?.[1];
+
+  assert.ok(markdown);
+  assert.match(markdown, /run-scoped acceptance report/i);
+  assert.doesNotMatch(markdown, /passed 50\/50|CI run \d+ passed/i);
 });

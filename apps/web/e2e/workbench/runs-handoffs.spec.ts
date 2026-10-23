@@ -110,7 +110,16 @@ test('PA-HANDOFF-01 revise a draft, publish and acknowledge its immutable handof
   const secondSave = waitForHandoffUpdate();
   await page.getByRole('button', { name: 'Save handoff details' }).click();
   expect((await secondSave).ok()).toBe(true);
+  const readyResponse = page.waitForResponse(
+    (response) =>
+      response
+        .url()
+        .includes(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/handoffs/`) &&
+      response.url().endsWith('/ready') &&
+      response.request().method() === 'POST',
+  );
   await page.getByRole('button', { name: 'Mark handoff ready' }).click();
+  expect((await readyResponse).ok()).toBe(true);
 
   const handoffsUrl = `/api/v1/workspaces/${workspace.id}/projects/${project.id}/handoffs`;
   const handoffs = await page.request.get(handoffsUrl).then((response) => response.json());

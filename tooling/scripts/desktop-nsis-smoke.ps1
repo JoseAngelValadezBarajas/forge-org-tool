@@ -210,7 +210,14 @@ finally {
       }
     }
   }
-  $ownedSidecarIds = @($ownedSidecarPids | Sort-Object -Unique)
+  $installedSidecarIds = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue |
+    Where-Object {
+      $_.Path -and $_.Path.StartsWith(
+        $installRoot + [System.IO.Path]::DirectorySeparatorChar,
+        [System.StringComparison]::OrdinalIgnoreCase
+      )
+    } | ForEach-Object Id)
+  $ownedSidecarIds = @(@($ownedSidecarPids) + @($installedSidecarIds) | Sort-Object -Unique)
   $sidecarShutdownDeadline = [DateTime]::UtcNow.AddSeconds(15)
   do {
     $remainingSidecarPids = @($ownedSidecarIds | Where-Object {

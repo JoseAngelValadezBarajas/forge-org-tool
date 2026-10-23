@@ -1,6 +1,21 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { missingPrerequisites } from './run-acceptance-local.mjs';
+import { missingPrerequisites, npmInvocation } from './run-acceptance-local.mjs';
+
+test('acceptance runner invokes npm without enabling deprecated Windows shell interpolation', () => {
+  assert.deepEqual(
+    npmInvocation({
+      npmCli: null,
+      platform: 'win32',
+      comSpec: 'C:\\Windows\\System32\\cmd.exe',
+      args: ['run', 'test:e2e:full'],
+    }),
+    {
+      command: 'C:\\Windows\\System32\\cmd.exe',
+      args: ['/d', '/s', '/c', 'npm run test:e2e:full'],
+    },
+  );
+});
 
 test('acceptance preflight accepts the documented Node, Python, uv, npm and Chromium baseline', () => {
   assert.deepEqual(

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
-test('evidence provenance, invalidation, verification trace, and release manifest remain truthful', async ({
+test('PA-DEL-001 evidence provenance, invalidation, verification trace, and release manifest remain truthful', async ({
   page,
 }) => {
   test.setTimeout(60_000);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   organizationApi,
@@ -15,6 +15,7 @@ const statuses: EpicStatus[] = ['planning', 'archived', 'planned', 'in_progress'
 
 export function EpicDetailPage() {
   const { workspaceId = '', projectId = '', epicId = '' } = useParams();
+  const currentEpicId = useRef(epicId);
   const [project, setProject] = useState<Project | null>(null);
   const [epic, setEpic] = useState<Epic | null>(null);
   const [title, setTitle] = useState('');
@@ -24,6 +25,10 @@ export function EpicDetailPage() {
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    currentEpicId.current = epicId;
+  }, [epicId]);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
@@ -67,7 +72,7 @@ export function EpicDetailPage() {
 
   async function save(event: FormEvent) {
     event.preventDefault();
-    if (!epic || project?.status !== 'active' || !title.trim()) return;
+    if (!epic || epic.id !== epicId || project?.status !== 'active' || !title.trim()) return;
     setSaved(false);
     setError('');
     try {
@@ -76,12 +81,14 @@ export function EpicDetailPage() {
         description: description.trim() || null,
         status,
       });
+      if (currentEpicId.current !== epic.id) return;
       setEpic(updated);
       setTitle(updated.title);
       setDescription(updated.description ?? '');
       setStatus(updated.status);
       setSaved(true);
     } catch (cause) {
+      if (currentEpicId.current !== epic.id) return;
       setError(cause instanceof Error ? cause.message : 'Unable to save Epic.');
     }
   }
@@ -102,7 +109,7 @@ export function EpicDetailPage() {
           </Button>
         </div>
       )}
-      {epic && !loading && (
+      {epic?.id === epicId && !loading && (
         <>
           {readOnly && (
             <p role="status">This is an archived project. Epic details are read-only.</p>

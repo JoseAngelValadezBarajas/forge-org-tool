@@ -72,7 +72,16 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
     .locator('article')
     .filter({ has: page.getByRole('combobox', { name: /^Status for/ }) });
   await expect(taskItems.first()).toContainText(`Second task ${suffix}`);
+  const taskStatusResponse = page.waitForResponse(
+    (response) =>
+      response
+        .url()
+        .includes(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features/`) &&
+      response.url().includes('/tasks/') &&
+      response.request().method() === 'PATCH',
+  );
   await page.getByLabel(`Status for Second task ${suffix}`).selectOption('done');
+  expect((await taskStatusResponse).ok()).toBe(true);
   await expect(taskItems.first()).toContainText('done');
   await expect(page.getByText(`Criterion ${suffix}`, { exact: true })).toBeVisible();
 

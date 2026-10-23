@@ -45,7 +45,15 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
     cleanup.indexOf('$process.CloseMainWindow()') < cleanup.indexOf('Stop-Process -Id $process.Id'),
     'the restarted application gets a graceful shutdown before forced termination',
   );
-  assert.match(smoke, /\$ownedSidecarPids\s*\|\s*Sort-Object\s+-Unique/);
+  assert.match(
+    cleanup,
+    /\$ownedSidecarPids[\s\S]*\$installedSidecarIds[\s\S]*Sort-Object\s+-Unique/,
+  );
+  assert.match(
+    cleanup,
+    /Get-Process\s+-Name\s+'forge-sidecar'[\s\S]*?\$installRoot[\s\S]*?Sort-Object\s+-Unique/,
+    'cleanup discovers sidecars from the unique install path even if UI startup failed before ownership capture',
+  );
   assert.match(smoke, /\$sidecar\.Path\.StartsWith\(\$installRoot/);
   assert.match(smoke, /\$sidecar\.WaitForExit\(15000\)/);
   assert.match(
@@ -56,4 +64,13 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
     workflow,
     /run: npm run test:desktop:acceptance\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
   );
+});
+
+test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {
+  const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
+  const command = packageJson.scripts['test:desktop:acceptance'];
+
+  assert.match(command, /npm run build/);
+  assert.match(command, /package_sidecar\.ps1/);
+  assert.match(command, /desktop:build:nsis/);
 });

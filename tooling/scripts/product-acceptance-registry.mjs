@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { resolve, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { format, resolveConfig } from 'prettier';
 
@@ -25,7 +25,7 @@ const REASON_REQUIRED = new Set([
   'BLOCKED_WITH_REASON',
 ]);
 
-export function validateRegistry(manifest, shards) {
+export function validateRegistry(manifest, shards, declaredTestIds, declaredEvidencePaths) {
   const expected = new Map();
   for (const page of manifest.pages ?? []) {
     for (const [nodeId, title] of page.frames ?? []) {
@@ -67,6 +67,24 @@ export function validateRegistry(manifest, shards) {
       if (frame.status === 'AUTOMATED_PASS' && (!frame.test_ids.length || !frame.evidence.length)) {
         throw new Error(`AUTOMATED_PASS for Figma node ${id} requires test IDs and evidence.`);
       }
+      if (declaredTestIds) {
+        const unknownTestIds = frame.test_ids.filter((testId) => !declaredTestIds.has(testId));
+        if (unknownTestIds.length) {
+          throw new Error(
+            `Figma node ${id} references unknown acceptance test ID(s): ${unknownTestIds.join(', ')}.`,
+          );
+        }
+      }
+      if (declaredEvidencePaths) {
+        const unknownEvidence = frame.evidence.filter(
+          (evidence) => !declaredEvidencePaths.has(evidence.replaceAll('\\', '/')),
+        );
+        if (unknownEvidence.length) {
+          throw new Error(
+            `Figma node ${id} references unknown evidence reference(s): ${unknownEvidence.join(', ')}.`,
+          );
+        }
+      }
       if (REASON_REQUIRED.has(frame.status) && !frame.notes?.trim()) {
         throw new Error(`${frame.status} for Figma node ${id} requires notes.`);
       }
@@ -91,6 +109,32 @@ export function validateRegistry(manifest, shards) {
   };
 }
 
+function collectAcceptanceTestIds(directory) {
+  const ids = new Set();
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      for (const id of collectAcceptanceTestIds(path)) ids.add(id);
+    } else if (entry.isFile() && entry.name.endsWith('.spec.ts')) {
+      const source = readFileSync(path, 'utf8');
+      for (const match of source.matchAll(/\bPA-[A-Z0-9]+(?:-[A-Z0-9]+)*\b/g)) ids.add(match[0]);
+    }
+  }
+  return ids;
+}
+
+function collectAcceptanceTestFiles(root, directory) {
+  const files = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...collectAcceptanceTestFiles(root, path));
+    else if (entry.isFile() && entry.name.endsWith('.spec.ts')) {
+      files.push(relative(root, path).replaceAll('\\', '/'));
+    }
+  }
+  return files;
+}
+
 function renderMarkdown(registry) {
   const counts = Object.entries(registry.status_counts).filter(([, count]) => count > 0);
   const lines = [
@@ -103,11 +147,11 @@ function renderMarkdown(registry) {
     '## Acceptance dimensions',
     '',
     `- Functional: ${registry.status_counts.AUTOMATED_PASS} Figma frames have linked automated behavior evidence; non-pass states remain explicit and no complete-coverage claim is made.`,
-    '- Responsive: journeys run in desktop Chromium and a 390px responsive Chromium viewport; this verifies responsive layout, not native-device browser or touch-event behavior. Dedicated 1440px, 1280px, 1024px, and 375px multi-screen viewport certification remains open.',
+    '- Responsive: the full behavioral suite runs in Desktop Chrome (1280×720) and a 390×844 responsive Chromium project. UX-02 additionally captures Planning and Readiness at 1440, 1280, 1024, 390 and 375px in Dark and Light; Run, Handoff, Repository, Context Package, Evidence, Verification and Candidate detail routes are captured at 1280 and 390px. This is browser layout evidence, not native-device or touch certification.',
     '- Accessibility: PA-A11Y-01 exercises theme persistence, keyboard command navigation, focus restoration, and axe WCAG 2.1 A/AA checks on the command palette and Planning route.',
     '- Visual: tagged screenshots are captured as evidence; no approved pixel-diff baselines exist and no human Figma parity review is implied.',
-    '- Native Desktop: the Windows UI Automation smoke installs the NSIS app, creates workspace and project records, checks restart persistence and cleanup; local native execution is unavailable without Rust/Cargo, and CI must provide that evidence.',
-    '- Browser behavior: the latest isolated full acceptance run passed 46/46 desktop and responsive-viewport scenarios; this is automated behavior evidence, not human Figma visual certification.',
+    '- Native Desktop: the Windows UI Automation smoke installs the NSIS app, checks visible-window and React UI state, creates workspace/project records through the installed app, verifies isolated SQLite persistence after restart, single-instance activation, and sidecar cleanup. Installed import/export interaction remains blocked; consult the run-specific GitHub Actions status and uploaded artifact for execution results.',
+    '- Execution evidence: each local or CI run writes a run-scoped acceptance report and Playwright JSON report. This registry maps Figma frames to automated journeys; its coverage statuses are not a live result for a particular run. CI does not refresh Figma metadata or imply human visual certification.',
     '',
     '| Figma node | Screen | Domain | Classification | Status | Tests | Notes |',
     '| --- | --- | --- | --- | --- | --- | --- |',
@@ -129,7 +173,11 @@ export async function buildRegistryFiles(root = process.cwd()) {
     .filter((name) => name.endsWith('.json') && name !== 'figma-frame-manifest.json')
     .sort()
     .map((name) => JSON.parse(readFileSync(join(directory, name), 'utf8')));
-  const registry = validateRegistry(manifest, shards);
+  const declaredTestIds = collectAcceptanceTestIds(join(root, 'apps/web/e2e'));
+  const declaredEvidencePaths = new Set(
+    collectAcceptanceTestFiles(root, join(root, 'apps/web/e2e')),
+  );
+  const registry = validateRegistry(manifest, shards, declaredTestIds, declaredEvidencePaths);
   const outputs = [
     [
       join(root, 'docs/quality/product-acceptance-registry.json'),

@@ -9,6 +9,24 @@ const apiRoot = join(repositoryRoot, 'apps', 'api');
 const webPackagePath = join(repositoryRoot, 'apps', 'web', 'package.json');
 const requireFromWeb = createRequire(webPackagePath);
 
+export function npmInvocation({
+  npmCli = process.env.npm_execpath,
+  platform = process.platform,
+  comSpec = process.env.ComSpec ?? 'cmd.exe',
+  args = [],
+} = {}) {
+  if (npmCli) return { command: process.execPath, args: [npmCli, ...args] };
+  if (platform === 'win32') {
+    return { command: comSpec, args: ['/d', '/s', '/c', `npm ${args.join(' ')}`] };
+  }
+  return { command: 'npm', args };
+}
+
+function runNpm(args, options) {
+  const invocation = npmInvocation({ args });
+  return spawnSync(invocation.command, invocation.args, options);
+}
+
 export function missingPrerequisites({ nodeMajor, pythonMajor, pythonMinor, npm, uv, chromium }) {
   const missing = [];
   if (nodeMajor !== 24) missing.push(`Node.js 24 is required (found ${nodeMajor ?? 'unknown'}).`);
@@ -25,11 +43,12 @@ export function missingPrerequisites({ nodeMajor, pythonMajor, pythonMinor, npm,
 }
 
 function commandAvailable(command, args) {
-  const result = spawnSync(command, args, {
+  const options = {
     cwd: repositoryRoot,
     encoding: 'utf8',
-    shell: process.platform === 'win32',
-  });
+    shell: false,
+  };
+  const result = command === 'npm' ? runNpm(args, options) : spawnSync(command, args, options);
   return result.status === 0;
 }
 
@@ -37,7 +56,7 @@ function getPythonVersion() {
   const result = spawnSync('uv', ['run', '--project', apiRoot, '--locked', 'python', '--version'], {
     cwd: repositoryRoot,
     encoding: 'utf8',
-    shell: process.platform === 'win32',
+    shell: false,
   });
   if (result.status !== 0) return {};
   const match = `${result.stdout}\n${result.stderr}`.match(/Python\s+(\d+)\.(\d+)/i);
@@ -87,21 +106,16 @@ function runAcceptance() {
     process.stdout.write(
       'Starting the full Playwright acceptance suite; Playwright owns and stops its isolated servers.\n',
     );
-    const npmCli = process.env.npm_execpath;
-    const result = spawnSync(
-      npmCli ? process.execPath : 'npm',
-      npmCli ? [npmCli, 'run', 'test:e2e:full'] : ['run', 'test:e2e:full'],
-      {
-        cwd: repositoryRoot,
-        env: {
-          ...process.env,
-          FORGE_E2E_EVIDENCE_DIR: evidenceDirectory,
-          FORGE_E2E_JSON_REPORT: playwrightReportPath,
-        },
-        stdio: 'inherit',
-        shell: !npmCli && process.platform === 'win32',
+    const result = runNpm(['run', 'test:e2e:full'], {
+      cwd: repositoryRoot,
+      env: {
+        ...process.env,
+        FORGE_E2E_EVIDENCE_DIR: evidenceDirectory,
+        FORGE_E2E_JSON_REPORT: playwrightReportPath,
       },
-    );
+      stdio: 'inherit',
+      shell: false,
+    });
     exitCode = result.status ?? 1;
     status = exitCode === 0 ? 'PASS' : 'FAIL';
   }

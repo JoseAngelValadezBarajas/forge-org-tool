@@ -69,7 +69,11 @@
         ["87:3", "IMP-01 / 01 · Import / Select source"],
         ["87:84", "IMP-01 / 02 · Import / Review planning"],
         ["87:187", "IMP-01 / 03 · Import / Bridge error state"],
-        ["87:256", "IMP-01 / 04 · Export / Review & Download"]
+        ["87:256", "IMP-01 / 04 · Export / Review & Download"],
+        ["305:127", "IMP-01 / 05 · Import / Complete"],
+        ["305:230", "IMP-01 / 06 · Export / Ready for download"],
+        ["309:218", "IMP-01 / 07 · Return to Project Overview"],
+        ["314:199", "IMP-01 / 08 · Import / Validation rejected"]
       ]
     },
     {

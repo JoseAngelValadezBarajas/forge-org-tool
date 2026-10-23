@@ -26,10 +26,12 @@ export function useFeatureDetailController(
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
   const loadGeneration = useRef(0);
+  const taskGeneration = useRef(0);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
       const generation = ++loadGeneration.current;
+      const tasksAtStart = taskGeneration.current;
       try {
         const [nextTasks, nextCriteria, nextDependencies, nextReadiness, nextOverview] =
           await Promise.all([
@@ -42,7 +44,7 @@ export function useFeatureDetailController(
               .catch(() => ({ epics: [], unassigned_features: [] })),
           ]);
         if (!isCurrent() || generation !== loadGeneration.current) return;
-        setTasks(nextTasks);
+        if (tasksAtStart === taskGeneration.current) setTasks(nextTasks);
         setCriteria(nextCriteria);
         setDependencies(nextDependencies);
         const nextFeatures = (nextOverview.epics ?? [])
@@ -133,12 +135,13 @@ export function useFeatureDetailController(
     if (nextIndex < 0 || nextIndex >= tasks.length) return;
     const ids = tasks.map((task) => task.id);
     [ids[index], ids[nextIndex]] = [ids[nextIndex], ids[index]];
-    const generation = ++loadGeneration.current;
+    const generation = ++taskGeneration.current;
     try {
       const reordered = await organizationApi.reorderTasks(workspaceId, projectId, featureId, ids);
-      if (generation === loadGeneration.current) setTasks(reordered);
+      if (generation === taskGeneration.current) setTasks(reordered);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to reorder tasks.');
+      await load();
     }
   }
 

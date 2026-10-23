@@ -4,14 +4,14 @@
     "file_key": "r10szKLgiIPVi2NBmbjTpm",
     "description": "Live Figma get_metadata, active pages 04, 10, 12, 14, 16, 17 and 18"
   },
-  "frame_count": 115,
+  "frame_count": 119,
   "status_counts": {
-    "AUTOMATED_PASS": 79,
+    "AUTOMATED_PASS": 82,
     "AUTOMATED_FAIL": 0,
     "NOT_IMPLEMENTED_PRODUCT_GAP": 12,
-    "DESIGN_REFERENCE_ONLY": 10,
+    "DESIGN_REFERENCE_ONLY": 12,
     "MANUAL_REVIEW_REQUIRED": 12,
-    "BLOCKED_WITH_REASON": 2
+    "BLOCKED_WITH_REASON": 1
   },
   "frames": [
     {
@@ -24,9 +24,7 @@
       "user_action": "Create a workspace on first use; create, search, archive, and restore a project.",
       "expected_result": "Organization reflects the persisted workspace and project state.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile UI journey and API-backed persistence passed; this is behavioral automation, not human visual parity certification.",
       "domain": "organization-planning-readiness"
@@ -41,9 +39,7 @@
       "user_action": "Create Epics and Features, then inspect the project planning overview.",
       "expected_result": "The project overview displays persisted planning records and linked features.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile creation and persisted planning records passed; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -58,9 +54,7 @@
       "user_action": "Filter a Feature and change its manual planning status.",
       "expected_result": "The Feature moves between status columns and the selected status persists.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile filtering and status transition passed with persisted API assertions; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -75,9 +69,7 @@
       "user_action": "Add and update Tasks, reorder them, and add an acceptance criterion.",
       "expected_result": "Task status/order and acceptance criteria persist and remain visible after reload.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile task, criterion, ordering, and persistence journey passed; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -92,7 +84,7 @@
       "user_action": "Open Workbench and inspect context, run state, handoff, and delivery evidence.",
       "expected_result": "Workbench presents persisted state and preserves reported-versus-verified boundaries.",
       "test_ids": ["PA-RUN-01", "PA-HANDOFF-01"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-RUN-01 and PA-HANDOFF-01 passed on chromium-desktop and chromium-mobile with API-backed persistence assertions; behavior only, not human Figma parity certification.",
       "domain": "navigation-and-core-reference-frames"
@@ -106,10 +98,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Inspect release progress, gate evidence, and candidate state.",
       "expected_result": "Release view reports persisted delivery status without implying publication.",
-      "test_ids": ["PA-DELIVERY-01"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
-      "status": "BLOCKED_WITH_REASON",
-      "notes": "Delivery desktop behavior passes in a focused run, but the integrated run still fails in mobile: the Verification history card intercepts the Evaluate gates pointer action. Native visual parity is not certified.",
+      "test_ids": ["PA-DEL-001"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "The integrated 50/50 desktop and responsive-viewport Playwright run passed the Release Gate and Delivery journeys; the former mobile pointer interception is no longer reproduced. Automated behavior evidence does not certify native visual parity.",
       "domain": "navigation-and-core-reference-frames"
     },
     {
@@ -122,9 +114,7 @@
       "user_action": "Connect an authorized local Git root, observe metadata, and disconnect it.",
       "expected_result": "Repository metadata is persisted; source content is not read; disconnect changes its status.",
       "test_ids": ["PA-REPO-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -139,9 +129,7 @@
       "user_action": "Submit a local repository path in the Approved local Git root field.",
       "expected_result": "Only a Git root inside the configured authorized root is connected.",
       "test_ids": ["PA-REPO-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -156,9 +144,7 @@
       "user_action": "Open a connected repository detail.",
       "expected_result": "The page displays the stored Git metadata observation without source content.",
       "test_ids": ["PA-REPO-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -173,9 +159,7 @@
       "user_action": "Link an available repository to a feature and preview its context package.",
       "expected_result": "The feature context view shows its repository link and generated planning/metadata context.",
       "test_ids": ["PA-CONTEXT-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -190,9 +174,7 @@
       "user_action": "Preview and save the generated context package; download JSON and Markdown.",
       "expected_result": "The saved snapshot retains its fingerprint and both downloads contain the saved payload.",
       "test_ids": ["PA-CONTEXT-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -207,9 +189,7 @@
       "user_action": "Inspect saved context package history and open a snapshot.",
       "expected_result": "Earlier package records remain available and unchanged after newer context is saved.",
       "test_ids": ["PA-CONTEXT-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -284,9 +264,7 @@
       "user_action": "Open the Workbench and inspect recorded Runs and Handoffs.",
       "expected_result": "Human-reported work and its provenance are shown without claiming agent execution.",
       "test_ids": ["PA-RUN-01", "PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -301,9 +279,7 @@
       "user_action": "Review the Runs list.",
       "expected_result": "Recorded Runs appear with their reported execution mode and a detail link.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -318,9 +294,7 @@
       "user_action": "Submit a Run title using Record Run.",
       "expected_result": "A human-reported Run is stored and appears in the Runs list.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -335,9 +309,7 @@
       "user_action": "Open the Run detail and report activity with occurrence times.",
       "expected_result": "Events are shown chronologically and remain persisted after reload.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -352,9 +324,7 @@
       "user_action": "Submit a typed activity event in the Run detail form.",
       "expected_result": "The event is attributed as a human report and appended to the timeline.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -369,9 +339,7 @@
       "user_action": "Create a Handoff and save draft summary and next actions.",
       "expected_result": "The draft can be revised before it is made ready.",
       "test_ids": ["PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -386,9 +354,7 @@
       "user_action": "Review draft and ready Handoffs in the project queue.",
       "expected_result": "Current Handoff state and available next actions are visible.",
       "test_ids": ["PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -403,9 +369,7 @@
       "user_action": "Inspect the immutable revision and acknowledge it as a named reviewer.",
       "expected_result": "Acknowledgement is bound to the current immutable revision and does not certify technical work.",
       "test_ids": ["PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -420,9 +384,7 @@
       "user_action": null,
       "expected_result": "The acknowledged revision is visibly identified as acknowledged.",
       "test_ids": ["PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -437,7 +399,7 @@
       "user_action": "Review evidence provenance and release readiness.",
       "expected_result": "Delivery overview presents provenance, verification and non-publication boundaries.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied.",
       "domain": "delivery-transfer-desktop"
@@ -452,7 +414,7 @@
       "user_action": "Filter and inspect evidence by provenance and status.",
       "expected_result": "Active and invalidated evidence retain their explicit provenance.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run.",
       "domain": "delivery-transfer-desktop"
@@ -467,7 +429,7 @@
       "user_action": "Register a user-reported evidence reference.",
       "expected_result": "Evidence persists as REPORTED and is not represented as independently verified.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run.",
       "domain": "delivery-transfer-desktop"
@@ -482,7 +444,7 @@
       "user_action": "Inspect evidence provenance and invalidate the record.",
       "expected_result": "Detail preserves source/provenance and invalidation is persisted.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -497,7 +459,7 @@
       "user_action": "Preview and evaluate a named verification rule.",
       "expected_result": "Blocked outcome, blockers, fingerprint and saved evaluation are visible and persisted.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run.",
       "domain": "delivery-transfer-desktop"
@@ -527,7 +489,7 @@
       "user_action": "Open a saved verification result and inspect its trace.",
       "expected_result": "Saved evaluation, blockers and staleness are shown.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey.",
       "domain": "delivery-transfer-desktop"
@@ -542,7 +504,7 @@
       "user_action": "Create a release candidate draft.",
       "expected_result": "Candidate is stored at its initial revision and remains a draft until frozen.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys.",
       "domain": "delivery-transfer-desktop"
@@ -557,7 +519,7 @@
       "user_action": "Evaluate release gates for a frozen candidate.",
       "expected_result": "Gate result and candidate revision are recorded; blockers prevent manifest creation.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run.",
       "domain": "delivery-transfer-desktop"
@@ -572,7 +534,7 @@
       "user_action": "Freeze a candidate, save its manifest and download JSON/Markdown.",
       "expected_result": "Manifest bytes match saved state and explicitly remain NOT_PUBLISHED.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run.",
       "domain": "delivery-transfer-desktop"
@@ -587,7 +549,7 @@
       "user_action": "Choose a project JSON document for preview.",
       "expected_result": "Document is parsed without committing records.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile, including selecting a real downloaded project document for preview; behavior only, not native Desktop certification.",
       "domain": "delivery-transfer-desktop"
@@ -602,7 +564,7 @@
       "user_action": "Review schema, counts and fingerprint, then confirm import.",
       "expected_result": "Planning-only records are committed after explicit confirmation.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile; preview counts/fingerprint and explicit commit were verified against imported planning records.",
       "domain": "delivery-transfer-desktop"
@@ -619,7 +581,7 @@
       "test_ids": [],
       "evidence": [],
       "status": "BLOCKED_WITH_REASON",
-      "notes": "Native installed-app automation was not run; neither pywinauto nor uiautomation nor WinAppDriver is installed/available in this runner.",
+      "notes": "Current Windows UI Automation verifies installed startup, workspace/project CRUD, SQLite persistence, restart, single-instance activation and cleanup, but does not exercise the native transfer bridge failure or recovery flow.",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -632,9 +594,69 @@
       "user_action": "Download the selected project's planning JSON.",
       "expected_result": "Downloaded bytes contain the versioned planning snapshot and exclude operational evidence.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile and validated the actual downloaded JSON bytes and schema.",
+      "domain": "delivery-transfer-desktop"
+    },
+    {
+      "figma_node_id": "305:127",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 05 · Import / Complete",
+      "classification": "EXECUTABLE_PRODUCT_WORKFLOW",
+      "route": "/transfer/{workspaceId}/{projectId}",
+      "user_action": "Finish an import and open the imported Project or begin another import.",
+      "expected_result": "The completion state provides a usable next action for the newly created Project or another import.",
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The current UI confirms the imported project ID and planning data, but does not expose the Figma Open project or Import another actions.",
+      "domain": "delivery-transfer-desktop"
+    },
+    {
+      "figma_node_id": "305:230",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 06 · Export / Ready for download",
+      "classification": "EXECUTABLE_PRODUCT_WORKFLOW",
+      "route": "/transfer/{workspaceId}/{projectId}",
+      "user_action": "Download the prepared project planning snapshot.",
+      "expected_result": "A ready state is shown and the browser downloads a real planning-only JSON snapshot without changing the source Project.",
+      "test_ids": ["PA-TRN-001"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "PA-TRN-001 asserts the Export ready state and validates downloaded JSON bytes in both Chromium projects; local focused run passed 2/2.",
+      "domain": "delivery-transfer-desktop"
+    },
+    {
+      "figma_node_id": "309:218",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 07 · Return to Project Overview",
+      "classification": "VISUAL_LAYOUT_REFERENCE",
+      "route": "/projects/{workspaceId}/{projectId}",
+      "user_action": null,
+      "expected_result": null,
+      "test_ids": [],
+      "evidence": [],
+      "status": "DESIGN_REFERENCE_ONLY",
+      "notes": "The frame is labeled UX-00 prototype and explicitly says its interactions are simulated; Project Overview behavior is separately covered by PA-ORG-002 without claiming this static composition is implemented.",
+      "domain": "delivery-transfer-desktop"
+    },
+    {
+      "figma_node_id": "314:199",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 08 · Import / Validation rejected",
+      "classification": "ALTERNATE_PRODUCT_STATE",
+      "route": "/transfer/{workspaceId}/{projectId}",
+      "user_action": "Correct an incompatible document after validation fails and retry preview.",
+      "expected_result": "The error is visible, no project records are committed, and a corrected document can be previewed.",
+      "test_ids": ["PA-TRN-001"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "PA-TRN-001 verifies unsupported-schema feedback, no partial project writes, recovery to a valid preview and malformed-JSON feedback in desktop and mobile Chromium.",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -648,8 +670,8 @@
       "expected_result": "Organization shows matching projects and their actual active/archived state.",
       "test_ids": ["PA-ORG-001", "PA-A11Y-01"],
       "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json",
-        "test-results/product-acceptance/<run>/playwright-results.json"
+        "apps/web/e2e/organization/organization-workflows.spec.ts",
+        "apps/web/e2e/accessibility/accessibility-and-shell.spec.ts"
       ],
       "status": "AUTOMATED_PASS",
       "notes": "Workspace list and project search/archived visibility behavior passed on desktop and mobile. PA-A11Y-01 verifies theme persistence, keyboard command navigation, focus restoration, and WCAG 2.1 A/AA axe scans; not visual Figma certification.",
@@ -665,9 +687,7 @@
       "user_action": "Create a workspace in the empty state, then create a Project in a workspace.",
       "expected_result": "New workspace/project records are persisted and shown by Organization.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Fresh-database first-use workspace and project creation passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -697,7 +717,7 @@
       "user_action": "Create an Epic and inspect its linked Features in the planning view.",
       "expected_result": "The Epic and linked Feature appear in the planning overview.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "Epic creation and summary behavior passed, but this frame suggests an Epic explorer and the product has no separate Epic detail route; no visual parity is claimed.",
       "domain": "organization-planning-readiness"
@@ -712,9 +732,7 @@
       "user_action": "Search planning Features and filter by status.",
       "expected_result": "Only Features matching the search and status filters are displayed.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Search and status filtering passed in desktop/mobile acceptance journeys; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -729,9 +747,7 @@
       "user_action": "Create a Feature and associate it with an Epic.",
       "expected_result": "The Feature is shown under the selected Epic and persists in the planning API.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Feature creation and Epic assignment passed in desktop/mobile journeys; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -746,9 +762,7 @@
       "user_action": "Create Tasks, update Task status/order, and add acceptance criteria.",
       "expected_result": "Changes persist and remain visible after reloading Feature detail.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Feature detail task/criterion operations and persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -763,9 +777,7 @@
       "user_action": "Select a Feature status from the board card.",
       "expected_result": "The Feature appears in the selected column and API state matches the selection.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manual Feature status transition passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -780,9 +792,7 @@
       "user_action": "Archive or restore a Project.",
       "expected_result": "Project status is updated while history is retained; workspace editing is not exposed in this UI.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Project archive/restore passed automated checks; workspace administration shown by this frame is not implemented. No full-frame parity is claimed.",
       "domain": "organization-planning-readiness"
@@ -812,9 +822,7 @@
       "user_action": "Change a Feature status and inspect its new board column.",
       "expected_result": "The Feature is visible in the new status column and the API stores that status.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Board status movement passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -829,9 +837,7 @@
       "user_action": "Show archived Projects and restore one.",
       "expected_result": "The Project returns to active state and remains persisted.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Project archive/restore and API persistence passed on desktop and mobile; the frame's confirmation layout was not visual-certified.",
       "domain": "organization-planning-readiness"
@@ -846,9 +852,7 @@
       "user_action": "Create the first workspace from the empty state.",
       "expected_result": "The new workspace replaces the empty state and is persisted.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "First-use workspace creation passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -863,9 +867,7 @@
       "user_action": "Select a workspace from the Organization workspace selector.",
       "expected_result": "Organization loads projects for the selected workspace.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The journey selects its created workspace, but broader workspace management/editing shown in the frame is not exposed; no full-frame parity is claimed.",
       "domain": "organization-planning-readiness"
@@ -880,9 +882,7 @@
       "user_action": "Search Projects, include archived items, and restore a Project.",
       "expected_result": "The filtered list reflects persisted project status.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Project search, archived visibility, restore, and persistence passed on desktop and mobile; not visual Figma certification.",
       "domain": "organization-planning-readiness"
@@ -897,7 +897,7 @@
       "user_action": "Create a Project.",
       "expected_result": "A Project is created; source/origin selection is unavailable in the current UI.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Project creation is implemented and covered in the authored journey, but choosing an origin is not an available Organization control.",
       "domain": "organization-planning-readiness"
@@ -912,7 +912,7 @@
       "user_action": null,
       "expected_result": null,
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Current code renders Epic summaries and linked Features in the planning board; no separate Epic detail route exists.",
       "domain": "organization-planning-readiness"
@@ -942,9 +942,7 @@
       "user_action": "Create Tasks, change Task status, and reorder Tasks.",
       "expected_result": "Task status and order are retained in the API and after reload.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Task creation, status change, ordering, and SQLite-backed persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -959,9 +957,7 @@
       "user_action": "Add an acceptance criterion to a Feature.",
       "expected_result": "The criterion is visible and persists in the API and after reload.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Acceptance criterion creation and persisted API behavior passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -976,9 +972,7 @@
       "user_action": "Attempt a self-dependency, then create a valid Feature dependency.",
       "expected_result": "The invalid self-link is not persisted; the valid relationship is persisted and displayed.",
       "test_ids": ["PA-PLAN-002"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Self-dependency no-op and valid dependency persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -1008,9 +1002,7 @@
       "user_action": "Search for a Feature query that has no match, then clear the query.",
       "expected_result": "An empty result is shown and matching Features return when the query is cleared.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Empty search and restoration of search results passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -1025,7 +1017,7 @@
       "user_action": "Archive a Project using the current immediate Archive action.",
       "expected_result": "Project status changes to archived; no confirmation dialog is currently shown.",
       "test_ids": ["PA-ORG-001"],
-      "evidence": [],
+      "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Project archiving exists and is covered by the authored test; the Figma confirmation step is absent and is not fabricated.",
       "domain": "organization-planning-readiness"
@@ -1160,9 +1152,7 @@
       "user_action": "Move a Task up and inspect the updated Task order.",
       "expected_result": "The API returns the new order and the UI retains it after reload.",
       "test_ids": ["PA-PLAN-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Task reordering passed through UI and API on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -1177,9 +1167,7 @@
       "user_action": "Review and create a decision from feature-scoped Readiness.",
       "expected_result": "Decision records are listed with their current status; there is no separate project Decisions inventory page.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Decision creation, linking, accepted state, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -1194,9 +1182,7 @@
       "user_action": "Create a decision, accept it, and open its revision history.",
       "expected_result": "Accepted status and decision revision history are shown and persisted.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Decision acceptance and initial revision history passed on desktop/mobile. A reproduced case mismatch was fixed so Accept disappears for lowercase API status; not visual Figma certification.",
       "domain": "organization-planning-readiness"
@@ -1211,9 +1197,7 @@
       "user_action": "Review feature-scoped Invariants in Readiness.",
       "expected_result": "Invariant statement, revision, and acknowledgement state are displayed; there is no separate project Invariants inventory screen.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Invariant creation, acknowledgement, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
       "domain": "organization-planning-readiness"
@@ -1228,9 +1212,7 @@
       "user_action": "Open Readiness and inspect the current deterministic planning preview.",
       "expected_result": "The UI shows current readiness outcome and explicitly distinguishes planning from execution/delivery verification.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Readiness outcomes and the non-verification boundary passed on desktop and mobile; automated behavior only, not visual certification.",
       "domain": "organization-planning-readiness"
@@ -1290,9 +1272,7 @@
       "user_action": "Evaluate a Feature whose planning rules are satisfied.",
       "expected_result": "Readiness preview reports READY_TO_START only when its rules pass.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "READY_TO_START outcome was asserted after criterion, accepted decision, and invariant acknowledgement on desktop and mobile; no visual parity claim.",
       "domain": "organization-planning-readiness"
@@ -1307,7 +1287,7 @@
       "user_action": "Open the displayed Decision history.",
       "expected_result": "Stored revisions are displayed without changing the current decision.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The authored journey opens history but only verifies the initial revision; a superseded historical revision is not created or certified.",
       "domain": "organization-planning-readiness"
@@ -1322,9 +1302,7 @@
       "user_action": "Create an Invariant for the current Feature and acknowledge its current revision.",
       "expected_result": "Invariant and acknowledgement revision are persisted and visible after reload.",
       "test_ids": ["PA-READY-001"],
-      "evidence": [
-        "apps/web/test-results/product-acceptance/pa-org-plan-ready-final-20261022.json"
-      ],
+      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Invariant form, create/acknowledge actions, and SQLite-backed API persistence passed on desktop and mobile; not visual Figma certification.",
       "domain": "organization-planning-readiness"
@@ -1369,9 +1347,7 @@
       "user_action": "Connect an authorized synthetic local repository.",
       "expected_result": "The authorized repository appears in the project repository inventory.",
       "test_ids": ["PA-REPO-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1386,9 +1362,7 @@
       "user_action": "Submit a repository path outside the authorized local root.",
       "expected_result": "The path is rejected and no repository record is created.",
       "test_ids": ["PA-REPO-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1403,9 +1377,7 @@
       "user_action": "Preview a feature Context Package.",
       "expected_result": "A generated schema and fingerprint are displayed for review before save.",
       "test_ids": ["PA-CONTEXT-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1420,9 +1392,7 @@
       "user_action": "Open the Workbench Runs registry.",
       "expected_result": "Recorded human-reported Runs are listed with their provenance.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1437,9 +1407,7 @@
       "user_action": "Open a ready Handoff for human review.",
       "expected_result": "The immutable revision and its reported provenance are available for review.",
       "test_ids": ["PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1454,7 +1422,7 @@
       "user_action": "Review evidence records and provenance.",
       "expected_result": "Evidence inventory distinguishes provenance and invalidation state.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1469,7 +1437,7 @@
       "user_action": "Evaluate checks and inspect blocking conditions.",
       "expected_result": "Blocked outcomes and blockers are explicit and retained.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run.",
       "domain": "delivery-transfer-desktop"
@@ -1484,7 +1452,7 @@
       "user_action": "Review candidate gates and freeze state.",
       "expected_result": "Gate result is revision-aware and manifest creation requires a current PASS.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run.",
       "domain": "delivery-transfer-desktop"
@@ -1499,7 +1467,7 @@
       "user_action": "Export, review, import and confirm a project document.",
       "expected_result": "Only validated planning data is imported; rejected documents cause no writes.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/transfer-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Focused Playwright run passed on chromium-desktop and chromium-mobile, including export/import and invalid-document no-partial-write assertions. This is automated behavior evidence, not human Figma certification.",
       "domain": "delivery-transfer-desktop"
@@ -1514,9 +1482,7 @@
       "user_action": "Inspect connected repository metadata and authorization boundaries.",
       "expected_result": "Only the authorized synthetic root is connected and metadata is reported without reading source content.",
       "test_ids": ["PA-REPO-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/repositories/repositories.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1526,14 +1492,14 @@
       "page_id": "133:2",
       "page_name": "18 · JOURNEYS / Advanced UX-00",
       "screen_state": "UX-A / 12 · Desconectar repositorio · Confirmar",
-      "classification": "PROPOSED_UNIMPLEMENTED_BEHAVIOR",
+      "classification": "VISUAL_LAYOUT_REFERENCE",
       "route": "/repositories/:workspaceId/:projectId",
       "user_action": "Confirm a repository disconnection.",
       "expected_result": "The disconnected state is shown while prior observations remain stored.",
       "test_ids": [],
       "evidence": [],
-      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Figma text calls the post-action state simulated in the prototype; the current repository page disconnects directly and contains no confirmation dialog.",
+      "status": "DESIGN_REFERENCE_ONLY",
+      "notes": "Figma text identifies this confirmation/post-action composition as simulated; it is treated as a design reference rather than a committed product requirement. The current repository page disconnects directly.",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1546,9 +1512,7 @@
       "user_action": "Change feature context and request a fresh preview.",
       "expected_result": "The new preview fingerprint differs while the previously saved snapshot remains immutable.",
       "test_ids": ["PA-CONTEXT-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Fingerprint change and prior snapshot immutability passed in both Chromium projects; no dedicated stale badge is asserted.",
       "domain": "repositories-context-workbench"
@@ -1563,9 +1527,7 @@
       "user_action": "Preview and save a Context Package snapshot.",
       "expected_result": "Saved snapshot history preserves its payload and exposes JSON and Markdown downloads.",
       "test_ids": ["PA-CONTEXT-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/context/context-packages.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1580,9 +1542,7 @@
       "user_action": "Inspect a Run detail and its activity timeline.",
       "expected_result": "Events persist and render in chronological order as human-reported activity.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1597,9 +1557,7 @@
       "user_action": "Submit a valid activity event and attempt an invalid empty-title event.",
       "expected_result": "The valid event appears in order; invalid input returns validation failure without an extra event record.",
       "test_ids": ["PA-RUN-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1614,9 +1572,7 @@
       "user_action": "Revise a draft, mark it ready, inspect revision history, and acknowledge it.",
       "expected_result": "An immutable ready revision is reviewed and acknowledged by a named person.",
       "test_ids": ["PA-HANDOFF-01"],
-      "evidence": [
-        "test-results/product-acceptance/forge-product-acceptance-7a2f37f2-1f3a-4f50-b9a0-495051530533/playwright-results.json"
-      ],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification.",
       "domain": "repositories-context-workbench"
@@ -1646,7 +1602,7 @@
       "user_action": "Register reported evidence.",
       "expected_result": "The stored record remains REPORTED and is not asserted verified.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1661,7 +1617,7 @@
       "user_action": "Inspect and invalidate evidence.",
       "expected_result": "Invalidation is retained in backend state.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1676,7 +1632,7 @@
       "user_action": "Preview, evaluate and inspect verification history.",
       "expected_result": "Outcome, blockers and stale status derive from recorded inputs.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1691,7 +1647,7 @@
       "user_action": "Inspect blockers for a failed verification.",
       "expected_result": "Missing active VERIFIED evidence is shown as a blocker.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1706,7 +1662,7 @@
       "user_action": "Create a release candidate draft.",
       "expected_result": "Candidate persists with draft status and revision.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1721,7 +1677,7 @@
       "user_action": "Freeze a candidate at its expected revision.",
       "expected_result": "Frozen snapshot and fingerprint are retained.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1736,7 +1692,7 @@
       "user_action": "Evaluate and diagnose release gates.",
       "expected_result": "Gate outcome and blockers are retained for the current revision.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1751,7 +1707,7 @@
       "user_action": "Save and download the release manifest.",
       "expected_result": "Actual JSON and Markdown downloads identify the artifact as NOT_PUBLISHED.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1766,7 +1722,7 @@
       "user_action": "Recover from invalid transfer input without partial writes.",
       "expected_result": "Error is visible and persisted project list remains unchanged.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/transfer-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Malformed JSON and invalid schema, fingerprint, reference and cycle inputs passed without partial writes on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1796,7 +1752,7 @@
       "user_action": "Confirm evidence invalidation.",
       "expected_result": "Record status changes to INVALIDATED and remains persisted.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport.",
       "domain": "delivery-transfer-desktop"
@@ -1811,7 +1767,7 @@
       "user_action": "Download a release manifest for review.",
       "expected_result": "Download is a local planning artifact and does not publish or deploy.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport.",
       "domain": "delivery-transfer-desktop"

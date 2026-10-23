@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { organizationApi } from '@forge-org/api-client';
 import { EpicDetailPage } from './EpicDetailPage';
@@ -47,6 +47,7 @@ const feature = {
 function renderPage() {
   return render(
     <MemoryRouter initialEntries={['/planning/w1/p1/epics/e1']}>
+      <NavigateToMissingEpic />
       <Routes>
         <Route
           path="/planning/:workspaceId/:projectId/epics/:epicId"
@@ -54,6 +55,13 @@ function renderPage() {
         />
       </Routes>
     </MemoryRouter>,
+  );
+}
+
+function NavigateToMissingEpic() {
+  const navigate = useNavigate();
+  return (
+    <button onClick={() => navigate('/planning/w1/p1/epics/missing')}>Open missing Epic</button>
   );
 }
 
@@ -119,6 +127,15 @@ describe('EpicDetailPage', () => {
     renderPage();
     expect(await screen.findByRole('alert')).toHaveTextContent(/epic.*not found/i);
     expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+  });
+
+  it('does not keep the previous Epic editable after navigating to a missing Epic', async () => {
+    renderPage();
+    expect(await screen.findByLabelText('Epic title')).toHaveValue('Release');
+    fireEvent.click(screen.getByRole('button', { name: 'Open missing Epic' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/epic.*not found/i);
+    expect(screen.queryByLabelText('Epic title')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save Epic' })).not.toBeInTheDocument();
   });
 
   it('shows an empty Features state', async () => {

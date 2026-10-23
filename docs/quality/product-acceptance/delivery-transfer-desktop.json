@@ -12,7 +12,7 @@
       "user_action": "Review evidence provenance and release readiness.",
       "expected_result": "Delivery overview presents provenance, verification and non-publication boundaries.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied."
     },
@@ -26,7 +26,7 @@
       "user_action": "Filter and inspect evidence by provenance and status.",
       "expected_result": "Active and invalidated evidence retain their explicit provenance.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run."
     },
@@ -40,7 +40,7 @@
       "user_action": "Register a user-reported evidence reference.",
       "expected_result": "Evidence persists as REPORTED and is not represented as independently verified.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run."
     },
@@ -54,7 +54,7 @@
       "user_action": "Inspect evidence provenance and invalidate the record.",
       "expected_result": "Detail preserves source/provenance and invalidation is persisted.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport."
     },
@@ -68,7 +68,7 @@
       "user_action": "Preview and evaluate a named verification rule.",
       "expected_result": "Blocked outcome, blockers, fingerprint and saved evaluation are visible and persisted.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run."
     },
@@ -96,7 +96,7 @@
       "user_action": "Open a saved verification result and inspect its trace.",
       "expected_result": "Saved evaluation, blockers and staleness are shown.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey."
     },
@@ -110,7 +110,7 @@
       "user_action": "Create a release candidate draft.",
       "expected_result": "Candidate is stored at its initial revision and remains a draft until frozen.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys."
     },
@@ -124,7 +124,7 @@
       "user_action": "Evaluate release gates for a frozen candidate.",
       "expected_result": "Gate result and candidate revision are recorded; blockers prevent manifest creation.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run."
     },
@@ -138,7 +138,7 @@
       "user_action": "Freeze a candidate, save its manifest and download JSON/Markdown.",
       "expected_result": "Manifest bytes match saved state and explicitly remain NOT_PUBLISHED.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run."
     },
@@ -152,7 +152,7 @@
       "user_action": "Choose a project JSON document for preview.",
       "expected_result": "Document is parsed without committing records.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile, including selecting a real downloaded project document for preview; behavior only, not native Desktop certification."
     },
@@ -166,7 +166,7 @@
       "user_action": "Review schema, counts and fingerprint, then confirm import.",
       "expected_result": "Planning-only records are committed after explicit confirmation.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile; preview counts/fingerprint and explicit commit were verified against imported planning records."
     },
@@ -182,7 +182,7 @@
       "test_ids": [],
       "evidence": [],
       "status": "BLOCKED_WITH_REASON",
-      "notes": "Native installed-app automation was not run; neither pywinauto nor uiautomation nor WinAppDriver is installed/available in this runner."
+      "notes": "Current Windows UI Automation verifies installed startup, workspace/project CRUD, SQLite persistence, restart, single-instance activation and cleanup, but does not exercise the native transfer bridge failure or recovery flow."
     },
     {
       "figma_node_id": "87:256",
@@ -194,9 +194,65 @@
       "user_action": "Download the selected project's planning JSON.",
       "expected_result": "Downloaded bytes contain the versioned planning snapshot and exclude operational evidence.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/<run>/playwright-results.json"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile and validated the actual downloaded JSON bytes and schema."
+    },
+    {
+      "figma_node_id": "305:127",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 05 · Import / Complete",
+      "classification": "EXECUTABLE_PRODUCT_WORKFLOW",
+      "route": "/transfer/{workspaceId}/{projectId}",
+      "user_action": "Finish an import and open the imported Project or begin another import.",
+      "expected_result": "The completion state provides a usable next action for the newly created Project or another import.",
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The current UI confirms the imported project ID and planning data, but does not expose the Figma Open project or Import another actions."
+    },
+    {
+      "figma_node_id": "305:230",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 06 · Export / Ready for download",
+      "classification": "EXECUTABLE_PRODUCT_WORKFLOW",
+      "route": "/transfer/{workspaceId}/{projectId}",
+      "user_action": "Download the prepared project planning snapshot.",
+      "expected_result": "A ready state is shown and the browser downloads a real planning-only JSON snapshot without changing the source Project.",
+      "test_ids": ["PA-TRN-001"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "PA-TRN-001 asserts the Export ready state and validates downloaded JSON bytes in both Chromium projects; local focused run passed 2/2."
+    },
+    {
+      "figma_node_id": "309:218",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 07 · Return to Project Overview",
+      "classification": "VISUAL_LAYOUT_REFERENCE",
+      "route": "/projects/{workspaceId}/{projectId}",
+      "user_action": null,
+      "expected_result": null,
+      "test_ids": [],
+      "evidence": [],
+      "status": "DESIGN_REFERENCE_ONLY",
+      "notes": "The frame is labeled UX-00 prototype and explicitly says its interactions are simulated; Project Overview behavior is separately covered by PA-ORG-002 without claiming this static composition is implemented."
+    },
+    {
+      "figma_node_id": "314:199",
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "screen_state": "IMP-01 / 08 · Import / Validation rejected",
+      "classification": "ALTERNATE_PRODUCT_STATE",
+      "route": "/transfer/{workspaceId}/{projectId}",
+      "user_action": "Correct an incompatible document after validation fails and retry preview.",
+      "expected_result": "The error is visible, no project records are committed, and a corrected document can be previewed.",
+      "test_ids": ["PA-TRN-001"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "PA-TRN-001 verifies unsupported-schema feedback, no partial project writes, recovery to a valid preview and malformed-JSON feedback in desktop and mobile Chromium."
     },
     {
       "figma_node_id": "133:335",
@@ -208,7 +264,7 @@
       "user_action": "Review evidence records and provenance.",
       "expected_result": "Evidence inventory distinguishes provenance and invalidation state.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport."
     },
@@ -222,7 +278,7 @@
       "user_action": "Evaluate checks and inspect blocking conditions.",
       "expected_result": "Blocked outcomes and blockers are explicit and retained.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run."
     },
@@ -236,7 +292,7 @@
       "user_action": "Review candidate gates and freeze state.",
       "expected_result": "Gate result is revision-aware and manifest creation requires a current PASS.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run."
     },
@@ -250,7 +306,7 @@
       "user_action": "Export, review, import and confirm a project document.",
       "expected_result": "Only validated planning data is imported; rejected documents cause no writes.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/transfer-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Focused Playwright run passed on chromium-desktop and chromium-mobile, including export/import and invalid-document no-partial-write assertions. This is automated behavior evidence, not human Figma certification."
     },
@@ -264,7 +320,7 @@
       "user_action": "Register reported evidence.",
       "expected_result": "The stored record remains REPORTED and is not asserted verified.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport."
     },
@@ -278,7 +334,7 @@
       "user_action": "Inspect and invalidate evidence.",
       "expected_result": "Invalidation is retained in backend state.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport."
     },
@@ -292,7 +348,7 @@
       "user_action": "Preview, evaluate and inspect verification history.",
       "expected_result": "Outcome, blockers and stale status derive from recorded inputs.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport."
     },
@@ -306,7 +362,7 @@
       "user_action": "Inspect blockers for a failed verification.",
       "expected_result": "Missing active VERIFIED evidence is shown as a blocker.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport."
     },
@@ -320,7 +376,7 @@
       "user_action": "Create a release candidate draft.",
       "expected_result": "Candidate persists with draft status and revision.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport."
     },
@@ -334,7 +390,7 @@
       "user_action": "Freeze a candidate at its expected revision.",
       "expected_result": "Frozen snapshot and fingerprint are retained.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport."
     },
@@ -348,7 +404,7 @@
       "user_action": "Evaluate and diagnose release gates.",
       "expected_result": "Gate outcome and blockers are retained for the current revision.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport."
     },
@@ -362,7 +418,7 @@
       "user_action": "Save and download the release manifest.",
       "expected_result": "Actual JSON and Markdown downloads identify the artifact as NOT_PUBLISHED.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport."
     },
@@ -376,7 +432,7 @@
       "user_action": "Recover from invalid transfer input without partial writes.",
       "expected_result": "Error is visible and persisted project list remains unchanged.",
       "test_ids": ["PA-TRN-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/transfer-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Malformed JSON and invalid schema, fingerprint, reference and cycle inputs passed without partial writes on desktop and the responsive viewport."
     },
@@ -390,7 +446,7 @@
       "user_action": "Confirm evidence invalidation.",
       "expected_result": "Record status changes to INVALIDATED and remains persisted.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport."
     },
@@ -404,7 +460,7 @@
       "user_action": "Download a release manifest for review.",
       "expected_result": "Download is a local planning artifact and does not publish or deploy.",
       "test_ids": ["PA-DEL-001"],
-      "evidence": ["test-results/product-acceptance/*/playwright/delivery-acceptance.spec.ts"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport."
     }

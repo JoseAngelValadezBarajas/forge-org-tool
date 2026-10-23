@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('exports real planning data, downloads bytes, imports through UI, and rejects invalid documents without writes', async ({
+test('PA-TRN-001 exports real planning data, downloads bytes, imports through UI, and rejects invalid documents without writes', async ({
   page,
 }) => {
   test.setTimeout(60_000);
@@ -28,6 +28,7 @@ test('exports real planning data, downloads bytes, imports through UI, and rejec
   const downloadWait = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download project export' }).click();
   const download = await downloadWait;
+  await expect(page.getByRole('heading', { name: 'Export ready' })).toBeVisible();
   expect(download.suggestedFilename()).toBe('project-export.json');
   const path = await download.path();
   expect(path).toBeTruthy();
@@ -134,6 +135,20 @@ test('exports real planning data, downloads bytes, imports through UI, and rejec
   }
 
   await page.getByText('Advanced JSON paste').click();
+  await page
+    .getByLabel('Advanced JSON document')
+    .fill(JSON.stringify({ ...valid, schema_version: 'forge-project-import-v999' }));
+  await page.getByRole('button', { name: 'Review import' }).click();
+  await expect(page.getByRole('alert')).toContainText('Unsupported project import schema');
+  await expect(page.getByRole('heading', { name: 'Review planning changes' })).toHaveCount(0);
+  expect(
+    await (await page.request.get(`/api/v1/workspaces/${targetWorkspace.id}/projects`)).json(),
+  ).toHaveLength(before);
+
+  await page.getByLabel('Advanced JSON document').fill(JSON.stringify(valid));
+  await page.getByRole('button', { name: 'Review import' }).click();
+  await expect(page.getByRole('heading', { name: 'Review planning changes' })).toBeVisible();
+
   await page.getByLabel('Advanced JSON document').fill('{ invalid json');
   await page.getByRole('button', { name: 'Review import' }).click();
   await expect(page.getByRole('alert')).toBeVisible();
