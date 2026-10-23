@@ -20,3 +20,20 @@ states.
 
 No project records are fabricated in the UI. Empty, archived, and error states
 are represented explicitly. This slice does not import legacy code or assets.
+
+## Project overview parity requirement
+
+`REQ-ORG-001-PROJECT-OVERVIEW` — A user who selects a Project from Organization
+can open a project overview before entering the planning board. The overview
+loads the Project through the public API client, presents its persisted name,
+description, and status, and provides navigation to planning and the existing
+Project transfer/export workflow. A user can update the Project name and
+description, archive an active Project, and restore an archived Project. These
+operations remain workspace-scoped and persisted by the API. Loading and API
+failure states are visible and retryable; an unavailable Project is not
+presented as a successful empty Project. The planning board remains directly
+reachable and retains its existing URL and behavior.
+
+Acceptance: `docs/specs/ORG-001-organization/acceptance.md` and the
+`PA-ORG-002` browser journey. API response/request types must be sourced from
+the generated OpenAPI declarations.

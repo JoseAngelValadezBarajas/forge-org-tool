@@ -8,4 +8,7 @@
 - [x] Keep manual planning state distinct from delivery evidence.
 - [x] Tasks, acceptance criteria, and project-scoped dependencies.
 - [x] Filtering, epic/feature/task edits, task reorder, and dependency removal API contracts.
+- [ ] `REQ-ORG-002-EPIC-DETAIL`: open, inspect, edit and navigate a specific
+      Epic through its workspace-scoped detail route; an archived Project is
+      read-only and a missing/cross-Project Epic is rejected visibly.
 - [x] Chromium review of the planning route and responsive evidence.

@@ -6,6 +6,10 @@
 - [x] Prevent cross-workspace project access.
 - [x] Persist records across API client sessions.
 - [x] Render actionable empty, loading, error, active, and archived states.
+- [ ] `REQ-ORG-001-PROJECT-OVERVIEW`: open a persisted Project overview from
+      Organization; edit name/description; archive and restore; navigate to the
+      existing Planning board and Transfer export workflow; verify persistence
+      and visible recovery for an unavailable Project (`PA-ORG-002`).
 - [x] Keep `/__components` deterministic and backend-free.
 - [ ] Human Figma review of the organization screen; automated tests are not
       visual certification.
