@@ -4,7 +4,6 @@ import styles from './KanbanColumn.module.css';
 
 export const PLANNING_COLUMN_STATUSES = [
   { value: 'backlog', label: 'Backlog' },
-  { value: 'refining', label: 'Refining' },
   { value: 'ready', label: 'Ready' },
   { value: 'in_progress', label: 'In progress' },
   { value: 'verify', label: 'Verify' },

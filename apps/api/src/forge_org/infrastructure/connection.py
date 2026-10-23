@@ -22,6 +22,11 @@ def database_path() -> Path:
 def connect() -> sqlite3.Connection:
     path = database_path()
     path.parent.mkdir(parents=True, exist_ok=True)
+    # Import lazily so migration tooling and backup verification stay acyclic.
+    from .migrations.backup import backup_before_migration
+    from .migrations.runner import CURRENT_SCHEMA_VERSION
+
+    backup_before_migration(path, current_version=CURRENT_SCHEMA_VERSION)
     engine = create_engine(
         f'sqlite:///{path.as_posix()}',
         connect_args={'check_same_thread': False},
@@ -31,7 +36,6 @@ def connect() -> sqlite3.Connection:
     cast(sqlite3.Connection, raw_connection.driver_connection).row_factory = sqlite3.Row
     connection = cast(sqlite3.Connection, raw_connection)
     connection.execute('PRAGMA foreign_keys = ON')
-    # Import lazily to avoid a cycle with the legacy schema compatibility store.
     from .migrations.runner import migrate
 
     migrate(connection)

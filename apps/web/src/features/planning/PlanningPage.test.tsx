@@ -11,7 +11,8 @@ const overview = {
       project_id: 'p1',
       title: 'Launch',
       description: null,
-      status: 'planning',
+      status: 'backlog',
+      archived_at: null,
       created_at: '',
       updated_at: '',
       features: [
@@ -124,14 +125,14 @@ describe('PlanningPage', () => {
         '/api/v1/workspaces/w1/projects/p1/features',
         expect.objectContaining({
           method: 'POST',
-          body: JSON.stringify({ title: 'Gamma', epic_id: 'e1' }),
+          body: JSON.stringify({ title: 'Gamma', epic_id: 'e1', kind: 'story', tags: [] }),
         }),
       ),
     );
     expect(screen.getByText(/manual product records only/i)).toBeInTheDocument();
   });
 
-  it('renders all six API-supported planning workflow columns', async () => {
+  it('renders both five-column Boards and preserves legacy refining items separately', async () => {
     const sixColumnOverview = {
       ...overview,
       unassigned_features: [
@@ -177,9 +178,10 @@ describe('PlanningPage', () => {
       </MemoryRouter>,
     );
 
-    for (const column of ['Backlog', 'Refining', 'Ready', 'In progress', 'Verify', 'Done']) {
-      expect(await screen.findByRole('heading', { name: column })).toBeInTheDocument();
+    for (const column of ['Backlog', 'Ready', 'In progress', 'Verify', 'Done']) {
+      expect(await screen.findAllByRole('heading', { name: column })).toHaveLength(2);
     }
+    expect(screen.getByRole('region', { name: 'Legacy refining work items' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Gamma' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Delta' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Filter planning by status' })).toHaveDisplayValue(

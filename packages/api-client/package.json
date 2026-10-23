@@ -21,26 +21,6 @@
       "types": "./dist/planning.d.ts",
       "import": "./dist/planning.js"
     },
-    "./readiness": {
-      "types": "./dist/readiness.d.ts",
-      "import": "./dist/readiness.js"
-    },
-    "./repositories": {
-      "types": "./dist/repositories.d.ts",
-      "import": "./dist/repositories.js"
-    },
-    "./context": {
-      "types": "./dist/context.d.ts",
-      "import": "./dist/context.js"
-    },
-    "./workbench": {
-      "types": "./dist/workbench.d.ts",
-      "import": "./dist/workbench.js"
-    },
-    "./delivery": {
-      "types": "./dist/delivery.d.ts",
-      "import": "./dist/delivery.js"
-    },
     "./transfer": {
       "types": "./dist/transfer.d.ts",
       "import": "./dist/transfer.js"

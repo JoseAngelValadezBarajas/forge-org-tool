@@ -4,18 +4,18 @@ SQLite is the system of record. All domain records are workspace/project scoped 
 
 ## Active aggregates
 
-| Aggregate | Ownership and relationships | Durable behavior |
-|---|---|---|
-| Workspace | Root local scope; unique normalized name | Create, edit, list, select active workspace, archive/restore if supported by the product API |
-| Project | Belongs to one workspace; has active/archived lifecycle | CRUD and archive/restore; archived projects reject ordinary mutation |
-| Epic | Belongs to a project | First-class project-board item with priority, tags and derived progress |
-| Story / legacy Feature | Belongs to a project and optionally an Epic | Stories and Bugs are first-class persisted work items; legacy Features remain readable/migratable |
-| Bug | Planning work item with structured report fields | Optional local image attachments use bounded, validated, staged storage |
-| Acceptance Criterion | Belongs to a Story/Feature | CRUD, ordered position, safe plain-text notes and persisted satisfaction state |
-| Task | Belongs to a Story/Feature | Persisted planning task, status and order |
-| Dependency | Links blocking and blocked planning items within the same project | Unique directed edge; cycle/reference checks enforced by application validation |
-| Workspace tag | Stable normalized key in a workspace scope | Reuse within that workspace; identical labels in other workspaces are independent |
-| Transfer preview | Scoped to a target workspace/project and payload fingerprint | Preview and confirm share validation; stale fingerprints fail without partial writes |
+| Aggregate              | Ownership and relationships                                       | Durable behavior                                                                                  |
+| ---------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Workspace              | Root local scope; unique normalized name                          | Create, edit, list, select active workspace, archive/restore if supported by the product API      |
+| Project                | Belongs to one workspace; has active/archived lifecycle           | CRUD and archive/restore; archived projects reject ordinary mutation                              |
+| Epic                   | Belongs to a project                                              | First-class project-board item with priority, tags and derived progress                           |
+| Story / legacy Feature | Belongs to a project and optionally an Epic                       | Stories and Bugs are first-class persisted work items; legacy Features remain readable/migratable |
+| Bug                    | Planning work item with structured report fields                  | Optional local image attachments use bounded, validated, staged storage                           |
+| Acceptance Criterion   | Belongs to a Story/Feature                                        | CRUD, ordered position, safe plain-text notes and persisted satisfaction state                    |
+| Task                   | Belongs to a Story/Feature                                        | Persisted planning task, status and order                                                         |
+| Dependency             | Links blocking and blocked planning items within the same project | Unique directed edge; cycle/reference checks enforced by application validation                   |
+| Workspace tag          | Stable normalized key in a workspace scope                        | Reuse within that workspace; identical labels in other workspaces are independent                 |
+| Transfer preview       | Scoped to a target workspace/project and payload fingerprint      | Preview and confirm share validation; stale fingerprints fail without partial writes              |
 
 ## Work status
 

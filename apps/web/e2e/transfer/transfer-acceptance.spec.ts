@@ -35,7 +35,7 @@ test('PA-TRN-001 exports real planning data, downloads bytes, imports through UI
   const rawBytes = await (await import('node:fs/promises')).readFile(path!);
   const document = JSON.parse(rawBytes.toString('utf8'));
   expect(document).toMatchObject({
-    schema_version: 'forge-project-import-v1',
+    schema_version: 'forge-project-transfer-v2',
     project: { name: `Export ${suffix}` },
   });
   expect(document.features[0].title).toBe(`Feature ${suffix}`);

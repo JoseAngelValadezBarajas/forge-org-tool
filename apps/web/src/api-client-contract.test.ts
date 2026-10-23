@@ -6,19 +6,17 @@ describe('organizationApi compatibility facade', () => {
     vi.unstubAllGlobals();
   });
 
-  it('preserves representative planning and delivery HTTP contracts', async () => {
+  it('preserves representative planning and transfer HTTP contracts', async () => {
     const fetchMock = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
         new Response(JSON.stringify({ id: 'p1', name: 'Planning' }), { status: 200 }),
       )
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify({ id: 'rc1', status: 'draft' }), { status: 200 }),
-      );
+      .mockResolvedValueOnce(new Response(JSON.stringify({ project_id: 'p1' }), { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
     await organizationApi.planningOverview('w1', 'p1');
-    await organizationApi.createCandidate('w1', 'p1', 'rc1', 'Release candidate');
+    await organizationApi.exportProject('w1', 'p1');
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
@@ -27,10 +25,9 @@ describe('organizationApi compatibility facade', () => {
     );
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      '/api/v1/workspaces/w1/projects/p1/release-candidates',
+      '/api/v1/workspaces/w1/projects/p1/export?schema_version=forge-project-import-v1',
       expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ title: 'rc1', summary: 'Release candidate' }),
+        credentials: 'same-origin',
       }),
     );
   });

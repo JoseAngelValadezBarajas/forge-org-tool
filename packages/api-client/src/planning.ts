@@ -1,15 +1,13 @@
 import { getApiJson, sendJson } from './transport.js';
 import type {
   Criterion,
-  Decision,
-  DecisionRevision,
+  BugAttachment,
   Dependency,
   Epic,
   Feature,
-  Invariant,
-  InvariantRevision,
   PlanningOverview,
   Task,
+  WorkspaceTag,
 } from './types.js';
 
 export const planningCapability = {
@@ -17,32 +15,124 @@ export const planningCapability = {
     getApiJson<PlanningOverview>({
       path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/planning/overview`,
     }),
-  createEpic: (workspaceId: string, projectId: string, title: string, description?: string) =>
+  listWorkspaceTags: (workspaceId: string) =>
+    getApiJson<WorkspaceTag[]>({ path: `/api/v1/workspaces/${workspaceId}/tags` }),
+  createWorkspaceTag: (workspaceId: string, name: string, color = '#6b7280') =>
+    sendJson<WorkspaceTag>(`/api/v1/workspaces/${workspaceId}/tags`, {
+      method: 'POST',
+      body: JSON.stringify({ name, color }),
+    }),
+  updateWorkspaceTag: (
+    workspaceId: string,
+    tagId: string,
+    values: Partial<Pick<WorkspaceTag, 'name' | 'color'>>,
+  ) =>
+    sendJson<WorkspaceTag>(`/api/v1/workspaces/${workspaceId}/tags/${tagId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(values),
+    }),
+  deleteWorkspaceTag: (workspaceId: string, tagId: string) =>
+    sendJson<void>(`/api/v1/workspaces/${workspaceId}/tags/${tagId}`, {
+      method: 'DELETE',
+      body: '{}',
+    }),
+  listBugAttachments: (workspaceId: string, projectId: string, featureId: string) =>
+    getApiJson<BugAttachment[]>({
+      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments`,
+    }),
+  uploadBugAttachment: (
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    payload: {
+      file_name: string;
+      content_type: 'image/png' | 'image/jpeg' | 'image/webp';
+      data_base64: string;
+    },
+  ) =>
+    sendJson<BugAttachment>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments`,
+      { method: 'POST', body: JSON.stringify(payload) },
+    ),
+  deleteBugAttachment: (
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    attachmentId: string,
+  ) =>
+    sendJson<void>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachmentId}`,
+      { method: 'DELETE', body: '{}' },
+    ),
+  createEpic: (
+    workspaceId: string,
+    projectId: string,
+    title: string,
+    description?: string,
+    options?: Pick<Epic, 'priority' | 'tags'>,
+  ) =>
     sendJson<Epic>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/epics`, {
       method: 'POST',
-      body: JSON.stringify({ title, description: description || null }),
+      body: JSON.stringify({
+        title,
+        description: description || null,
+        priority: options?.priority ?? 'medium',
+        tags: options?.tags ?? [],
+      }),
     }),
   updateEpic: (
     workspaceId: string,
     projectId: string,
     epicId: string,
-    values: Partial<Pick<Epic, 'title' | 'description' | 'status'>>,
+    values: Partial<Pick<Epic, 'title' | 'description' | 'status' | 'priority' | 'tags'>>,
   ) =>
     sendJson<Epic>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/epics/${epicId}`, {
       method: 'PATCH',
       body: JSON.stringify(values),
     }),
-  createFeature: (workspaceId: string, projectId: string, title: string, epic_id?: string) =>
+  createFeature: (
+    workspaceId: string,
+    projectId: string,
+    title: string,
+    epic_id?: string,
+    values?: Partial<
+      Pick<
+        Feature,
+        | 'kind'
+        | 'bug_severity'
+        | 'steps_to_reproduce'
+        | 'expected_result'
+        | 'actual_result'
+        | 'tags'
+        | 'notes'
+      >
+    >,
+  ) =>
     sendJson<Feature>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/features`, {
       method: 'POST',
-      body: JSON.stringify({ title, epic_id: epic_id || null }),
+      body: JSON.stringify({ title, epic_id: epic_id || null, ...values }),
     }),
   updateFeature: (
     workspaceId: string,
     projectId: string,
     featureId: string,
     values: Partial<
-      Pick<Feature, 'title' | 'description' | 'goal' | 'epic_id' | 'priority' | 'status'>
+      Pick<
+        Feature,
+        | 'title'
+        | 'description'
+        | 'goal'
+        | 'epic_id'
+        | 'priority'
+        | 'status'
+        | 'kind'
+        | 'bug_severity'
+        | 'steps_to_reproduce'
+        | 'expected_result'
+        | 'actual_result'
+        | 'tags'
+        | 'notes'
+      >
     > & { clear_epic?: boolean },
   ) =>
     sendJson<Feature>(
@@ -63,80 +153,31 @@ export const planningCapability = {
     getApiJson<Criterion[]>({
       path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/acceptance-criteria`,
     }),
-  createDecision: (
-    workspaceId: string,
-    projectId: string,
-    values: { title: string; context: string; decision: string; rationale: string },
-  ) =>
-    sendJson<Decision>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/decisions`, {
-      method: 'POST',
-      body: JSON.stringify(values),
-    }),
-  listDecisions: (workspaceId: string, projectId: string) =>
-    getApiJson<Decision[]>({
-      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/decisions`,
-    }),
-  updateDecision: (
-    workspaceId: string,
-    projectId: string,
-    decisionId: string,
-    values: Partial<Pick<Decision, 'title' | 'context' | 'decision' | 'rationale'>>,
-  ) =>
-    sendJson<Decision>(
-      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/decisions/${decisionId}`,
-      { method: 'PATCH', body: JSON.stringify(values) },
-    ),
-  listDecisionRevisions: (workspaceId: string, projectId: string, decisionId: string) =>
-    getApiJson<DecisionRevision[]>({
-      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/decisions/${decisionId}/revisions`,
-    }),
-  acceptDecision: (workspaceId: string, projectId: string, decisionId: string) =>
-    sendJson<Decision>(
-      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/decisions/${decisionId}/accept`,
-      { method: 'POST', body: '{}' },
-    ),
-  linkDecision: (workspaceId: string, projectId: string, decisionId: string, featureId: string) =>
-    sendJson<void>(
-      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/decisions/${decisionId}/features/${featureId}`,
-      { method: 'POST', body: '{}' },
-    ),
-  listInvariants: (workspaceId: string, projectId: string, featureId?: string) =>
-    getApiJson<Invariant[]>({
-      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/invariants${featureId ? `?feature_id=${encodeURIComponent(featureId)}` : ''}`,
-    }),
-  createInvariant: (
-    workspaceId: string,
-    projectId: string,
-    values: { title: string; statement: string; rationale: string; feature_id?: string },
-  ) =>
-    sendJson<Invariant>(`/api/v1/workspaces/${workspaceId}/projects/${projectId}/invariants`, {
-      method: 'POST',
-      body: JSON.stringify(values),
-    }),
-  updateInvariant: (
-    workspaceId: string,
-    projectId: string,
-    invariantId: string,
-    values: Partial<Pick<Invariant, 'title' | 'statement' | 'rationale'>>,
-  ) =>
-    sendJson<Invariant>(
-      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/invariants/${invariantId}`,
-      { method: 'PATCH', body: JSON.stringify(values) },
-    ),
-  listInvariantRevisions: (workspaceId: string, projectId: string, invariantId: string) =>
-    getApiJson<InvariantRevision[]>({
-      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/invariants/${invariantId}/revisions`,
-    }),
-  acknowledgeInvariant: (
+  updateCriterion: (
     workspaceId: string,
     projectId: string,
     featureId: string,
-    invariantId: string,
-    expected_revision: number,
+    criterionId: string,
+    values: Partial<Pick<Criterion, 'description' | 'satisfied' | 'position'>>,
+  ) =>
+    sendJson<Criterion>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/acceptance-criteria/${criterionId}`,
+      { method: 'PATCH', body: JSON.stringify(values) },
+    ),
+  deleteCriterion: (
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    criterionId: string,
   ) =>
     sendJson<void>(
-      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/invariants/${invariantId}/acknowledge`,
-      { method: 'POST', body: JSON.stringify({ expected_revision }) },
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/acceptance-criteria/${criterionId}`,
+      { method: 'DELETE', body: '{}' },
+    ),
+  reorderCriteria: (workspaceId: string, projectId: string, featureId: string, ids: string[]) =>
+    sendJson<Criterion[]>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/acceptance-criteria/reorder`,
+      { method: 'POST', body: JSON.stringify({ ids }) },
     ),
   createTask: (workspaceId: string, projectId: string, featureId: string, title: string) =>
     sendJson<Task>(

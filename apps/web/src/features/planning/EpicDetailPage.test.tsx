@@ -9,6 +9,7 @@ const api = vi.hoisted(() => ({
   getProject: vi.fn(),
   planningOverview: vi.fn(),
   updateEpic: vi.fn(),
+  updateFeature: vi.fn(),
 }));
 vi.mock('@forge-org/api-client', () => ({ organizationApi: api }));
 
@@ -27,7 +28,13 @@ const epic = {
   project_id: 'p1',
   title: 'Release',
   description: 'Ship carefully',
-  status: 'planning' as const,
+  status: 'backlog' as const,
+  archived_at: null,
+  priority: 'medium',
+  tags: [],
+  feature_count: 1,
+  completed_feature_count: 0,
+  progress: 0,
   created_at: '',
   updated_at: '',
 };
@@ -40,6 +47,9 @@ const feature = {
   goal: null,
   priority: 'high' as const,
   status: 'backlog' as const,
+  kind: 'story',
+  tags: [],
+  notes: null,
   created_at: '',
   updated_at: '',
 };
@@ -74,6 +84,7 @@ describe('EpicDetailPage', () => {
       unassigned_features: [],
     });
     vi.mocked(organizationApi.updateEpic).mockResolvedValue({ ...epic, title: 'Release 2' });
+    vi.mocked(organizationApi.updateFeature).mockResolvedValue({ ...feature, status: 'done' });
   });
 
   it('renders matching Epic metadata and links its Features', async () => {
@@ -144,6 +155,20 @@ describe('EpicDetailPage', () => {
       unassigned_features: [],
     });
     renderPage();
-    expect(await screen.findByText(/no features linked/i)).toBeInTheDocument();
+    expect(await screen.findByText(/no work items linked/i)).toBeInTheDocument();
+  });
+
+  it('renders the five-column Epic Board and persists keyboard status changes', async () => {
+    renderPage();
+    expect(await screen.findByRole('region', { name: 'Epic Board' })).toBeInTheDocument();
+    for (const name of ['Backlog', 'Ready', 'In progress', 'Verify', 'Done']) {
+      expect(screen.getByRole('heading', { name })).toBeInTheDocument();
+    }
+    fireEvent.change(screen.getByLabelText('Status for Board'), { target: { value: 'done' } });
+    await waitFor(() =>
+      expect(organizationApi.updateFeature).toHaveBeenCalledWith('w1', 'p1', 'f1', {
+        status: 'done',
+      }),
+    );
   });
 });

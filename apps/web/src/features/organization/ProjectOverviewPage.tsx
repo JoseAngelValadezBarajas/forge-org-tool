@@ -26,8 +26,6 @@ type Overview = {
   criteria: number;
   satisfiedCriteria: number;
   dependencies: number;
-  decisions: number;
-  activeInvariants: number;
 };
 type Mutation = 'save' | 'archive' | 'restore';
 type MutationError = { message: string; action: Mutation };
@@ -47,11 +45,9 @@ async function loadOverview(workspaceId: string, projectId: string): Promise<Ove
   assertProjectScope(project, workspaceId, projectId);
   const workspace = workspaces.find((item) => item.id === workspaceId);
   if (!workspace) throw new Error('Owning Workspace not found.');
-  const [planning, dependencies, decisions, invariants] = await Promise.all([
+  const [planning, dependencies] = await Promise.all([
     organizationApi.planningOverview(workspaceId, projectId),
     organizationApi.listDependencies(workspaceId, projectId),
-    organizationApi.listDecisions(workspaceId, projectId),
-    organizationApi.listInvariants(workspaceId, projectId),
   ]);
   const features = planning.epics
     .flatMap((epic) => epic.features)
@@ -75,8 +71,6 @@ async function loadOverview(workspaceId: string, projectId: string): Promise<Ove
     criteria: criteria.length,
     satisfiedCriteria: criteria.filter((criterion) => criterion.satisfied).length,
     dependencies: dependencies.length,
-    decisions: decisions.length,
-    activeInvariants: invariants.filter((invariant) => invariant.status === 'active').length,
   };
 }
 
@@ -345,8 +339,6 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                 detail="Declared satisfied / total"
               />
               <MetricCard label="Dependencies" value={overview.dependencies} />
-              <MetricCard label="Decisions" value={overview.decisions} />
-              <MetricCard label="Active Invariants" value={overview.activeInvariants} />
             </div>
           </section>
           <section aria-label="Pending Features">

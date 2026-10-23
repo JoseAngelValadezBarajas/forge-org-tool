@@ -12,8 +12,13 @@ export const transferCapability = {
       `/api/v1/workspaces/${workspaceId}/projects/import`,
       { method: 'POST', body: JSON.stringify({ document, expected_fingerprint }) },
     ),
-  exportProject: (workspaceId: string, projectId: string) =>
+  exportProject: (
+    workspaceId: string,
+    projectId: string,
+    schemaVersion:
+      'forge-project-import-v1' | 'forge-project-transfer-v2' = 'forge-project-import-v1',
+  ) =>
     getApiJson<unknown>({
-      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export`,
+      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/export?schema_version=${schemaVersion}`,
     }),
 };

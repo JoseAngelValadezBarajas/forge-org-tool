@@ -30,43 +30,15 @@ test('compiled facade and capability subpath expose callable operations', async 
   assert.equal(typeof planning.planningCapability.planningOverview, 'function');
 });
 
-test('workbench event facade preserves generated API paths and request bodies', async () => {
+test('compatibility facade exposes only active 1.0 capabilities', async () => {
   const { organizationApi } = await import(pathToFileURL(resolve(packageRoot, 'dist/index.js')));
-  const calls = [];
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (input, init) => {
-    calls.push({ input: String(input), init });
-    return new globalThis.Response(JSON.stringify({ id: 'event-1' }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  };
-  try {
-    assert.equal(typeof organizationApi.listRunEvents, 'function');
-    assert.equal(typeof organizationApi.createRunEvent, 'function');
-    await organizationApi.listRunEvents('workspace-1', 'project-1', 'run-1');
-    await organizationApi.createRunEvent('workspace-1', 'project-1', 'run-1', {
-      event_type: 'NOTE',
-      title: 'Human reported update',
-      expected_version: 3,
-    });
-
-    assert.equal(
-      calls[0].input,
-      '/api/v1/workspaces/workspace-1/projects/project-1/runs/run-1/events',
-    );
-    assert.equal(calls[0].init.credentials, 'same-origin');
-    assert.equal(
-      calls[1].input,
-      '/api/v1/workspaces/workspace-1/projects/project-1/runs/run-1/events',
-    );
-    assert.equal(calls[1].init.method, 'POST');
-    assert.deepEqual(JSON.parse(calls[1].init.body), {
-      event_type: 'NOTE',
-      title: 'Human reported update',
-      expected_version: 3,
-    });
-  } finally {
-    globalThis.fetch = originalFetch;
-  }
+  assert.equal(typeof organizationApi.listWorkspaces, 'function');
+  assert.equal(typeof organizationApi.planningOverview, 'function');
+  assert.equal(typeof organizationApi.previewProjectImport, 'function');
+  assert.equal('listRunEvents' in organizationApi, false);
+  assert.equal('listHandoffs' in organizationApi, false);
+  assert.equal('listEvidence' in organizationApi, false);
+  assert.equal('previewReadiness' in organizationApi, false);
+  assert.equal('listRepositories' in organizationApi, false);
+  assert.equal('listContextPackages' in organizationApi, false);
 });

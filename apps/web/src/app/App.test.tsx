@@ -4,6 +4,7 @@ import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import parity from '../../../../docs/design/design-system-parity.json';
+import { productPatternCatalogIds } from './component-gallery/catalog/product-patterns';
 import { App } from './App';
 
 function renderRoute(path: string) {
@@ -51,7 +52,7 @@ describe('M1 application shell', () => {
     expect(screen.getByText('LOCAL MODE')).toBeInTheDocument();
   });
 
-  it('exposes contextual destinations for every product capability on project routes', () => {
+  it('exposes only the supported 1.0 product destinations on project routes', () => {
     renderRoute('/planning/w1/p1');
 
     const navigation = screen.getByRole('navigation', { name: 'Product navigation' });
@@ -59,153 +60,32 @@ describe('M1 application shell', () => {
       'href',
       '/planning/w1/p1',
     );
-    expect(within(navigation).getByRole('link', { name: 'Workbench' })).toHaveAttribute(
-      'href',
-      '/workbench/w1/p1',
-    );
-    expect(within(navigation).getByRole('link', { name: 'Delivery' })).toHaveAttribute(
-      'href',
-      '/delivery/w1/p1',
-    );
-    expect(within(navigation).getByRole('link', { name: 'Repositories' })).toHaveAttribute(
-      'href',
-      '/repositories/w1/p1',
-    );
     expect(within(navigation).getByRole('link', { name: 'Transfer' })).toHaveAttribute(
       'href',
       '/transfer/w1/p1',
     );
-    expect(within(navigation).getByText('Readiness (choose a feature)')).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
+    expect(
+      within(navigation).queryAllByText(/Readiness|Workbench|Delivery|Repositories|Context/),
+    ).toHaveLength(0);
   });
 
-  it('adds feature-scoped destinations from feature detail routes', () => {
-    renderRoute('/planning/w1/p1/features/f1');
+  it.each(['/readiness/w1/p1/f1', '/workbench/w1/p1', '/delivery/w1/p1'])(
+    'does not mount retired product route %s',
+    async (path) => {
+      renderRoute(path);
+      expect(await screen.findByText('Page not found.')).toBeInTheDocument();
+    },
+  );
 
-    const navigation = screen.getByRole('navigation', { name: 'Product navigation' });
-    expect(within(navigation).getByRole('link', { name: 'Readiness' })).toHaveAttribute(
-      'href',
-      '/readiness/w1/p1/f1',
-    );
-    expect(within(navigation).getByRole('link', { name: 'Context' })).toHaveAttribute(
-      'href',
-      '/context/w1/p1/f1',
-    );
-  });
-
-  it('shows a contextual breadcrumb from workspace through the current feature page', () => {
-    renderRoute('/readiness/w1/p1/f1');
+  it('keeps a workspace-to-project breadcrumb in the supported planning workflow', () => {
+    renderRoute('/planning/w1/p1');
 
     const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' });
     expect(within(breadcrumb).getByRole('link', { name: 'Workspace' })).toHaveAttribute(
       'href',
       '/',
     );
-    expect(within(breadcrumb).getByRole('link', { name: 'Project' })).toHaveAttribute(
-      'href',
-      '/projects/w1/p1',
-    );
-    expect(within(breadcrumb).getByRole('link', { name: 'Feature' })).toHaveAttribute(
-      'href',
-      '/planning/w1/p1/features/f1',
-    );
-    expect(within(breadcrumb).getByText('Readiness')).toHaveAttribute('aria-current', 'page');
-  });
-
-  it('opens persisted evidence detail through its direct project-scoped URL', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            id: 'e1',
-            title: 'Synthetic report',
-            summary: 'A human-reported reference',
-            provenance: 'REPORTED',
-            status: 'ACTIVE',
-            reference_kind: 'url',
-            reference_value: 'https://example.invalid/report',
-            feature_id: null,
-            created_at: '2026-10-22T00:00:00Z',
-            project_id: 'p1',
-          }),
-          { status: 200 },
-        ),
-      ),
-    );
-    renderRoute('/delivery/w1/p1/evidence/e1');
-
-    expect(await screen.findByRole('heading', { name: 'Synthetic report' })).toBeInTheDocument();
-    expect(screen.getByText('REPORTED')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /back to delivery/i })).toHaveAttribute(
-      'href',
-      '/delivery/w1/p1',
-    );
-  });
-
-  it('mounts run activity and immutable context snapshots at their direct URLs', async () => {
-    const fetchMock = vi.fn().mockImplementation((input: string) => {
-      const path = String(input);
-      if (path.endsWith('/runs/run-1'))
-        return Promise.resolve(
-          new Response(
-            JSON.stringify({
-              id: 'run-1',
-              project_id: 'p1',
-              feature_id: null,
-              title: 'Human report',
-              description: null,
-              execution_mode: 'manual',
-              executor_type: 'human',
-              status: 'PLANNED',
-              version: 1,
-              created_at: '',
-              updated_at: '',
-            }),
-            { status: 200 },
-          ),
-        );
-      if (path.endsWith('/runs/run-1/events'))
-        return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
-      if (path.endsWith('/context/packages/pkg-1'))
-        return Promise.resolve(
-          new Response(
-            JSON.stringify({
-              id: 'pkg-1',
-              project_id: 'p1',
-              feature_id: 'f1',
-              schema_version: 'forge-context-v1',
-              fingerprint: 'sha256:snapshot',
-              payload_json: '{}',
-              markdown: '# Saved context',
-              created_at: '',
-            }),
-            { status: 200 },
-          ),
-        );
-      return Promise.resolve(new Response(JSON.stringify([]), { status: 200 }));
-    });
-    vi.stubGlobal('fetch', fetchMock);
-
-    const runView = render(
-      <MemoryRouter initialEntries={['/workbench/w1/p1/runs/run-1']}>
-        <App />
-      </MemoryRouter>,
-    );
-    expect(
-      await screen.findByRole('heading', { name: 'Human report', level: 2 }),
-    ).toBeInTheDocument();
-    runView.unmount();
-
-    render(
-      <MemoryRouter initialEntries={['/context/w1/p1/f1/packages/pkg-1']}>
-        <App />
-      </MemoryRouter>,
-    );
-    expect(await screen.findByText('sha256:snapshot')).toBeInTheDocument();
-    expect(screen.getByText('# Saved context')).toBeInTheDocument();
+    expect(within(breadcrumb).getByText('Planning')).toHaveAttribute('aria-current', 'page');
   });
 
   it('exposes loading state and prevents native button interaction', async () => {
@@ -232,10 +112,11 @@ describe('M1 application shell', () => {
     expect(
       screen.getByText('Feature detail', { selector: '[aria-current="page"]' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^Planning$/ })).toHaveAttribute(
-      'href',
-      '/planning/preview',
-    );
+    expect(
+      within(
+        document.querySelector('[data-product-pattern="page-header"]') as HTMLElement,
+      ).getByRole('link', { name: /^Planning$/ }),
+    ).toHaveAttribute('href', '/planning/preview');
   });
 
   it('previews Disabled navigation and every DependencyGroup state', async () => {
@@ -249,29 +130,6 @@ describe('M1 application shell', () => {
 
     const dependencies = document.querySelector('[data-product-pattern="dependency-group"]');
     expect(within(dependencies as HTMLElement).getByText('BLOCKED')).toBeInTheDocument();
-    expect(within(dependencies as HTMLElement).getByText('CLEAR')).toBeInTheDocument();
-    expect(within(dependencies as HTMLElement).getByText('ARCHIVED')).toBeInTheDocument();
-  });
-
-  it('previews Reported, Observed, and Unknown provenance without certifying verification', async () => {
-    await renderRoute('/__components');
-
-    const provenance = document.querySelector('[data-product-pattern="provenance-notice"]');
-    expect(within(provenance as HTMLElement).getByText('REPORTED')).toBeInTheDocument();
-    expect(within(provenance as HTMLElement).getByText('OBSERVED')).toBeInTheDocument();
-    expect(within(provenance as HTMLElement).getByText('UNKNOWN')).toBeInTheDocument();
-    expect(
-      within(provenance as HTMLElement).getAllByText(/not.*verification/i).length,
-    ).toBeGreaterThan(0);
-  });
-
-  it('previews both canonical TrustDisclosure variants as static compositions', async () => {
-    await renderRoute('/__components');
-
-    const trustDisclosure = document.querySelector('[data-product-pattern="trust-disclosure"]');
-    expect(within(trustDisclosure as HTMLElement).getByText('DEFAULT')).toBeInTheDocument();
-    expect(within(trustDisclosure as HTMLElement).getByText('EXPANDED')).toBeInTheDocument();
-    expect(trustDisclosure).not.toHaveAttribute('aria-expanded');
   });
 
   it('previews each supported product state from the feature-owned components', async () => {
@@ -279,20 +137,6 @@ describe('M1 application shell', () => {
 
     const planning = document.querySelector('[data-product-pattern="project-planning-home"]');
     expect(within(planning as HTMLElement).getByText('DEFAULT')).toBeInTheDocument();
-    expect(within(planning as HTMLElement).getByText('EMPTY')).toBeInTheDocument();
-    expect(within(planning as HTMLElement).getByText('ARCHIVED')).toBeInTheDocument();
-
-    const snapshots = document.querySelector('[data-product-pattern="evaluation-snapshot"]');
-    expect(within(snapshots as HTMLElement).getByText('PREVIEW')).toBeInTheDocument();
-    expect(within(snapshots as HTMLElement).getByText('SAVED')).toBeInTheDocument();
-    expect(within(snapshots as HTMLElement).getByText('STALE')).toBeInTheDocument();
-
-    const invariants = document.querySelector('[data-product-pattern="invariant-card"]');
-    expect(within(invariants as HTMLElement).getByText('STALE')).toBeInTheDocument();
-
-    const revisions = document.querySelector('[data-product-pattern="revision-history"]');
-    expect(within(revisions as HTMLElement).getByText('CURRENT')).toBeInTheDocument();
-    expect(within(revisions as HTMLElement).getByText('SUPERSEDED')).toBeInTheDocument();
   });
 
   it('supports gallery interaction and dark/light switching', async () => {
@@ -393,11 +237,17 @@ describe('M1 application shell', () => {
   });
 
   it('renders a real feature-owned preview for every page-20 product pattern', async () => {
-    const productEntries = parity.inventory.filter((entry) => entry.category === 'product');
+    const productEntries = parity.inventory.filter(
+      (entry) =>
+        entry.category === 'product' &&
+        productPatternCatalogIds.includes(
+          entry.componentHost.id as (typeof productPatternCatalogIds)[number],
+        ),
+    );
 
     await renderRoute('/__components');
 
-    expect(productEntries).toHaveLength(28);
+    expect(productEntries).toHaveLength(productPatternCatalogIds.length);
     for (const entry of productEntries) {
       const hostId = entry.componentHost.id;
       expect(entry.componentHost.status, `${entry.figmaName} host coverage`).toBe('AVAILABLE');

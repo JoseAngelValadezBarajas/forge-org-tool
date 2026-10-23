@@ -1,225 +1,48 @@
 {
   "components": {
     "schemas": {
-      "AcknowledgeRequest": {
+      "BugAttachmentCreate": {
         "properties": {
-          "expected_revision": {
-            "minimum": 1.0,
-            "title": "Expected Revision",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "expected_revision"
-        ],
-        "title": "AcknowledgeRequest",
-        "type": "object"
-      },
-      "AcknowledgeResponse": {
-        "properties": {
-          "acknowledged_at": {
-            "format": "date-time",
-            "title": "Acknowledged At",
+          "content_type": {
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "title": "Content Type",
             "type": "string"
           },
-          "acknowledged_revision": {
-            "title": "Acknowledged Revision",
-            "type": "integer"
-          },
-          "feature_id": {
-            "title": "Feature Id",
-            "type": "string"
-          },
-          "invariant_id": {
-            "title": "Invariant Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "feature_id",
-          "invariant_id",
-          "acknowledged_revision",
-          "acknowledged_at"
-        ],
-        "title": "AcknowledgeResponse",
-        "type": "object"
-      },
-      "CandidateCreate": {
-        "properties": {
-          "summary": {
-            "maxLength": 4000,
+          "data_base64": {
+            "maxLength": 7000000,
             "minLength": 1,
-            "title": "Summary",
+            "title": "Data Base64",
             "type": "string"
           },
-          "title": {
-            "maxLength": 200,
+          "file_name": {
+            "maxLength": 255,
             "minLength": 1,
-            "title": "Title",
+            "title": "File Name",
             "type": "string"
           }
         },
         "required": [
-          "title",
-          "summary"
+          "file_name",
+          "content_type",
+          "data_base64"
         ],
-        "title": "CandidateCreate",
+        "title": "BugAttachmentCreate",
         "type": "object"
       },
-      "CandidateFreezeRequest": {
+      "BugAttachmentResponse": {
         "properties": {
-          "expected_revision": {
-            "minimum": 1.0,
-            "title": "Expected Revision",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "expected_revision"
-        ],
-        "title": "CandidateFreezeRequest",
-        "type": "object"
-      },
-      "CandidateHistoryResponse": {
-        "properties": {
-          "candidate_id": {
-            "title": "Candidate Id",
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "fingerprint": {
-            "title": "Fingerprint",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
+          "byte_size": {
+            "title": "Byte Size",
             "type": "integer"
           },
-          "snapshot_json": {
-            "title": "Snapshot Json",
+          "content_type": {
+            "title": "Content Type",
             "type": "string"
           },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "candidate_id",
-          "revision",
-          "status",
-          "snapshot_json",
-          "fingerprint",
-          "created_at"
-        ],
-        "title": "CandidateHistoryResponse",
-        "type": "object"
-      },
-      "CandidateResponse": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "fingerprint": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Fingerprint"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "summary": {
-            "title": "Summary",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "title",
-          "summary",
-          "status",
-          "revision",
-          "fingerprint",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "CandidateResponse",
-        "type": "object"
-      },
-      "CandidateUpdate": {
-        "properties": {
-          "summary": {
-            "anyOf": [
-              {
-                "maxLength": 4000,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Summary"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "maxLength": 200,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          }
-        },
-        "title": "CandidateUpdate",
-        "type": "object"
-      },
-      "ContextPackageResponse": {
-        "properties": {
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -229,42 +52,29 @@
             "title": "Feature Id",
             "type": "string"
           },
-          "fingerprint": {
-            "title": "Fingerprint",
+          "file_name": {
+            "title": "File Name",
             "type": "string"
           },
           "id": {
             "title": "Id",
             "type": "string"
           },
-          "markdown": {
-            "title": "Markdown",
-            "type": "string"
-          },
-          "payload_json": {
-            "title": "Payload Json",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "schema_version": {
-            "title": "Schema Version",
+          "sha256": {
+            "title": "Sha256",
             "type": "string"
           }
         },
         "required": [
           "id",
-          "project_id",
           "feature_id",
-          "schema_version",
-          "fingerprint",
-          "payload_json",
-          "markdown",
+          "file_name",
+          "content_type",
+          "byte_size",
+          "sha256",
           "created_at"
         ],
-        "title": "ContextPackageResponse",
+        "title": "BugAttachmentResponse",
         "type": "object"
       },
       "CriterionCreate": {
@@ -286,6 +96,23 @@
           "description"
         ],
         "title": "CriterionCreate",
+        "type": "object"
+      },
+      "CriterionReorderRequest": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2000,
+            "title": "Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "title": "CriterionReorderRequest",
         "type": "object"
       },
       "CriterionResponse": {
@@ -373,322 +200,6 @@
         "title": "CriterionUpdate",
         "type": "object"
       },
-      "DecisionCreate": {
-        "properties": {
-          "alternatives_considered": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Alternatives Considered"
-          },
-          "context": {
-            "maxLength": 4000,
-            "minLength": 1,
-            "title": "Context",
-            "type": "string"
-          },
-          "decision": {
-            "maxLength": 4000,
-            "minLength": 1,
-            "title": "Decision",
-            "type": "string"
-          },
-          "rationale": {
-            "maxLength": 4000,
-            "minLength": 1,
-            "title": "Rationale",
-            "type": "string"
-          },
-          "title": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          },
-          "tradeoffs": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tradeoffs"
-          }
-        },
-        "required": [
-          "title",
-          "context",
-          "decision",
-          "rationale"
-        ],
-        "title": "DecisionCreate",
-        "type": "object"
-      },
-      "DecisionResponse": {
-        "properties": {
-          "alternatives_considered": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Alternatives Considered"
-          },
-          "context": {
-            "title": "Context",
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "decision": {
-            "title": "Decision",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "rationale": {
-            "title": "Rationale",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "superseded_by_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Superseded By Id"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "tradeoffs": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tradeoffs"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "title",
-          "context",
-          "decision",
-          "rationale",
-          "alternatives_considered",
-          "tradeoffs",
-          "status",
-          "revision",
-          "superseded_by_id",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "DecisionResponse",
-        "type": "object"
-      },
-      "DecisionRevisionResponse": {
-        "properties": {
-          "alternatives_considered": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Alternatives Considered"
-          },
-          "context": {
-            "title": "Context",
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "decision": {
-            "title": "Decision",
-            "type": "string"
-          },
-          "decision_id": {
-            "title": "Decision Id",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "rationale": {
-            "title": "Rationale",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "superseded_by_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Superseded By Id"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "tradeoffs": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tradeoffs"
-          }
-        },
-        "required": [
-          "id",
-          "decision_id",
-          "revision",
-          "title",
-          "context",
-          "decision",
-          "rationale",
-          "alternatives_considered",
-          "tradeoffs",
-          "status",
-          "superseded_by_id",
-          "created_at"
-        ],
-        "title": "DecisionRevisionResponse",
-        "type": "object"
-      },
-      "DecisionUpdate": {
-        "properties": {
-          "alternatives_considered": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Alternatives Considered"
-          },
-          "context": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Context"
-          },
-          "decision": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Decision"
-          },
-          "rationale": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rationale"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          },
-          "tradeoffs": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tradeoffs"
-          }
-        },
-        "title": "DecisionUpdate",
-        "type": "object"
-      },
       "DependencyCreate": {
         "properties": {
           "blocked_feature_id": {
@@ -761,6 +272,20 @@
             ],
             "title": "Description"
           },
+          "priority": {
+            "default": "medium",
+            "pattern": "^(low|medium|high|critical)$",
+            "title": "Priority",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Tags",
+            "type": "array"
+          },
           "title": {
             "maxLength": 200,
             "minLength": 1,
@@ -776,6 +301,23 @@
       },
       "EpicResponse": {
         "properties": {
+          "archived_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "completed_feature_count": {
+            "default": 0,
+            "title": "Completed Feature Count",
+            "type": "integer"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -792,9 +334,24 @@
             ],
             "title": "Description"
           },
+          "feature_count": {
+            "default": 0,
+            "title": "Feature Count",
+            "type": "integer"
+          },
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "priority": {
+            "default": "medium",
+            "title": "Priority",
+            "type": "string"
+          },
+          "progress": {
+            "default": 0,
+            "title": "Progress",
+            "type": "integer"
           },
           "project_id": {
             "title": "Project Id",
@@ -802,14 +359,21 @@
           },
           "status": {
             "enum": [
-              "planning",
-              "archived",
-              "planned",
+              "backlog",
+              "ready",
               "in_progress",
+              "verify",
               "done"
             ],
             "title": "Status",
             "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
           },
           "title": {
             "title": "Title",
@@ -847,14 +411,26 @@
             ],
             "title": "Description"
           },
+          "priority": {
+            "anyOf": [
+              {
+                "pattern": "^(low|medium|high|critical)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
           "status": {
             "anyOf": [
               {
                 "enum": [
-                  "planning",
-                  "archived",
-                  "planned",
+                  "backlog",
+                  "ready",
                   "in_progress",
+                  "verify",
                   "done"
                 ],
                 "type": "string"
@@ -864,6 +440,21 @@
               }
             ],
             "title": "Status"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
           },
           "title": {
             "anyOf": [
@@ -882,128 +473,37 @@
         "title": "EpicUpdate",
         "type": "object"
       },
-      "EvidenceCreate": {
-        "properties": {
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "provenance": {
-            "title": "Provenance",
-            "type": "string"
-          },
-          "reference_kind": {
-            "title": "Reference Kind",
-            "type": "string"
-          },
-          "reference_value": {
-            "title": "Reference Value",
-            "type": "string"
-          },
-          "summary": {
-            "maxLength": 4000,
-            "minLength": 1,
-            "title": "Summary",
-            "type": "string"
-          },
-          "title": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "title",
-          "summary",
-          "provenance",
-          "reference_kind",
-          "reference_value"
-        ],
-        "title": "EvidenceCreate",
-        "type": "object"
-      },
-      "EvidenceResponse": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "provenance": {
-            "title": "Provenance",
-            "type": "string"
-          },
-          "reference_kind": {
-            "title": "Reference Kind",
-            "type": "string"
-          },
-          "reference_value": {
-            "title": "Reference Value",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "summary": {
-            "title": "Summary",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "feature_id",
-          "title",
-          "summary",
-          "provenance",
-          "reference_kind",
-          "reference_value",
-          "status",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "EvidenceResponse",
-        "type": "object"
-      },
       "FeatureCreate": {
         "properties": {
+          "actual_result": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Result"
+          },
+          "bug_severity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bug Severity"
+          },
           "description": {
             "anyOf": [
               {
@@ -1027,6 +527,18 @@
             ],
             "title": "Epic Id"
           },
+          "expected_result": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Result"
+          },
           "goal": {
             "anyOf": [
               {
@@ -1039,6 +551,27 @@
             ],
             "title": "Goal"
           },
+          "kind": {
+            "default": "story",
+            "enum": [
+              "story",
+              "bug"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
           "priority": {
             "default": "medium",
             "pattern": "^(low|medium|high|critical)$",
@@ -1050,6 +583,26 @@
             "pattern": "^(backlog|refining|ready|in_progress|verify|done)$",
             "title": "Status",
             "type": "string"
+          },
+          "steps_to_reproduce": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps To Reproduce"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Tags",
+            "type": "array"
           },
           "title": {
             "maxLength": 200,
@@ -1066,6 +619,28 @@
       },
       "FeatureResponse": {
         "properties": {
+          "actual_result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Result"
+          },
+          "bug_severity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bug Severity"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -1093,6 +668,17 @@
             ],
             "title": "Epic Id"
           },
+          "expected_result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Result"
+          },
           "goal": {
             "anyOf": [
               {
@@ -1108,6 +694,22 @@
             "title": "Id",
             "type": "string"
           },
+          "kind": {
+            "default": "feature",
+            "title": "Kind",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
           "priority": {
             "title": "Priority",
             "type": "string"
@@ -1119,6 +721,24 @@
           "status": {
             "title": "Status",
             "type": "string"
+          },
+          "steps_to_reproduce": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps To Reproduce"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
           },
           "title": {
             "title": "Title",
@@ -1147,6 +767,35 @@
       },
       "FeatureUpdate": {
         "properties": {
+          "actual_result": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Result"
+          },
+          "bug_severity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bug Severity"
+          },
           "clear_epic": {
             "default": false,
             "title": "Clear Epic",
@@ -1175,6 +824,18 @@
             ],
             "title": "Epic Id"
           },
+          "expected_result": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Result"
+          },
           "goal": {
             "anyOf": [
               {
@@ -1186,6 +847,33 @@
               }
             ],
             "title": "Goal"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "story",
+                  "bug"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
           },
           "priority": {
             "anyOf": [
@@ -1211,6 +899,33 @@
             ],
             "title": "Status"
           },
+          "steps_to_reproduce": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Steps To Reproduce"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
           "title": {
             "anyOf": [
               {
@@ -1228,65 +943,6 @@
         "title": "FeatureUpdate",
         "type": "object"
       },
-      "GateEvaluationResponse": {
-        "properties": {
-          "blockers": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Blockers",
-            "type": "array"
-          },
-          "candidate_id": {
-            "title": "Candidate Id",
-            "type": "string"
-          },
-          "candidate_revision": {
-            "title": "Candidate Revision",
-            "type": "integer"
-          },
-          "created_at": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Created At"
-          },
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "input_fingerprint": {
-            "title": "Input Fingerprint",
-            "type": "string"
-          },
-          "outcome": {
-            "title": "Outcome",
-            "type": "string"
-          }
-        },
-        "required": [
-          "candidate_id",
-          "candidate_revision",
-          "outcome",
-          "input_fingerprint",
-          "blockers"
-        ],
-        "title": "GateEvaluationResponse",
-        "type": "object"
-      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1298,315 +954,6 @@
           }
         },
         "title": "HTTPValidationError",
-        "type": "object"
-      },
-      "HandoffAckRequest": {
-        "properties": {
-          "acknowledged_by": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Acknowledged By",
-            "type": "string"
-          },
-          "expected_revision": {
-            "minimum": 1.0,
-            "title": "Expected Revision",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "expected_revision",
-          "acknowledged_by"
-        ],
-        "title": "HandoffAckRequest",
-        "type": "object"
-      },
-      "HandoffAcknowledgementResponse": {
-        "properties": {
-          "acknowledged_at": {
-            "format": "date-time",
-            "title": "Acknowledged At",
-            "type": "string"
-          },
-          "acknowledged_by": {
-            "title": "Acknowledged By",
-            "type": "string"
-          },
-          "handoff_id": {
-            "title": "Handoff Id",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "handoff_id",
-          "revision",
-          "acknowledged_by",
-          "acknowledged_at"
-        ],
-        "title": "HandoffAcknowledgementResponse",
-        "type": "object"
-      },
-      "HandoffCreate": {
-        "properties": {
-          "context_package_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Context Package Id"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "title": {
-            "default": "",
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "title": "HandoffCreate",
-        "type": "object"
-      },
-      "HandoffResponse": {
-        "properties": {
-          "context_package_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Context Package Id"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "current_revision": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Current Revision"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "next_actions": {
-            "title": "Next Actions",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "run_id": {
-            "title": "Run Id",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "summary": {
-            "title": "Summary",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "feature_id",
-          "run_id",
-          "context_package_id",
-          "title",
-          "summary",
-          "next_actions",
-          "status",
-          "current_revision",
-          "version",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "HandoffResponse",
-        "type": "object"
-      },
-      "HandoffRevisionResponse": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "fingerprint": {
-            "title": "Fingerprint",
-            "type": "string"
-          },
-          "handoff_id": {
-            "title": "Handoff Id",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "markdown": {
-            "title": "Markdown",
-            "type": "string"
-          },
-          "next_actions": {
-            "title": "Next Actions",
-            "type": "string"
-          },
-          "payload_json": {
-            "title": "Payload Json",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          },
-          "schema_version": {
-            "title": "Schema Version",
-            "type": "string"
-          },
-          "summary": {
-            "title": "Summary",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "handoff_id",
-          "revision",
-          "title",
-          "summary",
-          "next_actions",
-          "schema_version",
-          "fingerprint",
-          "payload_json",
-          "markdown",
-          "created_at"
-        ],
-        "title": "HandoffRevisionResponse",
-        "type": "object"
-      },
-      "HandoffUpdate": {
-        "properties": {
-          "expected_version": {
-            "minimum": 1.0,
-            "title": "Expected Version",
-            "type": "integer"
-          },
-          "next_actions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next Actions"
-          },
-          "summary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Summary"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          }
-        },
-        "required": [
-          "expected_version"
-        ],
-        "title": "HandoffUpdate",
-        "type": "object"
-      },
-      "HandoffVersionRequest": {
-        "properties": {
-          "expected_version": {
-            "minimum": 1.0,
-            "title": "Expected Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "expected_version"
-        ],
-        "title": "HandoffVersionRequest",
         "type": "object"
       },
       "HealthResponse": {
@@ -1730,403 +1077,6 @@
         "title": "ImportResponse",
         "type": "object"
       },
-      "InvariantCreate": {
-        "properties": {
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "rationale": {
-            "maxLength": 4000,
-            "minLength": 1,
-            "title": "Rationale",
-            "type": "string"
-          },
-          "statement": {
-            "maxLength": 4000,
-            "minLength": 1,
-            "title": "Statement",
-            "type": "string"
-          },
-          "title": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "title",
-          "statement",
-          "rationale"
-        ],
-        "title": "InvariantCreate",
-        "type": "object"
-      },
-      "InvariantResponse": {
-        "properties": {
-          "acknowledged_revision": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Acknowledged Revision"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "rationale": {
-            "title": "Rationale",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          },
-          "statement": {
-            "title": "Statement",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "feature_id",
-          "title",
-          "statement",
-          "rationale",
-          "status",
-          "revision",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "InvariantResponse",
-        "type": "object"
-      },
-      "InvariantRevisionResponse": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "invariant_id": {
-            "title": "Invariant Id",
-            "type": "string"
-          },
-          "rationale": {
-            "title": "Rationale",
-            "type": "string"
-          },
-          "revision": {
-            "title": "Revision",
-            "type": "integer"
-          },
-          "statement": {
-            "title": "Statement",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "invariant_id",
-          "revision",
-          "title",
-          "statement",
-          "rationale",
-          "status",
-          "feature_id",
-          "created_at"
-        ],
-        "title": "InvariantRevisionResponse",
-        "type": "object"
-      },
-      "InvariantUpdate": {
-        "properties": {
-          "rationale": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rationale"
-          },
-          "statement": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Statement"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          }
-        },
-        "title": "InvariantUpdate",
-        "type": "object"
-      },
-      "ManifestResponse": {
-        "properties": {
-          "candidate_id": {
-            "title": "Candidate Id",
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "fingerprint": {
-            "title": "Fingerprint",
-            "type": "string"
-          },
-          "gate_evaluation_id": {
-            "title": "Gate Evaluation Id",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "markdown": {
-            "title": "Markdown",
-            "type": "string"
-          },
-          "payload_json": {
-            "title": "Payload Json",
-            "type": "string"
-          },
-          "schema_version": {
-            "title": "Schema Version",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "candidate_id",
-          "gate_evaluation_id",
-          "schema_version",
-          "fingerprint",
-          "status",
-          "payload_json",
-          "markdown",
-          "created_at"
-        ],
-        "title": "ManifestResponse",
-        "type": "object"
-      },
-      "ManifestSaveRequest": {
-        "properties": {
-          "gate_evaluation_id": {
-            "title": "Gate Evaluation Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "gate_evaluation_id"
-        ],
-        "title": "ManifestSaveRequest",
-        "type": "object"
-      },
-      "ObservationResponse": {
-        "properties": {
-          "branch": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Branch"
-          },
-          "clean": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Clean"
-          },
-          "detached": {
-            "title": "Detached",
-            "type": "boolean"
-          },
-          "error_code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error Code"
-          },
-          "head_sha": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Head Sha"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "observed_at": {
-            "format": "date-time",
-            "title": "Observed At",
-            "type": "string"
-          },
-          "observer_version": {
-            "title": "Observer Version",
-            "type": "string"
-          },
-          "repository_id": {
-            "title": "Repository Id",
-            "type": "string"
-          },
-          "source_content_read": {
-            "title": "Source Content Read",
-            "type": "boolean"
-          },
-          "staged_count": {
-            "title": "Staged Count",
-            "type": "integer"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "tracked_modified_count": {
-            "title": "Tracked Modified Count",
-            "type": "integer"
-          },
-          "unborn": {
-            "title": "Unborn",
-            "type": "boolean"
-          },
-          "untracked_count": {
-            "title": "Untracked Count",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "repository_id",
-          "observed_at",
-          "head_sha",
-          "branch",
-          "detached",
-          "unborn",
-          "clean",
-          "tracked_modified_count",
-          "staged_count",
-          "untracked_count",
-          "observer_version",
-          "status",
-          "error_code",
-          "source_content_read"
-        ],
-        "title": "ObservationResponse",
-        "type": "object"
-      },
       "ProjectCreate": {
         "properties": {
           "description": {
@@ -2247,399 +1197,6 @@
           }
         },
         "title": "ProjectUpdate",
-        "type": "object"
-      },
-      "RepositoryCreate": {
-        "properties": {
-          "root_path": {
-            "maxLength": 1000,
-            "minLength": 1,
-            "title": "Root Path",
-            "type": "string"
-          }
-        },
-        "required": [
-          "root_path"
-        ],
-        "title": "RepositoryCreate",
-        "type": "object"
-      },
-      "RepositoryLinkCreate": {
-        "properties": {
-          "repository_id": {
-            "title": "Repository Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "repository_id"
-        ],
-        "title": "RepositoryLinkCreate",
-        "type": "object"
-      },
-      "RepositoryResponse": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "root_path": {
-            "title": "Root Path",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "root_path",
-          "status",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "RepositoryResponse",
-        "type": "object"
-      },
-      "RunCreate": {
-        "properties": {
-          "context_package_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Context Package Id"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "execution_mode": {
-            "default": "manual",
-            "title": "Execution Mode",
-            "type": "string"
-          },
-          "executor_label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Executor Label"
-          },
-          "executor_type": {
-            "default": "human",
-            "title": "Executor Type",
-            "type": "string"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "title": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "title"
-        ],
-        "title": "RunCreate",
-        "type": "object"
-      },
-      "RunEventCreate": {
-        "properties": {
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "event_type": {
-            "title": "Event Type",
-            "type": "string"
-          },
-          "expected_version": {
-            "minimum": 1.0,
-            "title": "Expected Version",
-            "type": "integer"
-          },
-          "occurred_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Occurred At"
-          },
-          "supersedes_event_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Supersedes Event Id"
-          },
-          "title": {
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "event_type",
-          "title",
-          "expected_version"
-        ],
-        "title": "RunEventCreate",
-        "type": "object"
-      },
-      "RunEventResponse": {
-        "properties": {
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "event_type": {
-            "title": "Event Type",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "occurred_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Occurred At"
-          },
-          "origin": {
-            "title": "Origin",
-            "type": "string"
-          },
-          "run_id": {
-            "title": "Run Id",
-            "type": "string"
-          },
-          "supersedes_event_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Supersedes Event Id"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "run_id",
-          "event_type",
-          "title",
-          "description",
-          "origin",
-          "occurred_at",
-          "supersedes_event_id",
-          "created_at"
-        ],
-        "title": "RunEventResponse",
-        "type": "object"
-      },
-      "RunResponse": {
-        "properties": {
-          "context_package_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Context Package Id"
-          },
-          "created_at": {
-            "format": "date-time",
-            "title": "Created At",
-            "type": "string"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "execution_mode": {
-            "title": "Execution Mode",
-            "type": "string"
-          },
-          "executor_label": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Executor Label"
-          },
-          "executor_type": {
-            "title": "Executor Type",
-            "type": "string"
-          },
-          "feature_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feature Id"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "title": "Updated At",
-            "type": "string"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "project_id",
-          "feature_id",
-          "context_package_id",
-          "title",
-          "description",
-          "execution_mode",
-          "executor_type",
-          "executor_label",
-          "status",
-          "version",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "RunResponse",
-        "type": "object"
-      },
-      "RunStatusUpdate": {
-        "properties": {
-          "expected_version": {
-            "minimum": 1.0,
-            "title": "Expected Version",
-            "type": "integer"
-          },
-          "status": {
-            "title": "Status",
-            "type": "string"
-          }
-        },
-        "required": [
-          "status",
-          "expected_version"
-        ],
-        "title": "RunStatusUpdate",
         "type": "object"
       },
       "TaskCreate": {
@@ -2831,129 +1388,6 @@
         "title": "ValidationError",
         "type": "object"
       },
-      "VerificationRequest": {
-        "properties": {
-          "candidate_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Candidate Id"
-          },
-          "rule_id": {
-            "title": "Rule Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "rule_id"
-        ],
-        "title": "VerificationRequest",
-        "type": "object"
-      },
-      "VerificationResponse": {
-        "properties": {
-          "blockers": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Blockers",
-            "type": "array"
-          },
-          "candidate_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Candidate Id"
-          },
-          "created_at": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Created At"
-          },
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "input_fingerprint": {
-            "title": "Input Fingerprint",
-            "type": "string"
-          },
-          "outcome": {
-            "title": "Outcome",
-            "type": "string"
-          },
-          "project_id": {
-            "title": "Project Id",
-            "type": "string"
-          },
-          "rule_id": {
-            "title": "Rule Id",
-            "type": "string"
-          },
-          "stale": {
-            "default": false,
-            "title": "Stale",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "project_id",
-          "rule_id",
-          "candidate_id",
-          "outcome",
-          "input_fingerprint",
-          "blockers"
-        ],
-        "title": "VerificationResponse",
-        "type": "object"
-      },
-      "VerificationRuleResponse": {
-        "properties": {
-          "description": {
-            "title": "Description",
-            "type": "string"
-          },
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "label",
-          "description"
-        ],
-        "title": "VerificationRuleResponse",
-        "type": "object"
-      },
       "WorkspaceCreate": {
         "properties": {
           "description": {
@@ -3021,6 +1455,92 @@
           "updated_at"
         ],
         "title": "WorkspaceResponse",
+        "type": "object"
+      },
+      "WorkspaceTagCreate": {
+        "properties": {
+          "color": {
+            "default": "#6b7280",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "title": "Color",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "WorkspaceTagCreate",
+        "type": "object"
+      },
+      "WorkspaceTagResponse": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "workspace_id": {
+            "title": "Workspace Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "workspace_id",
+          "name",
+          "color",
+          "created_at"
+        ],
+        "title": "WorkspaceTagResponse",
+        "type": "object"
+      },
+      "WorkspaceTagUpdate": {
+        "properties": {
+          "color": {
+            "anyOf": [
+              {
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "WorkspaceTagUpdate",
         "type": "object"
       },
       "WorkspaceUpdate": {
@@ -3628,376 +2148,6 @@
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/decisions": {
-      "get": {
-        "operationId": "list_decisions_api_v1_workspaces__workspace_id__projects__project_id__decisions_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/DecisionResponse"
-                  },
-                  "title": "Response List Decisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Decisions Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Decisions",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "create_decision_api_v1_workspaces__workspace_id__projects__project_id__decisions_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DecisionCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DecisionResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create Decision",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}": {
-      "patch": {
-        "operationId": "update_decision_api_v1_workspaces__workspace_id__projects__project_id__decisions__decision_id__patch",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "decision_id",
-            "required": true,
-            "schema": {
-              "title": "Decision Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DecisionUpdate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DecisionResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Update Decision",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/accept": {
-      "post": {
-        "operationId": "accept_decision_api_v1_workspaces__workspace_id__projects__project_id__decisions__decision_id__accept_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "decision_id",
-            "required": true,
-            "schema": {
-              "title": "Decision Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DecisionResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Accept Decision",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/features/{feature_id}": {
-      "post": {
-        "operationId": "link_decision_api_v1_workspaces__workspace_id__projects__project_id__decisions__decision_id__features__feature_id__post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "decision_id",
-            "required": true,
-            "schema": {
-              "title": "Decision Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Link Decision",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/revisions": {
-      "get": {
-        "operationId": "decision_revisions_api_v1_workspaces__workspace_id__projects__project_id__decisions__decision_id__revisions_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "decision_id",
-            "required": true,
-            "schema": {
-              "title": "Decision Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/DecisionRevisionResponse"
-                  },
-                  "title": "Response Decision Revisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Decisions  Decision Id  Revisions Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Decision Revisions",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/dependencies": {
       "get": {
         "operationId": "list_dependencies_api_v1_workspaces__workspace_id__projects__project_id__dependencies_get",
@@ -4349,289 +2499,6 @@
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/evidence": {
-      "get": {
-        "operationId": "list_evidence_api_v1_workspaces__workspace_id__projects__project_id__evidence_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "search",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "maxLength": 200,
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Search"
-            }
-          },
-          {
-            "in": "query",
-            "name": "provenance",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Provenance"
-            }
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Status"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/EvidenceResponse"
-                  },
-                  "title": "Response List Evidence Api V1 Workspaces  Workspace Id  Projects  Project Id  Evidence Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Evidence",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "create_evidence_api_v1_workspaces__workspace_id__projects__project_id__evidence_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EvidenceCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EvidenceResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create Evidence",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/evidence/{evidence_id}": {
-      "get": {
-        "operationId": "get_evidence_api_v1_workspaces__workspace_id__projects__project_id__evidence__evidence_id__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "evidence_id",
-            "required": true,
-            "schema": {
-              "title": "Evidence Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EvidenceResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Get Evidence",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/evidence/{evidence_id}/invalidate": {
-      "post": {
-        "operationId": "invalidate_evidence_api_v1_workspaces__workspace_id__projects__project_id__evidence__evidence_id__invalidate_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "evidence_id",
-            "required": true,
-            "schema": {
-              "title": "Evidence Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EvidenceResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Invalidate Evidence",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/export": {
       "get": {
         "operationId": "export_project_api_v1_workspaces__workspace_id__projects__project_id__export_get",
@@ -4651,6 +2518,16 @@
             "required": true,
             "schema": {
               "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "schema_version",
+            "required": false,
+            "schema": {
+              "default": "forge-project-import-v1",
+              "title": "Schema Version",
               "type": "string"
             }
           }
@@ -5065,7 +2942,141 @@
         ]
       }
     },
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/acceptance-criteria/reorder": {
+      "post": {
+        "operationId": "reorder_criteria_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__acceptance_criteria_reorder_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "feature_id",
+            "required": true,
+            "schema": {
+              "title": "Feature Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CriterionReorderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CriterionResponse"
+                  },
+                  "title": "Response Reorder Criteria Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Acceptance Criteria Reorder Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reorder Criteria",
+        "tags": [
+          "organization"
+        ]
+      }
+    },
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/acceptance-criteria/{criterion_id}": {
+      "delete": {
+        "operationId": "delete_criterion_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__acceptance_criteria__criterion_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "feature_id",
+            "required": true,
+            "schema": {
+              "title": "Feature Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "criterion_id",
+            "required": true,
+            "schema": {
+              "title": "Criterion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Criterion",
+        "tags": [
+          "organization"
+        ]
+      },
       "patch": {
         "operationId": "update_criterion_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__acceptance_criteria__criterion_id__patch",
         "parameters": [
@@ -5144,9 +3155,9 @@
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/packages": {
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/attachments": {
       "get": {
-        "operationId": "list_context_packages_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__context_packages_get",
+        "operationId": "list_bug_attachments_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__attachments_get",
         "parameters": [
           {
             "in": "path",
@@ -5182,9 +3193,9 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/ContextPackageResponse"
+                    "$ref": "#/components/schemas/BugAttachmentResponse"
                   },
-                  "title": "Response List Context Packages Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Context Packages Get",
+                  "title": "Response List Bug Attachments Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Attachments Get",
                   "type": "array"
                 }
               }
@@ -5202,13 +3213,13 @@
             "description": "Validation Error"
           }
         },
-        "summary": "List Context Packages",
+        "summary": "List Bug Attachments",
         "tags": [
-          "organization"
+          "planning"
         ]
       },
       "post": {
-        "operationId": "save_context_package_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__context_packages_post",
+        "operationId": "upload_bug_attachment_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__attachments_post",
         "parameters": [
           {
             "in": "path",
@@ -5238,12 +3249,22 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BugAttachmentCreate"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "201": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContextPackageResponse"
+                  "$ref": "#/components/schemas/BugAttachmentResponse"
                 }
               }
             },
@@ -5260,15 +3281,15 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Save Context Package",
+        "summary": "Upload Bug Attachment",
         "tags": [
-          "organization"
+          "planning"
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/packages/{package_id}": {
-      "get": {
-        "operationId": "get_context_package_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__context_packages__package_id__get",
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/attachments/{attachment_id}": {
+      "delete": {
+        "operationId": "delete_bug_attachment_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__attachments__attachment_id__delete",
         "parameters": [
           {
             "in": "path",
@@ -5299,23 +3320,16 @@
           },
           {
             "in": "path",
-            "name": "package_id",
+            "name": "attachment_id",
             "required": true,
             "schema": {
-              "title": "Package Id",
+              "title": "Attachment Id",
               "type": "string"
             }
           }
         ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContextPackageResponse"
-                }
-              }
-            },
+          "204": {
             "description": "Successful Response"
           },
           "422": {
@@ -5329,15 +3343,15 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Get Context Package",
+        "summary": "Delete Bug Attachment",
         "tags": [
-          "organization"
+          "planning"
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/packages/{package_id}/download": {
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/attachments/{attachment_id}/content": {
       "get": {
-        "operationId": "download_context_package_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__context_packages__package_id__download_get",
+        "operationId": "get_bug_attachment_content_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__attachments__attachment_id__content_get",
         "parameters": [
           {
             "in": "path",
@@ -5368,20 +3382,10 @@
           },
           {
             "in": "path",
-            "name": "package_id",
+            "name": "attachment_id",
             "required": true,
             "schema": {
-              "title": "Package Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "format",
-            "required": false,
-            "schema": {
-              "default": "json",
-              "title": "Format",
+              "title": "Attachment Id",
               "type": "string"
             }
           }
@@ -5406,533 +3410,9 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Download Context Package",
+        "summary": "Get Bug Attachment Content",
         "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/context/preview": {
-      "post": {
-        "operationId": "preview_context_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__context_preview_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Preview Context Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Context Preview Post",
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Preview Context",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/invariants/{invariant_id}/acknowledge": {
-      "post": {
-        "operationId": "acknowledge_invariant_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__invariants__invariant_id__acknowledge_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "invariant_id",
-            "required": true,
-            "schema": {
-              "title": "Invariant Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcknowledgeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AcknowledgeResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Acknowledge Invariant",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/readiness/evaluations": {
-      "get": {
-        "operationId": "list_readiness_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__readiness_evaluations_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "additionalProperties": true,
-                    "type": "object"
-                  },
-                  "title": "Response List Readiness Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Readiness Evaluations Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Readiness",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "save_readiness_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__readiness_evaluations_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Save Readiness Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Readiness Evaluations Post",
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Save Readiness",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/readiness/preview": {
-      "post": {
-        "operationId": "preview_readiness_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__readiness_preview_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Preview Readiness Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Readiness Preview Post",
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Preview Readiness",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/repositories": {
-      "get": {
-        "operationId": "list_feature_repositories_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__repositories_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/RepositoryResponse"
-                  },
-                  "title": "Response List Feature Repositories Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Repositories Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Feature Repositories",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "link_feature_repository_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__repositories_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RepositoryLinkCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response Link Feature Repository Api V1 Workspaces  Workspace Id  Projects  Project Id  Features  Feature Id  Repositories Post",
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Link Feature Repository",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/repositories/{repository_id}": {
-      "delete": {
-        "operationId": "unlink_feature_repository_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__repositories__repository_id__delete",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "feature_id",
-            "required": true,
-            "schema": {
-              "title": "Feature Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "repository_id",
-            "required": true,
-            "schema": {
-              "title": "Repository Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Unlink Feature Repository",
-        "tags": [
-          "organization"
+          "planning"
         ]
       }
     },
@@ -6228,676 +3708,6 @@
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/handoffs": {
-      "get": {
-        "operationId": "list_handoffs_api_v1_workspaces__workspace_id__projects__project_id__handoffs_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/HandoffResponse"
-                  },
-                  "title": "Response List Handoffs Api V1 Workspaces  Workspace Id  Projects  Project Id  Handoffs Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Handoffs",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}": {
-      "patch": {
-        "operationId": "update_handoff_api_v1_workspaces__workspace_id__projects__project_id__handoffs__handoff_id__patch",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "handoff_id",
-            "required": true,
-            "schema": {
-              "title": "Handoff Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HandoffUpdate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HandoffResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Update Handoff",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/acknowledge": {
-      "post": {
-        "operationId": "acknowledge_handoff_api_v1_workspaces__workspace_id__projects__project_id__handoffs__handoff_id__acknowledge_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "handoff_id",
-            "required": true,
-            "schema": {
-              "title": "Handoff Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HandoffAckRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HandoffAcknowledgementResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Acknowledge Handoff",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/ready": {
-      "post": {
-        "operationId": "ready_handoff_api_v1_workspaces__workspace_id__projects__project_id__handoffs__handoff_id__ready_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "handoff_id",
-            "required": true,
-            "schema": {
-              "title": "Handoff Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HandoffVersionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HandoffResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Ready Handoff",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/revisions": {
-      "get": {
-        "operationId": "list_handoff_revisions_api_v1_workspaces__workspace_id__projects__project_id__handoffs__handoff_id__revisions_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "handoff_id",
-            "required": true,
-            "schema": {
-              "title": "Handoff Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/HandoffRevisionResponse"
-                  },
-                  "title": "Response List Handoff Revisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Handoffs  Handoff Id  Revisions Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Handoff Revisions",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/handoffs/{handoff_id}/revisions/{revision}/download": {
-      "get": {
-        "operationId": "download_handoff_revision_api_v1_workspaces__workspace_id__projects__project_id__handoffs__handoff_id__revisions__revision__download_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "handoff_id",
-            "required": true,
-            "schema": {
-              "title": "Handoff Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "revision",
-            "required": true,
-            "schema": {
-              "title": "Revision",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "format",
-            "required": false,
-            "schema": {
-              "default": "json",
-              "title": "Format",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Download Handoff Revision",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/invariants": {
-      "get": {
-        "operationId": "list_invariants_api_v1_workspaces__workspace_id__projects__project_id__invariants_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "feature_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Feature Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/InvariantResponse"
-                  },
-                  "title": "Response List Invariants Api V1 Workspaces  Workspace Id  Projects  Project Id  Invariants Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Invariants",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "create_invariant_api_v1_workspaces__workspace_id__projects__project_id__invariants_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InvariantCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvariantResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create Invariant",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}": {
-      "patch": {
-        "operationId": "update_invariant_api_v1_workspaces__workspace_id__projects__project_id__invariants__invariant_id__patch",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "invariant_id",
-            "required": true,
-            "schema": {
-              "title": "Invariant Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InvariantUpdate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvariantResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Update Invariant",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}/revisions": {
-      "get": {
-        "operationId": "invariant_revisions_api_v1_workspaces__workspace_id__projects__project_id__invariants__invariant_id__revisions_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "invariant_id",
-            "required": true,
-            "schema": {
-              "title": "Invariant Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/InvariantRevisionResponse"
-                  },
-                  "title": "Response Invariant Revisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Invariants  Invariant Id  Revisions Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Invariant Revisions",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/planning/overview": {
       "get": {
         "operationId": "planning_overview_api_v1_workspaces__workspace_id__projects__project_id__planning_overview_get",
@@ -6946,1092 +3756,6 @@
           }
         },
         "summary": "Planning Overview",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates": {
-      "get": {
-        "operationId": "list_candidates_api_v1_workspaces__workspace_id__projects__project_id__release_candidates_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/CandidateResponse"
-                  },
-                  "title": "Response List Candidates Api V1 Workspaces  Workspace Id  Projects  Project Id  Release Candidates Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Candidates",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "create_candidate_api_v1_workspaces__workspace_id__projects__project_id__release_candidates_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CandidateCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CandidateResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create Candidate",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}": {
-      "get": {
-        "operationId": "get_candidate_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CandidateResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Get Candidate",
-        "tags": [
-          "organization"
-        ]
-      },
-      "patch": {
-        "operationId": "update_candidate_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__patch",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CandidateUpdate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CandidateResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Update Candidate",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/freeze": {
-      "post": {
-        "operationId": "freeze_candidate_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__freeze_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CandidateFreezeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CandidateResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Freeze Candidate",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates": {
-      "get": {
-        "operationId": "list_candidate_gates_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__gates_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/GateEvaluationResponse"
-                  },
-                  "title": "Response List Candidate Gates Api V1 Workspaces  Workspace Id  Projects  Project Id  Release Candidates  Candidate Id  Gates Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Candidate Gates",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/evaluate": {
-      "post": {
-        "operationId": "evaluate_gates_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__gates_evaluate_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GateEvaluationResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Evaluate Gates",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/gates/preview": {
-      "post": {
-        "operationId": "preview_gates_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__gates_preview_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GateEvaluationResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Preview Gates",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/manifest": {
-      "get": {
-        "operationId": "get_manifest_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__manifest_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "manifest_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Manifest Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ManifestResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Get Manifest",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "save_manifest_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__manifest_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManifestSaveRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ManifestResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Save Manifest",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/manifest/download": {
-      "get": {
-        "operationId": "download_manifest_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__manifest_download_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "format",
-            "required": false,
-            "schema": {
-              "default": "json",
-              "title": "Format",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "manifest_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Manifest Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Download Manifest",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/release-candidates/{candidate_id}/revisions": {
-      "get": {
-        "operationId": "list_candidate_revisions_api_v1_workspaces__workspace_id__projects__project_id__release_candidates__candidate_id__revisions_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "candidate_id",
-            "required": true,
-            "schema": {
-              "title": "Candidate Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/CandidateHistoryResponse"
-                  },
-                  "title": "Response List Candidate Revisions Api V1 Workspaces  Workspace Id  Projects  Project Id  Release Candidates  Candidate Id  Revisions Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Candidate Revisions",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/repositories": {
-      "get": {
-        "operationId": "list_repositories_api_v1_workspaces__workspace_id__projects__project_id__repositories_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/RepositoryResponse"
-                  },
-                  "title": "Response List Repositories Api V1 Workspaces  Workspace Id  Projects  Project Id  Repositories Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Repositories",
-        "tags": [
-          "organization"
-        ]
-      },
-      "post": {
-        "operationId": "connect_repository_api_v1_workspaces__workspace_id__projects__project_id__repositories_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RepositoryCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RepositoryResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Connect Repository",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/repositories/{repository_id}/disconnect": {
-      "post": {
-        "operationId": "disconnect_repository_api_v1_workspaces__workspace_id__projects__project_id__repositories__repository_id__disconnect_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "repository_id",
-            "required": true,
-            "schema": {
-              "title": "Repository Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RepositoryResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Disconnect Repository",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/repositories/{repository_id}/observations": {
-      "get": {
-        "operationId": "list_observations_api_v1_workspaces__workspace_id__projects__project_id__repositories__repository_id__observations_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "repository_id",
-            "required": true,
-            "schema": {
-              "title": "Repository Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ObservationResponse"
-                  },
-                  "title": "Response List Observations Api V1 Workspaces  Workspace Id  Projects  Project Id  Repositories  Repository Id  Observations Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Observations",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/repositories/{repository_id}/observe": {
-      "post": {
-        "operationId": "observe_repository_api_v1_workspaces__workspace_id__projects__project_id__repositories__repository_id__observe_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "repository_id",
-            "required": true,
-            "schema": {
-              "title": "Repository Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ObservationResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Observe Repository",
         "tags": [
           "organization"
         ]
@@ -8088,9 +3812,9 @@
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/runs": {
+    "/api/v1/workspaces/{workspace_id}/tags": {
       "get": {
-        "operationId": "list_runs_api_v1_workspaces__workspace_id__projects__project_id__runs_get",
+        "operationId": "list_workspace_tags_api_v1_workspaces__workspace_id__tags_get",
         "parameters": [
           {
             "in": "path",
@@ -8100,64 +3824,6 @@
               "title": "Workspace Id",
               "type": "string"
             }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "feature_id",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Feature Id"
-            }
-          },
-          {
-            "in": "query",
-            "name": "status",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Status"
-            }
-          },
-          {
-            "in": "query",
-            "name": "search",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "maxLength": 160,
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Search"
-            }
           }
         ],
         "responses": {
@@ -8166,9 +3832,9 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/RunResponse"
+                    "$ref": "#/components/schemas/WorkspaceTagResponse"
                   },
-                  "title": "Response List Runs Api V1 Workspaces  Workspace Id  Projects  Project Id  Runs Get",
+                  "title": "Response List Workspace Tags Api V1 Workspaces  Workspace Id  Tags Get",
                   "type": "array"
                 }
               }
@@ -8186,13 +3852,13 @@
             "description": "Validation Error"
           }
         },
-        "summary": "List Runs",
+        "summary": "List Workspace Tags",
         "tags": [
           "organization"
         ]
       },
       "post": {
-        "operationId": "create_run_api_v1_workspaces__workspace_id__projects__project_id__runs_post",
+        "operationId": "create_workspace_tag_api_v1_workspaces__workspace_id__tags_post",
         "parameters": [
           {
             "in": "path",
@@ -8202,22 +3868,13 @@
               "title": "Workspace Id",
               "type": "string"
             }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RunCreate"
+                "$ref": "#/components/schemas/WorkspaceTagCreate"
               }
             }
           },
@@ -8228,7 +3885,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RunResponse"
+                  "$ref": "#/components/schemas/WorkspaceTagResponse"
                 }
               }
             },
@@ -8245,15 +3902,15 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Create Run",
+        "summary": "Create Workspace Tag",
         "tags": [
           "organization"
         ]
       }
     },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}": {
-      "get": {
-        "operationId": "get_run_api_v1_workspaces__workspace_id__projects__project_id__runs__run_id__get",
+    "/api/v1/workspaces/{workspace_id}/tags/{tag_id}": {
+      "delete": {
+        "operationId": "delete_workspace_tag_api_v1_workspaces__workspace_id__tags__tag_id__delete",
         "parameters": [
           {
             "in": "path",
@@ -8266,32 +3923,16 @@
           },
           {
             "in": "path",
-            "name": "project_id",
+            "name": "tag_id",
             "required": true,
             "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "run_id",
-            "required": true,
-            "schema": {
-              "title": "Run Id",
+              "title": "Tag Id",
               "type": "string"
             }
           }
         ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RunResponse"
-                }
-              }
-            },
+          "204": {
             "description": "Successful Response"
           },
           "422": {
@@ -8305,77 +3946,13 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Get Run",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/events": {
-      "get": {
-        "operationId": "list_run_events_api_v1_workspaces__workspace_id__projects__project_id__runs__run_id__events_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "run_id",
-            "required": true,
-            "schema": {
-              "title": "Run Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/RunEventResponse"
-                  },
-                  "title": "Response List Run Events Api V1 Workspaces  Workspace Id  Projects  Project Id  Runs  Run Id  Events Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Run Events",
+        "summary": "Delete Workspace Tag",
         "tags": [
           "organization"
         ]
       },
-      "post": {
-        "operationId": "create_run_event_api_v1_workspaces__workspace_id__projects__project_id__runs__run_id__events_post",
+      "patch": {
+        "operationId": "update_workspace_tag_api_v1_workspaces__workspace_id__tags__tag_id__patch",
         "parameters": [
           {
             "in": "path",
@@ -8388,19 +3965,10 @@
           },
           {
             "in": "path",
-            "name": "project_id",
+            "name": "tag_id",
             "required": true,
             "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "run_id",
-            "required": true,
-            "schema": {
-              "title": "Run Id",
+              "title": "Tag Id",
               "type": "string"
             }
           }
@@ -8409,147 +3977,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RunEventCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RunEventResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create Run Event",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/handoffs": {
-      "post": {
-        "operationId": "create_handoff_api_v1_workspaces__workspace_id__projects__project_id__runs__run_id__handoffs_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "run_id",
-            "required": true,
-            "schema": {
-              "title": "Run Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HandoffCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HandoffResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Create Handoff",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/runs/{run_id}/status": {
-      "post": {
-        "operationId": "update_run_status_api_v1_workspaces__workspace_id__projects__project_id__runs__run_id__status_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "run_id",
-            "required": true,
-            "schema": {
-              "title": "Run Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RunStatusUpdate"
+                "$ref": "#/components/schemas/WorkspaceTagUpdate"
               }
             }
           },
@@ -8560,7 +3988,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RunResponse"
+                  "$ref": "#/components/schemas/WorkspaceTagResponse"
                 }
               }
             },
@@ -8577,299 +4005,7 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Update Run Status",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/verifications": {
-      "get": {
-        "operationId": "list_verifications_api_v1_workspaces__workspace_id__projects__project_id__verifications_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/VerificationResponse"
-                  },
-                  "title": "Response List Verifications Api V1 Workspaces  Workspace Id  Projects  Project Id  Verifications Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Verifications",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/verifications/evaluate": {
-      "post": {
-        "operationId": "evaluate_verification_api_v1_workspaces__workspace_id__projects__project_id__verifications_evaluate_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerificationRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerificationResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Evaluate Verification",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/verifications/preview": {
-      "post": {
-        "operationId": "preview_verification_api_v1_workspaces__workspace_id__projects__project_id__verifications_preview_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerificationRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerificationResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Preview Verification",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/verifications/rules": {
-      "get": {
-        "operationId": "list_verification_rules_api_v1_workspaces__workspace_id__projects__project_id__verifications_rules_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/VerificationRuleResponse"
-                  },
-                  "title": "Response List Verification Rules Api V1 Workspaces  Workspace Id  Projects  Project Id  Verifications Rules Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "List Verification Rules",
-        "tags": [
-          "organization"
-        ]
-      }
-    },
-    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/verifications/{evaluation_id}": {
-      "get": {
-        "operationId": "get_verification_api_v1_workspaces__workspace_id__projects__project_id__verifications__evaluation_id__get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "workspace_id",
-            "required": true,
-            "schema": {
-              "title": "Workspace Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "project_id",
-            "required": true,
-            "schema": {
-              "title": "Project Id",
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "evaluation_id",
-            "required": true,
-            "schema": {
-              "title": "Evaluation Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerificationResponse"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            },
-            "description": "Validation Error"
-          }
-        },
-        "summary": "Get Verification",
+        "summary": "Update Workspace Tag",
         "tags": [
           "organization"
         ]

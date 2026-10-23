@@ -106,7 +106,12 @@ const canonical = {
   '229:534': { name: 'ReleaseGate', category: 'product' },
 };
 const counts = { core: 37, icon: 35, product: 28 };
-const implementationStatuses = new Set(['IMPLEMENTED', 'PARTIAL', 'NOT_IMPLEMENTED']);
+const implementationStatuses = new Set([
+  'IMPLEMENTED',
+  'PARTIAL',
+  'NOT_IMPLEMENTED',
+  'OUT_OF_SCOPE',
+]);
 const nonempty = (v) => typeof v === 'string' && v.trim().length > 0;
 const record = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const repositoryRoot = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -174,6 +179,8 @@ export function validateParity(registry, { root = repositoryRoot } = {}) {
         mapping.current.forEach((reference) =>
           checkCurrentPath(reference, `${label}.${field}`, 'file'),
         );
+      if (row.implementationStatus === 'OUT_OF_SCOPE' && mapping.current?.length)
+        errors.push(`${label}.${field} out-of-scope mappings must not claim current files`);
     }
     if (!nonempty(row.component?.name)) errors.push(`${label}.component.name is required`);
     if (!implementationStatuses.has(row.implementationStatus))
@@ -206,6 +213,8 @@ export function validateParity(registry, { root = repositoryRoot } = {}) {
       }
       if (!['AVAILABLE', 'PLANNED'].includes(host.status))
         errors.push(`${label}.componentHost status is invalid`);
+      if (row.implementationStatus === 'OUT_OF_SCOPE' && host.status !== 'PLANNED')
+        errors.push(`${label}.componentHost out-of-scope previews must be PLANNED`);
       if (host.status === 'AVAILABLE' && !nonempty(host.source))
         errors.push(`${label}.componentHost source required for AVAILABLE`);
       else if (host.status === 'AVAILABLE')

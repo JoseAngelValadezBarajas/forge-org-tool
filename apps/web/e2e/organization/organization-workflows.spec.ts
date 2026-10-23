@@ -38,7 +38,9 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
 
   const projectName = `Lifecycle ${suffix}`;
   await page.getByLabel('Project name').fill(projectName);
-  await page.getByLabel('Description').fill('Created through Organization UI');
+  await page
+    .getByRole('textbox', { name: 'Description', exact: true })
+    .fill('Created through Organization UI');
   await page.getByRole('button', { name: 'Create Project' }).click();
   const projectHeading = page
     .getByRole('region', { name: 'Project summaries' })
@@ -84,7 +86,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   );
   expect((await persisted.json())[0]).toMatchObject({ status: 'active' });
   await page.reload();
-  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+  await expect(page.getByRole('combobox', { name: 'Workspace' })).toHaveValue(workspace.id);
   await search.fill(projectName);
   await expect(page.getByRole('button', { name: 'Archive' })).toBeVisible();
 });

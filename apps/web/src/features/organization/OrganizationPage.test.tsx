@@ -8,6 +8,57 @@ describe('OrganizationPage', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    localStorage.clear();
+  });
+
+  it('restores and persists the explicitly selected workspace across a page reload', async () => {
+    localStorage.setItem('forge-active-workspace', 'w2');
+    const workspaces = [
+      { id: 'w1', name: 'One', status: 'active', created_at: '', updated_at: '' },
+      { id: 'w2', name: 'Two', status: 'active', created_at: '', updated_at: '' },
+    ];
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      const path = String(input);
+      const payload =
+        path === '/api/v1/workspaces'
+          ? workspaces
+          : path.includes('/workspaces/w2/')
+            ? [
+                {
+                  id: 'p2',
+                  workspace_id: 'w2',
+                  name: 'Two project',
+                  description: null,
+                  status: 'active',
+                  created_at: '',
+                  updated_at: '',
+                  archived_at: null,
+                },
+              ]
+            : [];
+      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const renderPage = () =>
+      render(
+        <MemoryRouter>
+          <OrganizationPage />
+        </MemoryRouter>,
+      );
+    const first = renderPage();
+    const selector = await screen.findByRole('combobox', { name: 'Workspace' });
+    await waitFor(() => expect(selector).toHaveValue('w2'));
+    expect(await screen.findByRole('link', { name: 'Two project' })).toBeInTheDocument();
+    fireEvent.change(selector, { target: { value: 'w1' } });
+    await waitFor(() => expect(localStorage.getItem('forge-active-workspace')).toBe('w1'));
+    first.unmount();
+
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByRole('combobox', { name: 'Workspace' })).toHaveValue('w1');
   });
 
   it('shows an actionable empty state and creates a workspace', async () => {
@@ -35,47 +86,82 @@ describe('OrganizationPage', () => {
 
     await screen.findByText('No workspaces yet');
     fireEvent.change(screen.getByLabelText('Workspace name'), { target: { value: 'Research' } });
+    fireEvent.change(screen.getByLabelText('Workspace description'), {
+      target: { value: 'Local planning records' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Create Workspace' }));
 
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(
         '/api/v1/workspaces',
-        expect.objectContaining({ method: 'POST' }),
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ name: 'Research', description: 'Local planning records' }),
+        }),
+      ),
+    );
+  });
+
+  it('edits the selected workspace name and description through the API', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Research',
+      description: 'Old description',
+      created_at: '',
+      updated_at: '',
+    };
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      const path = String(input);
+      if (path === '/api/v1/workspaces')
+        return Promise.resolve(new Response(JSON.stringify([workspace]), { status: 200 }));
+      if (path === '/api/v1/workspaces/w1' && init?.method === 'PATCH')
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({ ...workspace, name: 'Research Lab', description: 'Updated' }),
+            { status: 200 },
+          ),
+        );
+      if (path.endsWith('/tags')) return Promise.resolve(new Response('[]', { status: 200 }));
+      return Promise.resolve(new Response('[]', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(await screen.findByLabelText('Edit workspace name'), {
+      target: { value: 'Research Lab' },
+    });
+    fireEvent.change(screen.getByLabelText('Edit workspace description'), {
+      target: { value: 'Updated' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save workspace' }));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/workspaces/w1',
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify({ name: 'Research Lab', description: 'Updated' }),
+        }),
       ),
     );
   });
 
   it('renders projects for the selected workspace', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi
-        .fn()
-        .mockResolvedValueOnce(
-          new Response(
-            JSON.stringify([
-              { id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' },
-            ]),
-            { status: 200 },
-          ),
-        )
-        .mockResolvedValueOnce(
-          new Response(
-            JSON.stringify([
-              {
-                id: 'p1',
-                workspace_id: 'w1',
-                name: 'Atlas',
-                description: 'Map work',
-                status: 'active',
-                created_at: '',
-                updated_at: '',
-                archived_at: null,
-              },
-            ]),
-            { status: 200 },
-          ),
-        ),
-    );
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((input: string) => {
+      const path = String(input);
+      const payload = path === '/api/v1/workspaces'
+        ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
+        : path.endsWith('/tags')
+          ? []
+          : [{
+              id: 'p1', workspace_id: 'w1', name: 'Atlas', description: 'Map work',
+              status: 'active', created_at: '', updated_at: '', archived_at: null,
+            }];
+      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+    }));
     render(
       <MemoryRouter>
         <OrganizationPage />
@@ -159,18 +245,18 @@ describe('OrganizationPage', () => {
   });
 
   it('recovers the workspace dashboard after a temporary loading failure', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('Connection unavailable'))
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify([
-            { id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' },
-          ]),
-          { status: 200 },
-        ),
-      )
-      .mockResolvedValueOnce(new Response('[]', { status: 200 }));
+    let failFirstRequest = true;
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (failFirstRequest) {
+        failFirstRequest = false;
+        return Promise.reject(new Error('Connection unavailable'));
+      }
+      const path = String(input);
+      const payload = path === '/api/v1/workspaces'
+        ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
+        : [];
+      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+    });
     vi.stubGlobal('fetch', fetchMock);
     render(
       <MemoryRouter>
@@ -228,7 +314,7 @@ describe('OrganizationPage', () => {
     });
   });
 
-  it('summarizes persisted planning and current readiness with real attention links', async () => {
+  it('summarizes persisted planning and keeps attention links in the planning board', async () => {
     const features = [
       {
         id: 'f-ready',
@@ -272,28 +358,6 @@ describe('OrganizationPage', () => {
             status: 200,
           }),
         );
-      if (path.includes('/readiness/preview')) {
-        const featureId = path.includes('f-ready') ? 'f-ready' : 'f-blocked';
-        const ready = featureId === 'f-ready';
-        return Promise.resolve(
-          new Response(
-            JSON.stringify({
-              feature_id: featureId,
-              evaluated_at: '2026-10-22T12:00:00Z',
-              rule_set_version: 'fnd03-v1',
-              input_fingerprint: `${featureId}-fingerprint`,
-              outcome: ready ? 'READY_TO_START' : 'NOT_READY',
-              passed_checks: [],
-              failed_checks: ready ? [] : ['R02'],
-              blockers: ready
-                ? []
-                : [{ code: 'R02_MISSING', message: 'Add an acceptance criterion.' }],
-              results: [],
-            }),
-            { status: 200 },
-          ),
-        );
-      }
       return Promise.resolve(
         new Response(
           JSON.stringify(
@@ -324,17 +388,14 @@ describe('OrganizationPage', () => {
     );
 
     expect(await screen.findByText('2 planned features')).toBeInTheDocument();
-    expect(screen.getByText(/Readiness evaluation preview:/)).toHaveTextContent(
-      'Readiness evaluation preview: 1 ready to start · 1 not ready · 0 unavailable',
-    );
-    expect(screen.getByRole('link', { name: 'Needs criteria' })).toHaveAttribute(
-      'href',
-      '/planning/w1/p1/features/f-blocked',
-    );
-    expect(screen.getByRole('listitem')).toHaveTextContent('Add an acceptance criterion.');
+    expect(
+      fetchMock.mock.calls
+        .map(([path]) => String(path))
+        .some((path) => path.includes('/readiness/')),
+    ).toBe(false);
   });
 
-  it('shows real runs and handoff status in one newest-first activity feed', async () => {
+  it('does not request or render retired run and handoff activity', async () => {
     const run = (id: string, title: string, date: string) => ({
       id,
       project_id: 'p1',
@@ -419,20 +480,13 @@ describe('OrganizationPage', () => {
       </MemoryRouter>,
     );
 
-    const newest = await screen.findByText('Newest run');
-    expect(screen.getAllByText('Reported run')).toHaveLength(2);
-    expect(screen.getByText('Handoff status')).toBeInTheDocument();
-    expect(screen.getByText('Review handoff')).toBeInTheDocument();
-    const rows = screen.getAllByRole('listitem');
-    expect(rows.map((row) => row.textContent)).toEqual([
-      expect.stringContaining('Newest run'),
-      expect.stringContaining('Review handoff'),
-      expect.stringContaining('Older run'),
-    ]);
-    expect(newest).toBeInTheDocument();
+    await screen.findByRole('heading', { name: 'Atlas' });
+    expect(screen.queryByText(/recent activity/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('Newest run')).not.toBeInTheDocument();
+    expect(screen.queryByText('Review handoff')).not.toBeInTheDocument();
   });
 
-  it('distinguishes an empty activity feed from an API loading failure', async () => {
+  it('does not expose an empty or failed state for the retired activity feed', async () => {
     const workspace = [
       { id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' },
     ];
@@ -461,35 +515,13 @@ describe('OrganizationPage', () => {
         );
       }),
     );
-    const { unmount } = render(
-      <MemoryRouter>
-        <OrganizationPage />
-      </MemoryRouter>,
-    );
-    expect(await screen.findByText('No recent activity for this workspace.')).toBeInTheDocument();
-
-    unmount();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockImplementation((input: string) => {
-        const path = String(input);
-        if (path === '/api/v1/workspaces')
-          return Promise.resolve(new Response(JSON.stringify(workspace), { status: 200 }));
-        if (path.includes('/runs?'))
-          return Promise.resolve(new Response('failure', { status: 500 }));
-        return Promise.resolve(
-          new Response(JSON.stringify(path.includes('/projects?') ? [project] : []), {
-            status: 200,
-          }),
-        );
-      }),
-    );
     render(
       <MemoryRouter>
         <OrganizationPage />
       </MemoryRouter>,
     );
-    expect(await screen.findByText('Recent activity could not be loaded.')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
+    expect(screen.queryByText(/recent activity/i)).not.toBeInTheDocument();
   });
 
   it('does not show a prior workspace project after a selection race', async () => {

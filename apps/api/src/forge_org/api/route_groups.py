@@ -3,14 +3,10 @@
 from fastapi import APIRouter
 
 from .capability_routes import (
-    context,
-    delivery,
+    attachments,
     organization,
     planning,
-    readiness,
-    repositories,
     transfer,
-    workbench,
 )
 
 
@@ -31,12 +27,8 @@ def build_capability_router(source: APIRouter | None = None) -> APIRouter:
         return composed
     for module in (
         planning,
+        attachments,
         organization,
-        readiness,
-        repositories,
-        context,
-        workbench,
-        delivery,
         transfer,
     ):
         composed.routes.extend(module.build_router(source).routes)

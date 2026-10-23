@@ -11,10 +11,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Review evidence provenance and release readiness.",
       "expected_result": "Delivery overview presents provenance, verification and non-publication boundaries.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "76:97",
@@ -25,10 +25,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Filter and inspect evidence by provenance and status.",
       "expected_result": "Active and invalidated evidence retain their explicit provenance.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "76:176",
@@ -39,10 +39,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Register a user-reported evidence reference.",
       "expected_result": "Evidence persists as REPORTED and is not represented as independently verified.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "76:250",
@@ -53,10 +53,10 @@
       "route": "/delivery/{workspaceId}/{projectId}/evidence/{evidenceId}",
       "user_action": "Inspect evidence provenance and invalidate the record.",
       "expected_result": "Detail preserves source/provenance and invalidation is persisted.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "77:118",
@@ -67,10 +67,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Preview and evaluate a named verification rule.",
       "expected_result": "Blocked outcome, blockers, fingerprint and saved evaluation are visible and persisted.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "77:207",
@@ -95,10 +95,10 @@
       "route": "/delivery/{workspaceId}/{projectId}/verifications/{verificationId}",
       "user_action": "Open a saved verification result and inspect its trace.",
       "expected_result": "Saved evaluation, blockers and staleness are shown.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "77:347",
@@ -109,10 +109,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Create a release candidate draft.",
       "expected_result": "Candidate is stored at its initial revision and remains a draft until frozen.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "78:234",
@@ -123,10 +123,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Evaluate release gates for a frozen candidate.",
       "expected_result": "Gate result and candidate revision are recorded; blockers prevent manifest creation.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "78:322",
@@ -137,10 +137,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Freeze a candidate, save its manifest and download JSON/Markdown.",
       "expected_result": "Manifest bytes match saved state and explicitly remain NOT_PUBLISHED.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "87:3",
@@ -263,10 +263,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Review evidence records and provenance.",
       "expected_result": "Evidence inventory distinguishes provenance and invalidation state.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:391",
@@ -277,10 +277,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Evaluate checks and inspect blocking conditions.",
       "expected_result": "Blocked outcomes and blockers are explicit and retained.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:445",
@@ -291,10 +291,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Review candidate gates and freeze state.",
       "expected_result": "Gate result is revision-aware and manifest creation requires a current PASS.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "133:500",
@@ -319,10 +319,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Register reported evidence.",
       "expected_result": "The stored record remains REPORTED and is not asserted verified.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:114",
@@ -333,10 +333,10 @@
       "route": "/delivery/{workspaceId}/{projectId}/evidence/{evidenceId}",
       "user_action": "Inspect and invalidate evidence.",
       "expected_result": "Invalidation is retained in backend state.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:183",
@@ -347,10 +347,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Preview, evaluate and inspect verification history.",
       "expected_result": "Outcome, blockers and stale status derive from recorded inputs.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:252",
@@ -361,10 +361,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Inspect blockers for a failed verification.",
       "expected_result": "Missing active VERIFIED evidence is shown as a blocker.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:321",
@@ -375,10 +375,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Create a release candidate draft.",
       "expected_result": "Candidate persists with draft status and revision.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:390",
@@ -389,10 +389,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Freeze a candidate at its expected revision.",
       "expected_result": "Frozen snapshot and fingerprint are retained.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:459",
@@ -403,10 +403,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Evaluate and diagnose release gates.",
       "expected_result": "Gate outcome and blockers are retained for the current revision.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:528",
@@ -417,10 +417,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Save and download the release manifest.",
       "expected_result": "Actual JSON and Markdown downloads identify the artifact as NOT_PUBLISHED.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "142:597",
@@ -445,10 +445,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Confirm evidence invalidation.",
       "expected_result": "Record status changes to INVALIDATED and remains persisted.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "143:184",
@@ -459,10 +459,10 @@
       "route": "/delivery/{workspaceId}/{projectId}",
       "user_action": "Download a release manifest for review.",
       "expected_result": "Download is a local planning artifact and does not publish or deploy.",
-      "test_ids": ["PA-DEL-001"],
-      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     }
   ]
 }

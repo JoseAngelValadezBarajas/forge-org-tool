@@ -6,6 +6,7 @@ import parity from '../../../../../docs/design/design-system-parity.json';
 import { catalogFamilyById, catalogSections } from './catalog/inventory';
 import { catalogStatus } from './catalog/parity-status';
 import { foundationCatalog } from './catalog/foundations';
+import { productPatternCatalogIds } from './catalog/product-patterns';
 import type { CatalogItem, CatalogSection } from './catalog/types';
 import { TokenPreview } from './previews/foundations';
 import { IconCatalogPreview } from './previews/icons';
@@ -380,7 +381,13 @@ const productAccessibility: Record<string, string> = {
 
 catalog.push(
   ...parity.inventory
-    .filter((entry) => entry.category === 'product')
+    .filter(
+      (entry) =>
+        entry.category === 'product' &&
+        productPatternCatalogIds.includes(
+          entry.componentHost.id as (typeof productPatternCatalogIds)[number],
+        ),
+    )
     .map((entry) => ({
       id: entry.componentHost.id,
       name: entry.figmaName,
@@ -469,7 +476,8 @@ function ComponentPreview({
   const feedbackPreview = renderFeedbackPreview(item.id);
   if (feedbackPreview !== null) return feedbackPreview;
   const productPatternPreview = renderProductPatternPreview(item.id);
-  if (productPatternPreview !== null) return productPatternPreview;
+  if (productPatternPreview !== null)
+    return <div data-product-pattern={item.id}>{productPatternPreview}</div>;
 
   if (item.id === 'tokens') return <TokenPreview />;
   if (item.id === 'icon-library') return <IconCatalogPreview />;

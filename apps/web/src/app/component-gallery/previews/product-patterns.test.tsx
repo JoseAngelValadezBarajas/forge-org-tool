@@ -11,13 +11,12 @@ describe('product pattern previews', () => {
 
   it('renders feature-owned planning patterns from deterministic fixtures', () => {
     render(<MemoryRouter>{renderProductPatternPreview('feature-card')}</MemoryRouter>);
-    expect(screen.getAllByRole('link', { name: 'Review local planning changes' })).toHaveLength(3);
-    expect(screen.getByText('backlog')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Review local planning changes' })).toBeInTheDocument();
+    expect(screen.getByText('in progress')).toBeInTheDocument();
   });
 
-  it('renders feature-owned delivery patterns and returns null for unknown IDs', () => {
-    render(renderProductPatternPreview('verification-summary'));
-    expect(screen.getByText('sha256:scoped')).toBeInTheDocument();
+  it('returns null for retired and unknown product patterns', () => {
+    expect(renderProductPatternPreview('verification-summary')).toBeNull();
     expect(renderProductPatternPreview('unknown-pattern')).toBeNull();
   });
 

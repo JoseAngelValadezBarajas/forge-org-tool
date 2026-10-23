@@ -42,7 +42,10 @@ export function TransferPage() {
         <Card>
           <section aria-labelledby="import-title" className={styles.panel}>
             <h3 id="import-title">Import a project</h3>
-            <p>Select a previously exported `forge-project-import-v1` JSON file.</p>
+            <p>
+              Import versioned project JSON. Existing `forge-project-import-v1` files remain
+              supported.
+            </p>
             <FormField label="Choose a project JSON file">
               <input
                 className={styles.fileInput}
@@ -63,7 +66,7 @@ export function TransferPage() {
                   id="transfer-document"
                   value={documentText}
                   onChange={(event) => updateDocumentText(event.target.value)}
-                  placeholder="Paste a forge-project-import-v1 document"
+                  placeholder="Paste a versioned project transfer document"
                   rows={10}
                 />
               </FormField>
@@ -90,7 +93,7 @@ export function TransferPage() {
             {exported && (
               <div className={styles.review} role="status">
                 <h4>Export ready</h4>
-                <StatusChip tone="success">forge-project-import-v1</StatusChip>
+                <StatusChip tone="success">forge-project-transfer-v2</StatusChip>
                 <p>JSON download prepared from the selected project.</p>
                 {documentText && (
                   <details>

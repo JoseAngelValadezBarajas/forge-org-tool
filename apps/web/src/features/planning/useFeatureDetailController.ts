@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   organizationApi,
+  type BugAttachment,
   type Criterion,
   type Dependency,
   type Feature,
-  type ReadinessResult,
   type Task,
 } from '@forge-org/api-client';
 
@@ -21,7 +21,13 @@ export function useFeatureDetailController(
   const [featureTitle, setFeatureTitle] = useState('');
   const [featureDescription, setFeatureDescription] = useState('');
   const [featureGoal, setFeatureGoal] = useState('');
-  const [readiness, setReadiness] = useState<ReadinessResult | null>(null);
+  const [bugSeverity, setBugSeverity] = useState('medium');
+  const [stepsToReproduce, setStepsToReproduce] = useState('');
+  const [expectedResult, setExpectedResult] = useState('');
+  const [actualResult, setActualResult] = useState('');
+  const [featureTags, setFeatureTags] = useState('');
+  const [notes, setNotes] = useState('');
+  const [attachments, setAttachments] = useState<BugAttachment[]>([]);
   const [taskTitle, setTaskTitle] = useState('');
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
@@ -33,16 +39,14 @@ export function useFeatureDetailController(
       const generation = ++loadGeneration.current;
       const tasksAtStart = taskGeneration.current;
       try {
-        const [nextTasks, nextCriteria, nextDependencies, nextReadiness, nextOverview] =
-          await Promise.all([
-            organizationApi.listTasks(workspaceId, projectId, featureId),
-            organizationApi.listCriteria(workspaceId, projectId, featureId),
-            organizationApi.listDependencies(workspaceId, projectId),
-            organizationApi.previewReadiness(workspaceId, projectId, featureId).catch(() => null),
-            organizationApi
-              .planningOverview(workspaceId, projectId)
-              .catch(() => ({ epics: [], unassigned_features: [] })),
-          ]);
+        const [nextTasks, nextCriteria, nextDependencies, nextOverview] = await Promise.all([
+          organizationApi.listTasks(workspaceId, projectId, featureId),
+          organizationApi.listCriteria(workspaceId, projectId, featureId),
+          organizationApi.listDependencies(workspaceId, projectId),
+          organizationApi
+            .planningOverview(workspaceId, projectId)
+            .catch(() => ({ epics: [], unassigned_features: [] })),
+        ]);
         if (!isCurrent() || generation !== loadGeneration.current) return;
         if (tasksAtStart === taskGeneration.current) setTasks(nextTasks);
         setCriteria(nextCriteria);
@@ -52,11 +56,22 @@ export function useFeatureDetailController(
           .concat(nextOverview.unassigned_features ?? []);
         setFeatures(nextFeatures);
         const nextFeature = nextFeatures.find((item) => item.id === featureId) ?? null;
+        const nextAttachments =
+          nextFeature?.kind === 'bug'
+            ? await organizationApi.listBugAttachments(workspaceId, projectId, featureId)
+            : [];
+        if (!isCurrent() || generation !== loadGeneration.current) return;
         setFeature(nextFeature);
         setFeatureTitle(nextFeature?.title ?? '');
         setFeatureDescription(nextFeature?.description ?? '');
         setFeatureGoal(nextFeature?.goal ?? '');
-        setReadiness(nextReadiness);
+        setNotes(nextFeature?.notes ?? '');
+        setBugSeverity(nextFeature?.bug_severity ?? 'medium');
+        setStepsToReproduce(nextFeature?.steps_to_reproduce ?? '');
+        setExpectedResult(nextFeature?.expected_result ?? '');
+        setActualResult(nextFeature?.actual_result ?? '');
+        setFeatureTags(nextFeature?.tags?.join(', ') ?? '');
+        setAttachments(nextAttachments);
       } catch (cause) {
         if (isCurrent() && generation === loadGeneration.current) {
           setError(cause instanceof Error ? cause.message : 'Unable to load feature detail.');
@@ -98,11 +113,25 @@ export function useFeatureDetailController(
         title: featureTitle.trim(),
         description: featureDescription.trim() || null,
         goal: featureGoal.trim() || null,
+        ...(feature.kind === 'bug'
+          ? {
+              bug_severity: bugSeverity,
+              steps_to_reproduce: stepsToReproduce.trim() || null,
+              expected_result: expectedResult.trim() || null,
+              actual_result: actualResult.trim() || null,
+            }
+          : {}),
+        tags: featureTags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        notes: notes.trim() || null,
       });
       setFeature(updated);
       setFeatureTitle(updated.title);
       setFeatureDescription(updated.description ?? '');
       setFeatureGoal(updated.goal ?? '');
+      setNotes(updated.notes ?? '');
       setFeatures((items) => items.map((item) => (item.id === updated.id ? updated : item)));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to update feature.');
@@ -118,6 +147,76 @@ export function useFeatureDetailController(
       await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to add criterion.');
+    }
+  }
+
+  async function updateCriterion(
+    criterionId: string,
+    values: Parameters<typeof organizationApi.updateCriterion>[4],
+  ) {
+    try {
+      await organizationApi.updateCriterion(workspaceId, projectId, featureId, criterionId, values);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to update acceptance criterion.');
+    }
+  }
+
+  async function removeCriterion(criterionId: string) {
+    try {
+      await organizationApi.deleteCriterion(workspaceId, projectId, featureId, criterionId);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to delete acceptance criterion.');
+    }
+  }
+
+  async function moveCriterion(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= criteria.length) return;
+    const ids = criteria.map((item) => item.id);
+    [ids[index], ids[nextIndex]] = [ids[nextIndex], ids[index]];
+    try {
+      await organizationApi.reorderCriteria(workspaceId, projectId, featureId, ids);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to reorder acceptance criteria.');
+    }
+  }
+
+  async function uploadAttachment(file: File) {
+    if (!feature || feature.kind !== 'bug') return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Screenshot must be 5 MiB or smaller.');
+      return;
+    }
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      setError('Choose a PNG, JPEG, or WebP screenshot.');
+      return;
+    }
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = '';
+      for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+      }
+      await organizationApi.uploadBugAttachment(workspaceId, projectId, feature.id, {
+        file_name: file.name,
+        content_type: file.type as 'image/png' | 'image/jpeg' | 'image/webp',
+        data_base64: btoa(binary),
+      });
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to upload screenshot.');
+    }
+  }
+
+  async function removeAttachment(attachmentId: string) {
+    try {
+      await organizationApi.deleteBugAttachment(workspaceId, projectId, featureId, attachmentId);
+      setAttachments((items) => items.filter((item) => item.id !== attachmentId));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to remove screenshot.');
     }
   }
 
@@ -147,6 +246,9 @@ export function useFeatureDetailController(
 
   return {
     addCriterion,
+    updateCriterion,
+    removeCriterion,
+    moveCriterion,
     addTask,
     changeTask,
     criteria,
@@ -155,10 +257,24 @@ export function useFeatureDetailController(
     error,
     featureName,
     moveTask,
-    readiness,
     feature,
+    attachments,
+    uploadAttachment,
+    removeAttachment,
     featureDescription,
     featureGoal,
+    bugSeverity,
+    setBugSeverity,
+    stepsToReproduce,
+    setStepsToReproduce,
+    expectedResult,
+    setExpectedResult,
+    actualResult,
+    setActualResult,
+    featureTags,
+    setFeatureTags,
+    notes,
+    setNotes,
     featureTitle,
     saveFeature,
     setFeatureTitle,

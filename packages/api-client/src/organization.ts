@@ -1,10 +1,18 @@
 import { getApiJson, sendJson } from './transport.js';
-import type { Project, ProjectUpdate, Workspace } from './types.js';
+import type { Project, ProjectUpdate, Workspace, WorkspaceUpdate } from './types.js';
 
 export const organizationCapability = {
   listWorkspaces: () => getApiJson<Workspace[]>({ path: '/api/v1/workspaces' }),
-  createWorkspace: (name: string) =>
-    sendJson<Workspace>('/api/v1/workspaces', { method: 'POST', body: JSON.stringify({ name }) }),
+  createWorkspace: (name: string, description?: string) =>
+    sendJson<Workspace>('/api/v1/workspaces', {
+      method: 'POST',
+      body: JSON.stringify({ name, description: description || null }),
+    }),
+  updateWorkspace: (workspaceId: string, values: WorkspaceUpdate) =>
+    sendJson<Workspace>(`/api/v1/workspaces/${workspaceId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(values),
+    }),
   listProjects: (
     workspaceId: string,
     search = '',

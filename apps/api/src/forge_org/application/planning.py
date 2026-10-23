@@ -19,12 +19,20 @@ class PlanningService:
         return self.repository.list_epics(project_id)
 
     def create_epic(
-        self, workspace_id: str, project_id: str, title: str, description: str | None
+        self,
+        workspace_id: str,
+        project_id: str,
+        title: str,
+        description: str | None,
+        priority: str = 'medium',
+        tags: list[str] | None = None,
     ) -> dict[str, Any]:
         self._project(workspace_id, project_id)
         if not title.strip():
             raise ValueError('Title is required')
-        return self.repository.create_epic(project_id, title.strip(), description)
+        return self.repository.create_epic(
+            workspace_id, project_id, title.strip(), description, priority, tags or []
+        )
 
     def update_epic(
         self, workspace_id: str, project_id: str, epic_id: str, values: dict[str, Any]
@@ -36,7 +44,7 @@ class PlanningService:
             raise ValueError('Title is required')
         if 'title' in values:
             values['title'] = values['title'].strip()
-        return self.repository.update_epic(project_id, epic_id, values) or {}
+        return self.repository.update_epic(workspace_id, project_id, epic_id, values) or {}
 
     def list_features(
         self,
@@ -64,7 +72,7 @@ class PlanningService:
         ):
             raise LookupError('Epic not found')
         values['title'] = values['title'].strip()
-        return self.repository.create_feature(project_id, values)
+        return self.repository.create_feature(workspace_id, project_id, values)
 
     def update_feature(
         self, workspace_id: str, project_id: str, feature_id: str, values: dict[str, Any]
@@ -83,7 +91,33 @@ class PlanningService:
             if not values['title'].strip():
                 raise ValueError('Title is required')
             values['title'] = values['title'].strip()
-        return self.repository.update_feature(project_id, feature_id, values) or {}
+        return self.repository.update_feature(workspace_id, project_id, feature_id, values) or {}
+
+    def workspace_tags(self, workspace_id: str) -> list[dict[str, Any]]:
+        if self.repository.get_workspace(workspace_id) is None:
+            raise LookupError('Workspace not found')
+        return self.repository.list_workspace_tags(workspace_id)
+
+    def create_workspace_tag(self, workspace_id: str, name: str, color: str) -> dict[str, Any]:
+        if self.repository.get_workspace(workspace_id) is None:
+            raise LookupError('Workspace not found')
+        return self.repository.create_workspace_tag(workspace_id, name, color)
+
+    def update_workspace_tag(
+        self, workspace_id: str, tag_id: str, values: dict[str, Any]
+    ) -> dict[str, Any]:
+        if self.repository.get_workspace(workspace_id) is None:
+            raise LookupError('Workspace not found')
+        item = self.repository.update_workspace_tag(workspace_id, tag_id, values)
+        if item is None:
+            raise LookupError('Workspace tag not found')
+        return item
+
+    def delete_workspace_tag(self, workspace_id: str, tag_id: str) -> None:
+        if self.repository.get_workspace(workspace_id) is None:
+            raise LookupError('Workspace not found')
+        if not self.repository.delete_workspace_tag(workspace_id, tag_id):
+            raise LookupError('Workspace tag not found')
 
     def overview(self, workspace_id: str, project_id: str) -> dict[str, Any]:
         epics = self.list_epics(workspace_id, project_id)
@@ -117,10 +151,31 @@ class PlanningService:
         values: dict[str, Any],
     ) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id)
+        if self._project(workspace_id, project_id)['status'] != 'active':
+            raise ValueError('Archived projects are read-only')
+        if 'description' in values and not str(values['description'] or '').strip():
+            raise ValueError('Description is required')
         item = self.repository.update_criterion(feature_id, criterion_id, values)
         if item is None:
             raise LookupError('Acceptance criterion not found')
         return item
+
+    def delete_criterion(
+        self, workspace_id: str, project_id: str, feature_id: str, criterion_id: str
+    ) -> None:
+        self.feature(workspace_id, project_id, feature_id)
+        if self._project(workspace_id, project_id)['status'] != 'active':
+            raise ValueError('Archived projects are read-only')
+        if not self.repository.delete_criterion(feature_id, criterion_id):
+            raise LookupError('Acceptance criterion not found')
+
+    def reorder_criteria(
+        self, workspace_id: str, project_id: str, feature_id: str, ids: list[str]
+    ) -> list[dict[str, Any]]:
+        self.feature(workspace_id, project_id, feature_id)
+        if self._project(workspace_id, project_id)['status'] != 'active':
+            raise ValueError('Archived projects are read-only')
+        return self.repository.reorder_criteria(feature_id, ids)
 
     def create_task(
         self, workspace_id: str, project_id: str, feature_id: str, values: dict[str, Any]

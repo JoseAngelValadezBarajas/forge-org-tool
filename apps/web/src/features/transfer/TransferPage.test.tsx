@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TransferPage } from './TransferPage';
 
 const document = {
-  schema_version: 'forge-project-import-v1',
+  schema_version: 'forge-project-transfer-v2',
   project: { name: 'Exported planning project' },
   features: [],
   tasks: [],
@@ -13,7 +13,7 @@ const document = {
   dependencies: [],
 };
 const preview = {
-  schema_version: 'forge-project-import-v1',
+  schema_version: 'forge-project-transfer-v2',
   fingerprint: 'transfer-fp',
   project: { name: 'Exported planning project' },
   counts: { features: 0, tasks: 0, acceptance_criteria: 0, dependencies: 0 },
@@ -32,7 +32,7 @@ describe('TransferPage', () => {
   it('previews an exported document and commits only the reviewed fingerprint', async () => {
     const fetchMock = vi.fn().mockImplementation((input: string) => {
       const path = String(input);
-      if (path.endsWith('/export'))
+      if (path.includes('/export?'))
         return Promise.resolve(new Response(JSON.stringify(document), { status: 200 }));
       if (path.endsWith('/projects/import/preview'))
         return Promise.resolve(new Response(JSON.stringify(preview), { status: 200 }));
@@ -54,7 +54,7 @@ describe('TransferPage', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Download project export' }));
-    expect(await screen.findByText('forge-project-import-v1')).toBeInTheDocument();
+    expect(await screen.findByText('forge-project-transfer-v2')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
     expect(await screen.findByText('transfer-fp')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Confirm planning import' })).toBeEnabled();
@@ -73,7 +73,7 @@ describe('TransferPage', () => {
 
   it('renders the API validation error when preview rejects the document', async () => {
     const fetchMock = vi.fn().mockImplementation((input: string) => {
-      if (String(input).endsWith('/export'))
+      if (String(input).includes('/export?'))
         return Promise.resolve(new Response(JSON.stringify(document), { status: 200 }));
       return Promise.resolve(
         new Response(JSON.stringify({ detail: 'Dependency graph contains a cycle' }), {
@@ -91,7 +91,7 @@ describe('TransferPage', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Download project export' }));
-    await screen.findByText('forge-project-import-v1');
+    await screen.findByText('forge-project-transfer-v2');
     fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Dependency graph contains a cycle');
     expect(

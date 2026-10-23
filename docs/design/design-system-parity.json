@@ -5036,28 +5036,24 @@
       "component": {
         "name": "FeatureOverview",
         "target": "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.tsx",
-        "current": ["apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/planning/index.ts#FeatureOverview",
-        "current": ["apps/web/src/features/planning/index.ts#FeatureOverview"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.module.css",
-        "current": [
-          "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.test.tsx",
-        "current": [
-          "apps/web/src/features/planning/components/FeatureOverview/FeatureOverview.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "feature-overview",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5080,7 +5076,7 @@
         }
       ],
       "states": ["Ready", "Blocked", "Unavailable"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5090,15 +5086,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code derives Ready, Blocked, and Unavailable from ReadinessResult. The host renders all three using deterministic typed results, including a blocker. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/planning/FeatureDetailPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/planning/FeatureDetailPage.test.tsx",
-          "styles": "apps/web/src/features/planning/PlanningPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5184,24 +5173,24 @@
       "component": {
         "name": "RuleCard",
         "target": "apps/web/src/features/readiness/components/RuleCard/RuleCard.tsx",
-        "current": ["apps/web/src/features/readiness/components/RuleCard/RuleCard.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/readiness/index.ts#RuleCard",
-        "current": ["apps/web/src/features/readiness/index.ts#RuleCard"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/RuleCard/RuleCard.module.css",
-        "current": ["apps/web/src/features/readiness/components/RuleCard/RuleCard.module.css"]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/RuleCard/RuleCard.test.tsx",
-        "current": ["apps/web/src/features/readiness/components/RuleCard/RuleCard.test.tsx"]
+        "current": []
       },
       "componentHost": {
         "id": "rule-card",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5224,7 +5213,7 @@
         }
       ],
       "states": ["Passed", "Blocked", "Unavailable"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5234,15 +5223,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code renders the supplied rule identifier, result, and explanation; PASS/PASSED receive success tone and other results remain visible warning text. The host previews passed, blocked, and unavailable results. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
-          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5253,30 +5235,24 @@
       "component": {
         "name": "EvaluationSnapshot",
         "target": "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.tsx"
-        ]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/readiness/index.ts#EvaluationSnapshot",
-        "current": ["apps/web/src/features/readiness/index.ts#EvaluationSnapshot"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.module.css",
-        "current": [
-          "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.test.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/EvaluationSnapshot/EvaluationSnapshot.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "evaluation-snapshot",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5299,7 +5275,7 @@
         }
       ],
       "states": ["Preview", "Saved", "Stale"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5309,15 +5285,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Typed Preview, Saved, and Stale states are implemented and shown in the host. The Readiness consumer derives Preview/Stale from returned data and does not label an unsaved evaluation Saved; the deprecated stale prop remains compatible. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
-          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5328,24 +5297,24 @@
       "component": {
         "name": "RuleAction",
         "target": "apps/web/src/features/readiness/components/RuleAction/RuleAction.tsx",
-        "current": ["apps/web/src/features/readiness/components/RuleAction/RuleAction.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/readiness/index.ts#RuleAction",
-        "current": ["apps/web/src/features/readiness/index.ts#RuleAction"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/RuleAction/RuleAction.module.css",
-        "current": ["apps/web/src/features/readiness/components/RuleAction/RuleAction.module.css"]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/RuleAction/RuleAction.test.tsx",
-        "current": ["apps/web/src/features/readiness/components/RuleAction/RuleAction.test.tsx"]
+        "current": []
       },
       "componentHost": {
         "id": "rule-action",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5368,7 +5337,7 @@
         }
       ],
       "states": ["Available", "ReadOnly", "Unavailable"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5378,15 +5347,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code supports an enabled action, the archived prop, and the native disabled prop. The host previews all three interaction states; disabled actions remain native disabled buttons. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
-          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5397,26 +5359,24 @@
       "component": {
         "name": "DecisionCard",
         "target": "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.tsx",
-        "current": ["apps/web/src/features/readiness/components/DecisionCard/DecisionCard.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/readiness/index.ts#DecisionCard",
-        "current": ["apps/web/src/features/readiness/index.ts#DecisionCard"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.module.css",
-        "current": [
-          "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/DecisionCard/DecisionCard.test.tsx",
-        "current": ["apps/web/src/features/readiness/components/DecisionCard/DecisionCard.test.tsx"]
+        "current": []
       },
       "componentHost": {
         "id": "decision-card",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5439,7 +5399,7 @@
         }
       ],
       "states": ["Proposed", "Accepted", "Superseded"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5449,15 +5409,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code renders title, revision, status, and children; ACCEPTED is success-toned while proposed/superseded status strings remain explicit. The host previews proposed, accepted, and superseded labels. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
-          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5468,30 +5421,24 @@
       "component": {
         "name": "RevisionHistory",
         "target": "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.tsx"
-        ]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/readiness/index.ts#RevisionHistory",
-        "current": ["apps/web/src/features/readiness/index.ts#RevisionHistory"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.module.css",
-        "current": [
-          "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.test.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/RevisionHistory/RevisionHistory.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "revision-history",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5508,7 +5455,7 @@
         }
       ],
       "states": ["Current", "Superseded"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5518,15 +5465,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Each revision is visibly marked Current or Superseded; callers can provide currentRevision or item status, and persisted decision history falls back to its highest ordered revision. The host shows both states without asserting live history. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
-          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5537,28 +5477,24 @@
       "component": {
         "name": "InvariantCard",
         "target": "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.tsx",
-        "current": ["apps/web/src/features/readiness/components/InvariantCard/InvariantCard.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/readiness/index.ts#InvariantCard",
-        "current": ["apps/web/src/features/readiness/index.ts#InvariantCard"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.module.css",
-        "current": [
-          "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.test.tsx",
-        "current": [
-          "apps/web/src/features/readiness/components/InvariantCard/InvariantCard.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "invariant-card",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5581,7 +5517,7 @@
         }
       ],
       "states": ["Current", "Acknowledged", "Stale"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5591,15 +5527,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Current, Acknowledged, and Stale are distinguished from the current and acknowledged revision numbers; an older acknowledgement is labeled Stale and still requires re-acknowledgement. Host fixtures are illustrative and do not imply verification. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/readiness/ReadinessPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/readiness/ReadinessPage.test.tsx",
-          "styles": "apps/web/src/features/readiness/ReadinessPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5610,30 +5539,24 @@
       "component": {
         "name": "RepositoryCard",
         "target": "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.tsx",
-        "current": [
-          "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.tsx"
-        ]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/repositories/index.ts#RepositoryCard",
-        "current": ["apps/web/src/features/repositories/index.ts#RepositoryCard"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.module.css",
-        "current": [
-          "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.test.tsx",
-        "current": [
-          "apps/web/src/features/repositories/components/RepositoryCard/RepositoryCard.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "repository-card",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5656,7 +5579,7 @@
         }
       ],
       "states": ["Connected", "Observed", "Unavailable"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5666,15 +5589,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code renders connected, observed, and unavailable repository states, including read-only observation metadata and source-content disclosure. The host previews all three with typed synthetic data. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/repositories/RepositoriesPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/repositories/RepositoriesPage.test.tsx",
-          "styles": "apps/web/src/features/repositories/RepositoriesPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5685,30 +5601,24 @@
       "component": {
         "name": "ContextPackageCard",
         "target": "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.tsx",
-        "current": [
-          "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.tsx"
-        ]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/context/index.ts#ContextPackageCard",
-        "current": ["apps/web/src/features/context/index.ts#ContextPackageCard"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.module.css",
-        "current": [
-          "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.test.tsx",
-        "current": [
-          "apps/web/src/features/context/components/ContextPackageCard/ContextPackageCard.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "context-package-card",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5731,7 +5641,7 @@
         }
       ],
       "states": ["Fresh", "Stale", "Unavailable"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5741,15 +5651,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Code supports Fresh, Stale, and Unavailable package states; an unverified freshness note is also available when state is omitted. The host previews all three named states using a typed synthetic snapshot. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/context/ContextPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/context/ContextPage.test.tsx",
-          "styles": "apps/web/src/features/context/ContextPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5760,24 +5663,24 @@
       "component": {
         "name": "ReportField",
         "target": "apps/web/src/features/workbench/components/ReportField/ReportField.tsx",
-        "current": ["apps/web/src/features/workbench/components/ReportField/ReportField.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/workbench/index.ts#ReportField",
-        "current": ["apps/web/src/features/workbench/index.ts#ReportField"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/workbench/components/ReportField/ReportField.module.css",
-        "current": ["apps/web/src/features/workbench/components/ReportField/ReportField.module.css"]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/workbench/components/ReportField/ReportField.test.tsx",
-        "current": ["apps/web/src/features/workbench/components/ReportField/ReportField.test.tsx"]
+        "current": []
       },
       "componentHost": {
         "id": "report-field",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5794,7 +5697,7 @@
         }
       ],
       "states": ["HasValue", "Empty"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5804,15 +5707,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Code derives HasValue and Empty from whether the ReactNode contains renderable content, presents the state visibly, and preserves the reported/no-assumed-proof disclosure. Empty values omit the value row. Host previews both states. Human visual review remains NOT_HUMAN_REVIEWED; the low-contrast Figma footnote uses the semantic secondary text token.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/workbench/WorkbenchPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/workbench/WorkbenchPage.test.tsx",
-          "styles": "apps/web/src/features/workbench/WorkbenchPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5823,30 +5719,24 @@
       "component": {
         "name": "ProvenanceNotice",
         "target": "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.tsx",
-        "current": [
-          "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.tsx"
-        ]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/workbench/index.ts#ProvenanceNotice",
-        "current": ["apps/web/src/features/workbench/index.ts#ProvenanceNotice"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.module.css",
-        "current": [
-          "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.test.tsx",
-        "current": [
-          "apps/web/src/features/workbench/components/ProvenanceNotice/ProvenanceNotice.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "provenance-notice",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5869,7 +5759,7 @@
         }
       ],
       "states": ["Reported", "Observed", "Unknown"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5879,15 +5769,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Code and host expose Reported, Observed, and Unknown states using semantic tokens. The existing Reported copy is preserved; Observed states that observation alone is not verification, and Unknown never implies evidence. Figma's shared description 'Claimed execution is not observed verification' is expanded for Observed/Unknown with more explicit truth copy. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/workbench/WorkbenchPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/workbench/WorkbenchPage.test.tsx",
-          "styles": "apps/web/src/features/workbench/WorkbenchPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5898,28 +5781,24 @@
       "component": {
         "name": "TrustDisclosure",
         "target": "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.tsx",
-        "current": ["apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/delivery/index.ts#TrustDisclosure",
-        "current": ["apps/web/src/features/delivery/index.ts#TrustDisclosure"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.module.css",
-        "current": [
-          "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.test.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/TrustDisclosure/TrustDisclosure.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "trust-disclosure",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -5936,7 +5815,7 @@
         }
       ],
       "states": ["Default", "Expanded"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -5946,15 +5825,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Code exposes typed Default and Expanded presentation states, matching the static Figma variants; no expanded/collapsed interaction is implied. Both states are tested and previewed from the feature export. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
-          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -5965,28 +5837,24 @@
       "component": {
         "name": "DownloadAction",
         "target": "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.tsx",
-        "current": ["apps/web/src/features/delivery/components/DownloadAction/DownloadAction.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/delivery/index.ts#DownloadAction",
-        "current": ["apps/web/src/features/delivery/index.ts#DownloadAction"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.module.css",
-        "current": [
-          "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.test.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/DownloadAction/DownloadAction.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "download-action",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -6009,7 +5877,7 @@
         }
       ],
       "states": ["Ready", "Downloading", "Failed"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6019,15 +5887,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code supports ready downloads, pending preparation, and an error/alert state (the API names the latter error rather than Failed). The host previews all three without fetching or creating artifacts. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
-          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -6038,30 +5899,24 @@
       "component": {
         "name": "VerificationSummary",
         "target": "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.tsx"
-        ]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/delivery/index.ts#VerificationSummary",
-        "current": ["apps/web/src/features/delivery/index.ts#VerificationSummary"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.module.css",
-        "current": [
-          "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.module.css"
-        ]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.test.tsx",
-        "current": [
-          "apps/web/src/features/delivery/components/VerificationSummary/VerificationSummary.test.tsx"
-        ]
+        "current": []
       },
       "componentHost": {
         "id": "verification-summary",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -6090,7 +5945,7 @@
         }
       ],
       "states": ["NotRun", "PassedScoped", "Failed", "Stale"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6100,15 +5955,8 @@
         "metadataReviewed": true,
         "designContextReviewed": true
       },
-      "implementationNotes": "Code supports outcome and blocker presentation plus stale-state override; NotRun is expressible as an outcome string. The host previews scoped pass, failure with blocker, and stale results. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
-          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     },
     {
       "category": "product",
@@ -6119,24 +5967,24 @@
       "component": {
         "name": "ReleaseGate",
         "target": "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.tsx",
-        "current": ["apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.tsx"]
+        "current": []
       },
       "publicApi": {
         "target": "apps/web/src/features/delivery/index.ts#ReleaseGate",
-        "current": ["apps/web/src/features/delivery/index.ts#ReleaseGate"]
+        "current": []
       },
       "styles": {
         "target": "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.module.css",
-        "current": ["apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.module.css"]
+        "current": []
       },
       "tests": {
         "target": "apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.test.tsx",
-        "current": ["apps/web/src/features/delivery/components/ReleaseGate/ReleaseGate.test.tsx"]
+        "current": []
       },
       "componentHost": {
         "id": "release-gate",
-        "status": "AVAILABLE",
-        "source": "apps/web/src/app/component-gallery/ComponentGallery.tsx"
+        "status": "PLANNED",
+        "source": null
       },
       "variants": [
         {
@@ -6159,7 +6007,7 @@
         }
       ],
       "states": ["Blocked", "NotReady", "ScopedPass"],
-      "implementationStatus": "IMPLEMENTED",
+      "implementationStatus": "OUT_OF_SCOPE",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED",
       "source": {
         "fileKey": "r10szKLgiIPVi2NBmbjTpm",
@@ -6169,15 +6017,8 @@
         "metadataReviewed": true,
         "designContextReviewed": false
       },
-      "implementationNotes": "Code accepts and displays arbitrary gate outcomes with optional explanatory content, covering Blocked, NotReady, and ScopedPass labels. The host clarifies that a scoped pass is not a release action. Visual review remains NOT_HUMAN_REVIEWED.",
-      "relatedImplementation": [
-        {
-          "path": "apps/web/src/features/delivery/DeliveryPage.tsx",
-          "kind": "INLINE_BEHAVIOR",
-          "tests": "apps/web/src/features/delivery/DeliveryPage.test.tsx",
-          "styles": "apps/web/src/features/delivery/DeliveryPage.module.css"
-        }
-      ]
+      "implementationNotes": "Retired from the active 1.0 product scope. Historical Figma mapping retained; not implemented or visually certified.",
+      "relatedImplementation": []
     }
   ],
   "codeOnlyComponents": [
@@ -6207,13 +6048,6 @@
       "source": "apps/web/src/features/organization/components/OrganizationEmptyState.tsx",
       "publicApi": "apps/web/src/features/organization/index.ts#OrganizationEmptyState",
       "relationship": "Closest reference is product screen 4:32; no exact page-20 master confirmed.",
-      "visualReviewStatus": "NOT_HUMAN_REVIEWED"
-    },
-    {
-      "name": "DeliverySummary",
-      "source": "apps/web/src/features/delivery/DeliverySummary.tsx",
-      "publicApi": "Feature-local named export",
-      "relationship": "Counts summary; not an alias for VerificationSummary or ReleaseGate.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"
     }
   ]

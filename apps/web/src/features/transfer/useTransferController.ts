@@ -26,7 +26,11 @@ export function useTransferController(workspaceId: string, projectId: string) {
 
   async function exportProject() {
     try {
-      const document = await organizationApi.exportProject(workspaceId, projectId);
+      const document = await organizationApi.exportProject(
+        workspaceId,
+        projectId,
+        'forge-project-transfer-v2',
+      );
       const text = JSON.stringify(document, null, 2);
       downloadProjectDocument(document);
       setExported(true);

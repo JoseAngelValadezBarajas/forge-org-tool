@@ -13,6 +13,8 @@ type FeatureCardProps = {
 
 const statusLabel: Record<Feature['status'], string> = {
   backlog: 'backlog',
+  refining: 'legacy refining',
+  ready: 'ready',
   in_progress: 'in progress',
   verify: 'verify',
   done: 'done',
@@ -20,6 +22,8 @@ const statusLabel: Record<Feature['status'], string> = {
 
 const statusTone: Record<Feature['status'], 'neutral' | 'accent' | 'success'> = {
   backlog: 'neutral',
+  refining: 'neutral',
+  ready: 'neutral',
   in_progress: 'accent',
   verify: 'accent',
   done: 'success',
@@ -34,11 +38,13 @@ export function FeatureCard({ feature, href, children, readOnly = false }: Featu
         </Link>
         <div className={styles.chips}>
           <StatusChip tone={statusTone[feature.status]}>{statusLabel[feature.status]}</StatusChip>
+          {feature.kind === 'bug' && <StatusChip tone="danger">Bug</StatusChip>}
           <StatusChip tone="neutral">{feature.priority}</StatusChip>
         </div>
       </div>
       {feature.description && <p className={styles.description}>{feature.description}</p>}
       {feature.goal && <p className={styles.goal}>{feature.goal}</p>}
+      {feature.tags?.length ? <p>Tags: {feature.tags.join(', ')}</p> : null}
       {children && (
         <div className={styles.actions} aria-label="Feature planning actions">
           {children}

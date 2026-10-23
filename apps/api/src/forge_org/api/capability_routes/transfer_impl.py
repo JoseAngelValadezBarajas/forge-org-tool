@@ -4,7 +4,7 @@
 import sqlite3
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from forge_org.api.dependencies import service_error, transfer_service
 from forge_org.api.schemas import ImportCommitRequest, ImportPreviewResponse, ImportResponse
@@ -42,7 +42,7 @@ def import_project(
         result = transfer.import_project(
             workspace_id, payload.document, payload.expected_fingerprint
         )
-        return {'schema_version': 'forge-project-import-v1', 'workspace_id': workspace_id, **result}
+        return {'workspace_id': workspace_id, **result}
     except LookupError as exc:
         raise service_error(NotFound(str(exc))) from exc
     except (ValueError, TypeError) as exc:
@@ -55,9 +55,14 @@ def import_project(
 
 @capability_router.get('/workspaces/{workspace_id}/projects/{project_id}/export')
 def export_project(
-    workspace_id: str, project_id: str, transfer: ProjectTransferService = Depends(transfer_service)
+    workspace_id: str,
+    project_id: str,
+    schema_version: str = Query(default='forge-project-import-v1'),
+    transfer: ProjectTransferService = Depends(transfer_service),
 ) -> dict[str, Any]:
     try:
-        return transfer.export_project(workspace_id, project_id)
+        return transfer.export_project(workspace_id, project_id, schema_version)
     except LookupError as exc:
         raise service_error(NotFound(str(exc))) from exc
+    except ValueError as exc:
+        raise service_error(InvalidInput(str(exc))) from exc

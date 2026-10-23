@@ -6,6 +6,7 @@ from collections.abc import Iterator
 
 from fastapi import Depends, HTTPException
 
+from forge_org.application.attachments import BugAttachmentService
 from forge_org.application.context_packages import ContextPackageService
 from forge_org.application.delivery import DeliveryService
 from forge_org.application.knowledge import KnowledgeService
@@ -20,7 +21,7 @@ from forge_org.application.readiness import ReadinessService
 from forge_org.application.repositories import RepositoryService
 from forge_org.application.runs import HandoffService, RunService
 from forge_org.application.transfer import ProjectTransferService
-from forge_org.infrastructure.connection import connect
+from forge_org.infrastructure.connection import connect, database_path
 
 
 def database() -> Iterator[sqlite3.Connection]:
@@ -81,3 +82,9 @@ def knowledge_service(connection: sqlite3.Connection = Depends(database)) -> Kno
 
 def readiness_service(connection: sqlite3.Connection = Depends(database)) -> ReadinessService:
     return ReadinessService(connection)
+
+
+def bug_attachment_service(
+    connection: sqlite3.Connection = Depends(database),
+) -> BugAttachmentService:
+    return BugAttachmentService(connection, database_path().parent / 'bug-attachments')

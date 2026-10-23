@@ -532,10 +532,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Review and create a decision from feature-scoped Readiness.",
       "expected_result": "Decision records are listed with their current status; there is no separate project Decisions inventory page.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Decision creation, linking, accepted state, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Decision creation, linking, accepted state, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "121:223",
@@ -546,10 +546,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Create a decision, accept it, and open its revision history.",
       "expected_result": "Accepted status and decision revision history are shown and persisted.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Decision acceptance and initial revision history passed on desktop/mobile. A reproduced case mismatch was fixed so Accept disappears for lowercase API status; not visual Figma certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Decision acceptance and initial revision history passed on desktop/mobile. A reproduced case mismatch was fixed so Accept disappears for lowercase API status; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "121:295",
@@ -560,10 +560,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Review feature-scoped Invariants in Readiness.",
       "expected_result": "Invariant statement, revision, and acknowledgement state are displayed; there is no separate project Invariants inventory screen.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Invariant creation, acknowledgement, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Invariant creation, acknowledgement, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "121:383",
@@ -574,10 +574,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Open Readiness and inspect the current deterministic planning preview.",
       "expected_result": "The UI shows current readiness outcome and explicitly distinguishes planning from execution/delivery verification.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Readiness outcomes and the non-verification boundary passed on desktop and mobile; automated behavior only, not visual certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Readiness outcomes and the non-verification boundary passed on desktop and mobile; automated behavior only, not visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "121:471",
@@ -630,10 +630,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Evaluate a Feature whose planning rules are satisfied.",
       "expected_result": "Readiness preview reports READY_TO_START only when its rules pass.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "READY_TO_START outcome was asserted after criterion, accepted decision, and invariant acknowledgement on desktop and mobile; no visual parity claim."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "READY_TO_START outcome was asserted after criterion, accepted decision, and invariant acknowledgement on desktop and mobile; no visual parity claim. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "126:184",
@@ -644,10 +644,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Open the displayed Decision history.",
       "expected_result": "Stored revisions are displayed without changing the current decision.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The authored journey opens history but only verifies the initial revision; a superseded historical revision is not created or certified."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "The authored journey opens history but only verifies the initial revision; a superseded historical revision is not created or certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "126:240",
@@ -658,10 +658,10 @@
       "route": "/readiness/{workspaceId}/{projectId}/{featureId}",
       "user_action": "Create an Invariant for the current Feature and acknowledge its current revision.",
       "expected_result": "Invariant and acknowledgement revision are persisted and visible after reload.",
-      "test_ids": ["PA-READY-001"],
-      "evidence": ["apps/web/e2e/readiness/decisions-invariants-readiness.spec.ts"],
-      "status": "AUTOMATED_PASS",
-      "notes": "Invariant form, create/acknowledge actions, and SQLite-backed API persistence passed on desktop and mobile; not visual Figma certification."
+      "test_ids": [],
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
+      "notes": "Invariant form, create/acknowledge actions, and SQLite-backed API persistence passed on desktop and mobile; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
     },
     {
       "figma_node_id": "126:303",

@@ -57,7 +57,9 @@ test('Component Host delegates its route, category inventory, shell, and synthet
   }
   assert.doesNotMatch(content, /function ComponentPreview[\s\S]*?switch\s*\(item\.id\)/);
   const productPreviews = readFileSync(path.join(gallery, 'previews/product-patterns.tsx'), 'utf8');
-  assert.match(productPreviews, /from '\.\/fixtures'/);
+  assert.match(productPreviews, /const project = \{/);
+  assert.match(productPreviews, /Synthetic preview project/);
+  assert.doesNotMatch(productPreviews, /readiness|handoff|repository|release gate/i);
   const app = readFileSync(path.join(root, 'apps/web/src/app/App.tsx'), 'utf8');
   assert.doesNotMatch(app, /import\s+\{\s*ComponentGallery\s*\}\s+from/);
   assert.match(app, /import\.meta\.env\.DEV[\s\S]*?lazy\(/);

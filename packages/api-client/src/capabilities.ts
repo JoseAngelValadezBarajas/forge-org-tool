@@ -1,11 +1,6 @@
 import { organizationCapability } from './organization.js';
 import { planningCapability } from './planning.js';
-import { readinessCapability } from './readiness.js';
-import { repositoriesCapability } from './repositories.js';
-import { contextCapability } from './context.js';
 import { transferCapability } from './transfer.js';
-import { workbenchCapability } from './workbench.js';
-import { deliveryCapability } from './delivery.js';
 
 /**
  * Compatibility composition for callers that used the pre-modular API client.
@@ -14,12 +9,7 @@ import { deliveryCapability } from './delivery.js';
 export const legacyCapabilities = {
   ...organizationCapability,
   ...planningCapability,
-  ...readinessCapability,
-  ...repositoriesCapability,
-  ...contextCapability,
   ...transferCapability,
-  ...workbenchCapability,
-  ...deliveryCapability,
 };
 
 export type * from './types.js';

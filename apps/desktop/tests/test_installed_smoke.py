@@ -80,7 +80,7 @@ class InstalledSmokeTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     upgraded.execute("SELECT max(version) FROM schema_migrations").fetchone()[0],
-                    2,
+                    3,
                 )
                 upgraded.close()
 
