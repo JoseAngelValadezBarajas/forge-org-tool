@@ -13,10 +13,11 @@ const project: Project = {
   status: 'active',
   created_at: '',
   updated_at: '',
+  archived_at: null,
 };
 
 describe('ProjectCard', () => {
-  it('links to planning, identifies archival status and preserves management actions', () => {
+  it('links to Overview, identifies archival status and preserves management actions', () => {
     render(
       <MemoryRouter>
         <ProjectCard project={project} workspaceId="w1">
@@ -24,7 +25,7 @@ describe('ProjectCard', () => {
         </ProjectCard>
       </MemoryRouter>,
     );
-    expect(screen.getByRole('link', { name: 'Forge' })).toHaveAttribute('href', '/planning/w1/p1');
+    expect(screen.getByRole('link', { name: 'Forge' })).toHaveAttribute('href', '/projects/w1/p1');
     expect(screen.getByText('active')).toBeInTheDocument();
     expect(screen.getByText('Local-first work')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Archive' })).toBeInTheDocument();

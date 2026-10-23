@@ -28,6 +28,30 @@ def test_planning_hierarchy_supports_epic_feature_and_overview(tmp_path: Path) -
         os.environ.pop('FORGE_DATABASE_PATH', None)
 
 
+def test_epic_status_contract_preserves_source_and_existing_values(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'epic-status.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Epic statuses'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'Launch'}
+            ).json()
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+            epic = client.post(f'{root}/epics', json={'title': 'Release'}).json()
+            assert epic['status'] == 'planning'
+            for status in ('planning', 'archived', 'planned', 'in_progress', 'done'):
+                updated = client.patch(f'{root}/epics/{epic["id"]}', json={'status': status})
+                assert updated.status_code == 200, (status, updated.text)
+                assert updated.json()['status'] == status
+                assert (
+                    client.get(f'{root}/planning/overview').json()['epics'][0]['status'] == status
+                )
+            unsupported = client.patch(f'{root}/epics/{epic["id"]}', json={'status': 'paused'})
+            assert unsupported.status_code == 422
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
 def test_tasks_criteria_and_dependencies_are_project_scoped(tmp_path: Path) -> None:
     os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'tasks.db')
     try:

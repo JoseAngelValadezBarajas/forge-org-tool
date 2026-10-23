@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -33,7 +33,10 @@ describe('FeatureDetailPage', () => {
         updated_at: '',
       },
     ];
-    const fetchMock = vi.fn().mockImplementation((input: string) => {
+    let taskReads = 0;
+    let criterionReads = 0;
+    let resolveStaleTaskRead: ((response: Response) => void) | undefined;
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
       if (String(input).endsWith('/readiness/preview'))
         return Promise.resolve(
           new Response(
@@ -53,10 +56,32 @@ describe('FeatureDetailPage', () => {
         );
       if (String(input).endsWith('/tasks/reorder'))
         return Promise.resolve(new Response(JSON.stringify([tasks[1], tasks[0]]), { status: 200 }));
-      if (String(input).endsWith('/tasks'))
+      if (String(input).endsWith('/tasks')) {
+        taskReads += 1;
+        if (taskReads === 2)
+          return new Promise<Response>((resolve) => {
+            resolveStaleTaskRead = resolve;
+          });
         return Promise.resolve(new Response(JSON.stringify(tasks), { status: 200 }));
-      if (String(input).endsWith('/acceptance-criteria'))
-        return Promise.resolve(new Response('[]', { status: 200 }));
+      }
+      if (String(input).endsWith('/acceptance-criteria')) {
+        if (init?.method === 'POST') return Promise.resolve(new Response('{}', { status: 201 }));
+        criterionReads += 1;
+        const criteria =
+          criterionReads === 1
+            ? []
+            : [
+                {
+                  id: 'c1',
+                  feature_id: 'f1',
+                  description: 'Concurrent criterion',
+                  satisfied: false,
+                  created_at: '',
+                  updated_at: '',
+                },
+              ];
+        return Promise.resolve(new Response(JSON.stringify(criteria), { status: 200 }));
+      }
       if (String(input).endsWith('/dependencies'))
         return Promise.resolve(new Response('[]', { status: 200 }));
       return Promise.resolve(new Response('{}', { status: 200 }));
@@ -82,6 +107,11 @@ describe('FeatureDetailPage', () => {
       'href',
       '/context/w1/p1/f1',
     );
+    fireEvent.change(screen.getByLabelText('Acceptance criterion'), {
+      target: { value: 'Concurrent criterion' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Add criterion' }));
+    await waitFor(() => expect(taskReads).toBe(2));
     fireEvent.click(screen.getByRole('button', { name: 'Move First down' }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(
@@ -89,6 +119,24 @@ describe('FeatureDetailPage', () => {
         expect.objectContaining({ method: 'POST', body: JSON.stringify({ ids: ['t2', 't1'] }) }),
       ),
     );
+    await waitFor(() => {
+      expect(
+        screen
+          .getAllByRole('article')
+          .map((article) => within(article).getByText(/First|Second/).textContent),
+      ).toEqual(['Second', 'First']);
+    });
+    expect(resolveStaleTaskRead).toBeDefined();
+    await act(async () => {
+      resolveStaleTaskRead?.(new Response(JSON.stringify(tasks), { status: 200 }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    await screen.findByText('Concurrent criterion');
+    expect(
+      screen
+        .getAllByRole('article')
+        .map((article) => within(article).getByText(/First|Second/).textContent),
+    ).toEqual(['Second', 'First']);
     expect(screen.getByText(/planning records only/i)).toBeInTheDocument();
   });
 
@@ -151,6 +199,102 @@ describe('FeatureDetailPage', () => {
 
     expect(await screen.findByText('Foundation blocks Workspace dashboard')).toBeInTheDocument();
     expect(screen.queryByText('f1 blocks f2')).not.toBeInTheDocument();
+  });
+
+  it('reconciles a task created during a reorder that the API rejects', async () => {
+    const persistedTasks = [
+      {
+        id: 't1',
+        feature_id: 'f1',
+        title: 'First',
+        description: null,
+        status: 'todo',
+        position: 0,
+        created_at: '',
+        updated_at: '',
+      },
+      {
+        id: 't2',
+        feature_id: 'f1',
+        title: 'Second',
+        description: null,
+        status: 'todo',
+        position: 1,
+        created_at: '',
+        updated_at: '',
+      },
+    ];
+    let taskReads = 0;
+    let resolveStaleTaskRead: ((response: Response) => void) | undefined;
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      const path = String(input);
+      if (path.endsWith('/tasks') && init?.method === 'POST') {
+        const created = {
+          id: 't3',
+          feature_id: 'f1',
+          title: 'Created during reorder',
+          description: null,
+          status: 'todo',
+          position: 2,
+          created_at: '',
+          updated_at: '',
+        };
+        persistedTasks.push(created);
+        return Promise.resolve(new Response(JSON.stringify(created), { status: 201 }));
+      }
+      if (path.endsWith('/tasks/reorder'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ detail: 'Task ordering changed' }), { status: 409 }),
+        );
+      if (path.endsWith('/tasks')) {
+        taskReads += 1;
+        if (taskReads === 2)
+          return new Promise<Response>((resolve) => {
+            resolveStaleTaskRead = resolve;
+          });
+        return Promise.resolve(new Response(JSON.stringify(persistedTasks), { status: 200 }));
+      }
+      if (path.endsWith('/planning/overview'))
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({ epics: [], unassigned_features: [{ id: 'f1', title: 'Feature' }] }),
+            { status: 200 },
+          ),
+        );
+      if (path.endsWith('/acceptance-criteria') || path.endsWith('/dependencies'))
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      if (path.endsWith('/readiness/preview'))
+        return Promise.resolve(new Response('null', { status: 200 }));
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1/features/f1']}>
+        <Routes>
+          <Route
+            path="/planning/:workspaceId/:projectId/features/:featureId"
+            element={<FeatureDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByText('First');
+    fireEvent.change(screen.getByLabelText('Task title'), {
+      target: { value: 'Created during reorder' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Add task' }));
+    await waitFor(() => expect(taskReads).toBe(2));
+    fireEvent.click(screen.getByRole('button', { name: 'Move First down' }));
+    await screen.findByRole('alert');
+    await screen.findByText('Created during reorder');
+    await act(async () => {
+      resolveStaleTaskRead?.(
+        new Response(JSON.stringify(persistedTasks.slice(0, 2)), { status: 200 }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(screen.getByText('Created during reorder')).toBeInTheDocument();
   });
 
   it('edits feature details through the existing planning API', async () => {

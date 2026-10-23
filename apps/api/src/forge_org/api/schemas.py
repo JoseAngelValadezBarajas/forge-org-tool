@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -64,10 +64,13 @@ class EpicCreate(BaseModel):
     description: str | None = Field(default=None, max_length=4000)
 
 
+EpicStatus = Literal['planning', 'archived', 'planned', 'in_progress', 'done']
+
+
 class EpicUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = Field(default=None, max_length=4000)
-    status: str | None = Field(default=None, pattern='^(planned|in_progress|done)$')
+    status: EpicStatus | None = None
 
 
 class EpicResponse(BaseModel):
@@ -75,7 +78,7 @@ class EpicResponse(BaseModel):
     project_id: str
     title: str
     description: str | None
-    status: str
+    status: EpicStatus
     created_at: datetime
     updated_at: datetime
 

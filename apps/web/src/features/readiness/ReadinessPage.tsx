@@ -146,7 +146,7 @@ export function ReadinessPage() {
                 >
                   History
                 </Button>
-                {decision.status !== 'ACCEPTED' && (
+                {decision.status !== 'accepted' && (
                   <Button type="button" onClick={() => void acceptDecision(decision)}>
                     Accept decision
                   </Button>

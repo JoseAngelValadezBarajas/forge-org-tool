@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   organizationApi,
   type Criterion,
@@ -25,9 +25,13 @@ export function useFeatureDetailController(
   const [taskTitle, setTaskTitle] = useState('');
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
+  const loadGeneration = useRef(0);
+  const taskGeneration = useRef(0);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      const generation = ++loadGeneration.current;
+      const tasksAtStart = taskGeneration.current;
       try {
         const [nextTasks, nextCriteria, nextDependencies, nextReadiness, nextOverview] =
           await Promise.all([
@@ -39,8 +43,8 @@ export function useFeatureDetailController(
               .planningOverview(workspaceId, projectId)
               .catch(() => ({ epics: [], unassigned_features: [] })),
           ]);
-        if (!isCurrent()) return;
-        setTasks(nextTasks);
+        if (!isCurrent() || generation !== loadGeneration.current) return;
+        if (tasksAtStart === taskGeneration.current) setTasks(nextTasks);
         setCriteria(nextCriteria);
         setDependencies(nextDependencies);
         const nextFeatures = (nextOverview.epics ?? [])
@@ -54,7 +58,7 @@ export function useFeatureDetailController(
         setFeatureGoal(nextFeature?.goal ?? '');
         setReadiness(nextReadiness);
       } catch (cause) {
-        if (isCurrent()) {
+        if (isCurrent() && generation === loadGeneration.current) {
           setError(cause instanceof Error ? cause.message : 'Unable to load feature detail.');
         }
       }
@@ -131,10 +135,13 @@ export function useFeatureDetailController(
     if (nextIndex < 0 || nextIndex >= tasks.length) return;
     const ids = tasks.map((task) => task.id);
     [ids[index], ids[nextIndex]] = [ids[nextIndex], ids[index]];
+    const generation = ++taskGeneration.current;
     try {
-      setTasks(await organizationApi.reorderTasks(workspaceId, projectId, featureId, ids));
+      const reordered = await organizationApi.reorderTasks(workspaceId, projectId, featureId, ids);
+      if (generation === taskGeneration.current) setTasks(reordered);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to reorder tasks.');
+      await load();
     }
   }
 

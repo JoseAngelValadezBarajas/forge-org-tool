@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -198,5 +198,73 @@ describe('DeliveryPage', () => {
     expect(
       await screen.findByText('A frozen candidate and active VERIFIED evidence are required'),
     ).toBeInTheDocument();
+  });
+
+  it('does not let an older delivery read undo a completed evidence invalidation', async () => {
+    let currentEvidence: typeof evidence | null = null;
+    let staleSnapshot: typeof evidence | null = null;
+    let evidenceReads = 0;
+    let resolveStaleRead: ((response: Response) => void) | undefined;
+    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
+      const path = String(input);
+      if (path.endsWith('/evidence') && init?.method === 'POST') {
+        const values = JSON.parse(String(init.body));
+        currentEvidence = {
+          ...evidence,
+          title: values.title,
+          summary: values.summary,
+        };
+        staleSnapshot = { ...currentEvidence };
+        return Promise.resolve(new Response(JSON.stringify(currentEvidence), { status: 201 }));
+      }
+      if (path.endsWith('/invalidate')) {
+        currentEvidence = { ...currentEvidence!, status: 'INVALIDATED' };
+        return Promise.resolve(new Response(JSON.stringify(currentEvidence), { status: 200 }));
+      }
+      if (path.includes('/evidence?')) {
+        evidenceReads += 1;
+        if (evidenceReads === 1)
+          return new Promise<Response>((resolve) => {
+            resolveStaleRead = resolve;
+          });
+        return Promise.resolve(
+          new Response(JSON.stringify(currentEvidence ? [currentEvidence] : []), { status: 200 }),
+        );
+      }
+      if (path.endsWith('/verifications/rules'))
+        return Promise.resolve(new Response(JSON.stringify([rule]), { status: 200 }));
+      return Promise.resolve(new Response('[]', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/delivery/w1/p1']}>
+        <Routes>
+          <Route path="/delivery/:workspaceId/:projectId" element={<DeliveryPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await screen.findByRole('heading', { name: 'Delivery overview' });
+    await screen.findByRole('button', { name: 'Record Evidence' });
+    fireEvent.change(screen.getByLabelText('Evidence title'), {
+      target: { value: 'Concurrent report' },
+    });
+    fireEvent.change(screen.getByLabelText('Evidence summary'), {
+      target: { value: 'Reported once.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Record Evidence' }));
+    const evidenceRow = await screen.findByRole('article');
+    await waitFor(() => expect(evidenceRow).toHaveTextContent('REPORTED / ACTIVE'));
+    fireEvent.click(
+      within(evidenceRow).getByRole('button', { name: 'Invalidate Concurrent report' }),
+    );
+    await waitFor(() => expect(evidenceRow).toHaveTextContent('REPORTED / INVALIDATED'));
+
+    expect(resolveStaleRead).toBeDefined();
+    await act(async () => {
+      resolveStaleRead?.(new Response(JSON.stringify([staleSnapshot]), { status: 200 }));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(evidenceRow).toHaveTextContent('REPORTED / INVALIDATED');
   });
 });

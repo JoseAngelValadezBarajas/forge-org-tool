@@ -4,14 +4,18 @@ $installerFiles = @(Get-ChildItem -LiteralPath 'apps/desktop/src-tauri/target/re
 if ($installerFiles.Count -ne 1) { throw "Expected one NSIS installer, found $($installerFiles.Count)." }
 $installer = $installerFiles[0]
 
-$testRoot = Join-Path $env:RUNNER_TEMP "forge-org-desktop-smoke-$([guid]::NewGuid().ToString('N'))"
+$temporaryBase = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { [System.IO.Path]::GetTempPath() }
+$temporaryBase = [System.IO.Path]::GetFullPath($temporaryBase)
+$testRoot = Join-Path $temporaryBase "forge-org-desktop-smoke-$([guid]::NewGuid().ToString('N'))"
 $installRoot = Join-Path $testRoot 'installed'
 $isolatedLocalAppData = Join-Path $testRoot 'local-app-data'
 New-Item -ItemType Directory -Path $installRoot, $isolatedLocalAppData | Out-Null
 $previousLocalAppData = $env:LOCALAPPDATA
 $env:LOCALAPPDATA = $isolatedLocalAppData
 $process = $null
+$preexistingSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
 $sidecarPids = @()
+$ownedSidecarPids = @()
 
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
@@ -138,7 +142,8 @@ try {
 
   # A second invocation must activate the existing window without starting a second sidecar.
   $sidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
-  if ($sidecarPids.Count -eq 0) { throw 'The installed application has no ready sidecar process before the second launch.' }
+  $ownedSidecarPids = @($sidecarPids | Where-Object { $preexistingSidecarPids -notcontains $_ })
+  if ($ownedSidecarPids.Count -eq 0) { throw 'The isolated installed application did not start its own sidecar process.' }
   $null = [ForgeWindowNative]::ShowWindow($window.Handle, 6)
   if (-not [ForgeWindowNative]::IsIconic($window.Handle)) { throw 'The smoke test could not minimize the FORGE window.' }
   $second = Start-Process -FilePath $installedApp.FullName -PassThru
@@ -162,6 +167,13 @@ try {
   $createButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
 
+  $projectName = "Installed project smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
+  $projectInput = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Edit) 'Project name'
+  $projectInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($projectName)
+  $projectButton = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Project'
+  $projectButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
+
   $databasePath = Join-Path $isolatedLocalAppData 'ForgeOrgTool/data/forge.db'
   if (-not (Test-Path -LiteralPath $databasePath -PathType Leaf)) {
     throw "The sidecar did not create the configured per-user SQLite database: $databasePath"
@@ -170,7 +182,7 @@ try {
   if (-not $process.WaitForExit(15000)) { throw 'The installed FORGE desktop did not exit after its window was closed.' }
   $sidecarCleanupDeadline = [DateTime]::UtcNow.AddSeconds(15)
   do {
-    $remainingSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
+    $remainingSidecarPids = @($ownedSidecarPids | Where-Object { Get-Process -Id $_ -ErrorAction SilentlyContinue })
     if ($remainingSidecarPids.Count -eq 0) { break }
     Start-Sleep -Milliseconds 250
   } while ([DateTime]::UtcNow -lt $sidecarCleanupDeadline)
@@ -178,15 +190,73 @@ try {
 
   $process = Start-Process -FilePath $installedApp.FullName -PassThru
   $window = Get-ForgeWindow $process
+  $restartedSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
+  $ownedSidecarPids += @($restartedSidecarPids | Where-Object { $preexistingSidecarPids -notcontains $_ -and $ownedSidecarPids -notcontains $_ })
   $root = Get-ForgeAutomationRoot $window.Handle
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
-  Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
+  Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
 }
 finally {
-  if ($null -ne $process -and -not $process.HasExited) { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue }
-  Start-Sleep -Milliseconds 500
-  foreach ($sidecar in Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue) {
-    if ($sidecarPids -notcontains $sidecar.Id) { Stop-Process -Id $sidecar.Id -Force -ErrorAction SilentlyContinue }
+  if ($null -ne $process) {
+    $process.Refresh()
+    if (-not $process.HasExited) {
+      if (-not $process.CloseMainWindow() -or -not $process.WaitForExit(15000)) {
+        $process.Refresh()
+        if (-not $process.HasExited) {
+          Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+          try { $process.WaitForExit(15000) | Out-Null } catch { }
+        }
+      }
+    }
+  }
+  $installedSidecarIds = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue |
+    Where-Object {
+      $_.Path -and $_.Path.StartsWith(
+        $installRoot + [System.IO.Path]::DirectorySeparatorChar,
+        [System.StringComparison]::OrdinalIgnoreCase
+      )
+    } | ForEach-Object Id)
+  $ownedSidecarIds = @(@($ownedSidecarPids) + @($installedSidecarIds) | Sort-Object -Unique)
+  $sidecarShutdownDeadline = [DateTime]::UtcNow.AddSeconds(15)
+  do {
+    $remainingSidecarPids = @($ownedSidecarIds | Where-Object {
+      $candidate = Get-Process -Id $_ -ErrorAction SilentlyContinue
+      $null -ne $candidate -and $candidate.Path -and
+        $candidate.Path.StartsWith($installRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)
+    })
+    if ($remainingSidecarPids.Count -eq 0) { break }
+    Start-Sleep -Milliseconds 250
+  } while ([DateTime]::UtcNow -lt $sidecarShutdownDeadline)
+  foreach ($sidecarPid in $remainingSidecarPids) {
+    $sidecar = Get-Process -Id $sidecarPid -ErrorAction SilentlyContinue
+    if ($null -ne $sidecar -and $sidecar.Path -and
+        $sidecar.Path.StartsWith($installRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+      Stop-Process -Id $sidecarPid -Force -ErrorAction SilentlyContinue
+      try { $sidecar.WaitForExit(15000) | Out-Null } catch { }
+    }
   }
   $env:LOCALAPPDATA = $previousLocalAppData
+  $resolvedTestRoot = [System.IO.Path]::GetFullPath($testRoot)
+  $rootPrefix = $temporaryBase.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+  if (-not $resolvedTestRoot.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+      (Split-Path -Leaf $resolvedTestRoot) -notlike 'forge-org-desktop-smoke-*') {
+    throw "Refusing to remove a Desktop smoke path outside its unique temporary directory: $resolvedTestRoot"
+  }
+  if (Test-Path -LiteralPath $resolvedTestRoot -PathType Container) {
+    $lastCleanupError = $null
+    for ($attempt = 0; $attempt -lt 10; $attempt++) {
+      try {
+        Remove-Item -LiteralPath $resolvedTestRoot -Recurse -Force -ErrorAction Stop
+        $lastCleanupError = $null
+        break
+      } catch {
+        $lastCleanupError = $_
+        Start-Sleep -Milliseconds 500
+      }
+    }
+    if ($null -ne $lastCleanupError) {
+      throw "Could not remove the isolated Desktop smoke directory after waiting for owned processes to exit: $resolvedTestRoot. $lastCleanupError"
+    }
+  }
 }

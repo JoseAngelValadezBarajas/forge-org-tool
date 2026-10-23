@@ -38,6 +38,11 @@ describe('M1 application shell', () => {
     expect(screen.getByRole('button', { name: /create workspace/i })).toBeEnabled();
   });
 
+  it('opens an Epic detail route with project context', async () => {
+    renderRoute('/planning/w1/p1/epics/e1');
+    expect(await screen.findByRole('heading', { name: 'Epic detail' })).toBeInTheDocument();
+  });
+
   it('exposes the product shell hierarchy without inventing project routes', () => {
     renderRoute('/');
 
@@ -100,7 +105,7 @@ describe('M1 application shell', () => {
     );
     expect(within(breadcrumb).getByRole('link', { name: 'Project' })).toHaveAttribute(
       'href',
-      '/planning/w1/p1',
+      '/projects/w1/p1',
     );
     expect(within(breadcrumb).getByRole('link', { name: 'Feature' })).toHaveAttribute(
       'href',

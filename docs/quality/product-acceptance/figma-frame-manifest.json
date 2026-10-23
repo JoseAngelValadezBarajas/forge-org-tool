@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "file_key": "r10szKLgiIPVi2NBmbjTpm",
+  "source": "Live Figma get_metadata, active pages 04, 10, 12, 14, 16, 17 and 18",
+  "pages": [
+    {
+      "page_id": "1:5",
+      "page_name": "04 · SCREENS / Desktop Core",
+      "frames": [
+        ["4:32", "01 · Workspace Home"],
+        ["4:158", "02 · Project Overview"],
+        ["4:271", "03 · Project Board"],
+        ["5:89", "04 · Feature Detail"],
+        ["5:255", "05 · Developer Workbench"],
+        ["5:397", "06 · Release Detail"]
+      ]
+    },
+    {
+      "page_id": "57:2",
+      "page_name": "10 · SCREENS / Repositories & Context",
+      "frames": [
+        ["57:5", "01 · Project Repositories"],
+        ["57:71", "02 · Connect Local Repository"],
+        ["57:128", "03 · Repository Detail"],
+        ["58:89", "04 · Feature Context"],
+        ["58:165", "05 · Context Package Preview"],
+        ["58:235", "06 · Context Package History"],
+        ["251:554", "07 · No Repositories Connected"],
+        ["251:572", "08 · Repository Unavailable"],
+        ["251:594", "09 · Mobile Context Summary"],
+        ["251:618", "FND-04 · Legacy Component Catalog (reference)"]
+      ]
+    },
+    {
+      "page_id": "67:2",
+      "page_name": "12 · SCREENS / Agent Runs & Handoffs",
+      "frames": [
+        ["67:3", "01 · Workbench Overview"],
+        ["67:92", "02 · Agent Runs Inventory"],
+        ["67:170", "03 · Record a New Run"],
+        ["67:242", "04 · Run Detail & Timeline"],
+        ["68:118", "05 · Report an Activity Event"],
+        ["68:178", "06 · Handoff Composer"],
+        ["68:265", "07 · Handoff Queue"],
+        ["68:342", "08 · Handoff Review & Acknowledge"],
+        ["70:234", "09 · Handoff Acknowledged"]
+      ]
+    },
+    {
+      "page_id": "76:2",
+      "page_name": "14 · SCREENS / Evidence & Releases",
+      "frames": [
+        ["76:3", "01 · Delivery Overview"],
+        ["76:97", "02 · Evidence Inventory"],
+        ["76:176", "03 · Register Evidence"],
+        ["76:250", "04 · Evidence Detail & Provenance"],
+        ["77:118", "05 · Verification Center"],
+        ["77:207", "06 · Configure Verification Check"],
+        ["77:278", "07 · Verification Result & Trace"],
+        ["77:347", "08 · Create Release Candidate"],
+        ["78:234", "09 · Release Gate Evaluation"],
+        ["78:322", "10 · Release Candidates & Manifest"]
+      ]
+    },
+    {
+      "page_id": "87:2",
+      "page_name": "16 · JOURNEYS / Project Transfer",
+      "frames": [
+        ["87:3", "IMP-01 / 01 · Import / Select source"],
+        ["87:84", "IMP-01 / 02 · Import / Review planning"],
+        ["87:187", "IMP-01 / 03 · Import / Bridge error state"],
+        ["87:256", "IMP-01 / 04 · Export / Review & Download"],
+        ["305:127", "IMP-01 / 05 · Import / Complete"],
+        ["305:230", "IMP-01 / 06 · Export / Ready for download"],
+        ["309:218", "IMP-01 / 07 · Return to Project Overview"],
+        ["314:199", "IMP-01 / 08 · Import / Validation rejected"]
+      ]
+    },
+    {
+      "page_id": "98:2",
+      "page_name": "17 · SCREENS / Navigation UX-00",
+      "frames": [
+        ["98:3", "UX-00 / 01 · Explorar Workspaces"],
+        ["98:82", "UX-00 / 02 · Crear Workspace y Project"],
+        ["98:166", "UX-00 / 03 · Project Home"],
+        ["98:260", "UX-00 / 04 · Epic Explorer"],
+        ["98:352", "UX-00 / 05 · Encontrar Features"],
+        ["98:464", "UX-00 / 06 · Crear Feature"],
+        ["101:20", "UX-00 / 07 · Detalle de Feature y Tasks"],
+        ["101:107", "UX-00 / 08 · Board con selector de estado"],
+        ["101:192", "UX-00 / 09 · Administración de Project y Workspace"],
+        ["101:274", "UX-00 / 10 · Confirmación segura de eliminación"],
+        ["101:349", "UX-00 / 11 · Board después del cambio de estado"],
+        ["104:43", "UX-00 / 12 · Project archivado y restauración"],
+        ["109:47", "UX-00 / 13 · Primer uso y estado vacío"],
+        ["109:130", "UX-00 / 14 · Selector y gestión de Workspaces"],
+        ["109:213", "UX-00 / 15 · Explorador de Projects"],
+        ["109:297", "UX-00 / 16 · Crear Project y elegir origen"],
+        ["109:376", "UX-00 / 17 · Detalle de Epic y Features vinculadas"],
+        ["109:463", "UX-00 / 18 · Editar Feature"],
+        ["109:555", "UX-00 / 19 · Crear y actualizar Tasks"],
+        ["109:649", "UX-00 / 20 · Criterios de aceptación"],
+        ["109:728", "UX-00 / 21 · Dependencias y validaciones"],
+        ["109:803", "UX-00 / 22 · Búsqueda rápida y comandos"],
+        ["109:897", "UX-00 / 23 · Búsqueda vacía y recuperación"],
+        ["109:973", "UX-00 / 24 · Confirmación de archivado"],
+        ["109:1045", "UX-00 / 25 · Editar Workspace"],
+        ["109:1117", "UX-00 / 26 · Error de carga y reintento"],
+        ["109:1189", "UX-00 / 27 · Mapa de flujos avanzados"],
+        ["112:113", "UX-00 / 28 · Eliminar Task / Propuesta"],
+        ["117:122", "UX-00 / 29 · Board estado Refining"],
+        ["117:203", "UX-00 / 30 · Board estado Ready"],
+        ["117:284", "UX-00 / 31 · Board estado Verify"],
+        ["117:365", "UX-00 / 32 · Board estado Done"],
+        ["118:134", "UX-00 / 33 · Tasks reordenadas"],
+        ["121:140", "UX-00 / 34 · Decisions · Inventario"],
+        ["121:223", "UX-00 / 35 · Decision · Revisión y aceptación"],
+        ["121:295", "UX-00 / 36 · Invariants · Reglas del Project"],
+        ["121:383", "UX-00 / 37 · Readiness · Vista actual"],
+        ["121:471", "UX-00 / 38 · Readiness · Snapshot stale"],
+        ["122:166", "UX-00 / 39 · Sustituir Decision"],
+        ["122:231", "UX-00 / 40 · Retirar Invariant"],
+        ["122:288", "UX-00 / 41 · Readiness · Ready to start"],
+        ["126:184", "UX-00 / 42 · Decision · Revisión histórica"],
+        ["126:240", "UX-00 / 43 · Nueva Invariant · Formulario"],
+        ["126:303", "UX-00 / 44 · Detalle de Invariant"]
+      ]
+    },
+    {
+      "page_id": "133:2",
+      "page_name": "18 · JOURNEYS / Advanced UX-00",
+      "frames": [
+        ["133:3", "UX-A / 01 · Product journey hub"],
+        ["133:75", "UX-A / 02 · Repository connection"],
+        ["133:129", "UX-A / 03 · Repository denied"],
+        ["133:170", "UX-A / 04 · Context Package preview"],
+        ["133:227", "UX-A / 05 · Agent Run registry"],
+        ["133:280", "UX-A / 06 · Handoff review"],
+        ["133:335", "UX-A / 07 · Evidence registry"],
+        ["133:391", "UX-A / 08 · Verification and blocked checks"],
+        ["133:445", "UX-A / 09 · Release candidate gates"],
+        ["133:500", "UX-A / 10 · Project JSON Transfer"],
+        ["141:23", "UX-A / 11 · Repositorios · Inventario y permisos"],
+        ["141:90", "UX-A / 12 · Desconectar repositorio · Confirmar"],
+        ["141:156", "UX-A / 13 · Context Package · Snapshot stale"],
+        ["141:222", "UX-A / 14 · Context Package · Preview y guardado"],
+        ["141:291", "UX-A / 15 · Agent Run · Detalle y eventos"],
+        ["141:357", "UX-A / 16 · Agent Run · Agregar evento y resultado"],
+        ["141:431", "UX-A / 17 · Handoff · Revisiones y aceptación"],
+        ["141:500", "UX-A / 18 · Handoff · Contexto cambió"],
+        ["142:39", "UX-A / 19 · Evidence · Registrar con procedencia"],
+        ["142:114", "UX-A / 20 · Evidence · Detalle e invalidación"],
+        ["142:183", "UX-A / 21 · Verification · Preview y evaluación"],
+        ["142:252", "UX-A / 22 · Verification · V01 bloqueada"],
+        ["142:321", "UX-A / 23 · Release Candidate · Crear borrador"],
+        ["142:390", "UX-A / 24 · Release Candidate · Freeze confirmado"],
+        ["142:459", "UX-A / 25 · Release Gates · Diagnóstico G01–G06"],
+        ["142:528", "UX-A / 26 · Manifest · Exportación y trazabilidad"],
+        ["142:597", "UX-A / 27 · Project Transfer · Recuperación y respaldo"],
+        ["143:57", "UX-A / 28 · Handoff · Revisión reconocida"],
+        ["143:119", "UX-A / 29 · Evidence · Invalidación registrada"],
+        ["143:184", "UX-A / 30 · Manifest · Exportación simulada"],
+        ["144:63", "UX-A / 31 · Repository · Desconectado"],
+        ["144:120", "UX-A / 32 · Context Package · Snapshot guardado"]
+      ]
+    }
+  ]
+}

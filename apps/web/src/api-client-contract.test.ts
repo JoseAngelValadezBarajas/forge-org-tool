@@ -34,4 +34,36 @@ describe('organizationApi compatibility facade', () => {
       }),
     );
   });
+
+  it('preserves workspace-scoped Project read and update contracts', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 'p1', name: 'Project' }), { status: 200 }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 'p1', name: 'Renamed' }), { status: 200 }),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await organizationApi.getProject('w1', 'p1');
+    await organizationApi.updateProject('w1', 'p1', { name: 'Renamed' });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      '/api/v1/workspaces/w1/projects/p1',
+      expect.objectContaining({ credentials: 'same-origin' }),
+    );
+    expect(fetchMock.mock.calls[0][1]?.method).toBeUndefined();
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/v1/workspaces/w1/projects/p1',
+      expect.objectContaining({
+        method: 'PATCH',
+        headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ name: 'Renamed' }),
+        credentials: 'same-origin',
+      }),
+    );
+  });
 });

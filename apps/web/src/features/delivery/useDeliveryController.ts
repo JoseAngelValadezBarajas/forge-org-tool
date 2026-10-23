@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   organizationApi,
   type CandidateHistory,
@@ -39,9 +39,12 @@ export function useDeliveryController(workspaceId: string, projectId: string) {
   const [verification, setVerification] = useState<Verification | null>(null);
   const [manifest, setManifest] = useState<ReleaseManifest | null>(null);
   const [error, setError] = useState('');
+  const loadGeneration = useRef(0);
 
   const load = useCallback(
     async (isCurrent: () => boolean = () => true) => {
+      const generation = ++loadGeneration.current;
+      const isLatest = () => isCurrent() && generation === loadGeneration.current;
       try {
         const [nextEvidence, nextCandidates, nextRules, nextVerifications] = await Promise.all([
           organizationApi.listEvidence(workspaceId, projectId, search, provenance, status),
@@ -49,13 +52,13 @@ export function useDeliveryController(workspaceId: string, projectId: string) {
           organizationApi.listVerificationRules(workspaceId, projectId),
           organizationApi.listVerifications(workspaceId, projectId),
         ]);
-        if (!isCurrent()) return;
+        if (!isLatest()) return;
         setEvidence(nextEvidence);
         setCandidates(nextCandidates);
         setRules(nextRules);
         setVerifications(nextVerifications);
       } catch (cause) {
-        if (isCurrent()) {
+        if (isLatest()) {
           setError(cause instanceof Error ? cause.message : 'Unable to load delivery records.');
         }
       }

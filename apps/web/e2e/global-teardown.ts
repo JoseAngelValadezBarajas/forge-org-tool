@@ -1,20 +1,14 @@
-import { existsSync, readFileSync, rmSync } from 'node:fs';
-import { join, resolve, sep } from 'node:path';
+import { cleanupRunEnvironment } from '../../../tooling/scripts/e2e-environment.mjs';
+import { join } from 'node:path';
 
 export default async function globalTeardown() {
-  const taskRoot = resolve(
-    process.cwd(),
-    '../..',
-    '.superpowers/sdd/2026-10-22-ux-01-visual-interaction-parity',
-  );
-  const runRoot = join(taskRoot, 'e2e-fixture');
-  const markerPath = join(runRoot, 'FORGE-UX01-SYNTHETIC');
-  if (
-    !runRoot.startsWith(`${taskRoot}${sep}`) ||
-    !existsSync(markerPath) ||
-    readFileSync(markerPath, 'utf8') !== 'Synthetic browser fixture only.\n'
-  ) {
-    throw new Error(`Refusing to remove unexpected UX-01 browser fixture path: ${runRoot}`);
-  }
-  rmSync(runRoot, { recursive: true, force: true });
+  const root = process.env.FORGE_E2E_RUN_ROOT;
+  if (!root) throw new Error('Playwright did not provide an isolated acceptance run directory.');
+  cleanupRunEnvironment({
+    root,
+    fixtureDirectory: process.env.FORGE_E2E_FIXTURE_DIRECTORY,
+    repositoryRoot: process.env.FORGE_E2E_REPOSITORY_ROOT,
+    databasePath: process.env.FORGE_E2E_DATABASE_PATH,
+    markerPath: join(root, '.forge-product-acceptance-owner'),
+  });
 }

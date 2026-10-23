@@ -112,7 +112,7 @@ export function ContextPage() {
             <p>
               <strong>Schema:</strong> {preview.schema_version}
             </p>
-            <p>
+            <p className={styles.fingerprint}>
               <strong>Fingerprint:</strong> {preview.fingerprint}
             </p>
             <pre className={styles.preview}>{preview.markdown}</pre>

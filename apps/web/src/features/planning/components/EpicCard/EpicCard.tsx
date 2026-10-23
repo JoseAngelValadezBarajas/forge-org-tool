@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, StatusChip } from '@forge-org/ui';
 import type { Epic, Feature } from '@forge-org/api-client';
 import styles from './EpicCard.module.css';
 
-type EpicCardProps = { epic: Epic & { features: Feature[] }; children?: ReactNode };
+type EpicCardProps = { epic: Epic & { features: Feature[] }; children?: ReactNode; href?: string };
 
 function progressState(features: Feature[]): 'Backlog' | 'InProgress' | 'Done' {
   if (features.length > 0 && features.every((feature) => feature.status === 'done')) return 'Done';
@@ -11,14 +12,14 @@ function progressState(features: Feature[]): 'Backlog' | 'InProgress' | 'Done' {
   return 'Backlog';
 }
 
-export function EpicCard({ epic, children }: EpicCardProps) {
+export function EpicCard({ epic, children, href }: EpicCardProps) {
   const state = progressState(epic.features);
   const label = state === 'InProgress' ? 'In progress' : state;
   return (
     <Card className={styles.card} data-state={state}>
       <header className={styles.header}>
         <div>
-          <h3>{epic.title}</h3>
+          <h3>{href ? <Link to={href}>{epic.title}</Link> : epic.title}</h3>
           <p>
             {epic.features.length} {epic.features.length === 1 ? 'feature' : 'features'}
           </p>

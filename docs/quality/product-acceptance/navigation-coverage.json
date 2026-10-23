@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "domain": "navigation-and-core-reference-frames",
+  "frames": [
+    {
+      "figma_node_id": "5:255",
+      "page_id": "1:5",
+      "page_name": "04 · SCREENS / Desktop Core",
+      "screen_state": "05 · Developer Workbench",
+      "classification": "EXECUTABLE_PRODUCT_WORKFLOW",
+      "route": "/workbench/{workspaceId}/{projectId}",
+      "user_action": "Open Workbench and inspect context, run state, handoff, and delivery evidence.",
+      "expected_result": "Workbench presents persisted state and preserves reported-versus-verified boundaries.",
+      "test_ids": ["PA-RUN-01", "PA-HANDOFF-01"],
+      "evidence": ["apps/web/e2e/workbench/runs-handoffs.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "PA-RUN-01 and PA-HANDOFF-01 passed on chromium-desktop and chromium-mobile with API-backed persistence assertions; behavior only, not human Figma parity certification."
+    },
+    {
+      "figma_node_id": "5:397",
+      "page_id": "1:5",
+      "page_name": "04 · SCREENS / Desktop Core",
+      "screen_state": "06 · Release Detail",
+      "classification": "EXECUTABLE_PRODUCT_WORKFLOW",
+      "route": "/delivery/{workspaceId}/{projectId}",
+      "user_action": "Inspect release progress, gate evidence, and candidate state.",
+      "expected_result": "Release view reports persisted delivery status without implying publication.",
+      "test_ids": ["PA-DEL-001"],
+      "evidence": ["apps/web/e2e/delivery/delivery-acceptance.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "The integrated 50/50 desktop and responsive-viewport Playwright run passed the Release Gate and Delivery journeys; the former mobile pointer interception is no longer reproduced. Automated behavior evidence does not certify native visual parity."
+    },
+    {
+      "figma_node_id": "133:3",
+      "page_id": "133:2",
+      "page_name": "18 · JOURNEYS / Advanced UX-00",
+      "screen_state": "UX-A / 01 · Product journey hub",
+      "classification": "VISUAL_LAYOUT_REFERENCE",
+      "route": null,
+      "user_action": null,
+      "expected_result": "Provides a visual guide to journey categories; it is not a separate product route.",
+      "test_ids": [],
+      "evidence": [],
+      "status": "DESIGN_REFERENCE_ONLY",
+      "notes": "Figma footer identifies this as a UX guide whose links connect editable Figma screens; do not fabricate an application hub."
+    }
+  ]
+}

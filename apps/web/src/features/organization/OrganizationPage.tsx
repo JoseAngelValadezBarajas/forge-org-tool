@@ -116,7 +116,7 @@ export function OrganizationPage() {
                 {dashboardSummaries.map((summary) => (
                   <Card key={summary.project.id}>
                     <h3>
-                      <Link to={`/planning/${workspaceId}/${summary.project.id}`}>
+                      <Link to={`/projects/${workspaceId}/${summary.project.id}`}>
                         {summary.project.name}
                       </Link>
                     </h3>
@@ -216,8 +216,9 @@ export function OrganizationPage() {
                 {visibleProjects.map((project) => (
                   <ProjectCard key={project.id} project={project} workspaceId={workspaceId}>
                     <p>
-                      <Link to={`/repositories/${workspaceId}/${project.id}`}>Repositories</Link> ·{' '}
-                      <Link to={`/workbench/${workspaceId}/${project.id}`}>Workbench</Link> ·{' '}
+                      <Link to={`/planning/${workspaceId}/${project.id}`}>Open planning board</Link>{' '}
+                      · <Link to={`/repositories/${workspaceId}/${project.id}`}>Repositories</Link>{' '}
+                      · <Link to={`/workbench/${workspaceId}/${project.id}`}>Workbench</Link> ·{' '}
                       <Link to={`/delivery/${workspaceId}/${project.id}`}>Delivery</Link> ·{' '}
                       <Link to={`/transfer/${workspaceId}/${project.id}`}>Transfer</Link>
                     </p>

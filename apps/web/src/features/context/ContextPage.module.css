@@ -26,6 +26,9 @@
   color: var(--forge-text-muted);
   overflow-wrap: anywhere;
 }
+.fingerprint {
+  overflow-wrap: anywhere;
+}
 .preview {
   display: block;
   width: 100%;

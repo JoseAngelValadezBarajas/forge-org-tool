@@ -4,6 +4,46 @@ This record covers the reconstructed ORG-001 through ORG-009 slices. It does
 not certify Figma visual parity, human-installed Windows sign-off, or
 unimplemented legacy capabilities.
 
+## Project Overview and Epic Detail parity follow-up
+
+Legacy comparison is pinned to `cadc4223d3c08c793b4f39152108997b697a7a75`;
+target implementation is commit `d602bdd31d97ecbb05b4eb8e102d7f4dcb480103`.
+The Project Overview API/client operations and Organization route are in the
+preceding target commits recorded in branch history. Epic PATCH accepts the
+source values `planning | archived` plus the already-public target values
+`planned | in_progress | done`; OpenAPI and generated TypeScript types expose
+that union. API characterization first failed with HTTP 422 for persisted
+`planning`, then passed for all five states and rejected `paused` with 422.
+
+- `PA-ORG-002`: project metadata edit and archive persisted through reload;
+  Planning and Transfer links opened from the Overview. Chromium desktop and
+  390px mobile passed (2/2 focused cases).
+- `PA-PLAN-003`: Epic title/status persisted through reload and its Feature
+  link opened Feature detail. Chromium desktop and 390px mobile passed (2/2).
+- Screenshots are retained under the isolated Playwright output in
+  `test-results/product-acceptance/forge-product-acceptance-34164576-73aa-4089-9fcf-13204a2dc1a9/playwright/`:
+  `organization-organization--a6c04-ing-and-Transfer-navigation-chromium-desktop/project-overview.png`,
+  corresponding `chromium-mobile/project-overview.png`, and
+  `planning-planning-workflow-24e6a--Feature-navigation-persist-chromium-desktop/epic-detail.png`,
+  corresponding `chromium-mobile/epic-detail.png`. These are local ignored
+  test artifacts, not committed screenshots or human visual certification.
+- Focused API tests: 4/4; focused web tests: 35/35; web typecheck, Ruff,
+  mypy, architecture, and OpenAPI export check passed. Full Vitest: 183/183.
+- Full isolated Playwright rerun passed 50/50 across Chromium desktop and
+  mobile, including the unchanged existing Handoff journeys. The preceding
+  attempt had a transient Handoff-mobile timeout (49/50); that test passed
+  alone and then in the complete rerun. No test or assertion was weakened.
+- `npm test` passed architecture/tooling, API-type drift, typecheck, all
+  frontend tests (183/183), UI/tokens/icons/API-client package tests, and
+  packed external-consumer verification. Full API pytest passed (33 tests plus
+  one subtest); OpenAPI export check, Ruff, strict mypy, frontend lint, and
+  production build including Component Host exclusion passed.
+- Full local Playwright acceptance passed 50/50. After the final effect/lint
+  adjustment, the two new browser journeys were rerun and passed 4/4 desktop
+  and mobile. Prettier and Ruff formatting checks passed. Rustfmt/Clippy and
+  GitHub Quality for the new commit were not run: Cargo is not installed in
+  this Windows environment, and the branch was not pushed (PR remains open).
+
 Implementation commits include `6eca0da` (ORG-001), `e909ce9` (planning
 mutations), `38826b2` (knowledge revisions), `5499101` (context retrieval),
 `3a39790` (evidence filtering), `01c6e42` (run retrieval), `fec502d`

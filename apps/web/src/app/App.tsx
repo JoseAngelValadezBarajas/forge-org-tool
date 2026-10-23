@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@forge-org/ui';
-import { OrganizationPage } from '../features/organization';
-import { FeatureDetailPage, PlanningPage } from '../features/planning';
+import { OrganizationPage, ProjectOverviewPage } from '../features/organization';
+import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
 import { ReadinessPage } from '../features/readiness';
 import { HandoffDetailPage, RunDetailPage, WorkbenchPage } from '../features/workbench';
 import {
@@ -55,6 +55,11 @@ function ApplicationShell() {
   }
   const context = getProjectContext(location.pathname);
   const productDestinations = [
+    {
+      id: 'overview',
+      label: 'Overview',
+      path: context && `/projects/${context.workspaceId}/${context.projectId}`,
+    },
     {
       id: 'planning',
       label: 'Planning',
@@ -150,7 +155,12 @@ function ApplicationShell() {
             <Breadcrumbs pathname={location.pathname} />
             <Routes>
               <Route path="/" element={<OrganizationPage />} />
+              <Route path="/projects/:workspaceId/:projectId" element={<ProjectOverviewPage />} />
               <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+              <Route
+                path="/planning/:workspaceId/:projectId/epics/:epicId"
+                element={<EpicDetailPage />}
+              />
               <Route
                 path="/planning/:workspaceId/:projectId/features/:featureId"
                 element={<FeatureDetailPage />}
@@ -235,9 +245,10 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
   if (!context) return null;
   const parts = pathname.split('/').filter(Boolean);
   const section = parts[0];
-  const projectPath = `/planning/${context.workspaceId}/${context.projectId}`;
-  const featurePath = `${projectPath}/features/${context.featureId}`;
+  const projectPath = `/projects/${context.workspaceId}/${context.projectId}`;
+  const featurePath = `/planning/${context.workspaceId}/${context.projectId}/features/${context.featureId}`;
   const labelBySection: Record<string, string> = {
+    projects: 'Overview',
     planning: context.featureId ? 'Feature' : 'Planning',
     readiness: 'Readiness',
     workbench: 'Workbench',
@@ -277,6 +288,7 @@ function getProjectContext(pathname: string) {
   if (!section || !workspaceId || !projectId) return null;
   if (
     ![
+      'projects',
       'planning',
       'readiness',
       'workbench',

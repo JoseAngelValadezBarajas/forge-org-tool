@@ -404,7 +404,7 @@ export function DeliveryPage() {
           <ReleaseGate outcome={gate?.outcome ?? 'NOT_EVALUATED'}>
             {gate ? (
               <>
-                <p>Input fingerprint: {gate.input_fingerprint}</p>
+                <p className={styles.longValue}>Input fingerprint: {gate.input_fingerprint}</p>
                 {gate.blockers.map((blocker) => (
                   <p key={blocker}>{blocker}</p>
                 ))}

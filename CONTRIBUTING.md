@@ -26,3 +26,22 @@ Python formatting/linting uses `uv run --project apps/api --locked ruff
 format` and `ruff check`; Rust uses `cargo fmt` and `cargo clippy` against
 both desktop manifests. CI runs the check variants and the existing browser,
 API, and desktop suites.
+
+## Product acceptance journeys
+
+Run the full isolated Playwright acceptance locally with `npm run
+test:acceptance:local`. It requires Node 24, Python 3.12, `uv`, npm, and
+Playwright Chromium. Each run uses a disposable SQLite database and synthetic
+repository under the OS temp directory; reports and retained traces/screenshots
+go to `test-results/product-acceptance/`. It does not reuse an existing dev
+server or touch a user database. For a fast tagged subset use `npm run
+test:e2e:smoke`; `npm run test:e2e:visual` captures tagged visual evidence but
+does not certify pixel parity or replace human Figma review.
+
+On Windows, `npm run test:desktop:acceptance` builds the NSIS package and runs
+the installed-app UI Automation test against an isolated install and per-user
+data directory. It verifies the packaged GUI/API/SQLite journey and restart
+persistence. The coverage registry can be regenerated with `npm run
+acceptance:registry` and validated without writing with `npm run
+check:acceptance:registry`; its automated status is distinct from human-reviewed
+Figma parity.

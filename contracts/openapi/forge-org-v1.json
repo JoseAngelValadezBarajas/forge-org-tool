@@ -801,6 +801,13 @@
             "type": "string"
           },
           "status": {
+            "enum": [
+              "planning",
+              "archived",
+              "planned",
+              "in_progress",
+              "done"
+            ],
             "title": "Status",
             "type": "string"
           },
@@ -843,7 +850,13 @@
           "status": {
             "anyOf": [
               {
-                "pattern": "^(planned|in_progress|done)$",
+                "enum": [
+                  "planning",
+                  "archived",
+                  "planned",
+                  "in_progress",
+                  "done"
+                ],
                 "type": "string"
               },
               {

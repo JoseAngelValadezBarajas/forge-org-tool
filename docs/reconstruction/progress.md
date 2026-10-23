@@ -1,6 +1,6 @@
 # Reconstruction progress
 
-Last updated: 2026-10-20. This file records evidence, not intent.
+Last updated: 2026-10-23. This file records evidence, not intent.
 
 ## Gate status
 
@@ -9,7 +9,7 @@ Last updated: 2026-10-20. This file records evidence, not intent.
 | M0 legacy preservation | `VERIFIED` | `docs/migration/original-forge-baseline.md` and external preservation manifest/bundle recorded in the M0 delivery. |
 | M1 foundation | `READY_FOR_REVIEW` | `docs/evidence/m1/verification.md`; public CI run recorded there. |
 | Apache-2.0 license/provenance | `SPECIFIED` | Root `LICENSE`, `NOTICE`, package metadata and source-boundary note; legal owner review still required. |
-| Functional parity | `ORG-001..008_VERIFIED_AUTOMATED; ORG-009_VERIFIED_AUTOMATED_BEHAVIOR` | Organization, planning, readiness, repository/context, reported work, delivery truth, project transfer, desktop sidecar lifecycle/migration/packaging checks, and feature-owned web behavior have automated evidence. Installed-product and human visual certification remain review boundaries. |
+| Functional parity | `ORG-001..008_VERIFIED_AUTOMATED; ORG-009_VERIFIED_AUTOMATED_BEHAVIOR` | Organization Project Overview (`PA-ORG-002`) and independent Epic detail/status contract (`PA-PLAN-003`) now have desktop/mobile browser and API evidence; other capability evidence remains as previously recorded. Installed-product and human visual certification remain review boundaries. |
 | Figma visual certification | `NOT_STARTED` | Requires token reconciliation and retained Chromium evidence for functional screens. |
 | Stage 1 owner approval | `SUPERSEDED` | Full reconstruction approval superseded the old M1/Stage-1 stop gate; capability-level evidence remains required. |
 

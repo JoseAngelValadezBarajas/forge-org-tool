@@ -1528,8 +1528,11 @@ export interface components {
             id: string;
             /** Project Id */
             project_id: string;
-            /** Status */
-            status: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "planning" | "archived" | "planned" | "in_progress" | "done";
             /** Title */
             title: string;
             /**
@@ -1543,7 +1546,7 @@ export interface components {
             /** Description */
             description?: string | null;
             /** Status */
-            status?: string | null;
+            status?: ("planning" | "archived" | "planned" | "in_progress" | "done") | null;
             /** Title */
             title?: string | null;
         };
