@@ -98,6 +98,16 @@ test('installed Desktop acceptance preserves a Bug screenshot through restart', 
   );
 });
 
+test('native screenshot picker handles Windows dialog combo boxes without weakening persistence checks', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(smoke, /ControlType\]::ComboBox/);
+  assert.match(smoke, /AutomationId.*1148|1148.*AutomationId/);
+  assert.match(smoke, /SendWait\('%n'\)/);
+  assert.match(smoke, /Automation tree/);
+  assert.match(smoke, /PASS installed UI -> authenticated API -> SQLite -> restart/);
+});
+
 test('native combobox selection does not collapse an already closed dropdown', async () => {
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
 

@@ -19,6 +19,7 @@ $ownedSidecarPids = @()
 
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
+Add-Type -AssemblyName System.Windows.Forms
 Add-Type -TypeDefinition @'
 using System;
 using System.IO;
@@ -200,12 +201,41 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     $visibleWindows = @($windows | ForEach-Object { "'$($_.Current.Name)' class='$($_.Current.ClassName)' type='$($_.Current.ControlType)' hwnd=$($_.Current.NativeWindowHandle)" })
     throw "Windows did not expose the screenshot file picker to UI Automation. Top-level windows: $($visibleWindows -join '; ')"
   }
+
+  $dialogControls = $dialog.FindAll(
+    [System.Windows.Automation.TreeScope]::Descendants,
+    [System.Windows.Automation.Condition]::TrueCondition
+  )
+  $controlSummary = @($dialogControls | Select-Object -First 80 | ForEach-Object {
+    "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)' class='$($_.Current.ClassName)'"
+  })
+  Write-Output "Native screenshot file picker Automation tree: $($controlSummary -join '; ')"
+
   $fileName = $dialog.FindFirst(
     [System.Windows.Automation.TreeScope]::Descendants,
     [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Edit)
   )
-  if ($null -eq $fileName) { throw 'The screenshot file picker did not expose its file-name field.' }
-  $fileName.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($filePath)
+  if ($null -ne $fileName) {
+    $fileName.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($filePath)
+  } else {
+    $fileNameCombo = $dialogControls | Where-Object {
+      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::ComboBox -and
+      ($_.Current.AutomationId -eq '1148' -or $_.Current.Name -match '(?i)file name')
+    } | Select-Object -First 1
+    $valuePattern = $null
+    if ($null -ne $fileNameCombo -and $fileNameCombo.TryGetCurrentPattern(
+        [System.Windows.Automation.ValuePattern]::Pattern,
+        [ref]$valuePattern
+      )) {
+      $valuePattern.SetValue($filePath)
+    } else {
+      # Windows' common file picker exposes this field with Alt+N even when its
+      # UI Automation provider omits the Edit/ComboBox value pattern.
+      $dialog.SetFocus()
+      [System.Windows.Forms.SendKeys]::SendWait('%n')
+      [System.Windows.Forms.SendKeys]::SendWait($filePath)
+    }
+  }
   $open = $dialog.FindFirst(
     [System.Windows.Automation.TreeScope]::Descendants,
     [System.Windows.Automation.AndCondition]::new(@(
