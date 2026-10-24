@@ -2,11 +2,21 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { assertPublicPackageBoundary, PUBLIC_PACKAGE_NAMES, LOCAL_PACKAGE_NAMES, readPackageManifest } from './public-package-boundary.mjs';
+import {
+  assertPublicPackageBoundary,
+  PUBLIC_PACKAGE_NAMES,
+  LOCAL_PACKAGE_NAMES,
+  readPackageManifest,
+} from './public-package-boundary.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const rootPackage = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
-const manifests = Object.fromEntries([...PUBLIC_PACKAGE_NAMES, ...LOCAL_PACKAGE_NAMES].map((name) => [name, readPackageManifest(root, name)]));
+const manifests = Object.fromEntries(
+  [...PUBLIC_PACKAGE_NAMES, ...LOCAL_PACKAGE_NAMES].map((name) => [
+    name,
+    readPackageManifest(root, name),
+  ]),
+);
 
 test('keeps only api-client local in the application workspace', () => {
   assert.doesNotThrow(() => assertPublicPackageBoundary(rootPackage, manifests));

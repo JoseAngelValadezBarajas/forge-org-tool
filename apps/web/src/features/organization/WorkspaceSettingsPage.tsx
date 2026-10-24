@@ -1,7 +1,15 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { organizationApi, type Workspace, type WorkspaceTag } from '@forge-org/api-client';
-import { Button, Card, Dialog, FormField, Input, StatusChip, Textarea } from '@corefoundry-labs/forge-ui';
+import {
+  Button,
+  Card,
+  Dialog,
+  FormField,
+  Input,
+  StatusChip,
+  Textarea,
+} from '@corefoundry-labs/forge-ui';
 import styles from './WorkspaceSettingsPage.module.css';
 
 type TagDraft = Pick<WorkspaceTag, 'name' | 'color'>;

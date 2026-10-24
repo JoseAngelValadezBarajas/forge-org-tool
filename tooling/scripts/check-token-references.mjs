@@ -4,7 +4,12 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const tokenCss = resolve(root, 'node_modules/@corefoundry-labs/forge-tokens/dist/tokens.css');
-const tokenSource = JSON.parse(readFileSync(resolve(root, 'node_modules/@corefoundry-labs/forge-tokens/dist/tokens.json'), 'utf8'));
+const tokenSource = JSON.parse(
+  readFileSync(
+    resolve(root, 'node_modules/@corefoundry-labs/forge-tokens/dist/tokens.json'),
+    'utf8',
+  ),
+);
 
 const walk = (directory) =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
