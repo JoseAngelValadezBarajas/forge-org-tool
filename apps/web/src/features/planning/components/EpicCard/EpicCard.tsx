@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { DragEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, StatusChip } from '@forge-org/ui';
 import type { Epic, EpicStatus, Feature } from '@forge-org/api-client';
@@ -9,6 +9,8 @@ type EpicCardProps = {
   children?: ReactNode;
   href?: string;
   compact?: boolean;
+  draggable?: boolean;
+  onDragStart?: DragEventHandler<HTMLDivElement>;
 };
 
 const labels: Record<EpicStatus, string> = {
@@ -19,7 +21,14 @@ const labels: Record<EpicStatus, string> = {
   done: 'Done',
 };
 
-export function EpicCard({ epic, children, href, compact = false }: EpicCardProps) {
+export function EpicCard({
+  epic,
+  children,
+  href,
+  compact = false,
+  draggable = false,
+  onDragStart,
+}: EpicCardProps) {
   const knownStatus = epic.status in labels;
   const label = epic.archived_at
     ? 'Archived'
@@ -38,6 +47,8 @@ export function EpicCard({ epic, children, href, compact = false }: EpicCardProp
         className={`${styles.card} ${styles.compact}`}
         data-state={state}
         data-testid={`epic-card-${epic.id}`}
+        draggable={draggable}
+        onDragStart={onDragStart}
       >
         <p className={styles.compactType}>{`EPIC · ${epic.priority ?? 'medium'}`}</p>
         <h4 className={styles.compactTitle}>

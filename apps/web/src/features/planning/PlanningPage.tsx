@@ -1,30 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  Dialog,
-  FormField,
-  Input,
-  SearchField,
-  Select,
-  Textarea,
-} from '@forge-org/ui';
-import {
-  organizationApi,
-  type EpicStatus,
-  type Feature,
-  type WorkspaceTag,
-} from '@forge-org/api-client';
+import { Button, Dialog, FormField, Input, Select, Textarea } from '@forge-org/ui';
+import { organizationApi, type EpicStatus, type WorkspaceTag } from '@forge-org/api-client';
 import styles from './PlanningPage.module.css';
 import { CreateEpicDrawer } from './CreateEpicDrawer';
 import { CreateEpicContextBoard } from './CreateEpicContextBoard';
 import { usePlanningController } from './usePlanningController';
 import {
-  DependencyGroup,
   EpicCard,
   FeatureCard,
-  FilterBar,
   KanbanColumn,
   PLANNING_COLUMN_STATUSES,
   ProjectPlanningHome,
@@ -61,33 +45,18 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
     };
   }, [workspaceId]);
   const {
-    addDependency,
-    blockedFeatureId,
-    blockingFeatureId,
     createEpic,
     createFeature,
     actualResult,
     bugSeverity,
-    dependencies,
-    epicFilter,
     epicPriority,
     epicTags,
     error,
     featureEpicId,
     featureKind,
     featureTags,
-    featureName,
     featureTitle,
-    features,
     overview,
-    priorityFilter,
-    removeDependency,
-    search,
-    setTagFilter,
-    tagFilter,
-    setBlockedFeatureId,
-    setBlockingFeatureId,
-    setEpicFilter,
     setFeatureTitle,
     setFeatureEpicId,
     setFeatureKind,
@@ -102,8 +71,6 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
     expectedResult,
     epicDescription,
     setEpicDescription,
-    setPriorityFilter,
-    setSearch,
     setStatusFilter,
     setTitle,
     statusFilter,
@@ -424,6 +391,14 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       compact
                       headerCount={columnEpics.length}
                       emptyMessage="No Epics in this status."
+                      onDrop={(event, destination) => {
+                        event.preventDefault();
+                        const id = event.dataTransfer.getData('text/forge-epic-id');
+                        const epic = workflowEpics.find((item) => item.id === id);
+                        if (epic && epic.status !== destination) {
+                          void updateEpic(epic, destination);
+                        }
+                      }}
                     >
                       {columnEpics.map((epic) => (
                         <EpicCard
@@ -431,6 +406,11 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                           epic={epic}
                           compact
                           href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
+                          draggable
+                          onDragStart={(event) => {
+                            event.dataTransfer.setData('text/forge-epic-id', epic.id);
+                            event.dataTransfer.effectAllowed = 'move';
+                          }}
                         />
                       ))}
                       {columnEpics.length > 0 && (
@@ -571,180 +551,6 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
             </section>
           )}
         </section>
-        <FilterBar resultCount={visibleFeatures.length}>
-          <div className={styles.forms}>
-            <FormField label="Search planning">
-              <SearchField
-                aria-label="Search planning"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </FormField>
-            <FormField label="Status">
-              <Select
-                aria-label="Filter planning by status"
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
-              >
-                <option value="all">All statuses</option>
-                <option value="refining">Legacy refining</option>
-                {PLANNING_COLUMN_STATUSES.map((column) => (
-                  <option key={column.value} value={column.value}>
-                    {column.label}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-            <FormField label="Priority">
-              <Select
-                aria-label="Filter planning by priority"
-                value={priorityFilter}
-                onChange={(event) => setPriorityFilter(event.target.value)}
-              >
-                <option value="all">All priorities</option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </Select>
-            </FormField>
-            <FormField label="Epic">
-              <Select
-                aria-label="Filter planning by epic"
-                value={epicFilter}
-                onChange={(event) => setEpicFilter(event.target.value)}
-              >
-                <option value="all">All epics</option>
-                <option value="unassigned">Unassigned</option>
-                {overview.epics.map((epic) => (
-                  <option key={epic.id} value={epic.id}>
-                    {epic.title}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-            <FormField label="Tag">
-              <Select
-                aria-label="Filter planning by tag"
-                value={tagFilter}
-                onChange={(event) => setTagFilter(event.target.value)}
-              >
-                <option value="">All tags</option>
-                {workspaceTags.map((tag) => (
-                  <option key={tag.id} value={tag.name}>
-                    {tag.name}
-                  </option>
-                ))}
-              </Select>
-            </FormField>
-          </div>
-        </FilterBar>
-        {!isMobile && (
-          <div
-            className={styles.board}
-            role="region"
-            aria-label="Planning board"
-            tabIndex={0}
-            data-testid="project-epic-board"
-          >
-            {PLANNING_COLUMN_STATUSES.map(({ value: status }) => {
-              const columnFeatures = visibleFeatures.filter((feature) => feature.status === status);
-              return (
-                <KanbanColumn
-                  key={status}
-                  status={status}
-                  onDrop={(event, destination) => {
-                    event.preventDefault();
-                    const featureId =
-                      event.dataTransfer.getData('text/forge-feature-id') ||
-                      event.dataTransfer.getData('text/plain');
-                    const feature = visibleFeatures.find((item) => item.id === featureId);
-                    if (feature && feature.status !== destination)
-                      void updateFeature(feature, { status: destination });
-                  }}
-                >
-                  {columnFeatures.map((feature) => (
-                    <div
-                      key={feature.id}
-                      draggable
-                      data-testid={`work-item-card-${feature.id}`}
-                      onDragStart={(event) => {
-                        event.dataTransfer.setData('text/forge-feature-id', feature.id);
-                        event.dataTransfer.setData('text/plain', feature.id);
-                        event.dataTransfer.effectAllowed = 'move';
-                      }}
-                    >
-                      <FeatureCard
-                        feature={feature}
-                        href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
-                      >
-                        <div>
-                          <label>
-                            Priority
-                            <select
-                              aria-label={`Priority for ${feature.title}`}
-                              value={feature.priority}
-                              onChange={(event) =>
-                                void updateFeature(feature, {
-                                  priority: event.target.value as Feature['priority'],
-                                })
-                              }
-                            >
-                              <option value="low">low</option>
-                              <option value="medium">medium</option>
-                              <option value="high">high</option>
-                              <option value="critical">critical</option>
-                            </select>
-                          </label>
-                          <label>
-                            Status
-                            <select
-                              aria-label={`Status for ${feature.title}`}
-                              value={feature.status}
-                              onChange={(event) =>
-                                void updateFeature(feature, {
-                                  status: event.target.value as Feature['status'],
-                                })
-                              }
-                            >
-                              {PLANNING_COLUMN_STATUSES.map((column) => (
-                                <option key={column.value} value={column.value}>
-                                  {column.label.toLowerCase()}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <label>
-                            Epic
-                            <select
-                              aria-label={`Epic for ${feature.title}`}
-                              value={feature.epic_id ?? 'unassigned'}
-                              onChange={(event) =>
-                                void updateFeature(
-                                  feature,
-                                  event.target.value === 'unassigned'
-                                    ? { clear_epic: true }
-                                    : { epic_id: event.target.value },
-                                )
-                              }
-                            >
-                              <option value="unassigned">unassigned</option>
-                              {overview.epics.map((epic) => (
-                                <option key={epic.id} value={epic.id}>
-                                  {epic.title}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                        </div>
-                      </FeatureCard>
-                    </div>
-                  ))}
-                </KanbanColumn>
-              );
-            })}
-          </div>
-        )}
         {isMobile && (
           <section aria-label="Mobile work item board" className={styles.mobileBoard}>
             <FormField label="Work item status">
@@ -827,63 +633,6 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
             </div>
           </section>
         )}
-        <Card>
-          <form onSubmit={addDependency}>
-            <h3>Planning dependencies</h3>
-            <label>
-              Blocking feature
-              <select
-                aria-label="Blocking feature"
-                value={blockingFeatureId}
-                onChange={(event) => setBlockingFeatureId(event.target.value)}
-              >
-                <option value="">Select feature</option>
-                {features.map((feature) => (
-                  <option key={feature.id} value={feature.id}>
-                    {feature.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Blocked feature
-              <select
-                aria-label="Blocked feature"
-                value={blockedFeatureId}
-                onChange={(event) => setBlockedFeatureId(event.target.value)}
-              >
-                <option value="">Select feature</option>
-                {features.map((feature) => (
-                  <option key={feature.id} value={feature.id}>
-                    {feature.title}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Button type="submit">Add dependency</Button>
-          </form>
-          {dependencies.map((dependency) => (
-            <DependencyGroup
-              key={dependency.id}
-              blocker={featureName(dependency.blocking_feature_id)}
-              blocked={featureName(dependency.blocked_feature_id)}
-              state={
-                features.find((feature) => feature.id === dependency.blocking_feature_id)
-                  ?.status === 'done'
-                  ? 'Clear'
-                  : 'Blocked'
-              }
-            >
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void removeDependency(dependency)}
-              >
-                Remove dependency
-              </Button>
-            </DependencyGroup>
-          ))}
-        </Card>
       </div>
     </ProjectPlanningHome>
   );
