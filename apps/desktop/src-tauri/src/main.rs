@@ -21,8 +21,8 @@ fn should_hide_on_close_with_exit_override(exit_on_close: bool) -> bool {
 }
 
 fn should_hide_on_close() -> bool {
-    let exit_on_close = std::env::var_os("FORGE_DESKTOP_SMOKE_EXIT_ON_CLOSE")
-        .is_some_and(|value| value == "1");
+    let exit_on_close =
+        std::env::var_os("FORGE_DESKTOP_SMOKE_EXIT_ON_CLOSE").is_some_and(|value| value == "1");
     should_hide_on_close_with_exit_override(exit_on_close)
 }
 
@@ -328,8 +328,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::{
-        database_path, should_hide_on_close, should_hide_on_close_with_exit_override,
-        startup_log_path, TRAY_QUIT_ID, TRAY_SHOW_ID,
+        database_path, should_hide_on_close, should_hide_on_close_with_exit_override, startup_log_path,
+        TRAY_QUIT_ID, TRAY_SHOW_ID,
     };
     use std::path::Path;
 
