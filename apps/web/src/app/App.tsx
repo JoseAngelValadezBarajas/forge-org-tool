@@ -321,11 +321,13 @@ function ApplicationShell() {
                 aria-label="Current location"
                 data-node-id="344:106"
               >
-                <span>{(activeWorkspace?.name ?? 'Workspace').toUpperCase()}</span>
+                <Link to="/">{activeWorkspace?.name ?? 'Workspace'}</Link>
                 <span aria-hidden="true">/</span>
-                <span>{activeProject?.name ?? 'Project'}</span>
+                <Link to={`/projects/${context.workspaceId}/${context.projectId}`}>
+                  {activeProject?.name ?? 'Project'}
+                </Link>
                 <span aria-hidden="true">/</span>
-                <span>
+                <span aria-current="page">
                   {location.pathname.includes('/features/')
                     ? 'WORK ITEM'
                     : location.pathname.includes('/epics/')

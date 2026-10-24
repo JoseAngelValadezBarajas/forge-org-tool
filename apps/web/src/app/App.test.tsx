@@ -139,6 +139,16 @@ describe('M1 application shell', () => {
     );
     renderRoute('/planning/w1/p1/epics/e1');
     expect(await screen.findByRole('heading', { name: 'Release' })).toBeInTheDocument();
+    const topbarNavigation = screen.getByRole('navigation', { name: 'Current location' });
+    expect(within(topbarNavigation).getByRole('link', { name: 'Research' })).toHaveAttribute(
+      'href',
+      '/',
+    );
+    expect(within(topbarNavigation).getByRole('link', { name: 'Atlas' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    expect(within(topbarNavigation).getByText('EPIC')).toHaveAttribute('aria-current', 'page');
     expect(
       within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByRole('link', {
         name: 'Atlas',
@@ -185,17 +195,14 @@ describe('M1 application shell', () => {
       await within(sidebar).findByRole('navigation', { name: 'Project navigation' }),
     ).toBeInTheDocument();
     expect(within(sidebar).getByRole('combobox', { name: 'Workspace' })).toBeInTheDocument();
-    expect(
-      await within(sidebar).findByRole('heading', { name: 'Your projects' }),
-    ).toBeInTheDocument();
+    expect(await within(sidebar).findByRole('heading', { name: 'Project' })).toBeInTheDocument();
     const projectNavigation = within(sidebar).getByRole('navigation', {
       name: 'Project navigation',
     });
     expect(within(projectNavigation).queryByRole('link', { name: 'Overview' })).toBeNull();
-    expect(within(projectNavigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    expect(
+      within(projectNavigation).getByRole('link', { name: 'Workspace Overview' }),
+    ).toHaveAttribute('aria-current', 'page');
     expect(
       await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
     ).not.toHaveAttribute('aria-current', 'page');
@@ -273,7 +280,7 @@ describe('M1 application shell', () => {
     });
     expect(await within(projectNavigation).findByRole('link', { name: 'Atlas' })).toHaveAttribute(
       'href',
-      '/planning/w1/p1',
+      '/projects/w1/p1',
     );
     fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
       target: { value: 'w2' },
@@ -281,7 +288,7 @@ describe('M1 application shell', () => {
 
     expect(await within(projectNavigation).findByRole('link', { name: 'Signal' })).toHaveAttribute(
       'href',
-      '/planning/w2/p2',
+      '/projects/w2/p2',
     );
     expect(localStorage.getItem('forge-active-workspace')).toBe('w2');
     expect(
@@ -292,7 +299,7 @@ describe('M1 application shell', () => {
     const restoredSidebar = screen.getByRole('complementary');
     expect(await within(restoredSidebar).findByRole('link', { name: 'Signal' })).toHaveAttribute(
       'href',
-      '/planning/w2/p2',
+      '/projects/w2/p2',
     );
     expect(within(restoredSidebar).getByRole('combobox', { name: 'Workspace' })).toHaveValue('w2');
   });
@@ -389,11 +396,10 @@ describe('M1 application shell', () => {
     renderRoute('/planning/w1/p1');
 
     const navigation = screen.getByRole('navigation', { name: 'Project navigation' });
-    expect(within(navigation).getByRole('link', { name: 'Overview' })).toHaveAttribute(
+    expect(within(navigation).getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute(
       'href',
-      '/projects/w1/p1',
+      '/',
     );
-    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '/');
     fireEvent.click(
       within(screen.getByRole('banner', { name: 'Application controls' })).getByRole('button', {
         name: 'Search',

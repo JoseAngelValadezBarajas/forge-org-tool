@@ -256,6 +256,18 @@
 .topbar nav a {
   color: var(--forge-text-muted);
 }
+.topbarContext a {
+  color: inherit;
+  text-decoration: none;
+}
+.topbarContext a:first-child {
+  text-transform: uppercase;
+}
+.topbarContext a:hover,
+.topbarContext a:focus-visible {
+  color: var(--forge-text-primary);
+  text-decoration: underline;
+}
 .main {
   box-sizing: border-box;
   width: 100%;

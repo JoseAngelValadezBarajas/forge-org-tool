@@ -9,7 +9,7 @@ it('uses route-aware current-page semantics', () => {
       <NavigationItem to="/projects" label="Projects" />
     </MemoryRouter>,
   );
-  expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page');
+  expect(screen.getByRole('link', { name: /Projects/ })).toHaveAttribute('aria-current', 'page');
 });
 
 it('renders disabled navigation as an inaccessible-to-activation item', () => {
