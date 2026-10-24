@@ -194,10 +194,11 @@ export function WorkspaceSettingsPage() {
       const deletedName = tags.find((tag) => tag.id === tagId)?.name;
       setTags((current) => current.filter((tag) => tag.id !== tagId));
       if (deletedName) {
-        setTagUsage((current) => {
-          const { [deletedName]: _deleted, ...rest } = current;
-          return rest;
-        });
+        setTagUsage((current) =>
+          Object.fromEntries(
+            Object.entries(current).filter(([name]) => name !== deletedName),
+          ),
+        );
       }
       setTagDrafts((current) =>
         Object.fromEntries(Object.entries(current).filter(([id]) => id !== tagId)),
