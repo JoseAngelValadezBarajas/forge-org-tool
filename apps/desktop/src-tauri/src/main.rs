@@ -7,10 +7,63 @@ use std::net::{TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
-use tauri::{AppHandle, Manager, RunEvent, State};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::{AppHandle, Manager, RunEvent, State, WindowEvent};
 use tauri_plugin_shell::{process::CommandChild, ShellExt};
 
 const READINESS_TIMEOUT: Duration = Duration::from_secs(15);
+const TRAY_SHOW_ID: &str = "tray-show";
+const TRAY_QUIT_ID: &str = "tray-quit";
+
+fn should_hide_on_close() -> bool {
+    true
+}
+
+fn show_main_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
+    let show = MenuItem::with_id(app, TRAY_SHOW_ID, "Open FORGE", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, TRAY_QUIT_ID, "Exit FORGE", true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show, &quit])?;
+    let mut tray = TrayIconBuilder::new()
+        .menu(&menu)
+        .tooltip("FORGE Org Tool")
+        .on_menu_event(|app, event| match event.id.as_ref() {
+            TRAY_SHOW_ID => show_main_window(app),
+            TRAY_QUIT_ID => app.exit(0),
+            _ => {}
+        })
+        .on_tray_icon_event(|tray, event| {
+            if matches!(
+                event,
+                TrayIconEvent::DoubleClick {
+                    button: MouseButton::Left,
+                    ..
+                }
+            ) || matches!(
+                event,
+                TrayIconEvent::Click {
+                    button: MouseButton::Left,
+                    button_state: MouseButtonState::Up,
+                    ..
+                }
+            ) {
+                show_main_window(tray.app_handle());
+            }
+        });
+    if let Some(icon) = app.default_window_icon().cloned() {
+        tray = tray.icon(icon);
+    }
+    tray.build(app)?;
+    Ok(())
+}
 
 fn database_path(local_app_data: &Path) -> PathBuf {
     local_app_data
@@ -240,23 +293,37 @@ fn main() {
                 child: Mutex::new(Some(child)),
                 request_lock: Mutex::new(()),
             });
+            setup_tray(app.handle())?;
             Ok(())
         })
         .build(tauri::generate_context!())
         .expect("error while building FORGE Org Tool desktop host");
 
-    app.run(|app_handle, event| {
-        if matches!(event, RunEvent::ExitRequested { .. } | RunEvent::Exit) {
+    app.run(|app_handle, event| match event {
+        RunEvent::WindowEvent {
+            label,
+            event: WindowEvent::CloseRequested { api, .. },
+            ..
+        } if label == "main" && should_hide_on_close() => {
+            api.prevent_close();
+            if let Some(window) = app_handle.get_webview_window(&label) {
+                let _ = window.hide();
+            }
+        }
+        RunEvent::ExitRequested { .. } | RunEvent::Exit => {
             if let Some(state) = app_handle.try_state::<DesktopTransport>() {
                 stop_sidecar(&state);
             }
         }
+        _ => {}
     });
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{database_path, startup_log_path};
+    use super::{
+        database_path, should_hide_on_close, startup_log_path, TRAY_QUIT_ID, TRAY_SHOW_ID,
+    };
     use std::path::Path;
 
     #[test]
@@ -273,5 +340,12 @@ mod tests {
             startup_log_path(Path::new(r"C:\Users\test\AppData\Local")),
             Path::new(r"C:\Users\test\AppData\Local\ForgeOrgTool\logs\desktop.log")
         );
+    }
+
+    #[test]
+    fn tray_menu_uses_stable_commands_and_window_close_is_non_terminal() {
+        assert_eq!(TRAY_SHOW_ID, "tray-show");
+        assert_eq!(TRAY_QUIT_ID, "tray-quit");
+        assert!(should_hide_on_close());
     }
 }
