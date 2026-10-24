@@ -138,7 +138,14 @@
 .tagRow > button {
   flex: 0 0 auto;
   max-width: 40%;
+  opacity: 0;
   overflow-wrap: anywhere;
+  transition: opacity 120ms ease;
+}
+
+.tagRow:hover > button,
+.tagRow:focus-within > button {
+  opacity: 1;
 }
 
 .tagSwatch {

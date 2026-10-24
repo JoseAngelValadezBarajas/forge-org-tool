@@ -15,10 +15,11 @@
   "comparison": {
     "channelThreshold": 0,
     "antiAliasingIncluded": true,
-    "differentPixels": 176066,
+    "differentPixels": 94606,
     "totalPixels": 1382400,
-    "differentPixelRatio": 0.12736255787037037
+    "differentPixelRatio": 0.06843605324074074
   },
+  "referenceSha256": "dc179654dfa84d612c0da455ef1c7818e7482f745f8c2463387cd46b146dc113",
   "geometry": {
     "figmaNodeId": "347:224",
     "viewport": {
@@ -59,15 +60,39 @@
         "height": 658
       }
     },
-    "humanReview": "PENDING"
+    "humanReview": "PENDING",
+    "deviations": {
+      "boardAndDrawer": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "drawer": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      }
+    },
+    "tolerancePx": 1
+  },
+  "measurement": {
+    "status": "MEASURED",
+    "structuralTolerancePx": 1
   },
   "mismatchClassification": {
-    "geometry": "See geometry evidence; exact deviation values are not normalized.",
+    "geometry": "Geometry measured; see per-container deviations.",
     "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
     "colorsAndSurfaces": "Raster difference is measured; color-region attribution requires review.",
     "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
     "masksApplied": false
   },
-  "visualReview": "PENDING_HUMAN_REVIEW",
+  "review": {
+    "status": "HUMAN_REVIEW_PENDING"
+  },
+  "visualReview": "HUMAN_REVIEW_PENDING",
   "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
 }

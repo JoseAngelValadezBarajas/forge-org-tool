@@ -15,11 +15,16 @@
   "comparison": {
     "channelThreshold": 0,
     "antiAliasingIncluded": true,
-    "differentPixels": 83816,
+    "differentPixels": 84278,
     "totalPixels": 1382400,
-    "differentPixelRatio": 0.06063078703703704
+    "differentPixelRatio": 0.060964988425925924
   },
+  "referenceSha256": "c2bc4db9a22b156740d242f430cac8f03dcc6a7c08cf62f33168fe1d3e1d3aa8",
   "geometry": null,
+  "measurement": {
+    "status": "MEASURED",
+    "structuralTolerancePx": null
+  },
   "mismatchClassification": {
     "geometry": "Not independently measured for this frame.",
     "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
@@ -27,6 +32,9 @@
     "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
     "masksApplied": false
   },
-  "visualReview": "PENDING_HUMAN_REVIEW",
+  "review": {
+    "status": "HUMAN_REVIEW_PENDING"
+  },
+  "visualReview": "HUMAN_REVIEW_PENDING",
   "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
 }

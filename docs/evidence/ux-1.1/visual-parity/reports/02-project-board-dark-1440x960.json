@@ -15,10 +15,11 @@
   "comparison": {
     "channelThreshold": 0,
     "antiAliasingIncluded": true,
-    "differentPixels": 43780,
+    "differentPixels": 43578,
     "totalPixels": 1382400,
-    "differentPixelRatio": 0.031669560185185186
+    "differentPixelRatio": 0.0315234375
   },
+  "referenceSha256": "a8f9401ae53b7d5071079ddea4541b21f149616a534f71d95c6feb9ffdb0346e",
   "geometry": {
     "figmaNodeId": "344:82",
     "viewport": {
@@ -182,21 +183,21 @@
           "y": 340,
           "width": 214,
           "height": 146,
-          "title": "EPIC · mediumFrontend / UX4 items  ·  ui/ux"
+          "title": "EPIC · mediumFrontend / UX4 items  ·  frontend"
         },
         {
           "x": 273,
           "y": 498,
           "width": 214,
           "height": 146,
-          "title": "EPIC · highDocumentation2 items  ·  docs"
+          "title": "EPIC · highDocumentation2 items  ·  bug"
         },
         {
           "x": 505,
           "y": 340,
           "width": 214,
           "height": 146,
-          "title": "EPIC · highDetection Research6 items  ·  computer-vision"
+          "title": "EPIC · highDetection Research6 items  ·  research"
         },
         {
           "x": 737,
@@ -210,14 +211,14 @@
           "y": 340,
           "width": 214,
           "height": 146,
-          "title": "EPIC · mediumMVP Frontend3 items  ·  validation"
+          "title": "EPIC · mediumMVP Frontend3 items  ·  frontend"
         },
         {
           "x": 1201,
           "y": 340,
           "width": 214,
           "height": 146,
-          "title": "EPIC · lowInitial Infrastructure5 items  ·  complete"
+          "title": "EPIC · lowInitial Infrastructure5 items  ·  bug"
         }
       ]
     },
@@ -271,15 +272,67 @@
       }
     },
     "metadataOvershoot": "Figma frame width 1148px contains five 222px columns and four 10px gaps (1150px total); the parent clips the 2px excess.",
-    "humanReview": "PENDING"
+    "humanReview": "PENDING",
+    "deviations": {
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "topbar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "heading": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "primaryAction": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "toolbar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "board": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      }
+    },
+    "tolerancePx": 1
+  },
+  "measurement": {
+    "status": "MEASURED",
+    "structuralTolerancePx": 1
   },
   "mismatchClassification": {
-    "geometry": "See geometry evidence; exact deviation values are not normalized.",
+    "geometry": "Geometry measured; see per-container deviations.",
     "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
     "colorsAndSurfaces": "Raster difference is measured; color-region attribution requires review.",
     "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
     "masksApplied": false
   },
-  "visualReview": "PENDING_HUMAN_REVIEW",
+  "review": {
+    "status": "HUMAN_REVIEW_PENDING"
+  },
+  "visualReview": "HUMAN_REVIEW_PENDING",
   "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
 }

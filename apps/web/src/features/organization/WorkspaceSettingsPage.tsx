@@ -12,6 +12,8 @@ export function WorkspaceSettingsPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<WorkspaceTag[]>([]);
+  const [tagUsage, setTagUsage] = useState<Record<string, number>>({});
+  const [tagUsageLoading, setTagUsageLoading] = useState(false);
   const [tagDrafts, setTagDrafts] = useState<Record<string, TagDraft>>({});
   const [newTagName, setNewTagName] = useState('');
   const [newTagColor, setNewTagColor] = useState('#6b7280');
@@ -34,14 +36,48 @@ export function WorkspaceSettingsPage() {
           const itemsForWorkspace = await organizationApi.listWorkspaceTags(selected.id);
           if (!current) return;
           setTags(itemsForWorkspace);
+          setTagUsageLoading(itemsForWorkspace.length > 0);
           setTagDrafts(
             Object.fromEntries(
               itemsForWorkspace.map((tag) => [tag.id, { name: tag.name, color: tag.color }]),
             ),
           );
+          void organizationApi
+            .listProjects(selected.id, '', 'all')
+            .then(async (projects) => {
+              const overviews = await Promise.all(
+                projects.map((project) =>
+                  organizationApi.planningOverview(selected.id, project.id).catch(() => null),
+                ),
+              );
+              if (!current) return;
+              const counts = Object.fromEntries(itemsForWorkspace.map((tag) => [tag.name, 0]));
+              for (const overview of overviews) {
+                if (!overview) continue;
+                const records = [
+                  ...overview.epics,
+                  ...overview.epics.flatMap((epic) => epic.features),
+                  ...overview.unassigned_features,
+                ];
+                for (const record of records) {
+                  for (const tag of record.tags ?? []) {
+                    if (tag in counts) counts[tag] += 1;
+                  }
+                }
+              }
+              setTagUsage(counts);
+            })
+            .catch(() => {
+              if (current) setTagUsage({});
+            })
+            .finally(() => {
+              if (current) setTagUsageLoading(false);
+            });
         } else {
           setTags([]);
           setTagDrafts({});
+          setTagUsage({});
+          setTagUsageLoading(false);
         }
       })
       .catch((cause: unknown) => {
@@ -113,6 +149,7 @@ export function WorkspaceSettingsPage() {
         newTagColor,
       );
       setTags((current) => [...current, created].sort((a, b) => a.name.localeCompare(b.name)));
+      setTagUsage((current) => ({ ...current, [created.name]: 0 }));
       setTagDrafts((current) => ({
         ...current,
         [created.id]: { name: created.name, color: created.color },
@@ -136,6 +173,10 @@ export function WorkspaceSettingsPage() {
           .map((tag) => (tag.id === tagId ? updated : tag))
           .sort((a, b) => a.name.localeCompare(b.name)),
       );
+      setTagUsage((current) => {
+        const { [tagDrafts[tagId]?.name ?? updated.name]: previous, ...rest } = current;
+        return { ...rest, [updated.name]: previous ?? 0 };
+      });
       setTagDrafts((current) => ({
         ...current,
         [tagId]: { name: updated.name, color: updated.color },
@@ -150,7 +191,14 @@ export function WorkspaceSettingsPage() {
     if (!workspace) return;
     try {
       await organizationApi.deleteWorkspaceTag(workspace.id, tagId);
+      const deletedName = tags.find((tag) => tag.id === tagId)?.name;
       setTags((current) => current.filter((tag) => tag.id !== tagId));
+      if (deletedName) {
+        setTagUsage((current) => {
+          const { [deletedName]: _deleted, ...rest } = current;
+          return rest;
+        });
+      }
       setTagDrafts((current) =>
         Object.fromEntries(Object.entries(current).filter(([id]) => id !== tagId)),
       );
@@ -237,9 +285,18 @@ export function WorkspaceSettingsPage() {
                   return (
                     <li className={styles.tagRow} key={tag.id}>
                       <div className={styles.tagDisplay}>
+                        <span
+                          aria-hidden="true"
+                          className={styles.tagSwatch}
+                          style={{ backgroundColor: tag.color }}
+                        />
                         <div>
                           <strong>{`# ${tag.name}`}</strong>
-                          <span>Available throughout this workspace</span>
+                          <span>
+                            {tagUsageLoading
+                              ? 'Usage loading…'
+                              : `${tagUsage[tag.name] ?? 0} items`}
+                          </span>
                         </div>
                       </div>
                       <Button

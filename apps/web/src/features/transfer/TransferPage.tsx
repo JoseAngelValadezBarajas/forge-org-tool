@@ -128,12 +128,12 @@ export function TransferPage({
     : ['Select source', 'Review planning', 'Confirm'];
 
   const contextualPreviewPanel = contextualScope ? (
-    <Card>
+    <Card className={styles.contextCard}>
       <section
         aria-labelledby="context-preview-title"
         className={`${styles.panel} ${styles.previewPanel}`}
       >
-        <h3 id="context-preview-title">Import preview</h3>
+        <h3 id="context-preview-title">Preview · {destinationName || unavailableDestination}</h3>
         {preview ? (
           <>
             <StatusChip tone="success">Validated manifest · {preview.schema_version}</StatusChip>
@@ -146,15 +146,17 @@ export function TransferPage({
               ))}
             </div>
             <p className={styles.previewNotes}>CREATE NEW · IDs remapped · duplicate tags reused</p>
-            <p>All records are validated before import.</p>
-            <p className={styles.fingerprint}>
-              Fingerprint: <code>{preview.fingerprint}</code>
-            </p>
-            <StatusChip tone="warning">FINGERPRINT_REQUIRED</StatusChip>
-            <p>Only this reviewed fingerprint can be committed. Import is atomic.</p>
             <Button type="button" onClick={() => void importProject()}>
-              Confirm planning import
+              Confirm Import
             </Button>
+            <details className={styles.safeguards}>
+              <summary>Import safeguards</summary>
+              <StatusChip tone="warning">FINGERPRINT_REQUIRED</StatusChip>
+              <p className={styles.fingerprint}>
+                Fingerprint: <code>{preview.fingerprint}</code>
+              </p>
+              <p>Only this reviewed fingerprint can be committed. Import is atomic.</p>
+            </details>
           </>
         ) : (
           <p className={styles.previewEmpty}>Choose a source to see a validated preview.</p>
@@ -164,24 +166,30 @@ export function TransferPage({
   ) : null;
 
   return (
-    <div className={styles.stack}>
-      <SectionHeader
-        title={
-          contextualScope ? contextualTitle : projectId ? 'Project transfer' : 'Import project'
-        }
-        eyebrow={contextualScope ? 'Contextual transfer' : 'FORGE / Planning-only transfer'}
-      />
+    <div className={`${styles.stack} ${contextualScope ? styles.contextStack : ''}`}>
+      {contextualScope ? (
+        <header className={styles.contextHeading}>
+          <span>CONTEXTUAL TRANSFER</span>
+          <h1>{contextualTitle}</h1>
+          <p>Review the content before it becomes part of your project.</p>
+        </header>
+      ) : (
+        <SectionHeader
+          title={projectId ? 'Project transfer' : 'Import project'}
+          eyebrow="FORGE / Planning-only transfer"
+        />
+      )}
       {destinationLookupFailed && needsRecordName && (
         <p role="alert">
           The import destination could not be verified. Return to the project board and try again.
         </p>
       )}
-      <p>
-        {contextualScope
-          ? 'Review the content before it becomes part of your project.'
-          : 'Import and export use versioned project JSON or a ZIP package that includes Bug screenshots.'}{' '}
-        {!contextualScope && 'Operational evidence, verification and release records are excluded.'}
-      </p>
+      {!contextualScope && (
+        <p>
+          Import and export use versioned project JSON or a ZIP package that includes Bug
+          screenshots. Operational evidence, verification and release records are excluded.
+        </p>
+      )}
       {error && <p role="alert">{error}</p>}
 
       <ol className={styles.steps} aria-label="Transfer steps">
@@ -195,7 +203,7 @@ export function TransferPage({
       <div
         className={`${styles.workflowGrid} ${contextualScope ? styles.contextWorkflowGrid : ''}`}
       >
-        <Card>
+        <Card className={contextualScope ? styles.contextCard : undefined}>
           <section
             aria-labelledby={contextualScope ? undefined : 'import-title'}
             className={styles.panel}
@@ -208,7 +216,7 @@ export function TransferPage({
             </h3>
             <p>
               {contextualScope
-                ? 'Choose a versioned JSON document or paste it below. Preview validates references before confirmation.'
+                ? 'Supported: Epic, Story, Bug or Task JSON. Preview checks references before confirmation.'
                 : 'Import versioned project JSON or a v2 ZIP package with Bug screenshots. Existing `forge-project-import-v1` JSON files remain supported.'}
             </p>
             {contextualScope && (
@@ -224,29 +232,35 @@ export function TransferPage({
                   : 'application/json,.json,application/zip,.zip'
               }
               aria-label="Choose a project transfer file"
-              title={contextualScope ? 'Choose a .json file' : 'Choose a .json or .zip file'}
-              description="Browse for a local file."
+              className={contextualScope ? styles.contextFilePicker : undefined}
+              title={contextualScope ? 'Drop a .json file here' : 'Choose a .json or .zip file'}
+              description={contextualScope ? 'or browse your computer' : 'Browse for a local file.'}
               state={fileName ? 'selected' : 'empty'}
               onChange={(event) => {
                 const file = event.currentTarget.files?.[0];
                 if (file) void selectSourceFile(file);
               }}
             />
-            {fileName && <p className={styles.fileName}>Selected source: {fileName}</p>}
-            <details className={styles.advanced}>
-              <summary>Advanced JSON paste</summary>
-              <FormField label="Advanced JSON document">
-                <Textarea
-                  id="transfer-document"
-                  value={documentText}
-                  onChange={(event) => updateDocumentText(event.target.value)}
-                  placeholder={`Paste a versioned ${contextualScope ?? 'project'} transfer document`}
-                  rows={10}
-                />
-              </FormField>
-            </details>
+            {fileName && (!contextualScope || !preview) && (
+              <p className={styles.fileName}>Selected source: {fileName}</p>
+            )}
+            {(!contextualScope || !preview) && (
+              <details className={styles.advanced}>
+                <summary>Advanced JSON paste</summary>
+                <FormField label="Advanced JSON document">
+                  <Textarea
+                    id="transfer-document"
+                    value={documentText}
+                    onChange={(event) => updateDocumentText(event.target.value)}
+                    placeholder={`Paste a versioned ${contextualScope ?? 'project'} transfer document`}
+                    rows={10}
+                  />
+                </FormField>
+              </details>
+            )}
             <div className={styles.actions}>
               <Button
+                className={contextualScope ? styles.contextReviewAction : undefined}
                 type="button"
                 onClick={() => void previewImport()}
                 disabled={
@@ -257,7 +271,7 @@ export function TransferPage({
                 Review import
               </Button>
             </div>
-            {contextualScope && projectId && (
+            {contextualScope && projectId && !preview && (
               <details className={styles.exportDetails}>
                 <summary>Export existing {contextualScope}</summary>
                 {!(contextualScope === 'epics' && destinationId === projectId) && (

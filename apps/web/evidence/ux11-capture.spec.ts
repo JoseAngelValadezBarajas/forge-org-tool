@@ -35,7 +35,7 @@ async function seedSyntheticProject(page: Page) {
     description: 'Track readiness and release confidence.',
   });
   const root = `/api/v1/workspaces/${workspace.id}/projects/${project.id}`;
-  for (const name of ['ui/ux', 'docs', 'research', 'tracking', 'validation', 'complete']) {
+  for (const name of ['research', 'computer-vision', 'frontend', 'tracking', 'bug']) {
     await postJson<{ id: string }>(page, `/api/v1/workspaces/${workspace.id}/tags`, {
       name,
       color: name === 'research' ? '#d8874d' : '#6b7280',
@@ -61,9 +61,7 @@ async function seedSyntheticProject(page: Page) {
           ? 'Build reliable ant detection: models, datasets and validation.'
           : 'Make the end-to-end signal workflow observable and dependable.',
       priority: priorities[index],
-      tags: [['ui/ux'], ['docs'], ['computer-vision'], ['tracking'], ['validation'], ['complete']][
-        index
-      ],
+      tags: [['frontend'], ['bug'], ['research'], ['tracking'], ['frontend'], ['bug']][index],
     });
     if (statuses[index] !== 'backlog')
       await patchJson(page, `${root}/epics/${epic.id}`, { status: statuses[index] });
@@ -74,27 +72,33 @@ async function seedSyntheticProject(page: Page) {
     title: 'Improve detector V2 accuracy',
     description:
       'Improve detection accuracy on dense ant scenes while preserving inference speed. Evaluate precision, recall and edge cases before promotion.',
-    goal: 'Keep precision and recall within the agreed threshold.',
     epic_id: epics[2].id,
     priority: 'high',
     status: 'in_progress',
     kind: 'story',
-    tags: ['computer-vision', 'ml-research'],
+    tags: ['research', 'computer-vision'],
     notes:
       'Latest experiment shows improvements in crowded frames. Compare against V2-E2 and attach evaluation observations here.',
   });
-  await postJson<Created>(page, `${root}/features/${story.id}/acceptance-criteria`, {
-    description: 'AP improves against the baseline on blind data.',
-    position: 0,
-  });
-  await postJson<Created>(page, `${root}/features/${story.id}/acceptance-criteria`, {
-    description: 'False positives remain below the agreed threshold.',
-    position: 1,
-  });
-  await postJson<Created>(page, `${root}/features/${story.id}/acceptance-criteria`, {
-    description: 'Dense-scene benchmark is documented.',
-    position: 2,
-  });
+  const criteria = await Promise.all(
+    [
+      'AP improves against the baseline on blind data.',
+      'False positives remain below the agreed threshold.',
+      'Dense-scene benchmark is documented.',
+    ].map((description, position) =>
+      postJson<Created>(page, `${root}/features/${story.id}/acceptance-criteria`, {
+        description,
+        position,
+      }),
+    ),
+  );
+  await Promise.all(
+    criteria.slice(0, 2).map((criterion) =>
+      patchJson(page, `${root}/features/${story.id}/acceptance-criteria/${criterion.id}`, {
+        satisfied: true,
+      }),
+    ),
+  );
   await postJson<Created>(page, `${root}/features/${story.id}/tasks`, {
     title: 'Review model outputs',
     status: 'done',
@@ -117,7 +121,7 @@ async function seedSyntheticProject(page: Page) {
     kind: 'story',
     status: 'ready',
     priority: 'medium',
-    tags: ['CUDA'],
+    tags: ['computer-vision'],
   });
   for (let position = 0; position < 3; position += 1) {
     await postJson<Created>(page, `${root}/features/${gpuStory.id}/acceptance-criteria`, {
@@ -127,24 +131,26 @@ async function seedSyntheticProject(page: Page) {
   }
 
   const bug = await postJson<{ id: string }>(page, `${root}/features`, {
-    title: 'Confidence mismatch',
-    description: 'Confidence values diverge after seeking across timeline segments.',
+    title: 'Bounding boxes drift during playback',
+    description: 'Bounding boxes drift after seeking across timeline segments.',
     epic_id: epics[2].id,
     priority: 'high',
     status: 'verify',
     kind: 'bug',
     bug_severity: 'high',
-    steps_to_reproduce: '1. Load a sequence.\n2. Seek between segments.\n3. Compare confidence.',
-    expected_result: 'The overlay stays aligned with the current frame.',
-    actual_result: 'The overlay displays the previous segment confidence.',
+    steps_to_reproduce:
+      '1. Load an analyzed video with tracking enabled.\n2. Jump between timeline segments repeatedly.\n3. Observe bounding boxes after seeking.',
+    expected_result: 'Overlays stay synchronized with the current frame and tracking positions.',
+    actual_result:
+      'Bounding boxes lag behind moving ants after seeking, causing visible misalignment.',
     tags: ['tracking'],
-    notes: 'Observed on the synthetic browser fixture.',
+    notes: 'Observed in Chromium and the installed Desktop app. Investigate frame timing.',
   });
   const pngHex =
     '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c636000020000050001a5f645400000000049454e44ae426082';
   const attachment = await page.request.post(`${root}/features/${bug.id}/attachments`, {
     data: {
-      file_name: 'confidence-mismatch.png',
+      file_name: 'bounding-box-drift.png',
       content_type: 'image/png',
       data_base64: Buffer.from(pngHex, 'hex').toString('base64'),
     },
@@ -166,7 +172,7 @@ async function seedSyntheticProject(page: Page) {
         kind: epicIndex === 2 && itemIndex === 4 ? 'bug' : 'story',
         status: epicIndex === 2 && itemIndex === 5 ? 'done' : 'backlog',
         priority: epicIndex === 2 && itemIndex === 4 ? 'high' : 'medium',
-        tags: epicIndex === 2 && itemIndex === 3 ? ['dataset'] : [],
+        tags: epicIndex === 2 && itemIndex === 3 ? ['research'] : [],
         ...(epicIndex === 2 && itemIndex === 4
           ? {
               bug_severity: 'high',
@@ -207,7 +213,6 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     throw new Error('Set FORGE_UX11_CAPTURE_DIR to the intended synthetic evidence directory.');
   const output = resolve(evidenceDirectory);
   mkdirSync(output, { recursive: true });
-  const suffix = info.project.name;
   const { workspace, project, root, epic, story, bug } = await seedSyntheticProject(page);
   const projectBoardPath = `/planning/${workspace.id}/${project.id}`;
   const epicBoardPath = `${projectBoardPath}/epics/${epic.id}`;
@@ -224,13 +229,64 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
 
   async function reviewContextualTransfer() {
     await page.getByRole('button', { name: 'Review import' }).click();
-    await expect(page.getByRole('heading', { name: 'Import preview' })).toBeVisible();
-    await page.locator('summary').filter({ hasText: 'Advanced JSON paste' }).click();
+    await expect(page.getByRole('heading', { name: 'Preview · FormiAI' })).toBeVisible();
     await expect(page.getByLabel('Advanced JSON document')).toBeHidden();
-    await expect(page.getByRole('heading', { name: 'Import an Epic' })).toHaveCSS(
-      'font-size',
-      '28px',
-    );
+  }
+
+  async function selectContextualEpicFile() {
+    const transferDocument = {
+      schema_version: 'forge-project-transfer-v2',
+      project: { name: 'FormiAI' },
+      epics: [{ ref: 'epic:import', title: 'Detection Research', priority: 'high' }],
+      features: [
+        {
+          ref: 'story:one',
+          title: 'Improve detector V2 accuracy',
+          epic_ref: 'epic:import',
+          kind: 'story',
+          tasks: [
+            { ref: 'task:one', title: 'Review model outputs' },
+            { ref: 'task:two', title: 'Compare metrics with GT' },
+          ],
+          acceptance_criteria: [],
+        },
+        {
+          ref: 'story:two',
+          title: 'GPU batch inference',
+          epic_ref: 'epic:import',
+          kind: 'story',
+          tasks: [
+            { ref: 'task:three', title: 'Prepare the batch' },
+            { ref: 'task:four', title: 'Capture metrics' },
+          ],
+          acceptance_criteria: [],
+        },
+        {
+          ref: 'bug:one',
+          title: 'Confidence mismatch',
+          epic_ref: 'epic:import',
+          kind: 'bug',
+          bug_severity: 'high',
+          tasks: [{ ref: 'task:five', title: 'Reproduce the mismatch' }],
+          acceptance_criteria: [],
+        },
+        {
+          ref: 'bug:two',
+          title: 'Bounding box drift',
+          epic_ref: 'epic:import',
+          kind: 'bug',
+          bug_severity: 'high',
+          tasks: [{ ref: 'task:six', title: 'Compare bounding boxes' }],
+          acceptance_criteria: [],
+        },
+      ],
+      dependencies: [],
+    };
+    await page.getByLabel('Choose a project transfer file').setInputFiles({
+      name: 'detection-research.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(transferDocument)),
+    });
   }
 
   if (info.project.name === 'chromium-mobile') {
@@ -271,7 +327,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     await page.goto(bugDetailPath);
     await expect(page.getByRole('heading', { name: bug.title })).toBeVisible();
     await expect(
-      page.getByRole('img', { name: 'Bug screenshot: confidence-mismatch.png' }),
+      page.getByRole('img', { name: 'Bug screenshot: bounding-box-drift.png' }),
     ).toBeVisible();
     await capture('05-mobile-bug-detail');
     await page.goto(projectBoardPath);
@@ -286,15 +342,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     ).toBe(true);
     await capture('06-mobile-create-epic');
     await page.goto(`/transfer/${workspace.id}/${project.id}/epics/${project.id}`);
-    const transferDocument = {
-      schema_version: 'forge-project-transfer-v2',
-      project: { name: 'FormiAI' },
-      epics: [{ ref: 'epic:import', title: `Imported Epic ${suffix}` }],
-      features: [],
-      dependencies: [],
-    };
-    await page.locator('summary').filter({ hasText: 'Advanced JSON paste' }).click();
-    await page.getByLabel('Advanced JSON document').fill(JSON.stringify(transferDocument, null, 2));
+    await selectContextualEpicFile();
     await reviewContextualTransfer();
     await capture('07-mobile-contextual-transfer');
     await page.goto(`/workspaces/${workspace.id}/settings`);
@@ -501,7 +549,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   await page.goto(bugDetailPath);
   await expect(page.getByRole('heading', { name: bug.title })).toBeVisible();
   await expect(
-    page.getByRole('img', { name: 'Bug screenshot: confidence-mismatch.png' }),
+    page.getByRole('img', { name: 'Bug screenshot: bounding-box-drift.png' }),
   ).toBeVisible();
   await capture('05-bug-detail-1440x960');
   await page.goto(projectBoardPath);
@@ -533,21 +581,19 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   );
   await capture('06-create-epic-1440x960');
   await page.goto(`/transfer/${workspace.id}/${project.id}/epics/${project.id}`);
-  const transferDocument = {
-    schema_version: 'forge-project-transfer-v2',
-    project: { name: 'FormiAI' },
-    epics: [{ ref: 'epic:import', title: `Imported Epic ${suffix}` }],
-    features: [],
-    dependencies: [],
-  };
-  await page.locator('summary').filter({ hasText: 'Advanced JSON paste' }).click();
-  await page.getByLabel('Advanced JSON document').fill(JSON.stringify(transferDocument, null, 2));
+  await selectContextualEpicFile();
   await reviewContextualTransfer();
   await capture('07-contextual-transfer-preview-1440x960');
   await page.goto(`/workspaces/${workspace.id}/settings`);
   await expect(page.getByRole('heading', { name: 'Manage workspace tags' })).toBeVisible();
   await expect(page.getByLabel('Name for tag research')).toHaveValue('research');
   await expect(page.getByLabel('Name for tag tracking')).toHaveValue('tracking');
+  expect(
+    await page.getByLabel('Workspace tag composition').evaluate((element) => {
+      const { x, y, width, height } = element.getBoundingClientRect();
+      return { x, y, width, height };
+    }),
+  ).toEqual({ x: 274, y: 210, width: 1136, height: 593 });
   await capture('08-workspace-tags-settings-1440x960');
   await page.goto(projectBoardPath);
   await page.getByRole('combobox', { name: 'Appearance' }).selectOption('light');

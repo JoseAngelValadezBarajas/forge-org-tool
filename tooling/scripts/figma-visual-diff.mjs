@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { basename, dirname, resolve } from 'node:path';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
@@ -16,6 +17,58 @@ function args(argv) {
     if (!parsed[required]) throw new Error(`Missing required argument --${required}.`);
   }
   return parsed;
+}
+
+function rectDeviation(expected, actual) {
+  if (!expected || !actual) return null;
+  const fields = ['x', 'y', 'width', 'height'];
+  if (
+    !fields.every(
+      (field) => typeof expected[field] === 'number' && typeof actual[field] === 'number',
+    )
+  ) {
+    return null;
+  }
+  const deviation = Object.fromEntries(
+    fields.map((field) => [field, actual[field] - expected[field]]),
+  );
+  return {
+    ...deviation,
+    maxAbsoluteDeviation: Math.max(...Object.values(deviation).map(Math.abs)),
+  };
+}
+
+function measureGeometry(geometry, tolerance = 1) {
+  if (!geometry?.expectedFigma || !geometry?.actual)
+    return { status: 'NOT_MEASURED', deviations: {} };
+  const deviations = {};
+  for (const [name, expected] of Object.entries(geometry.expectedFigma)) {
+    const deviation = rectDeviation(expected, geometry.actual[name]);
+    if (deviation) deviations[name] = deviation;
+  }
+  const structuralRegression = Object.values(deviations).some(
+    (deviation) => deviation.maxAbsoluteDeviation > tolerance,
+  );
+  return {
+    status: structuralRegression ? 'STRUCTURAL_REGRESSION' : 'MEASURED',
+    tolerancePx: tolerance,
+    deviations,
+  };
+}
+
+function sha256(bytes) {
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+async function readApproval(path, node, referenceSha256) {
+  if (!path) return { status: 'HUMAN_REVIEW_PENDING', approval: null };
+  const approval = JSON.parse(await readFile(resolve(path), 'utf8'));
+  if (approval.node !== node) return { status: 'APPROVAL_NODE_MISMATCH', approval };
+  if (approval.referenceSha256 !== referenceSha256)
+    return { status: 'APPROVAL_REFERENCE_MISMATCH', approval };
+  if (approval.verdict !== 'ACCEPTED' || !approval.reviewedBy || !approval.reviewedAt)
+    return { status: 'APPROVAL_INVALID', approval };
+  return { status: 'HUMAN_ACCEPTED', approval };
 }
 
 const options = args(process.argv);
@@ -65,6 +118,15 @@ for (let index = 0; index < reference.data.length; index += 4) {
 }
 
 const totalPixels = reference.width * reference.height;
+const geometry = options.geometry
+  ? JSON.parse(await readFile(resolve(options.geometry), 'utf8'))
+  : null;
+const geometryMeasurement = measureGeometry(geometry);
+const referenceSha256 = sha256(referenceBytes);
+const review = await readApproval(options.approval, options.node, referenceSha256);
+const rejected =
+  geometryMeasurement.status === 'STRUCTURAL_REGRESSION' ||
+  (options.approval && review.status !== 'HUMAN_ACCEPTED');
 const report = {
   figmaNodeId: options.node,
   implementationRoute: options.route,
@@ -78,10 +140,24 @@ const report = {
     totalPixels,
     differentPixelRatio: differentPixels / totalPixels,
   },
-  geometry: options.geometry ? JSON.parse(await readFile(resolve(options.geometry), 'utf8')) : null,
+  referenceSha256,
+  geometry: geometry
+    ? {
+        ...geometry,
+        deviations: geometryMeasurement.deviations,
+        tolerancePx: geometryMeasurement.tolerancePx,
+      }
+    : null,
+  measurement: {
+    status:
+      geometryMeasurement.status === 'STRUCTURAL_REGRESSION' ? 'STRUCTURAL_REGRESSION' : 'MEASURED',
+    structuralTolerancePx: geometryMeasurement.tolerancePx ?? null,
+  },
   mismatchClassification: {
-    geometry: options.geometry
-      ? 'See geometry evidence; exact deviation values are not normalized.'
+    geometry: geometry
+      ? geometryMeasurement.status === 'STRUCTURAL_REGRESSION'
+        ? `Structural regression exceeds ${geometryMeasurement.tolerancePx}px tolerance; see per-container deviations.`
+        : 'Geometry measured; see per-container deviations.'
       : 'Not independently measured for this frame.',
     typography:
       'Raster difference is measured; font metrics and glyph-level mismatch classification require review.',
@@ -90,8 +166,12 @@ const report = {
       'Not inferred from pixels; review actual and overlay against the exact reference.',
     masksApplied: false,
   },
-  visualReview: 'PENDING_HUMAN_REVIEW',
-  status: 'VISUAL_FIDELITY_NOT_ACCEPTED',
+  review: { ...review, approval: review.approval ?? undefined },
+  visualReview: review.status,
+  status:
+    review.status === 'HUMAN_ACCEPTED' && geometryMeasurement.status !== 'STRUCTURAL_REGRESSION'
+      ? 'VISUAL_FIDELITY_ACCEPTED_BY_HUMAN'
+      : 'VISUAL_FIDELITY_NOT_ACCEPTED',
 };
 const stem = basename(actualPath, '.png');
 const reportJson = resolve(reportDirectory, `${stem}.json`);
@@ -106,6 +186,8 @@ const markdown = [
   `- Actual: \`${actualPath}\` (${actual.width}×${actual.height})`,
   `- Environment: ${report.environment}`,
   `- Exact differing pixels (threshold 0, antialias included): ${differentPixels}/${totalPixels} (${((100 * differentPixels) / totalPixels).toFixed(4)}%)`,
+  `- Reference SHA-256: \`${referenceSha256}\``,
+  `- Measurement status: ${report.measurement.status}`,
   `- Geometry: ${report.mismatchClassification.geometry}`,
   `- Typography: ${report.mismatchClassification.typography}`,
   `- Colors and surfaces: ${report.mismatchClassification.colorsAndSurfaces}`,
@@ -129,3 +211,4 @@ await Promise.all([
 console.log(
   `${options.node}: ${differentPixels}/${totalPixels} pixels differ; reports saved to ${dirname(reportJson)}`,
 );
+if (rejected) process.exitCode = 1;

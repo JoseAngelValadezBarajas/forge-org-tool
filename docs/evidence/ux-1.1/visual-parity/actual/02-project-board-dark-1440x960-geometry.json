@@ -161,21 +161,21 @@
         "y": 340,
         "width": 214,
         "height": 146,
-        "title": "EPIC · mediumFrontend / UX4 items  ·  ui/ux"
+        "title": "EPIC · mediumFrontend / UX4 items  ·  frontend"
       },
       {
         "x": 273,
         "y": 498,
         "width": 214,
         "height": 146,
-        "title": "EPIC · highDocumentation2 items  ·  docs"
+        "title": "EPIC · highDocumentation2 items  ·  bug"
       },
       {
         "x": 505,
         "y": 340,
         "width": 214,
         "height": 146,
-        "title": "EPIC · highDetection Research6 items  ·  computer-vision"
+        "title": "EPIC · highDetection Research6 items  ·  research"
       },
       {
         "x": 737,
@@ -189,14 +189,14 @@
         "y": 340,
         "width": 214,
         "height": 146,
-        "title": "EPIC · mediumMVP Frontend3 items  ·  validation"
+        "title": "EPIC · mediumMVP Frontend3 items  ·  frontend"
       },
       {
         "x": 1201,
         "y": 340,
         "width": 214,
         "height": 146,
-        "title": "EPIC · lowInitial Infrastructure5 items  ·  complete"
+        "title": "EPIC · lowInitial Infrastructure5 items  ·  bug"
       }
     ]
   },

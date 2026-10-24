@@ -79,7 +79,7 @@ describe('WorkspaceSettingsPage', () => {
       screen.getByRole('complementary', { name: 'Consistency by design' }),
     ).toBeInTheDocument();
     expect(screen.queryByRole('textbox', { name: 'New tag name' })).not.toBeInTheDocument();
-    expect(within(catalog).queryByText(/\d+ items/)).not.toBeInTheDocument();
+    expect(within(catalog).getByText(/\d+ items|Usage loading…/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'New tag' }));
     const editor = await screen.findByRole('dialog', { name: 'Edit workspace tags' });
     expect(within(editor).getByRole('textbox', { name: 'New tag name' })).toBeInTheDocument();
@@ -97,6 +97,58 @@ describe('WorkspaceSettingsPage', () => {
     expect(within(catalog).queryByText('# research')).not.toBeInTheDocument();
     fireEvent.click(within(catalog).getByRole('button', { name: 'Edit tag tracking' }));
     expect(await screen.findByRole('dialog', { name: 'Edit workspace tags' })).toBeInTheDocument();
+  });
+
+  it('derives truthful tag usage counts from persisted project records instead of inventing descriptions', async () => {
+    const tags = [
+      { id: 't1', workspace_id: 'w1', name: 'research', color: '#d8874d', created_at: '' },
+      { id: 't2', workspace_id: 'w1', name: 'tracking', color: '#336699', created_at: '' },
+    ];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        if (path === '/api/v1/workspaces')
+          return Promise.resolve(new Response(JSON.stringify([workspace]), { status: 200 }));
+        if (path === '/api/v1/workspaces/w1/tags')
+          return Promise.resolve(new Response(JSON.stringify(tags), { status: 200 }));
+        if (path === '/api/v1/workspaces/w1/projects/p1/planning/overview')
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                epics: [
+                  {
+                    id: 'e1',
+                    tags: ['research'],
+                    features: [
+                      { id: 'f1', tags: ['research', 'tracking'] },
+                      { id: 'f2', tags: ['tracking'] },
+                    ],
+                  },
+                ],
+                unassigned_features: [],
+              }),
+              { status: 200 },
+            ),
+          );
+        if (path.startsWith('/api/v1/workspaces/w1/projects'))
+          return Promise.resolve(
+            new Response(
+              JSON.stringify([{ id: 'p1', workspace_id: 'w1', status: 'active', name: 'FormiAI' }]),
+              { status: 200 },
+            ),
+          );
+        return Promise.resolve(new Response('{}', { status: 200 }));
+      }),
+    );
+    renderSettings();
+
+    const catalog = await screen.findByRole('region', { name: 'Tags in Research' });
+    expect((await within(catalog).findAllByText('2 items')).length).toBe(2);
+    expect(within(catalog).queryByText('Research tasks')).not.toBeInTheDocument();
+    expect(
+      within(catalog).queryByText('Available throughout this workspace'),
+    ).not.toBeInTheDocument();
   });
 
   it('creates and deletes workspace tags from the contextual editor', async () => {
