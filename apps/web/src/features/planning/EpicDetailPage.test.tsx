@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -141,7 +141,10 @@ describe('EpicDetailPage', () => {
       epics: [
         {
           ...epic,
-          features: [feature, { ...feature, id: 'f-done', title: 'Shipped story', status: 'done' }],
+          features: [
+            { ...feature, status: 'ready' },
+            { ...feature, id: 'f-done', title: 'Shipped story', status: 'done' },
+          ],
         },
       ],
       unassigned_features: [],
@@ -153,10 +156,11 @@ describe('EpicDetailPage', () => {
     expect(screen.getByRole('button', { name: 'New Work Item' })).toBeInTheDocument();
     const tabs = screen.getByRole('tablist', { name: 'Epic Work Item status' });
     expect(tabs).toBeInTheDocument();
+    expect(within(tabs).getAllByRole('tab')).toHaveLength(3);
+    expect(screen.getByRole('tab', { name: /ready/i })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('link', { name: 'Board' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: /done/i }));
+    fireEvent.click(screen.getByText('Other workflow statuses', { exact: true }));
     expect(screen.getByRole('link', { name: 'Shipped story' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Board' })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'New Work Item' }));
     expect(await screen.findByRole('dialog', { name: 'Create Work Item' })).toBeInTheDocument();
     fireEvent.change(screen.getByRole('textbox', { name: 'Work Item title' }), {
@@ -170,7 +174,6 @@ describe('EpicDetailPage', () => {
         tags: ['Accessibility'],
       }),
     );
-    fireEvent.click(screen.getByRole('tab', { name: /backlog/i }));
     expect(await screen.findByRole('link', { name: 'New story' })).toBeInTheDocument();
   });
 
@@ -276,5 +279,31 @@ describe('EpicDetailPage', () => {
         status: 'done',
       }),
     );
+  });
+
+  it('filters Stories and Bugs without changing the persisted Epic totals', async () => {
+    vi.mocked(organizationApi.planningOverview).mockResolvedValue({
+      epics: [
+        {
+          ...epic,
+          features: [
+            feature,
+            { ...feature, id: 'bug-1', title: 'Playback drift', kind: 'bug', status: 'done' },
+          ],
+        },
+      ],
+      unassigned_features: [],
+    });
+    renderPage();
+    expect(await screen.findByRole('region', { name: 'Epic context' })).toHaveTextContent(
+      '2 work items',
+    );
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter Work Items by type' }), {
+      target: { value: 'bug' },
+    });
+    expect(screen.getByRole('link', { name: 'Playback drift' })).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Board' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Epic context' })).toHaveTextContent('1 completed');
+    expect(screen.getByRole('region', { name: 'Epic context' })).toHaveTextContent('50% progress');
   });
 });

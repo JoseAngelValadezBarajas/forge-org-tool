@@ -16,34 +16,59 @@ async function createProject(page: Page, suffix: string) {
 
 async function createWorkspaceTags(page: Page, workspaceId: string, names: string[]) {
   await page.goto(`/workspaces/${workspaceId}/settings`);
-  const catalog = page.getByRole('region', { name: 'Manage workspace tags' });
   for (const name of names) {
-    await catalog.getByRole('textbox', { name: 'New tag name', exact: true }).fill(name);
+    await page.getByRole('button', { name: 'New tag', exact: true }).click();
+    const editor = page.getByRole('dialog', { name: 'Edit workspace tags', exact: true });
+    await editor.getByRole('textbox', { name: 'New tag name', exact: true }).fill(name);
     const created = page.waitForResponse(
       (response) =>
         response.url().endsWith(`/workspaces/${workspaceId}/tags`) &&
         response.request().method() === 'POST',
     );
-    await catalog.getByRole('button', { name: 'Create workspace tag', exact: true }).click();
+    await editor.getByRole('button', { name: 'Create workspace tag', exact: true }).click();
     expect((await created).status()).toBe(201);
+    await expect(editor).not.toBeVisible();
     await expect(
-      catalog.getByRole('textbox', { name: `Name for tag ${name}`, exact: true }),
-    ).toHaveValue(name);
+      page.getByRole('region', { name: /^Tags in / }).getByText(`# ${name}`, { exact: true }),
+    ).toBeVisible();
   }
 }
 
 async function openEpicDialog(page: Page) {
   await page.getByRole('button', { name: 'New Epic', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: 'Create Epic', exact: true });
+  const dialog = page.getByRole('dialog', { name: 'New Epic', exact: true });
   await expect(dialog).toBeVisible();
   return dialog;
 }
 
 async function openWorkItemDialog(page: Page) {
-  await page.getByRole('button', { name: /^New work item$/i }).click();
+  if (page.url().includes('/epics/')) {
+    await page.getByRole('button', { name: /New Work Item/ }).click();
+    const dialog = page.getByRole('dialog', { name: /^Create Work Item$/i });
+    await expect(dialog).toBeVisible();
+    return dialog;
+  }
+  const boardMenu = page.locator('details').filter({
+    has: page.locator('summary').filter({ hasText: /^Board/ }),
+  });
+  if (!(await boardMenu.evaluate((element: HTMLDetailsElement) => element.open))) {
+    await boardMenu.locator('summary').press('Enter');
+  }
+  await expect(boardMenu).toHaveAttribute('open', '');
+  await boardMenu.getByRole('button', { name: 'New work item', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: /^Create work item$/i });
   await expect(dialog).toBeVisible();
   return dialog;
+}
+
+async function closeProjectBoardMenu(page: Page) {
+  const boardMenu = page.locator('details').filter({
+    has: page.locator('summary').filter({ hasText: /^Board/ }),
+  });
+  if (await boardMenu.evaluate((element: HTMLDetailsElement) => element.open)) {
+    await boardMenu.locator('summary').press('Enter');
+  }
+  await expect(boardMenu).not.toHaveAttribute('open', '');
 }
 
 function projectWorkItemStatus(page: Page, title: string) {
@@ -60,12 +85,14 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   const { workspace, project } = await createProject(page, suffix);
   await createWorkspaceTags(page, workspace.id, ['AI', 'Research']);
   await page.goto(`/planning/${workspace.id}/${project.id}`);
-  await expect(page.getByRole('heading', { name: 'Project Board', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: `Project ${suffix} · Epics`, exact: true }),
+  ).toBeVisible();
 
   const epicTitle = `Epic ${suffix}`;
   const epicDialog = await openEpicDialog(page);
   await epicDialog.getByLabel('Epic title').fill(epicTitle);
-  await epicDialog.getByRole('combobox', { name: 'Epic priority' }).selectOption('high');
+  await epicDialog.getByRole('combobox', { name: 'Priority', exact: true }).selectOption('high');
   await epicDialog.getByRole('checkbox', { name: 'Epic tag AI', exact: true }).check();
   await epicDialog.getByRole('checkbox', { name: 'Epic tag Research', exact: true }).check();
   await epicDialog.getByRole('button', { name: 'Create Epic', exact: true }).click();
@@ -73,8 +100,13 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   const epicCard = page.locator('[data-state="backlog"]').filter({
     has: page.getByRole('link', { name: epicTitle, exact: true }),
   });
-  await expect(epicCard).toContainText('Priority: high');
-  await expect(epicCard.getByRole('list', { name: `${epicTitle} tags` })).toContainText('AI');
+  if (test.info().project.name === 'chromium-mobile') {
+    await expect(epicCard).toContainText('Priority: high');
+    await expect(epicCard.getByRole('list', { name: `${epicTitle} tags` })).toContainText('AI');
+  } else {
+    await expect(epicCard).toContainText('EPIC · high');
+    await expect(epicCard).toContainText('0 items · ai');
+  }
 
   const featureTitle = `Feature ${suffix}`;
   const featureDialog = await openWorkItemDialog(page);
@@ -86,6 +118,7 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
     .check();
   await featureDialog.getByRole('button', { name: 'Create Feature', exact: true }).click();
   await expect(featureDialog).not.toBeVisible();
+  await closeProjectBoardMenu(page);
   const featureLink = page.getByRole('link', { name: featureTitle, exact: true });
   await expect(featureLink).toBeVisible();
   const untaggedTitle = `Untagged ${suffix}`;
@@ -100,6 +133,7 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   ).not.toBeChecked();
   await untaggedDialog.getByRole('button', { name: 'Create Feature', exact: true }).click();
   await expect(untaggedDialog).not.toBeVisible();
+  await closeProjectBoardMenu(page);
   const untaggedLink = page.getByRole('link', { name: untaggedTitle, exact: true });
   await expect(untaggedLink).toBeVisible();
   await page.getByRole('combobox', { name: 'Filter planning by tag' }).selectOption('Research');
@@ -386,9 +420,19 @@ test('PA-PLAN-003 Epic detail edits and linked Feature navigation persist', asyn
   await featureDialog.getByLabel('Work Item title').fill(`Feature ${suffix}`);
   await featureDialog.getByRole('button', { name: 'Create Work Item', exact: true }).click();
   await expect(featureDialog).not.toBeVisible();
-  await expect(
-    epicBoard.getByRole('link', { name: `Feature ${suffix}`, exact: true }),
-  ).toBeVisible();
+  if (test.info().project.name === 'chromium-mobile') {
+    const otherStatuses = page.locator('details').filter({
+      has: page.locator('summary').filter({ hasText: /^Other workflow statuses/ }),
+    });
+    await otherStatuses.getByText('Other workflow statuses', { exact: true }).click();
+    await expect(
+      otherStatuses.getByRole('link', { name: `Feature ${suffix}`, exact: true }),
+    ).toBeVisible();
+  } else {
+    await expect(
+      epicBoard.getByRole('link', { name: `Feature ${suffix}`, exact: true }),
+    ).toBeVisible();
+  }
   await page.screenshot({ path: test.info().outputPath('epic-detail.png'), fullPage: true });
   await page.getByRole('button', { name: 'Edit Epic', exact: true }).click();
   const editDialog = page.getByRole('dialog', { name: 'Edit Epic', exact: true });
@@ -413,6 +457,9 @@ test('PA-PLAN-003 Epic detail edits and linked Feature navigation persist', asyn
   await expect(editDialog.getByLabel('Epic status')).toHaveValue('in_progress');
   await editDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
   await expect(editDialog).not.toBeVisible();
+  if (test.info().project.name === 'chromium-mobile') {
+    await page.getByText('Other workflow statuses', { exact: true }).click();
+  }
   await page.getByRole('link', { name: `Feature ${suffix}` }).click();
   await expect(page.getByRole('heading', { name: 'Work item detail', exact: true })).toBeVisible();
   overview = await (await page.request.get(overviewPath)).json();
@@ -438,6 +485,7 @@ test('PA-PLAN-004 creates a structured Bug with a durable screenshot from the pr
   await bugDialog.getByLabel('Actual result').fill('The view remains blank.');
   await bugDialog.getByRole('button', { name: 'Create Feature', exact: true }).click();
   await expect(bugDialog).not.toBeVisible();
+  await closeProjectBoardMenu(page);
 
   const bugLink = page.getByRole('link', { name: `Bug ${suffix}`, exact: true });
   await expect(bugLink).toBeVisible();
@@ -515,13 +563,16 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
   await featureDialog.getByLabel('Epic for new feature').selectOption({ label: epicTitle });
   await featureDialog.getByRole('button', { name: 'Create Feature', exact: true }).click();
   await expect(featureDialog).not.toBeVisible();
+  await closeProjectBoardMenu(page);
   await expect(page.getByRole('link', { name: storyTitle, exact: true })).toBeVisible();
 
   const overviewPath = `/api/v1/workspaces/${workspace.id}/projects/${project.id}/planning/overview`;
   const initialOverview = await (await page.request.get(overviewPath)).json();
   const epic = initialOverview.epics.find((item: { title: string }) => item.title === epicTitle);
   const feature = epic.features.find((item: { title: string }) => item.title === storyTitle);
-  const statuses = ['backlog', 'ready', 'in_progress', 'verify', 'done'];
+  expect(epic.status).toBe('backlog');
+  expect(feature.status).toBe('backlog');
+  const statuses = ['ready', 'in_progress', 'verify', 'done'];
 
   for (const status of statuses) {
     const response = page.waitForResponse(
@@ -530,7 +581,17 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
         item.request().method() === 'PATCH' &&
         item.request().postData()?.includes(`"status":"${status}"`) === true,
     );
-    await page.getByLabel(`Status for Epic ${epicTitle}`).selectOption(status);
+    if (test.info().project.name === 'chromium-mobile') {
+      await page.getByLabel(`Status for Epic ${epicTitle}`).selectOption(status);
+    } else {
+      await page.getByRole('link', { name: epicTitle, exact: true }).click();
+      await page.getByRole('button', { name: 'Edit Epic', exact: true }).click();
+      const editDialog = page.getByRole('dialog', { name: 'Edit Epic', exact: true });
+      await editDialog.getByLabel('Epic status').selectOption(status);
+      await editDialog.getByRole('button', { name: 'Save Epic', exact: true }).click();
+      await expect(editDialog).not.toBeVisible();
+      await page.goto(`/planning/${workspace.id}/${project.id}`);
+    }
     expect((await response).ok()).toBeTruthy();
     const persisted = await (await page.request.get(overviewPath)).json();
     expect(persisted.epics.find((item: { id: string }) => item.id === epic.id).status).toBe(status);
@@ -553,6 +614,12 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
   }
 
   await page.reload();
-  await expect(page.getByLabel(`Status for Epic ${epicTitle}`)).toHaveValue('done');
+  if (test.info().project.name === 'chromium-mobile') {
+    await expect(page.getByLabel(`Status for Epic ${epicTitle}`)).toHaveValue('done');
+  } else {
+    await expect(
+      page.locator('[data-state="done"]').getByRole('link', { name: epicTitle, exact: true }),
+    ).toBeVisible();
+  }
   await expect(projectWorkItemStatus(page, storyTitle)).toHaveValue('done');
 });

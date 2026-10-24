@@ -4,7 +4,12 @@ import { Card, StatusChip } from '@forge-org/ui';
 import type { Epic, EpicStatus, Feature } from '@forge-org/api-client';
 import styles from './EpicCard.module.css';
 
-type EpicCardProps = { epic: Epic & { features: Feature[] }; children?: ReactNode; href?: string };
+type EpicCardProps = {
+  epic: Epic & { features: Feature[] };
+  children?: ReactNode;
+  href?: string;
+  compact?: boolean;
+};
 
 const labels: Record<EpicStatus, string> = {
   backlog: 'Backlog',
@@ -14,7 +19,7 @@ const labels: Record<EpicStatus, string> = {
   done: 'Done',
 };
 
-export function EpicCard({ epic, children, href }: EpicCardProps) {
+export function EpicCard({ epic, children, href, compact = false }: EpicCardProps) {
   const knownStatus = epic.status in labels;
   const label = epic.archived_at
     ? 'Archived'
@@ -27,6 +32,24 @@ export function EpicCard({ epic, children, href }: EpicCardProps) {
     epic.completed_feature_count ??
     epic.features.filter((item: Feature) => item.status === 'done').length;
   const progress = epic.progress ?? (total ? Math.round((completed / total) * 100) : 0);
+  if (compact) {
+    return (
+      <Card
+        className={`${styles.card} ${styles.compact}`}
+        data-state={state}
+        data-testid={`epic-card-${epic.id}`}
+      >
+        <p className={styles.compactType}>{`EPIC · ${epic.priority ?? 'medium'}`}</p>
+        <h4 className={styles.compactTitle}>
+          {href ? <Link to={href}>{epic.title}</Link> : epic.title}
+        </h4>
+        <p className={styles.compactMeta}>
+          {total} items{epic.tags?.[0] ? `  ·  ${epic.tags[0].toLowerCase()}` : ''}
+        </p>
+        {children}
+      </Card>
+    );
+  }
   return (
     <Card className={styles.card} data-state={state}>
       <header className={styles.header}>

@@ -1,0 +1,254 @@
+{
+  "figmaNodeId": "344:82",
+  "viewport": {
+    "width": 1440,
+    "height": 960,
+    "deviceScaleFactor": 1,
+    "zoomPercent": 100
+  },
+  "actual": {
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 244,
+      "height": 960
+    },
+    "workspaceSelector": {
+      "x": 18,
+      "y": 128,
+      "width": 208,
+      "height": 48
+    },
+    "topbar": {
+      "x": 244,
+      "y": 0,
+      "width": 1196,
+      "height": 64
+    },
+    "breadcrumb": {
+      "x": 268,
+      "y": 22,
+      "width": 760,
+      "height": 20
+    },
+    "search": {
+      "x": 1042,
+      "y": 18.5,
+      "width": 140,
+      "height": 27
+    },
+    "theme": {
+      "x": 1196,
+      "y": 18.5,
+      "width": 95,
+      "height": 27
+    },
+    "heading": {
+      "x": 268,
+      "y": 88,
+      "width": 1148,
+      "height": 105
+    },
+    "eyebrow": {
+      "x": 268,
+      "y": 88,
+      "width": 900,
+      "height": 18
+    },
+    "title": {
+      "x": 268,
+      "y": 113,
+      "width": 900,
+      "height": 39
+    },
+    "description": {
+      "x": 268,
+      "y": 159,
+      "width": 900,
+      "height": 20
+    },
+    "primaryAction": {
+      "x": 1210,
+      "y": 88,
+      "width": 160,
+      "height": 42
+    },
+    "toolbar": {
+      "x": 268,
+      "y": 211,
+      "width": 1148,
+      "height": 51
+    },
+    "filters": [
+      {
+        "x": 268,
+        "y": 211,
+        "width": 118,
+        "height": 27
+      },
+      {
+        "x": 398,
+        "y": 211,
+        "width": 215,
+        "height": 27
+      },
+      {
+        "x": 625,
+        "y": 211,
+        "width": 135,
+        "height": 27
+      },
+      {
+        "x": 772,
+        "y": 211,
+        "width": 127,
+        "height": 27
+      },
+      {
+        "x": 911,
+        "y": 211,
+        "width": 120,
+        "height": 27
+      },
+      {
+        "x": 1043,
+        "y": 211,
+        "width": 151,
+        "height": 27
+      }
+    ],
+    "board": {
+      "x": 268,
+      "y": 280,
+      "width": 1148,
+      "height": 615
+    },
+    "columns": [
+      {
+        "x": 268,
+        "y": 280,
+        "width": 222,
+        "height": 615
+      },
+      {
+        "x": 500,
+        "y": 280,
+        "width": 222,
+        "height": 615
+      },
+      {
+        "x": 732,
+        "y": 280,
+        "width": 222,
+        "height": 615
+      },
+      {
+        "x": 964,
+        "y": 280,
+        "width": 222,
+        "height": 615
+      },
+      {
+        "x": 1196,
+        "y": 280,
+        "width": 222,
+        "height": 615
+      }
+    ],
+    "cards": [
+      {
+        "x": 273,
+        "y": 340,
+        "width": 214,
+        "height": 146,
+        "title": "EPIC · mediumFrontend / UX4 items  ·  ui/ux"
+      },
+      {
+        "x": 273,
+        "y": 498,
+        "width": 214,
+        "height": 146,
+        "title": "EPIC · highDocumentation2 items  ·  docs"
+      },
+      {
+        "x": 505,
+        "y": 340,
+        "width": 214,
+        "height": 146,
+        "title": "EPIC · highDetection Research6 items  ·  computer-vision"
+      },
+      {
+        "x": 737,
+        "y": 340,
+        "width": 214,
+        "height": 146,
+        "title": "EPIC · highTracking & Analytics8 items  ·  tracking"
+      },
+      {
+        "x": 969,
+        "y": 340,
+        "width": 214,
+        "height": 146,
+        "title": "EPIC · mediumMVP Frontend3 items  ·  validation"
+      },
+      {
+        "x": 1201,
+        "y": 340,
+        "width": 214,
+        "height": 146,
+        "title": "EPIC · lowInitial Infrastructure5 items  ·  complete"
+      }
+    ]
+  },
+  "expectedFigma": {
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 244,
+      "height": 960
+    },
+    "topbar": {
+      "x": 244,
+      "y": 0,
+      "width": 1196,
+      "height": 64
+    },
+    "heading": {
+      "x": 268,
+      "y": 88,
+      "width": 1148,
+      "height": 105
+    },
+    "primaryAction": {
+      "x": 1210,
+      "y": 88,
+      "width": 160,
+      "height": 42
+    },
+    "toolbar": {
+      "x": 268,
+      "y": 211,
+      "width": 1148,
+      "height": 51
+    },
+    "board": {
+      "x": 268,
+      "y": 280,
+      "width": 1148,
+      "height": 615
+    },
+    "columns": {
+      "width": 222,
+      "height": 615,
+      "gap": 10,
+      "count": 5,
+      "aggregateContentWidth": 1150
+    },
+    "epicCard": {
+      "width": 214,
+      "height": 146
+    }
+  },
+  "metadataOvershoot": "Figma frame width 1148px contains five 222px columns and four 10px gaps (1150px total); the parent clips the 2px excess.",
+  "humanReview": "PENDING"
+}

@@ -1,32 +1,34 @@
 # FORGE Org Tool 1.1 UX evidence
 
-The `screenshots/` directory contains 19 browser captures from the running React app: nine desktop target states at 1440x960 and ten mobile states at 390x844. The isolated Playwright SQLite fixture seeds synthetic workspaces, projects, Epics, Stories, Bugs, tags, tasks, criteria, and screenshot attachments. No installed or operator application data was read or modified. `desktop-installed-smoke.bmp` is a separate native screenshot from the newly built NSIS application running under an isolated temporary `LOCALAPPDATA`.
+## Current browser comparison
 
-Capture command from the repository root (PowerShell):
+The current comparison set is in `visual-parity/`: Figma references, freshly captured implementation images, per-pixel difference maps, 50% overlays, and machine-readable/Markdown reports. The generated files are automated evidence only. Every report remains `PENDING_HUMAN_REVIEW` and `VISUAL_FIDELITY_NOT_ACCEPTED`; a pixel-difference percentage is not a human parity verdict.
+
+Regenerate both desktop and mobile captures in distinct isolated Playwright/SQLite runs, then compare all ten exact Figma frames:
 
 ```powershell
-$env:FORGE_UX11_CAPTURE_DIR = (Join-Path (Get-Location) 'docs/evidence/ux-1.1/screenshots')
-node tooling/scripts/run-playwright-isolated.mjs --config apps/web/playwright.ux-evidence.config.ts
-Remove-Item Env:FORGE_UX11_CAPTURE_DIR
+npm run test:e2e:ux11-visual
 ```
 
-These are automated implementation screenshots for comparison against Figma nodes 344:3, 344:82, 344:182, 347:54, 347:145, 347:224, 347:308, 348:57, 348:129, and 348:210. They are not human visual certification.
+The fixture creates synthetic workspaces, projects, Epics, Stories, Bugs, tags, acceptance criteria, tasks, and image attachments in a disposable database. It does not read or write installed/operator application data. No screenshot masks are applied. Browser configuration: Chromium, 1440x960 desktop / 390x844 mobile, DPR 1, 100% zoom, bundled Inter, animations disabled.
 
-| Figma target | Captured implementation | Remaining differences / review notes |
-| --- | --- | --- |
-| 344:3 Workspace Home | `01-workspace-home-1440x960.png`, `01-mobile-workspace-home.png` | Uses live project data and actions; spacing and card geometry still need design review. |
-| 344:82 Project Board | `02-project-board-dark-1440x960.png` | Five columns fit at the target desktop viewport; card content includes product controls and longer copy than the reference. |
-| 344:182 Epic Board | `03-epic-board-1440x960.png`, `03-mobile-epic-board.png` | Desktop shows five work-item lanes. Mobile uses status tabs and a collapsed filter disclosure; exact spacing and copy differ. |
-| 347:54 Story Detail | `04-story-detail-1440x960.png`, `04-mobile-story-detail.png` | The real Story title is the page heading and Description is a distinct section; criteria and task management are product-backed. Remaining below-the-fold content density differs from the read-first reference. |
-| 347:145 Bug Detail | `05-bug-detail-1440x960.png`, `05-mobile-bug-detail.png` | Structured reproduction data and persisted screenshot attachments work; screenshot placement and exact content hierarchy remain different. |
-| 347:224 Create Epic | `06-create-epic-dialog-1440x960.png`, `06-mobile-create-epic.png` | Implemented as a right-side modal drawer on desktop and a bottom sheet on mobile; the Figma frame is a contextual panel integrated beside the board. |
-| 347:308 Contextual Transfer | `07-contextual-transfer-preview-1440x960.png`, `07-mobile-contextual-transfer.png` | Import validation and preview work, but the current workflow steps and file/JSON controls differ from the compact split-panel reference. |
-| 348:57 Workspace Tags/Settings | `08-workspace-tags-settings-1440x960.png`, `08-mobile-workspace-settings.png` | The captures wait for the synthetic `research` and `tracking` tags to load. Tag management is prioritized before workspace profile settings. The API does not provide tag usage counts, so none are fabricated. |
-| 348:129 Light Project Board | `09-project-board-light-1440x960.png`, `09-mobile-project-board-light.png` | Uses semantic light-theme tokens; external review is still needed for exact color, spacing, and typography parity. |
-| 348:210 Mobile Epic Board | `10-mobile-epic-board-390x844.png` | Work-item status selection and card interaction are functional at 390x844; exact Figma spacing and content density need human review. |
+| Figma node | Current exact pixel difference | Notes |
+| --- | ---: | --- |
+| 344:3 Workspace Home | 73,120 / 1,382,400 (5.29%) | Fresh automated comparison; remaining visual/content differences still require human review. |
+| 344:82 Project Board (dark) | 43,780 / 1,382,400 (3.17%) | Fresh automated comparison; remaining board spacing/content differences still require human review. |
+| 344:182 Epic Board | 85,953 / 1,382,400 (6.22%) | Figma summary says 6 items, 2 completed (33%), while its visible status lanes sum to 6 with only one Done card. Product counts remain derived from persisted records; the mismatch is not hard-coded away. |
+| 347:54 Story Detail | 186,957 / 1,382,400 (13.52%) | Product behavior is captured; remaining visual/content hierarchy differences require review. |
+| 347:145 Bug Detail | 83,816 / 1,382,400 (6.06%) | Structured reproduction and screenshot attachment are fixture-backed; visual differences remain. |
+| 347:224 Create Epic | 176,066 / 1,382,400 (12.74%) | Desktop uses a contextual board-plus-drawer composition; it is not yet visually certified. |
+| 347:308 Contextual Transfer | 1,025,839 / 1,382,400 (74.21%) | Product transfer flow is functional, but is the largest visual divergence and needs focused review. |
+| 348:57 Workspace Tags | 281,175 / 1,382,400 (20.34%) | Tag usage counts are not present in the API and are not fabricated. |
+| 348:129 Project Board (light) | 43,494 / 1,382,400 (3.15%) | Automated comparison only; exact color/typography/spacing review remains open. |
+| 348:210 Mobile Epic Board | 120,164 / 329,160 (36.51%) | Principal geometry is asserted exactly in `DetailPages.spec.ts`. Figma omits the working `Move` and `Other workflow statuses` controls, which remain visible/functioning in product; the Figma summary count and inferred lane totals also need human resolution. |
 
-The screenshots use synthetic names and counts rather than the illustrative Figma data. No claim of pixel-perfect parity or external human certification is made by this evidence.
+All reports are under `visual-parity/reports/`; references, actuals, differences, and overlays are retained in their corresponding subdirectories. The 19-image `screenshots/` set is the earlier UX evidence set and is not the source used by the current pixel comparator.
 
-## Installed Windows acceptance
+## Native Windows acceptance
 
-`npm run test:desktop:acceptance` rebuilt the web app and sidecar, produced the NSIS installer, installed it using a uniquely owned temporary app-data root, and verified the visible native window with Windows UI Automation. The test created a workspace, project, Epic, and Bug through the installed UI; confirmed API/SQLite persistence including a Bug screenshot attachment after application restart; and closed the app and sidecars. Latest run: window title `FORGE Org Tool`, 1216x839; database was confined to a unique `%LOCALAPPDATA%\Temp\forge-desktop-smoke-*` directory and removed with the owned test fixture. The retained screenshot shows the actual installed WebView. It does not certify human Figma parity.
+The native installed-app smoke is separate from browser/Figma evidence. A local reproduction was run against the previously downloaded CI NSIS installer using the corrected smoke harness and a unique disposable install and `LocalAppData` directory. It verified the visible `FORGE Org Tool` window (1216x839), UI → authenticated sidecar API → SQLite, synthetic workspace/project/Epic/Bug and screenshot attachment creation, persistence after restart, second-instance activation, graceful close, and sidecar cleanup. The synthetic database was under a temporary directory and did not touch operator application data. `desktop-installed-smoke.bmp` is the refreshed successful installed-application screenshot.
+
+This local result validates the corrected native file-picker automation and installed workflow against that prior installer; it does **not** certify a newly built installer. The current branch's fresh Windows Quality CI run must rebuild the installer and pass the installed acceptance job before the new package is considered verified. The previous CI run (`40025238782`, commit `8b547af`) failed during file selection and is historical evidence, not a pass for this branch's uncommitted changes. Neither native smoke nor browser pixel comparisons certify human Figma parity.

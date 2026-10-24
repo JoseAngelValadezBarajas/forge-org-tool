@@ -96,18 +96,56 @@ describe('M1 application shell', () => {
     );
     renderRoute('/planning/w1/p1/epics/e1');
     expect(await screen.findByRole('heading', { name: 'Release' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Project board' })).toHaveAttribute(
-      'href',
-      '/planning/w1/p1',
-    );
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByRole('link', {
+        name: 'Atlas',
+      }),
+    ).toHaveAttribute('href', '/planning/w1/p1');
   });
 
-  it('exposes the product shell hierarchy without inventing project routes', () => {
+  it('exposes the Figma sidebar hierarchy and keeps workspace controls in the shell', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Personal',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'FormiAI',
+      description: null,
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [workspace]
+            : path.includes('/projects?')
+              ? [project]
+              : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
     renderRoute('/');
 
-    expect(screen.getByRole('navigation', { name: 'Product navigation' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Workspace' })).toHaveAttribute('href', '/');
-    expect(screen.getByText('LOCAL MODE')).toBeInTheDocument();
+    const sidebar = screen.getByTestId('app-sidebar');
+    expect(
+      await within(sidebar).findByRole('navigation', { name: 'Project navigation' }),
+    ).toBeInTheDocument();
+    expect(within(sidebar).getByRole('combobox', { name: 'Workspace' })).toBeInTheDocument();
+    expect(
+      await within(sidebar).findByRole('heading', { name: 'Your projects' }),
+    ).toBeInTheDocument();
+    expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
   });
 
   it('provides compact mobile navigation for Projects, the current Board, Search and Settings', () => {
@@ -287,23 +325,28 @@ describe('M1 application shell', () => {
     );
     renderRoute('/workspaces/w1/settings');
 
-    expect(await screen.findByRole('heading', { name: 'Workspace settings' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Manage workspace tags' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Manage workspace tags' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Back to Projects' })).toHaveAttribute('href', '/');
   });
 
-  it('exposes only the supported 1.0 product destinations on project routes', () => {
+  it('keeps supported product destinations reachable from the compact project sidebar and palette', () => {
     renderRoute('/planning/w1/p1');
 
-    const navigation = screen.getByRole('navigation', { name: 'Product navigation' });
-    expect(within(navigation).getByRole('link', { name: 'Planning' })).toHaveAttribute(
+    const navigation = screen.getByRole('navigation', { name: 'Project navigation' });
+    expect(within(navigation).getByRole('link', { name: 'Overview' })).toHaveAttribute(
       'href',
-      '/planning/w1/p1',
+      '/projects/w1/p1',
     );
-    expect(within(navigation).getByRole('link', { name: 'Transfer' })).toHaveAttribute(
-      'href',
-      '/transfer/w1/p1',
+    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '/');
+    fireEvent.click(
+      within(screen.getByRole('banner', { name: 'Application controls' })).getByRole('button', {
+        name: 'Search',
+      }),
     );
+    expect(screen.getByRole('button', { name: 'Go to Planning' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Go to Transfer' })).toBeInTheDocument();
     expect(
       within(navigation).queryAllByText(/Readiness|Workbench|Delivery|Repositories|Context/),
     ).toHaveLength(0);
@@ -424,10 +467,9 @@ describe('M1 application shell', () => {
   it('provides a three-mode persistent application appearance control', () => {
     renderRoute('/');
 
-    const appearance = within(screen.getByRole('banner', { name: 'FORGE Org Tool' })).getByRole(
-      'combobox',
-      { name: 'Appearance' },
-    );
+    const appearance = within(screen.getByTestId('app-topbar')).getByRole('combobox', {
+      name: 'Appearance',
+    });
     expect(appearance).toHaveValue('dark');
     expect(screen.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
     fireEvent.change(appearance, { target: { value: 'light' } });

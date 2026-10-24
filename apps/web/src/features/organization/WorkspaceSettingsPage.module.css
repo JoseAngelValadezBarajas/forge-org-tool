@@ -1,18 +1,380 @@
 .stack {
   display: grid;
-  gap: var(--forge-space-5);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  box-sizing: border-box;
+  width: calc(100% - 12px);
+  min-width: 0;
+  margin: 7px 6px 0;
+}
+
+.heading {
+  display: grid;
+  grid-template-columns: minmax(0, 935px) 161px;
+  align-items: start;
+  column-gap: 10px;
+  width: 100%;
+  min-height: 97px;
+}
+
+.heading > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
 }
 
-.form {
-  display: grid;
-  gap: var(--forge-space-3);
-  max-width: 640px;
-  margin-top: var(--forge-space-4);
+.eyebrow {
+  width: min(870px, 100%);
+  color: var(--forge-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
 }
 
-.actions {
+.heading h1 {
+  width: min(900px, 100%);
+  margin: 0;
+  color: var(--forge-text-primary);
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 42px;
+}
+
+.heading p {
+  width: min(900px, 100%);
+  margin: 0;
+  color: var(--forge-text-muted);
+  font-size: 13px;
+  line-height: 25px;
+}
+
+.newTag {
+  box-sizing: border-box;
+  width: 161px;
+  height: 42px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tagsComposition {
+  display: grid;
+  grid-template-columns: minmax(0, 712fr) minmax(0, 406fr);
+  gap: 18px;
+  width: 100%;
+  min-height: 593px;
+  min-width: 0;
+}
+
+.catalog,
+.guidance {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 593px;
+  padding: 20px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 12px;
+  background: var(--forge-surface);
+}
+
+.catalog h2,
+.guidance h2 {
+  margin: 0;
+  color: var(--forge-text-primary);
+}
+
+.catalog h2 {
+  height: 30px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.catalogIntro {
+  height: 34px;
+  margin: 12px 0;
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.tagList {
+  display: grid;
+  gap: 12px;
+  width: calc(100% - 4px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tagRow {
   display: flex;
-  gap: var(--forge-space-3);
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 78px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--forge-surface-raised);
+}
+
+.tagRow > button {
+  min-height: 30px;
+  height: 30px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.tagDisplay {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tagRow > button {
+  flex: 0 0 auto;
+  max-width: 40%;
+  overflow-wrap: anywhere;
+}
+
+.tagSwatch {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  margin-top: 7px;
+  border-radius: 50%;
+}
+
+.tagDisplay > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.tagDisplay strong {
+  overflow: hidden;
+  color: var(--forge-accent);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 23px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tagDisplay > div > span {
+  overflow: hidden;
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tagActions {
+  position: relative;
+  flex: 0 0 auto;
+  color: var(--forge-text-muted);
+  font-size: 11px;
+}
+
+.tagActions > summary,
+.profileDetails > summary {
+  cursor: pointer;
+}
+
+.tagActions form {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  gap: 8px;
+  width: 250px;
+  padding: 12px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 9px;
+  background: var(--forge-surface);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 24%);
+}
+
+.tagActions form button {
+  justify-self: start;
+}
+
+.tagEditor {
+  display: grid;
+  gap: 12px;
+  max-height: min(65vh, 620px);
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.tagEditor > form:not(.newTagForm) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 80px;
+  align-items: end;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--forge-border-subtle);
+}
+
+.tagEditor .newTagForm {
+  grid-template-columns: minmax(0, 1fr) 80px;
+  align-items: end;
+}
+
+.tagEditor form button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tagEditor .newTagForm button {
+  grid-column: 1 / -1;
+}
+
+.guidance {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guidance h2 {
+  height: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.guidance p {
+  margin: 0;
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.guidance > p:first-of-type {
+  height: 88px;
+}
+
+.guidance h3 {
+  margin: 0;
+  color: var(--forge-text-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 21px;
+}
+
+.examples {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.examples span {
+  box-sizing: border-box;
+  min-width: 131px;
+  height: 30px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: var(--forge-surface-interactive);
+  color: var(--forge-accent);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.note {
+  margin-top: 0 !important;
+}
+
+.noTags {
+  color: var(--forge-text-muted);
+}
+
+.archivedNotice {
+  max-width: 712px;
+}
+
+.archivedNotice h2,
+.archivedNotice p {
+  margin: 12px 0 0;
+}
+
+.error {
+  margin: 0;
+  color: var(--forge-danger);
+}
+
+.profileDetails {
+  color: var(--forge-text-muted);
+}
+
+.profileForm,
+.newTagForm {
+  display: grid;
+  gap: 12px;
+  max-width: 640px;
+  margin-top: 16px;
+}
+
+.profileActions {
+  display: flex;
+  gap: 12px;
   flex-wrap: wrap;
+}
+
+.backLink {
+  color: var(--forge-text-muted);
+  font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+  .heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 18px;
+  }
+
+  .tagsComposition {
+    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .stack {
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+
+  .heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    height: auto;
+  }
+
+  .heading h1 {
+    width: 100%;
+    font-size: 26px;
+  }
+
+  .eyebrow,
+  .heading p {
+    width: 100%;
+  }
+
+  .tagsComposition {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+
+  .catalog,
+  .guidance {
+    width: 100%;
+    height: auto;
+    min-height: 220px;
+  }
 }

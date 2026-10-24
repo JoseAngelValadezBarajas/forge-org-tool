@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function downloadJson(page: Page, url: string, buttonName: string) {
   await page.goto(url);
+  await page.locator('summary').filter({ hasText: 'Export existing' }).click();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: buttonName }).click();
   const download = await downloadPromise;
@@ -16,7 +17,6 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   page,
 }) => {
   const suffix = `${test.info().project.name}-${Date.now()}`;
-  const mobile = test.info().project.name === 'chromium-mobile';
   const workspace = await page.request.post('/api/v1/workspaces', {
     data: { name: `Context transfer ${suffix}` },
   });
@@ -56,6 +56,7 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   await page.getByRole('button', { name: 'New Epic', exact: true }).click();
   await page.getByLabel('Epic title').fill(destinationEpicTitle);
   await page.getByRole('button', { name: 'Create Epic' }).click();
+  await page.locator('summary').filter({ hasText: 'Board' }).click();
   await page.getByRole('button', { name: 'New work item', exact: true }).click();
   await page.getByLabel('Feature title').fill(`Destination Story ${suffix}`);
   await page.getByLabel('Epic for new feature').selectOption({ label: destinationEpicTitle });
@@ -111,8 +112,12 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   expect(exportedEpic.epics.map((item) => item.title)).toEqual([`Imported Epic ${suffix}`]);
   expect(exportedEpic.features.map((item) => item.title)).toContain(`Imported Story ${suffix}`);
   await page.goto(epicPage);
-  if (mobile) await page.getByText('More Epic actions', { exact: true }).click();
-  await page.getByRole('link', { name: 'Import / export Stories and Bugs' }).click();
+  if (test.info().project.name === 'chromium-mobile') {
+    await page.getByRole('link', { name: `Imported Story ${suffix}` }).click();
+    await page.getByRole('link', { name: /Export Work Items/ }).click();
+  } else {
+    await page.getByRole('link', { name: 'Import / export Stories and Bugs' }).click();
+  }
   const workItemsDocument = {
     schema_version: 'forge-project-transfer-v2',
     project: { name: 'Work item fixture' },

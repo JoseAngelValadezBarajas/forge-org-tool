@@ -7,7 +7,6 @@ import {
   FormField,
   Input,
   SearchField,
-  SectionHeader,
   Select,
   Textarea,
 } from '@forge-org/ui';
@@ -18,6 +17,8 @@ import {
   type WorkspaceTag,
 } from '@forge-org/api-client';
 import styles from './PlanningPage.module.css';
+import { CreateEpicDrawer } from './CreateEpicDrawer';
+import { CreateEpicContextBoard } from './CreateEpicContextBoard';
 import { usePlanningController } from './usePlanningController';
 import {
   DependencyGroup,
@@ -29,16 +30,21 @@ import {
   ProjectPlanningHome,
 } from './components';
 
-export function PlanningPage() {
+export function PlanningPage({ projectName = 'Project' }: { projectName?: string }) {
   const { workspaceId = '', projectId = '' } = useParams();
   const [workspaceTags, setWorkspaceTags] = useState<WorkspaceTag[]>([]);
   const [tagCatalogError, setTagCatalogError] = useState('');
   const [epicDialogOpen, setEpicDialogOpen] = useState(false);
   const [featureDialogOpen, setFeatureDialogOpen] = useState(false);
   const [mobileEpicStatus, setMobileEpicStatus] = useState('all');
+  const [epicSearch, setEpicSearch] = useState('');
+  const [epicStatusFilter, setEpicStatusFilter] = useState('all');
+  const [epicPriorityFilter, setEpicPriorityFilter] = useState('all');
+  const [epicTagFilter, setEpicTagFilter] = useState('');
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 720);
   const epicCreateErrorAtSubmit = useRef<string | null>(null);
   const featureCreateErrorAtSubmit = useRef<string | null>(null);
+  const epicTriggerRef = useRef<HTMLButtonElement | null>(null);
   useEffect(() => {
     const updateViewport = () => setIsMobile(window.innerWidth <= 720);
     window.addEventListener('resize', updateViewport);
@@ -94,6 +100,8 @@ export function PlanningPage() {
     setEpicTags,
     stepsToReproduce,
     expectedResult,
+    epicDescription,
+    setEpicDescription,
     setPriorityFilter,
     setSearch,
     setStatusFilter,
@@ -132,6 +140,9 @@ export function PlanningPage() {
       return () => window.clearTimeout(timeout);
     }
   }, [error, featureTitle]);
+  useEffect(() => {
+    if (!epicDialogOpen) epicTriggerRef.current?.focus();
+  }, [epicDialogOpen]);
   const archivedEpics = overview.epics.filter((epic) => Boolean(epic.archived_at));
   const workflowEpics = overview.epics.filter(
     (epic) =>
@@ -141,91 +152,59 @@ export function PlanningPage() {
     (epic) =>
       !epic.archived_at && !PLANNING_COLUMN_STATUSES.some((column) => column.value === epic.status),
   );
+  const filteredWorkflowEpics = workflowEpics.filter((epic) => {
+    const query = epicSearch.trim().toLowerCase();
+    return (
+      (!query || epic.title.toLowerCase().includes(query)) &&
+      (epicStatusFilter === 'all' || epic.status === epicStatusFilter) &&
+      (epicPriorityFilter === 'all' || epic.priority === epicPriorityFilter) &&
+      (!epicTagFilter || epic.tags?.includes(epicTagFilter))
+    );
+  });
   return (
     <ProjectPlanningHome>
-      <div className={styles.stack}>
-        <SectionHeader title="Project Board" eyebrow="FORGE / Manual planning" />
-        {error && <p role="alert">{error}</p>}
-        <div className={styles.creationActions}>
-          <Link className={styles.projectOverviewLink} to={`/projects/${workspaceId}/${projectId}`}>
-            Project overview
-          </Link>
-          <Button type="button" onClick={() => setEpicDialogOpen(true)}>
-            New Epic
-          </Button>
-          <Button type="button" variant="secondary" onClick={() => setFeatureDialogOpen(true)}>
-            New work item
-          </Button>
-        </div>
-        {epicDialogOpen && (
-          <Dialog
-            open
-            title="Create Epic"
-            description="Add an Epic to this project."
-            className={styles.createEpicDrawer}
-            onCancel={() => setEpicDialogOpen(false)}
-          >
-            <form
-              className={styles.dialogForm}
-              onSubmit={(event) => {
-                epicCreateErrorAtSubmit.current = error;
-                void createEpic(event);
-              }}
+      <div className={`${styles.stack} ${epicDialogOpen ? styles.createEpicMode : ''}`}>
+        <section
+          className={styles.pageHeading}
+          data-testid="project-board-heading"
+          data-node-id="344:111"
+        >
+          <div>
+            <p
+              className={styles.eyebrow}
+              data-testid="project-board-eyebrow"
+              data-node-id="344:113"
             >
-              <label htmlFor="epic-title">Epic title</label>
-              <Input
-                id="epic-title"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                required
-              />
-              <FormField label="Epic priority">
-                <Select
-                  aria-label="Epic priority"
-                  value={epicPriority}
-                  onChange={(event) => setEpicPriority(event.target.value as typeof epicPriority)}
-                >
-                  {['low', 'medium', 'high', 'critical'].map((priority) => (
-                    <option key={priority} value={priority}>
-                      {priority}
-                    </option>
-                  ))}
-                </Select>
-              </FormField>
-              <fieldset className={styles.tagChoices}>
-                <legend>Epic tags</legend>
-                {tagCatalogError && <p role="status">{tagCatalogError}</p>}
-                {workspaceTags.map((tag) => (
-                  <label key={tag.id} className={styles.tagChoice}>
-                    <input
-                      type="checkbox"
-                      aria-label={`Epic tag ${tag.name}`}
-                      checked={epicTags
-                        .split(',')
-                        .map((value) => value.trim())
-                        .includes(tag.name)}
-                      onChange={(event) => {
-                        const selected = epicTags
-                          .split(',')
-                          .map((value) => value.trim())
-                          .filter(Boolean);
-                        setEpicTags(
-                          (event.target.checked
-                            ? [...selected, tag.name]
-                            : selected.filter((value) => value !== tag.name)
-                          ).join(', '),
-                        );
-                      }}
-                    />
-                    <span>{tag.name}</span>
-                  </label>
-                ))}
-                {workspaceTags.length === 0 && !tagCatalogError && <p>No workspace tags yet.</p>}
-              </fieldset>
-              <Button type="submit">Create Epic</Button>
-            </form>
-          </Dialog>
-        )}
+              PROJECT BOARD
+            </p>
+            <h1 data-testid="project-board-title" data-node-id="344:114">
+              {projectName} · Epics
+            </h1>
+            <p
+              className={styles.headingDescription}
+              data-testid="project-board-description"
+              data-node-id="344:115"
+            >
+              {epicDialogOpen
+                ? 'Create or edit work without leaving the Board.'
+                : 'Track the big outcomes. Open an Epic to manage its work items.'}
+            </p>
+          </div>
+          <Button
+            type="button"
+            aria-label="New Epic"
+            data-node-id="343:12"
+            className={styles.primaryEpicAction}
+            hidden={epicDialogOpen}
+            onClick={(event) => {
+              epicTriggerRef.current = event.currentTarget;
+              setEpicDialogOpen(true);
+            }}
+          >
+            + New Epic
+          </Button>
+        </section>
+        {error && <p role="alert">{error}</p>}
         {featureDialogOpen && (
           <Dialog open title="Create work item" onCancel={() => setFeatureDialogOpen(false)}>
             <form
@@ -343,56 +322,155 @@ export function PlanningPage() {
             </form>
           </Dialog>
         )}
-        <section aria-label="Project Board">
-          <h2>Project Board · Epics</h2>
-          <section aria-label="Epic visibility summary">
-            <p>
-              {overview.epics.length} total · {workflowEpics.length} in workflow ·{' '}
-              {archivedEpics.length} archived · {legacyEpics.length} legacy
-            </p>
-          </section>
-          <p className={styles.disclaimer}>
-            Planning status, priority, filters, and dependencies are manual product records only;
-            they never claim execution or delivery evidence.
-          </p>
-          {!isMobile && (
-            <div className={`${styles.board} ${styles.epicBoard}`} aria-label="Epic workflow board">
-              {PLANNING_COLUMN_STATUSES.map(({ value: status }) => (
-                <KanbanColumn
-                  key={`epics-${status}`}
-                  status={status}
-                  emptyMessage="No Epics in this status."
-                >
-                  {overview.epics
-                    .filter((epic) => epic.status === status && !epic.archived_at)
-                    .map((epic) => (
-                      <EpicCard
-                        key={epic.id}
-                        epic={epic}
-                        href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
-                      >
-                        <label>
-                          Epic status
-                          <Select
-                            aria-label={`Status for Epic ${epic.title}`}
-                            value={epic.status}
-                            onChange={(event) =>
-                              void updateEpic(epic, event.target.value as EpicStatus)
-                            }
-                          >
-                            {PLANNING_COLUMN_STATUSES.map((column) => (
-                              <option key={column.value} value={column.value}>
-                                {column.label}
-                              </option>
-                            ))}
-                          </Select>
-                        </label>
-                      </EpicCard>
-                    ))}
-                </KanbanColumn>
-              ))}
+        <section className={styles.epicBoardSection} aria-label="Project Board">
+          {!epicDialogOpen && (
+            <div
+              className={styles.epicToolbar}
+              aria-label="Epic board filters"
+              data-node-id="344:118"
+            >
+              <details className={styles.boardViewMenu}>
+                <summary>Board&nbsp; ▾</summary>
+                <div>
+                  <span aria-current="page">Epics</span>
+                  <Link to={`/projects/${workspaceId}/${projectId}`}>Project overview</Link>
+                  <Button type="button" variant="ghost" onClick={() => setFeatureDialogOpen(true)}>
+                    New work item
+                  </Button>
+                  <p>Planning status and dependencies are manual product records only.</p>
+                </div>
+              </details>
+              <Input
+                className={`${styles.epicFilter} ${styles.epicSearch}`}
+                type="search"
+                aria-label="Search Epics"
+                placeholder="Search Epics    ⌕"
+                value={epicSearch}
+                onChange={(event) => setEpicSearch(event.target.value)}
+              />
+              <Select
+                className={`${styles.epicFilter} ${styles.epicStatusFilter}`}
+                aria-label="Filter Epics by status"
+                value={epicStatusFilter}
+                onChange={(event) => setEpicStatusFilter(event.target.value)}
+              >
+                <option value="all">Status: All</option>
+                {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
+                  <option key={value} value={value}>{`Status: ${label}`}</option>
+                ))}
+              </Select>
+              <Select
+                className={`${styles.epicFilter} ${styles.epicPriorityFilter}`}
+                aria-label="Filter Epics by priority"
+                value={epicPriorityFilter}
+                onChange={(event) => setEpicPriorityFilter(event.target.value)}
+              >
+                <option value="all">Priority&nbsp; ▾</option>
+                {['low', 'medium', 'high', 'critical'].map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority[0]?.toUpperCase()}
+                    {priority.slice(1)}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                className={`${styles.epicFilter} ${styles.epicTagFilter}`}
+                aria-label="Filter Epics by tag"
+                value={epicTagFilter}
+                onChange={(event) => setEpicTagFilter(event.target.value)}
+              >
+                <option value="">Tags&nbsp; ▾</option>
+                {workspaceTags.map((tag) => (
+                  <option key={tag.id} value={tag.name}>
+                    {tag.name}
+                  </option>
+                ))}
+              </Select>
+              <Link
+                className={`${styles.epicFilter} ${styles.importEpic}`}
+                to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}
+              >
+                ⇩ Import Epic
+              </Link>
             </div>
           )}
+          <section className={styles.visuallyHidden} aria-label="Epic visibility summary">
+            {overview.epics.length} total · {workflowEpics.length} in workflow ·{' '}
+            {archivedEpics.length} archived · {legacyEpics.length} legacy
+          </section>
+          <div className={epicDialogOpen ? styles.boardAndDrawer : undefined}>
+            {!isMobile && epicDialogOpen && (
+              <CreateEpicContextBoard
+                epics={workflowEpics}
+                workspaceId={workspaceId}
+                projectId={projectId}
+              />
+            )}
+            {!isMobile && !epicDialogOpen && (
+              <div
+                className={`${styles.board} ${styles.epicBoard}`}
+                aria-label="Epic workflow board"
+                data-testid="project-epic-board"
+                data-node-id="344:131"
+              >
+                {PLANNING_COLUMN_STATUSES.map(({ value: status }) => {
+                  const columnEpics = filteredWorkflowEpics.filter(
+                    (epic) => epic.status === status,
+                  );
+                  return (
+                    <KanbanColumn
+                      key={`epics-${status}`}
+                      status={status}
+                      compact
+                      headerCount={columnEpics.length}
+                      emptyMessage="No Epics in this status."
+                    >
+                      {columnEpics.map((epic) => (
+                        <EpicCard
+                          key={epic.id}
+                          epic={epic}
+                          compact
+                          href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
+                        />
+                      ))}
+                      {columnEpics.length > 0 && (
+                        <button
+                          className={styles.addEpic}
+                          type="button"
+                          onClick={(event) => {
+                            epicTriggerRef.current = event.currentTarget;
+                            setEpicDialogOpen(true);
+                          }}
+                        >
+                          + Add Epic
+                        </button>
+                      )}
+                    </KanbanColumn>
+                  );
+                })}
+              </div>
+            )}
+            {epicDialogOpen && (
+              <CreateEpicDrawer
+                projectName={projectName}
+                title={title}
+                onTitleChange={setTitle}
+                description={epicDescription}
+                onDescriptionChange={setEpicDescription}
+                priority={epicPriority}
+                onPriorityChange={(value) => setEpicPriority(value as typeof epicPriority)}
+                tags={epicTags}
+                onTagsChange={setEpicTags}
+                workspaceTags={workspaceTags}
+                tagCatalogError={tagCatalogError}
+                onSubmit={(event) => {
+                  epicCreateErrorAtSubmit.current = error;
+                  void createEpic(event);
+                }}
+                onCancel={() => setEpicDialogOpen(false)}
+              />
+            )}
+          </div>
           {isMobile && (
             <section aria-label="Mobile Epic board" className={styles.mobileBoard}>
               <FormField label="Epic status">
@@ -564,7 +642,9 @@ export function PlanningPage() {
         {!isMobile && (
           <div
             className={styles.board}
+            role="region"
             aria-label="Planning board"
+            tabIndex={0}
             data-testid="project-epic-board"
           >
             {PLANNING_COLUMN_STATUSES.map(({ value: status }) => {

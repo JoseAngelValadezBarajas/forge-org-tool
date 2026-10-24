@@ -86,6 +86,52 @@ export function TransferPage() {
     }
   }
 
+  const contextualTitle =
+    contextualScope === 'epics'
+      ? 'Import an Epic'
+      : contextualScope === 'work-items'
+        ? 'Import work items'
+        : 'Import tasks';
+  const stepLabels = contextualScope
+    ? ['Select source', 'Preview', 'Confirm']
+    : ['Select source', 'Review planning', 'Confirm'];
+
+  const contextualPreviewPanel = contextualScope ? (
+    <Card>
+      <section
+        aria-labelledby="context-preview-title"
+        className={`${styles.panel} ${styles.previewPanel}`}
+      >
+        <h3 id="context-preview-title">Import preview</h3>
+        {preview ? (
+          <>
+            <StatusChip tone="success">Validated manifest · {preview.schema_version}</StatusChip>
+            <div className={styles.previewCounts}>
+              {Object.entries(preview.counts).map(([key, count]) => (
+                <div className={styles.previewCount} key={key}>
+                  <span>{key.replaceAll('_', ' ')}</span>
+                  <strong>{String(count)}</strong>
+                </div>
+              ))}
+            </div>
+            <p className={styles.previewNotes}>CREATE NEW · IDs remapped · duplicate tags reused</p>
+            <p>All records are validated before import.</p>
+            <p className={styles.fingerprint}>
+              Fingerprint: <code>{preview.fingerprint}</code>
+            </p>
+            <StatusChip tone="warning">FINGERPRINT_REQUIRED</StatusChip>
+            <p>Only this reviewed fingerprint can be committed. Import is atomic.</p>
+            <Button type="button" onClick={() => void importProject()}>
+              Confirm planning import
+            </Button>
+          </>
+        ) : (
+          <p className={styles.previewEmpty}>Choose a source to see a validated preview.</p>
+        )}
+      </section>
+    </Card>
+  ) : null;
+
   return (
     <div className={contextualScope ? styles.contextOverlay : undefined}>
       <div
@@ -110,11 +156,7 @@ export function TransferPage() {
         )}
         <SectionHeader
           title={
-            contextualScope
-              ? `Import / export ${contextualScope}`
-              : projectId
-                ? 'Project transfer'
-                : 'Import project'
+            contextualScope ? contextualTitle : projectId ? 'Project transfer' : 'Import project'
           }
           eyebrow="FORGE / Planning-only transfer"
         />
@@ -132,18 +174,24 @@ export function TransferPage() {
         {error && <p role="alert">{error}</p>}
 
         <ol className={styles.steps} aria-label="Transfer steps">
-          {['Select source', 'Review planning', 'Confirm'].map((step, index) => (
+          {stepLabels.map((step, index) => (
             <li key={step} aria-current={currentStep === index + 1 ? 'step' : undefined}>
               <span aria-hidden="true">0{index + 1}</span> {step}
             </li>
           ))}
         </ol>
 
-        <div className={styles.workflowGrid}>
+        <div
+          className={`${styles.workflowGrid} ${contextualScope ? styles.contextWorkflowGrid : ''}`}
+        >
           <Card>
-            <section aria-labelledby="import-title" className={styles.panel}>
+            <section
+              aria-labelledby={contextualScope ? undefined : 'import-title'}
+              className={styles.panel}
+              aria-label={contextualScope ? 'Import source' : undefined}
+            >
               <h3 id="import-title">
-                {contextualScope ? `Import ${contextualScope}` : 'Import a project'}
+                {contextualScope ? 'Import into this project' : 'Import a project'}
               </h3>
               <p>
                 {contextualScope
@@ -188,10 +236,27 @@ export function TransferPage() {
                   Review import
                 </Button>
               </div>
+              {contextualScope && projectId && (
+                <details className={styles.exportDetails}>
+                  <summary>Export existing {contextualScope}</summary>
+                  {!(contextualScope === 'epics' && destinationId === projectId) && (
+                    <Button type="button" variant="secondary" onClick={() => void exportProject()}>
+                      Download {contextualScope} export (JSON)
+                    </Button>
+                  )}
+                  {exported && (
+                    <div className={styles.review} role="status">
+                      <h4>Export ready</h4>
+                      <StatusChip tone="success">forge-project-transfer-v2</StatusChip>
+                      <p>Download prepared from the selected destination.</p>
+                    </div>
+                  )}
+                </details>
+              )}
             </section>
           </Card>
 
-          {projectId && (
+          {!contextualScope && projectId && (
             <Card>
               <section aria-labelledby="export-title" className={styles.panel}>
                 <h3 id="export-title">
@@ -230,9 +295,10 @@ export function TransferPage() {
               </section>
             </Card>
           )}
+          {contextualPreviewPanel}
         </div>
 
-        {preview && (
+        {!contextualScope && preview && (
           <Card>
             <section aria-labelledby="review-title" className={styles.panel}>
               <h3 id="review-title">Review planning changes</h3>

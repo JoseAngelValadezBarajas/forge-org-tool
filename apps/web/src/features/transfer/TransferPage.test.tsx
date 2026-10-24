@@ -330,6 +330,11 @@ describe('TransferPage', () => {
 
     const dialog = screen.getByRole('dialog', { name: /Import and export epics/i });
     expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(screen.getByRole('heading', { name: 'Import an Epic' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Import source' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Import preview' })).toHaveTextContent(
+      'Choose a source to see a validated preview.',
+    );
     expect(dialog).toHaveTextContent('Destination: epics (p1)');
     const closeButton = screen.getByRole('button', { name: /close transfer/i });
     expect(closeButton).toHaveFocus();
@@ -338,7 +343,7 @@ describe('TransferPage', () => {
       'application/json,.json',
     );
     fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
-    expect(screen.getByText('Advanced JSON paste')).toHaveFocus();
+    expect(screen.getByText('Export existing epics')).toHaveFocus();
     fireEvent.keyDown(dialog, { key: 'Tab' });
     expect(closeButton).toHaveFocus();
 
@@ -354,7 +359,11 @@ describe('TransferPage', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
     expect(await screen.findByText('transfer-fp')).toBeInTheDocument();
-    expect(screen.getByText('features: 0')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Import preview' })).toHaveTextContent(
+      'All records are validated before import.',
+    );
+    const featureCount = screen.getByText('features').nextElementSibling;
+    expect(featureCount).toHaveTextContent('0');
     fireEvent.click(screen.getByRole('button', { name: 'Confirm planning import' }));
 
     const returnLink = await screen.findByRole('link', { name: 'Return to project board' });

@@ -1,7 +1,217 @@
 .stack {
   display: grid;
-  gap: var(--forge-space-4);
+  gap: 18px;
   min-width: 0;
+}
+.createEpicMode {
+  gap: 16px;
+}
+.createEpicMode .pageHeading {
+  height: 101px;
+}
+.pageHeading {
+  display: flex;
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  height: 105px;
+  overflow: hidden;
+}
+.pageHeading > div {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  width: 930px;
+  min-width: 0;
+  flex: 0 0 930px;
+  height: 105px;
+}
+.pageHeading p,
+.pageHeading h1 {
+  box-sizing: border-box;
+  width: 900px;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pageHeading .eyebrow {
+  height: 18px;
+  color: var(--forge-accent);
+  font:
+    600 11px/18px Inter,
+    sans-serif;
+  white-space: nowrap;
+}
+.pageHeading h1 {
+  height: 39px;
+  color: var(--forge-text-primary);
+  font:
+    700 30px/39px Inter,
+    sans-serif;
+  white-space: nowrap;
+}
+.pageHeading .headingDescription {
+  height: 20px;
+  color: var(--forge-text-secondary);
+  font:
+    400 13px/20px Inter,
+    sans-serif;
+  white-space: nowrap;
+}
+.primaryEpicAction {
+  box-sizing: border-box;
+  width: 160px;
+  min-width: 160px;
+  height: 42px;
+  min-height: 42px;
+  margin-left: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--forge-accent);
+  color: var(--forge-accent-contrast);
+  font:
+    600 13px/19px Inter,
+    sans-serif;
+}
+.primaryEpicAction:hover {
+  background: var(--forge-accent);
+  filter: brightness(1.06);
+}
+.epicBoardSection {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  margin-bottom: 45px;
+}
+.epicToolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  height: 51px;
+  min-width: 0;
+  overflow: visible;
+}
+.epicFilter,
+.boardViewMenu > summary {
+  display: block;
+  box-sizing: border-box;
+  height: 27px;
+  min-height: 27px;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--forge-surface-interactive);
+  color: var(--forge-text-primary);
+  font:
+    500 11px/15px Inter,
+    sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.boardViewMenu {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 118px;
+}
+.boardViewMenu > summary {
+  width: 118px;
+  color: var(--forge-text-primary);
+  cursor: pointer;
+  list-style: none;
+}
+.boardViewMenu > summary::-webkit-details-marker {
+  display: none;
+}
+.boardViewMenu > div {
+  position: absolute;
+  top: 32px;
+  left: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 190px;
+  padding: 10px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 8px;
+  background: var(--forge-surface-raised);
+  box-shadow: var(--forge-shadow-md);
+}
+.boardViewMenu > div > * {
+  padding: 6px;
+  color: var(--forge-text-secondary);
+  font-size: 12px;
+  text-align: left;
+  text-decoration: none;
+}
+.epicSearch {
+  flex: 0 0 215px;
+  width: 215px;
+}
+.epicStatusFilter {
+  flex: 0 0 135px;
+  width: 135px;
+}
+.epicPriorityFilter {
+  flex: 0 0 127px;
+  width: 127px;
+}
+.epicTagFilter {
+  flex: 0 0 120px;
+  width: 120px;
+}
+.importEpic {
+  flex: 0 0 151px;
+  width: 151px;
+}
+.board.epicBoard {
+  display: grid;
+  grid-template-columns: repeat(5, 222px);
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 615px;
+  overflow: hidden;
+  padding: 0;
+}
+.board:focus-visible {
+  outline: 2px solid var(--forge-accent);
+  outline-offset: 3px;
+}
+.boardAndDrawer {
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  width: 100%;
+  min-width: 0;
+  height: 658px;
+  overflow: hidden;
+}
+.boardAndDrawer .board.epicBoard {
+  flex: 0 0 695px;
+  width: 695px;
+  height: 658px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  grid-template-columns: repeat(5, 222px);
+}
+.addEpic {
+  width: 200px;
+  min-height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--forge-text-subtle);
+  font:
+    500 12px/20px Inter,
+    sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.addEpic:hover {
+  color: var(--forge-text-primary);
 }
 .forms {
   display: grid;
@@ -56,6 +266,9 @@
 @media (min-width: 1400px) {
   .board {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .board.epicBoard {
+    max-width: 1148px;
   }
 }
 .board [aria-label='Feature planning actions'] {
@@ -139,6 +352,24 @@ dialog.createEpicDrawer {
   .board {
     display: none;
   }
+  .board.epicBoard {
+    display: none;
+  }
+  .pageHeading {
+    height: auto;
+    min-height: 105px;
+  }
+  .pageHeading > div {
+    width: auto;
+    flex: 1 1 auto;
+  }
+  .pageHeading h1 {
+    font-size: 24px;
+  }
+  .epicToolbar {
+    height: auto;
+    flex-wrap: wrap;
+  }
   .mobileBoard {
     display: grid;
     gap: var(--forge-space-3);
@@ -155,11 +386,12 @@ dialog.createEpicDrawer {
     align-items: stretch;
     flex-direction: column;
   }
-  dialog.createEpicDrawer {
-    inset: auto 0 0;
-    width: 100vw;
-    height: min(90dvh, 720px);
-    max-height: 90dvh;
-    border-radius: var(--forge-radius-md) var(--forge-radius-md) 0 0;
+  .boardAndDrawer {
+    height: auto;
+    overflow: visible;
+    flex-direction: column;
+  }
+  .boardAndDrawer .board.epicBoard {
+    display: none;
   }
 }

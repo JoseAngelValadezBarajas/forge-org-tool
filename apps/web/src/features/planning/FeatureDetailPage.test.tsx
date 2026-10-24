@@ -72,7 +72,11 @@ describe('FeatureDetailPage', () => {
     expect(screen.getByRole('heading', { name: 'Description', level: 2 })).toBeVisible();
     expect(screen.getByText('A clear summary for the team.')).toBeVisible();
     expect(screen.getByText('Make the detail easy to scan.')).toBeVisible();
-    expect(screen.getByText('Design')).toBeVisible();
+    const properties = screen.getByRole('region', { name: /^Properties$/ });
+    expect(within(properties).getByText('Design')).toBeVisible();
+    expect(screen.getByRole('region', { name: /^Tasks$/ })).toBeVisible();
+    expect(screen.getByRole('region', { name: /^Acceptance criteria$/ })).toBeVisible();
+    expect(screen.getByRole('combobox', { name: /^Work item status$/ })).toHaveValue('ready');
     expect(screen.getByText('Keep the existing notes.')).toBeVisible();
     expect(screen.queryByLabelText('Edit feature title')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Edit details' }));
@@ -450,9 +454,14 @@ describe('FeatureDetailPage', () => {
     fireEvent.change(screen.getByLabelText('Edit feature goal'), {
       target: { value: 'Show projects and their current planning state' },
     });
-    fireEvent.change(screen.getByLabelText('Actual result'), {
-      target: { value: 'Crash on launch' },
-    });
+    fireEvent.change(
+      within(screen.getByRole('dialog', { name: 'Edit Bug' })).getByRole('textbox', {
+        name: 'Actual result',
+      }),
+      {
+        target: { value: 'Crash on launch' },
+      },
+    );
     fireEvent.change(screen.getByLabelText('Work item notes'), {
       target: { value: 'Reproduces after restart\nOnly on Windows' },
     });
@@ -545,6 +554,15 @@ describe('FeatureDetailPage', () => {
       </MemoryRouter>,
     );
 
+    expect(await screen.findByRole('region', { name: /^How to reproduce$/ })).toHaveTextContent(
+      'Open the menu',
+    );
+    expect(screen.getByRole('region', { name: /^Actual result$/ })).toHaveTextContent('App exits');
+    expect(screen.getByRole('region', { name: /^Expected result$/ })).toHaveTextContent(
+      'Menu opens',
+    );
+    expect(screen.getByRole('region', { name: /^Screenshots$/ })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /^Attach another screenshot$/ })).toBeInTheDocument();
     const nativeFilePicker = vi.spyOn(HTMLInputElement.prototype, 'click');
     fireEvent.click(await screen.findByRole('button', { name: 'Add Bug screenshot' }));
     expect(nativeFilePicker).toHaveBeenCalled();

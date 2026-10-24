@@ -10,3 +10,18 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.compact {
+  position: relative;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  min-height: 36px;
+  box-sizing: border-box;
+  padding-block: 0;
+  font-size: 12px;
+}
+.compact > input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}

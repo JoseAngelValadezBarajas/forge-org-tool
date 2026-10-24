@@ -3,6 +3,7 @@
   color-scheme: dark;
   --forge-bg: #111315;
   --forge-surface: #171a1d;
+  --forge-surface-sidebar: #121416;
   --forge-surface-raised: #1e2226;
   --forge-surface-hover: #24292e;
   --forge-surface-active: #2d3339;
@@ -67,6 +68,7 @@
   color-scheme: light;
   --forge-bg: #f6f5f2;
   --forge-surface: #ffffff;
+  --forge-surface-sidebar: #f5f3f0;
   --forge-surface-raised: #fbfaf8;
   --forge-surface-hover: #f1efeb;
   --forge-surface-active: #e5e2dc;

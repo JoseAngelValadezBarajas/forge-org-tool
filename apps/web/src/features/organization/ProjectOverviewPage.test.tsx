@@ -404,12 +404,9 @@ describe('Project Overview route', () => {
   it('keeps shell project context on Overview while Planning still opens the board', async () => {
     renderOverview();
     await screen.findByRole('heading', { name: 'Atlas' });
-    const nav = within(screen.getByRole('navigation', { name: 'Product navigation' }));
+    const nav = within(screen.getByRole('navigation', { name: 'Project navigation' }));
     expect(nav.getByRole('link', { name: 'Overview' })).toHaveAttribute('href', '/projects/w1/p1');
-    expect(nav.getByRole('link', { name: 'Planning' })).toHaveAttribute('href', '/planning/w1/p1');
-    for (const [name, section] of [['Transfer', 'transfer']]) {
-      expect(nav.getByRole('link', { name: name! })).toHaveAttribute('href', `/${section}/w1/p1`);
-    }
+    expect(nav.getByRole('link', { name: 'Atlas' })).toHaveAttribute('href', '/planning/w1/p1');
     const breadcrumb = within(screen.getByRole('navigation', { name: 'Breadcrumb' }));
     expect(breadcrumb.getByRole('link', { name: 'Project board' })).toHaveAttribute(
       'href',
@@ -437,11 +434,23 @@ describe('Project Overview route', () => {
       '/planning/w1/p1',
     );
     expect(screen.getByRole('button', { name: 'Archive' })).toBeEnabled();
-    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute(
-      'href',
-      '/projects/w1/p1',
-    );
+    expect(
+      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
+        name: 'Overview',
+      }),
+    ).toHaveAttribute('href', '/');
     fireEvent.click(screen.getByRole('link', { name: 'Open Board' }));
-    expect(await screen.findByRole('heading', { name: 'Project Board' })).toBeInTheDocument();
+    expect(await screen.findByLabelText('Epic workflow board')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
+        name: 'Overview',
+      }),
+    ).toHaveAttribute('href', '/projects/w1/p1');
+    fireEvent.click(
+      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
+        name: 'Overview',
+      }),
+    );
+    expect(await screen.findByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
   });
 });

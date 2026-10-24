@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Criterion } from '@forge-org/api-client';
 import { CriterionItem } from './CriterionItem';
 
@@ -15,6 +15,19 @@ const criterion: Criterion = {
 };
 
 describe('CriterionItem', () => {
+  afterEach(cleanup);
+  it('offers a compact, keyboard-accessible satisfaction checkbox', () => {
+    const change = vi.fn();
+    render(
+      <ul>
+        <CriterionItem criterion={criterion} compact onSatisfiedChange={change} />
+      </ul>,
+    );
+    const checkbox = screen.getByRole('checkbox', { name: 'Satisfy Keyboard accessible' });
+    expect(checkbox).toBeChecked();
+    fireEvent.click(checkbox);
+    expect(change).toHaveBeenCalledWith(false);
+  });
   it('announces criterion satisfaction without implying verification', () => {
     render(
       <ul>

@@ -175,8 +175,16 @@ describe('PlanningPage', () => {
     await screen.findByRole('link', { name: 'Launch' });
     expect(screen.queryByLabelText('Epic title')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'New Epic' }));
-    expect(screen.getByRole('dialog', { name: 'Create Epic' })).toBeInTheDocument();
+    const drawer = screen.getByRole('dialog', { name: 'New Epic' });
+    expect(drawer).toHaveAttribute('aria-modal', 'false');
+    expect(drawer).toHaveTextContent('CREATE IN Project');
+    expect(drawer).toHaveTextContent('An Epic groups Stories, Bugs and Tasks.');
+    expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    expect(screen.getByLabelText('Epic workflow board')).toBeVisible();
     fireEvent.change(screen.getByLabelText('Epic title'), { target: { value: 'Roadmap' } });
+    fireEvent.change(screen.getByLabelText('Description'), {
+      target: { value: 'Coordinate the next product milestone.' },
+    });
     fireEvent.click(await screen.findByLabelText('Epic tag Platform'));
     fireEvent.click(screen.getByRole('button', { name: 'Create Epic' }));
 
@@ -187,7 +195,7 @@ describe('PlanningPage', () => {
           method: 'POST',
           body: JSON.stringify({
             title: 'Roadmap',
-            description: null,
+            description: 'Coordinate the next product milestone.',
             priority: 'medium',
             tags: ['Platform'],
           }),
@@ -223,8 +231,58 @@ describe('PlanningPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Create Epic' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Create failed');
-    expect(screen.getByRole('dialog', { name: 'Create Epic' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'New Epic' })).toBeInTheDocument();
     expect(screen.getByLabelText('Epic title')).toHaveValue('Keep my draft');
+  });
+
+  it('returns focus to the Epic creation trigger when the contextual panel closes', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) =>
+        Promise.resolve(
+          new Response(JSON.stringify(String(input).endsWith('/dependencies') ? [] : overview)),
+        ),
+      ),
+    );
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'New Epic' });
+    await screen.findByRole('link', { name: 'Launch' });
+    fireEvent.click(trigger);
+    expect(screen.getByLabelText('Epic title')).toHaveFocus();
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it('closes the contextual Epic panel with Escape and restores focus to its trigger', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) =>
+        Promise.resolve(
+          new Response(JSON.stringify(String(input).endsWith('/dependencies') ? [] : overview)),
+        ),
+      ),
+    );
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'New Epic' });
+    await screen.findByRole('link', { name: 'Launch' });
+    fireEvent.click(trigger);
+    fireEvent.keyDown(screen.getByLabelText('Epic title'), { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'New Epic' })).toBeNull());
+    expect(trigger).toHaveFocus();
   });
 
   it('filters the mobile Epic list by a single selected workflow status', async () => {
@@ -311,6 +369,7 @@ describe('PlanningPage', () => {
     const readyColumn = within(screen.getByLabelText('Planning board')).getByRole('region', {
       name: 'Ready',
     });
+    expect(screen.getByLabelText('Planning board')).toHaveAttribute('tabindex', '0');
     fireEvent.dragOver(readyColumn, { dataTransfer });
     fireEvent.drop(readyColumn, { dataTransfer });
 

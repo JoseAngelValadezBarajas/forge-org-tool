@@ -11,7 +11,7 @@
   background: color-mix(in srgb, var(--forge-overlay, #101820) 56%, transparent);
 }
 .contextDialog {
-  width: min(44rem, 100%);
+  width: min(72rem, 100%);
   height: 100%;
   box-sizing: border-box;
   overflow-y: auto;
@@ -78,7 +78,64 @@
   align-items: start;
 }
 .contextDialog .workflowGrid {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1.34fr) minmax(0, 1fr);
+  gap: var(--forge-space-4);
+}
+.contextWorkflowGrid > * {
+  min-width: 0;
+}
+.previewPanel {
+  align-content: start;
+  min-height: 32rem;
+}
+.previewEmpty {
+  display: grid;
+  min-height: 12rem;
+  place-items: center;
+  padding: var(--forge-space-5);
+  border: 1px dashed var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  text-align: center;
+}
+.previewCounts {
+  display: grid;
+  padding: var(--forge-space-2) var(--forge-space-4);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+}
+.previewCount {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: var(--forge-space-3);
+  padding: var(--forge-space-3) 0;
+  border-bottom: 1px solid var(--forge-border);
+  color: var(--forge-text-muted);
+  text-transform: capitalize;
+}
+.previewCount:last-child {
+  border-bottom: 0;
+}
+.previewCount strong {
+  color: var(--forge-text);
+  font-variant-numeric: tabular-nums;
+}
+.previewNotes {
+  font-family: var(--forge-font-mono);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.exportDetails {
+  display: grid;
+  gap: var(--forge-space-3);
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-3);
+}
+.exportDetails summary {
+  cursor: pointer;
+  color: var(--forge-text);
 }
 .panel {
   display: grid;
@@ -147,5 +204,11 @@
     width: 100%;
     padding: var(--forge-space-4);
     border-left: 0;
+  }
+  .contextDialog .workflowGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .previewPanel {
+    min-height: 0;
   }
 }

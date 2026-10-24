@@ -63,6 +63,15 @@ describe('OrganizationPage', () => {
     expect(await screen.findByRole('link', { name: 'Atlas' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Continue working' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'New project' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Import Project' })).toHaveAttribute(
+      'href',
+      '/transfer/workspaces/w1',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
+    expect(screen.getByRole('link', { name: 'Workspace settings' })).toHaveAttribute(
+      'href',
+      '/workspaces/w1/settings',
+    );
     expect(screen.getByRole('dialog', { hidden: true })).not.toHaveAttribute('open');
     expect(screen.queryByRole('textbox', { name: 'Project name' })).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Edit workspace name')).not.toBeInTheDocument();
@@ -71,6 +80,164 @@ describe('OrganizationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'New project' }));
     expect(await screen.findByRole('dialog', { name: 'Create project' })).toBeInTheDocument();
     expect(screen.getByLabelText('Project name')).toBeInTheDocument();
+  });
+
+  it('orders the approved home toolbar, metrics, compact cards and persisted continuation links', async () => {
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'Atlas',
+      description: 'Map work',
+      status: 'active',
+      archived_at: null,
+      created_at: '',
+      updated_at: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', archived_at: null, created_at: '', updated_at: '' }]
+            : path.includes('/projects?')
+              ? [project]
+              : {
+                  epics: [
+                    {
+                      id: 'e1',
+                      project_id: 'p1',
+                      title: 'Detection Research',
+                      archived_at: null,
+                      status: 'in_progress',
+                      updated_at: '2026-10-23T10:00:00Z',
+                      features: [],
+                    },
+                  ],
+                  unassigned_features: [],
+                };
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('WORKSPACE OVERVIEW')).toBeInTheDocument();
+    expect(
+      screen.getByText('Pick up where you left off. Organize work without the noise.'),
+    ).toBeInTheDocument();
+    const toolbar = screen.getByRole('heading', { name: 'Projects' });
+    const metrics = screen.getByRole('region', { name: 'Workspace summary' });
+    expect(
+      toolbar.compareDocumentPosition(metrics) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    const card = await screen.findByRole('article', { name: 'Atlas' });
+    expect(within(card).getByRole('link', { name: 'Atlas' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(within(card).getByText('PROJECT · ACTIVE')).toBeInTheDocument();
+    expect(within(card).getByText('Map work')).toBeInTheDocument();
+    fireEvent.click(within(card).getByText('Project actions'));
+    expect(within(card).getByRole('button', { name: 'Archive' })).toBeInTheDocument();
+    expect(within(card).getByRole('link', { name: 'Overview' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    const continuation = screen.getByRole('region', { name: 'Continue working' });
+    expect(
+      await within(continuation).findByRole('link', { name: 'Detection Research' }),
+    ).toHaveAttribute('href', '/planning/w1/p1/epics/e1');
+    expect(within(continuation).getByText('Atlas · 0 work items')).toBeInTheDocument();
+  });
+
+  it('continues only open Epics and reports their own persisted work item counts', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const epic = {
+          project_id: 'p1',
+          archived_at: null,
+          created_at: '',
+          updated_at: '2026-10-23T10:00:00Z',
+          status: 'in_progress',
+          features: [],
+        };
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', archived_at: null, created_at: '', updated_at: '' }]
+            : path.includes('/projects?')
+              ? [
+                  {
+                    id: 'p1',
+                    workspace_id: 'w1',
+                    name: 'Atlas',
+                    description: null,
+                    status: 'active',
+                    archived_at: null,
+                    created_at: '',
+                    updated_at: '',
+                  },
+                ]
+              : {
+                  epics: [
+                    {
+                      ...epic,
+                      id: 'closed',
+                      title: 'Closed research',
+                      status: 'done',
+                      updated_at: '2026-10-23T14:00:00Z',
+                    },
+                    {
+                      ...epic,
+                      id: 'archived',
+                      title: 'Archived research',
+                      archived_at: '2026-10-23T13:00:00Z',
+                      updated_at: '2026-10-23T13:00:00Z',
+                    },
+                    {
+                      ...epic,
+                      id: 'e1',
+                      title: 'Detection Research',
+                      features: [{ id: 'f1', title: 'Research story', status: 'ready' }],
+                    },
+                    {
+                      ...epic,
+                      id: 'e2',
+                      title: 'Tracking',
+                      updated_at: '2026-10-23T09:00:00Z',
+                      features: [
+                        { id: 'f2', title: 'Tracking story', status: 'ready' },
+                        { id: 'f3', title: 'Tracking bug', status: 'backlog' },
+                      ],
+                    },
+                  ],
+                  unassigned_features: [],
+                };
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+    const continuation = await screen.findByRole('region', { name: 'Continue working' });
+    expect(
+      await within(continuation).findByRole('link', { name: 'Detection Research' }),
+    ).toHaveAttribute('href', '/planning/w1/p1/epics/e1');
+    expect(within(continuation).getByText('Atlas · 1 work item')).toBeInTheDocument();
+    expect(within(continuation).getByText('Atlas · 2 work items')).toBeInTheDocument();
+    expect(
+      within(continuation).queryByRole('link', { name: 'Closed research' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(continuation).queryByRole('link', { name: 'Archived research' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows an actionable empty state and creates a workspace', async () => {
@@ -148,7 +315,8 @@ describe('OrganizationPage', () => {
     expect(await screen.findAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
     expect(screen.getByText('Map work')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument();
-    expect(screen.getByText('1 active · 0 archived')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
+    expect(screen.getByText('1 active · 0 archived')).toBeVisible();
   });
 
   it('keeps workspace totals truthful while searching across active and archived projects', async () => {
@@ -200,14 +368,15 @@ describe('OrganizationPage', () => {
     );
 
     expect(await screen.findAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
-    expect(screen.getByText('1 active · 1 archived')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
+    expect(screen.getByText('1 active · 1 archived')).toBeVisible();
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search projects' }), {
       target: { value: 'Atlas' },
     });
 
     expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
     expect(screen.queryByRole('heading', { name: 'Legacy' })).not.toBeInTheDocument();
-    expect(screen.getByText('1 active · 1 archived')).toBeInTheDocument();
+    expect(screen.getByText('1 active · 1 archived')).toBeVisible();
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search projects' }), {
       target: { value: '' },
     });
@@ -281,6 +450,7 @@ describe('OrganizationPage', () => {
     );
 
     await screen.findAllByRole('heading', { name: 'Atlas' });
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search projects' }), {
       target: { value: 'Discovery' },
     });

@@ -37,6 +37,8 @@
     "test:e2e:smoke": "npm run test:e2e --workspace=@forge-org/web -- --grep @smoke",
     "test:e2e:full": "npm run test:e2e --workspace=@forge-org/web",
     "test:e2e:visual": "npm run test:e2e --workspace=@forge-org/web -- --grep @visual",
+    "test:e2e:ux11-visual": "node tooling/scripts/run-ux11-visual.mjs",
+    "compare:ux11:figma": "node tooling/scripts/compare-ux11-evidence.mjs",
     "test:acceptance:local": "node tooling/scripts/run-acceptance-local.mjs",
     "acceptance:registry": "node tooling/scripts/product-acceptance-registry.mjs",
     "check:acceptance:registry": "node tooling/scripts/product-acceptance-registry.mjs --check",
@@ -54,13 +56,16 @@
     "quality": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0",
     "@eslint/js": "^9.39.5",
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/pngjs": "^6.0.5",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
     "openapi-typescript": "^7.13.0",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.9.10",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.72.0"

@@ -10,7 +10,7 @@ import {
 import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
 import { TransferPage } from '../features/transfer';
 import styles from './App.module.css';
-import { CommandPalette, NavigationItem, PageHeader, WorkspaceSwitcher } from './shell';
+import { CommandPalette, NavigationItem, WorkspaceSwitcher } from './shell';
 import { ThemeProvider, useTheme } from './theme';
 
 const ComponentGallery = import.meta.env.DEV
@@ -153,6 +153,16 @@ function ApplicationShell() {
     navigate('/');
   }
   const context = getProjectContext(location.pathname);
+  const isMobileEpicBoard = /^\/planning\/[^/]+\/[^/]+\/epics\/[^/]+(?:\/|$)/.test(
+    location.pathname,
+  );
+  const activeProject = context
+    ? projects.find((project) => project.id === context.projectId)
+    : null;
+  const orderedProjects = [...projects].sort(
+    (left, right) =>
+      Number(right.id === context?.projectId) - Number(left.id === context?.projectId),
+  );
   const mobileWorkspaceId = navigationWorkspaceId || activeWorkspaceId;
   const mobileBoardPath = context
     ? `/planning/${context.workspaceId}/${context.projectId}`
@@ -163,8 +173,9 @@ function ApplicationShell() {
     {
       id: 'overview',
       label: 'Overview',
-      path: context && `/projects/${context.workspaceId}/${context.projectId}`,
+      path: context ? `/projects/${context.workspaceId}/${context.projectId}` : '/',
     },
+    { id: 'projects', label: 'Projects', path: '/' },
     {
       id: 'planning',
       label: 'Planning',
@@ -178,9 +189,14 @@ function ApplicationShell() {
   ];
   return (
     <div className={styles.app} data-testid="application-shell" data-theme={resolvedTheme}>
-      <header className={styles.mobileHeader} aria-label="Workspace controls">
-        <Link to="/" className={styles.brand} aria-label="F FORGE">
-          <span className={styles.mark}>F</span> FORGE
+      <header
+        className={`${styles.mobileHeader} ${isMobileEpicBoard ? styles.mobileEpicHeader : ''}`}
+        aria-label="Workspace controls"
+        data-node-id={isMobileEpicBoard ? '348:211' : undefined}
+      >
+        <Link to="/" className={styles.brand}>
+          <span className={styles.mark}>F</span>
+          {isMobileEpicBoard ? (activeProject?.name ?? 'FORGE ORG TOOL') : 'FORGE'}
         </Link>
         <div className={styles.mobileWorkspace}>
           <WorkspaceSwitcher
@@ -197,7 +213,7 @@ function ApplicationShell() {
           />
         </div>
         <Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
-          Search
+          {isMobileEpicBoard ? '⌕' : 'Search'}
         </Button>
         <label className={`${styles.themeControl} ${styles.mobileTheme}`}>
           Appearance{' '}
@@ -209,9 +225,10 @@ function ApplicationShell() {
         </label>
       </header>
       <div className={styles.shellGrid}>
-        <aside className={styles.sidebar}>
-          <Link to="/" className={styles.brand}>
-            <span className={styles.mark}>F</span> FORGE
+        <aside className={styles.sidebar} data-testid="app-sidebar" data-node-id="344:83">
+          <Link to="/" className={styles.brand} data-node-id="344:84">
+            <span className={styles.mark}>F</span>
+            <span className={styles.brandName}>FORGE</span>
           </Link>
           <Link to="/" className={styles.mobileBrand} aria-label="F FORGE Workspace home">
             <span className={styles.mark}>F</span> FORGE
@@ -227,45 +244,36 @@ function ApplicationShell() {
               activeWorkspace?.name ??
               (navigationError ? 'Workspace unavailable' : 'Local Workspace')
             }
+            dataNodeId="344:89"
           />
           {navigationError && (
             <p role="alert" className={styles.navigationError}>
               {navigationError}
             </p>
           )}
-          <nav aria-label="Product navigation" className={styles.productNav}>
-            <NavigationItem to="/" end label="Workspace" />
-            {activeWorkspaceId && (
-              <NavigationItem
-                to={`/workspaces/${activeWorkspaceId}/settings`}
-                label="Workspace settings"
-              />
-            )}
-            {productDestinations.map((destination) =>
-              destination.path ? (
-                <NavigationItem
-                  key={destination.id}
-                  to={destination.path}
-                  label={destination.label}
-                />
-              ) : (
-                <span key={destination.id} aria-disabled="true" className={styles.disabledNavItem}>
-                  {destination.label} ({context ? 'choose a feature' : 'choose a project'})
-                </span>
-              ),
-            )}
-            {import.meta.env.DEV && <NavigationItem to="/__components" label="Component host" />}
-          </nav>
           {navigationWorkspaceId && (
             <nav aria-label="Project navigation" className={styles.projectNav}>
-              <h2>Projects</h2>
+              <h2>Your projects</h2>
+              <NavigationItem
+                to={context ? `/projects/${context.workspaceId}/${context.projectId}` : '/'}
+                label="◦   Overview"
+                aria-label="Overview"
+              />
+              <NavigationItem to="/" end label="◦   Projects" aria-label="Projects" />
               {projectWorkspaceId !== navigationWorkspaceId ? (
                 <span className={styles.emptyProjects}>Loading projects…</span>
               ) : projects.length === 0 ? (
                 <span className={styles.emptyProjects}>No active projects</span>
               ) : (
-                projects.map((project) => (
-                  <Link key={project.id} to={`/planning/${navigationWorkspaceId}/${project.id}`}>
+                orderedProjects.map((project) => (
+                  <Link
+                    key={project.id}
+                    to={`/planning/${navigationWorkspaceId}/${project.id}`}
+                    aria-current={context?.projectId === project.id ? 'page' : undefined}
+                  >
+                    <span className={styles.projectIcon} aria-hidden="true">
+                      {project.name === 'FormiAI' ? '◈' : project.name === 'Forge' ? '◇' : '◦'}
+                    </span>
                     {project.name}
                   </Link>
                 ))
@@ -273,42 +281,85 @@ function ApplicationShell() {
             </nav>
           )}
           <div className={styles.localMode}>
-            <strong>LOCAL MODE</strong>
-            <span>Private workspace</span>
+            <strong>LOCAL FIRST&nbsp;&nbsp; • &nbsp;&nbsp;PRIVATE</strong>
           </div>
         </aside>
-        <div className={styles.contentColumn}>
-          <PageHeader
+        <div
+          className={styles.contentColumn}
+          data-node-id={isMobileEpicBoard ? '348:215' : undefined}
+        >
+          <header
             className={styles.topbar}
-            eyebrow={activeWorkspace?.name ?? 'Local workspace'}
-            title="FORGE Org Tool"
+            data-testid="app-topbar"
+            data-node-id="344:105"
+            aria-label="Application controls"
           >
-            <Button
-              variant="ghost"
-              onClick={() => setPaletteOpen(true)}
-              aria-label="Open command palette"
-            >
-              Command palette
-            </Button>
-            <label className={styles.themeControl}>
-              Appearance{' '}
-              <select
-                value={theme}
-                onChange={(event) => setTheme(event.target.value as typeof theme)}
+            {context && (
+              <nav
+                className={styles.topbarContext}
+                aria-label="Current location"
+                data-node-id="344:106"
               >
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-                <option value="system">System</option>
-              </select>
-            </label>
-          </PageHeader>
-          <main id="main" className={styles.main}>
-            <Breadcrumbs pathname={location.pathname} />
+                <span>{(activeWorkspace?.name ?? 'Workspace').toUpperCase()}</span>
+                <span aria-hidden="true">/</span>
+                <span>{activeProject?.name ?? 'Project'}</span>
+                <span aria-hidden="true">/</span>
+                <span>
+                  {location.pathname.includes('/features/')
+                    ? 'WORK ITEM'
+                    : location.pathname.includes('/epics/')
+                      ? 'EPIC'
+                      : location.pathname.startsWith('/planning/')
+                        ? 'EPICS'
+                        : 'OVERVIEW'}
+                </span>
+              </nav>
+            )}
+            <div className={styles.topbarActions}>
+              <Button
+                variant="ghost"
+                onClick={() => setPaletteOpen(true)}
+                aria-label="Search"
+                data-node-id="344:107"
+              >
+                ⌕ Search
+              </Button>
+              <label className={styles.themeControl}>
+                <select
+                  aria-label="Appearance"
+                  data-node-id="344:109"
+                  value={theme}
+                  onChange={(event) => setTheme(event.target.value as typeof theme)}
+                >
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                  <option value="system">System</option>
+                </select>
+                <span className={styles.themeLabel} aria-hidden="true">
+                  ☀ / ☾
+                </span>
+              </label>
+            </div>
+          </header>
+          <main
+            id="main"
+            className={styles.main}
+            data-node-id={isMobileEpicBoard ? undefined : '344:81'}
+          >
+            <Breadcrumbs
+              pathname={location.pathname}
+              isMobileEpicBoard={isMobileEpicBoard}
+              workspaceName={activeWorkspace?.name}
+              projectName={activeProject?.name}
+            />
             <Routes>
               <Route path="/" element={<OrganizationPage />} />
               <Route path="/workspaces/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
               <Route path="/projects/:workspaceId/:projectId" element={<ProjectOverviewPage />} />
-              <Route path="/planning/:workspaceId/:projectId" element={<PlanningPage />} />
+              <Route
+                path="/planning/:workspaceId/:projectId"
+                element={<PlanningPage projectName={activeProject?.name} />}
+              />
               <Route
                 path="/planning/:workspaceId/:projectId/epics/:epicId"
                 element={<EpicDetailPage />}
@@ -338,7 +389,11 @@ function ApplicationShell() {
           </main>
         </div>
       </div>
-      <nav className={styles.mobileNav} aria-label="Mobile navigation">
+      <nav
+        className={styles.mobileNav}
+        aria-label="Mobile navigation"
+        data-node-id={isMobileEpicBoard ? '348:237' : undefined}
+      >
         <Link to="/" aria-current={!context ? 'page' : undefined}>
           Projects
         </Link>
@@ -384,7 +439,17 @@ function ApplicationShell() {
   );
 }
 
-function Breadcrumbs({ pathname }: { pathname: string }) {
+function Breadcrumbs({
+  pathname,
+  isMobileEpicBoard,
+  workspaceName,
+  projectName,
+}: {
+  pathname: string;
+  isMobileEpicBoard: boolean;
+  workspaceName?: string;
+  projectName?: string;
+}) {
   if (pathname.startsWith('/workspaces/')) {
     return (
       <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
@@ -407,8 +472,11 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
   const isEpic = section === 'planning' && fourth === 'epics';
   const isWorkItem = section === 'planning' && fourth === 'features';
   const crumbs = [
-    { label: 'Workspace', href: '/' },
-    { label: 'Project board', href: `/planning/${context.workspaceId}/${context.projectId}` },
+    { label: isMobileEpicBoard ? (workspaceName ?? 'Workspace') : 'Workspace', href: '/' },
+    {
+      label: isMobileEpicBoard ? (projectName ?? 'Project') : 'Project board',
+      href: `/planning/${context.workspaceId}/${context.projectId}`,
+    },
   ];
   if (section === 'planning' && !fourth) crumbs.pop();
   const currentLabel =
@@ -423,7 +491,11 @@ function Breadcrumbs({ pathname }: { pathname: string }) {
             : 'Project board';
   if (crumbs.at(-1)?.label !== currentLabel) crumbs.push({ label: currentLabel, href: '' });
   return (
-    <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+    <nav
+      aria-label="Breadcrumb"
+      className={`${styles.breadcrumb} ${isMobileEpicBoard ? styles.mobileEpicBreadcrumb : ''}`}
+      data-node-id={isMobileEpicBoard ? '348:216' : undefined}
+    >
       <ol>
         {crumbs.map((crumb, index) => (
           <li key={`${crumb.label}-${index}`}>

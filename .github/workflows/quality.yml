@@ -20,6 +20,13 @@ jobs:
       - run: npm run build:packages
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e:smoke
+      - run: npm run test:e2e:ux11-visual
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ux11-figma-comparison-${{ github.sha }}
+          path: docs/evidence/ux-1.1/visual-parity/
+          if-no-files-found: warn
       - run: npm run test:packages
       - run: npm run test
       - run: npm run build

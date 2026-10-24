@@ -11,16 +11,15 @@ import {
 } from '@forge-org/api-client';
 import {
   Button,
+  Badge,
   Card,
   Dialog,
   Input,
   MultiSelect,
-  SectionHeader,
   Select,
   Tabs,
   Textarea,
 } from '@forge-org/ui';
-import { FeatureCard } from './components/FeatureCard/FeatureCard';
 import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './EpicDetailPage.module.css';
 
@@ -36,6 +35,7 @@ export function EpicDetailPage() {
   const [status, setStatus] = useState<string>('backlog');
   const [features, setFeatures] = useState<Feature[]>([]);
   const [featureSearch, setFeatureSearch] = useState('');
+  const [featureKind, setFeatureKind] = useState('all');
   const [featurePriority, setFeaturePriority] = useState('all');
   const [featureTag, setFeatureTag] = useState('');
   const [error, setError] = useState('');
@@ -51,8 +51,9 @@ export function EpicDetailPage() {
   const [newBugExpected, setNewBugExpected] = useState('');
   const [newBugActual, setNewBugActual] = useState('');
   const [workspaceTags, setWorkspaceTags] = useState<WorkspaceTag[]>([]);
-  const [mobileStatus, setMobileStatus] = useState('backlog');
+  const [mobileStatus, setMobileStatus] = useState('ready');
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 720);
+  const [mobileCardDetails, setMobileCardDetails] = useState<Record<string, string>>({});
 
   useEffect(() => {
     currentEpicId.current = epicId;
@@ -114,6 +115,37 @@ export function EpicDetailPage() {
     window.addEventListener('resize', updateViewport);
     return () => window.removeEventListener('resize', updateViewport);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile || features.length === 0) return;
+    let current = true;
+    void Promise.all(
+      features.map(async (feature) => {
+        try {
+          if (feature.kind === 'bug') {
+            const attachments = await organizationApi.listBugAttachments(
+              workspaceId,
+              projectId,
+              feature.id,
+            );
+            return [
+              feature.id,
+              attachments.length ? 'Screenshot attached' : 'No screenshot',
+            ] as const;
+          }
+          const criteria = await organizationApi.listCriteria(workspaceId, projectId, feature.id);
+          return [feature.id, `${criteria.length} acceptance criteria`] as const;
+        } catch {
+          return [feature.id, ''] as const;
+        }
+      }),
+    ).then((entries) => {
+      if (current) setMobileCardDetails(Object.fromEntries(entries));
+    });
+    return () => {
+      current = false;
+    };
+  }, [features, isMobile, projectId, workspaceId]);
 
   async function save(event: FormEvent) {
     event.preventDefault();
@@ -196,6 +228,7 @@ export function EpicDetailPage() {
     const tag = featureTag.trim().toLocaleLowerCase();
     return (
       (!query || feature.title.toLocaleLowerCase().includes(query)) &&
+      (featureKind === 'all' || feature.kind === featureKind) &&
       (featurePriority === 'all' || feature.priority === featurePriority) &&
       (!tag || feature.tags?.some((value: string) => value.toLocaleLowerCase().includes(tag)))
     );
@@ -203,82 +236,117 @@ export function EpicDetailPage() {
 
   const readOnly = project?.status !== 'active' || Boolean(epic?.archived_at);
   const completedCount = features.filter((feature) => feature.status === 'done').length;
-  const workflowFeatureCount = features.filter((feature) =>
-    PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status),
-  ).length;
   const legacyFeatures = filteredFeatures.filter(
     (feature) => !PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status),
   );
   const itemCard = (feature: Feature) => (
-    <FeatureCard
+    <Card
+      as="article"
       key={feature.id}
-      feature={feature}
-      href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
+      aria-label={feature.title}
+      className={styles.itemCard}
+      draggable={!readOnly}
+      onDragStart={(event) => {
+        event.dataTransfer.setData('text/forge-feature-id', feature.id);
+        event.dataTransfer.effectAllowed = 'move';
+      }}
     >
+      <p className={styles.itemKind}>
+        {feature.kind === 'bug' ? 'Bug' : 'Story'} · {feature.priority}
+      </p>
+      <Link
+        className={styles.itemTitle}
+        to={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
+      >
+        {feature.title}
+      </Link>
+      <p className={styles.itemTags}>
+        {isMobile
+          ? [
+              mobileCardDetails[feature.id],
+              feature.kind === 'bug'
+                ? `${feature.status.charAt(0).toUpperCase()}${feature.status.slice(1)}`
+                : feature.tags?.join(', '),
+            ]
+              .filter(Boolean)
+              .join(' · ')
+          : feature.tags?.join(' · ') || 'No tags'}
+      </p>
       {!readOnly && (
-        <div className={styles.itemActions}>
-          <label>
-            Priority
-            <select
-              aria-label={`Priority for ${feature.title}`}
-              value={feature.priority}
-              onChange={(event) =>
-                void moveFeature(feature, { priority: event.target.value as Feature['priority'] })
-              }
-            >
-              {['low', 'medium', 'high', 'critical'].map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Move to status
-            <select
-              aria-label={`Status for ${feature.title}`}
-              value={feature.status}
-              onChange={(event) =>
-                void moveFeature(feature, { status: event.target.value as Feature['status'] })
-              }
-            >
-              {PLANNING_COLUMN_STATUSES.map((column) => (
-                <option key={column.value} value={column.value}>
-                  {column.label}
-                </option>
-              ))}
-              {!PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status) && (
-                <option value={feature.status}>Unsupported: {feature.status}</option>
-              )}
-            </select>
-          </label>
-        </div>
+        <details className={styles.itemActions}>
+          <summary>Move</summary>
+          <div className={styles.itemControls}>
+            <label>
+              Priority
+              <select
+                aria-label={`Priority for ${feature.title}`}
+                value={feature.priority}
+                onChange={(event) =>
+                  void moveFeature(feature, { priority: event.target.value as Feature['priority'] })
+                }
+              >
+                {['low', 'medium', 'high', 'critical'].map((value) => (
+                  <option key={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Move to status
+              <select
+                aria-label={`Status for ${feature.title}`}
+                value={feature.status}
+                onChange={(event) =>
+                  void moveFeature(feature, { status: event.target.value as Feature['status'] })
+                }
+              >
+                {PLANNING_COLUMN_STATUSES.map((column) => (
+                  <option key={column.value} value={column.value}>
+                    {column.label}
+                  </option>
+                ))}
+                {!PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status) && (
+                  <option value={feature.status}>Unsupported: {feature.status}</option>
+                )}
+              </select>
+            </label>
+          </div>
+        </details>
       )}
-    </FeatureCard>
+    </Card>
   );
   const featureFilters = (
-    <div className={styles.form}>
-      <label htmlFor="epic-board-search">Find Work Items</label>
+    <div className={styles.filters} aria-label="Work item filters">
+      <Select
+        aria-label="Filter Work Items by type"
+        value={featureKind}
+        onChange={(event) => setFeatureKind(event.target.value)}
+      >
+        <option value="all">All items</option>
+        <option value="story">Stories</option>
+        <option value="bug">Bugs</option>
+      </Select>
       <Input
         id="epic-board-search"
         aria-label="Find Work Items"
+        placeholder="Search Stories & Bugs"
         value={featureSearch}
         onChange={(event) => setFeatureSearch(event.target.value)}
       />
-      <label htmlFor="epic-board-priority">Filter by priority</label>
       <Select
         id="epic-board-priority"
         aria-label="Filter Work Items by priority"
         value={featurePriority}
         onChange={(event) => setFeaturePriority(event.target.value)}
       >
-        <option value="all">All priorities</option>
+        <option value="all">Priority</option>
         {['low', 'medium', 'high', 'critical'].map((value) => (
           <option key={value}>{value}</option>
         ))}
       </Select>
-      <label htmlFor="epic-board-tag">Filter by tag</label>
       <Input
         id="epic-board-tag"
         aria-label="Filter Work Items by tag"
+        placeholder="Tags"
         value={featureTag}
         onChange={(event) => setFeatureTag(event.target.value)}
       />
@@ -286,38 +354,66 @@ export function EpicDetailPage() {
   );
   return (
     <div className={styles.stack}>
-      <SectionHeader
-        title={epic?.title ?? 'Epic Board'}
-        eyebrow={`${project?.name ?? 'Project'} / Epic`}
-        actions={
-          epic && !readOnly ? (
-            <Button onClick={() => setEditing(true)}>Edit Epic</Button>
-          ) : undefined
-        }
-      />
-      <nav aria-label="Epic actions" className={styles.pageLinks}>
-        <Link to={`/planning/${workspaceId}/${projectId}`}>Back to Project Board</Link>
-        {isMobile ? (
-          <details className={styles.mobileEpicActions}>
-            <summary>More Epic actions</summary>
-            <Link to={`/transfer/${workspaceId}/${projectId}/epics/${epicId}`}>
-              Import / export Epic
-            </Link>
-            <Link to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}>
-              Import / export Stories and Bugs
-            </Link>
-          </details>
-        ) : (
-          <>
-            <Link to={`/transfer/${workspaceId}/${projectId}/epics/${epicId}`}>
-              Import / export Epic
-            </Link>
-            <Link to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}>
-              Import / export Stories and Bugs
-            </Link>
-          </>
+      <header className={styles.heading}>
+        <div className={styles.titleGroup}>
+          {!isMobile && <p className={styles.eyebrow}>Epic Board</p>}
+          <h1>{epic?.title ?? 'Epic Board'}</h1>
+          {isMobile ? (
+            <p className={styles.mobileProgress}>
+              {features.length} work items · {completedCount} completed
+            </p>
+          ) : (
+            <p className={styles.epicDescription}>{epic?.description || 'No description yet.'}</p>
+          )}
+        </div>
+        {epic && !readOnly && !isMobile && (
+          <Button
+            className={styles.primaryAction}
+            aria-label="New Work Item"
+            onClick={() => setCreateItemOpen(true)}
+          >
+            + New Item
+          </Button>
         )}
-      </nav>
+        {epic && !readOnly && isMobile && (
+          <Button
+            variant="secondary"
+            className={styles.mobileEditAction}
+            aria-label="Edit Epic"
+            onClick={() => setEditing(true)}
+          >
+            ✎
+          </Button>
+        )}
+      </header>
+      {!isMobile && (
+        <details className={styles.epicActions}>
+          <summary>Epic actions</summary>
+          <nav aria-label="Epic actions" className={styles.pageLinks}>
+            <Link to={`/planning/${workspaceId}/${projectId}`}>Back to Project Board</Link>
+            {isMobile ? (
+              <details className={styles.mobileEpicActions}>
+                <summary>More Epic actions</summary>
+                <Link to={`/transfer/${workspaceId}/${projectId}/epics/${epicId}`}>
+                  Import / export Epic
+                </Link>
+                <Link to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}>
+                  Import / export Stories and Bugs
+                </Link>
+              </details>
+            ) : (
+              <>
+                <Link to={`/transfer/${workspaceId}/${projectId}/epics/${epicId}`}>
+                  Import / export Epic
+                </Link>
+                <Link to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}>
+                  Import / export Stories and Bugs
+                </Link>
+              </>
+            )}
+          </nav>
+        </details>
+      )}
       {loading && <p role="status">Loading Epic…</p>}
       {error && (
         <div role="alert">
@@ -337,28 +433,34 @@ export function EpicDetailPage() {
             </p>
           )}
           {saved && <p role="status">Epic saved.</p>}
-          <Card className={styles.epicSummary}>
-            <p className={styles.epicDescription}>{epic.description || 'No description yet.'}</p>
-            <dl className={styles.epicMetadata}>
-              <div>
-                <dt>Status</dt>
-                <dd>{epic.status}</dd>
-              </div>
-              <div>
-                <dt>Work items</dt>
-                <dd>{features.length}</dd>
-              </div>
-              <div>
-                <dt>Completed</dt>
-                <dd>{completedCount}</dd>
-              </div>
-              <div>
-                <dt>Progress</dt>
-                <dd>
-                  {features.length ? Math.round((completedCount / features.length) * 100) : 0}%
-                </dd>
-              </div>
-            </dl>
+          <Card as="section" aria-label="Epic context" className={styles.epicSummary}>
+            <p className={styles.progress}>
+              {features.length} work items <span>•</span> {completedCount} completed <span>•</span>{' '}
+              {features.length ? Math.round((completedCount / features.length) * 100) : 0}% progress
+            </p>
+            <Badge className={styles.priority}>{epic.priority} priority</Badge>
+            <div className={styles.epicTags}>
+              {epic.tags?.map((tag: string) => (
+                <Badge key={tag}>{tag}</Badge>
+              ))}
+            </div>
+            <Link
+              className={styles.export}
+              to={`/transfer/${workspaceId}/${projectId}/work-items/${epicId}`}
+              aria-label="Import / export Stories and Bugs"
+            >
+              Export ↗
+            </Link>
+            {!readOnly && (
+              <Button
+                variant="ghost"
+                className={styles.editEpicAction}
+                aria-label="Edit Epic"
+                onClick={() => setEditing(true)}
+              >
+                ⋯
+              </Button>
+            )}
           </Card>
           <Dialog
             title="Edit Epic"
@@ -407,26 +509,10 @@ export function EpicDetailPage() {
               </div>
             </form>
           </Dialog>
-          <section aria-label="Epic Board">
-            <header className={styles.boardHeader}>
-              <div>
-                <h2>Stories and Bugs</h2>
-                <p>
-                  {features.length} total · {workflowFeatureCount} in workflow
-                </p>
-              </div>
-              {!readOnly && <Button onClick={() => setCreateItemOpen(true)}>New Work Item</Button>}
-            </header>
-            {isMobile ? (
-              <details className={styles.mobileFilters}>
-                <summary>Filter Work Items</summary>
-                {featureFilters}
-              </details>
-            ) : (
-              featureFilters
-            )}
+          <section aria-label="Epic Board" className={styles.boardSection}>
+            {!isMobile && featureFilters}
             {features.length === 0 && <p>No Work Items linked to this Epic yet.</p>}
-            {features.length > 0 && (
+            {
               <>
                 {isMobile ? (
                   <div className={styles.mobileBoard}>
@@ -434,22 +520,30 @@ export function EpicDetailPage() {
                       label="Epic Work Item status"
                       defaultValue={mobileStatus}
                       onChange={setMobileStatus}
-                      tabs={PLANNING_COLUMN_STATUSES.map(({ value, label }) => ({
-                        id: value,
-                        label,
-                        content: (
-                          <div className={styles.mobileItems}>
-                            {filteredFeatures.filter((feature) => feature.status === value)
-                              .length === 0 ? (
-                              <p>No Work Items in {label}.</p>
-                            ) : (
-                              filteredFeatures
-                                .filter((feature) => feature.status === value)
-                                .map(itemCard)
-                            )}
-                          </div>
-                        ),
-                      }))}
+                      tabs={PLANNING_COLUMN_STATUSES.filter(({ value }) =>
+                        ['ready', 'in_progress', 'verify'].includes(value),
+                      ).map(({ value, label }) => {
+                        const mobileLabel = value === 'in_progress' ? 'In Progress' : label;
+                        return {
+                          id: value,
+                          label: `${mobileLabel} ${features.filter((feature) => feature.status === value).length}`,
+                          content: (
+                            <>
+                              <h2 className={styles.mobileStatusHeading}>{mobileLabel}</h2>
+                              <div className={styles.mobileItems}>
+                                {filteredFeatures.filter((feature) => feature.status === value)
+                                  .length === 0 ? (
+                                  <p>No Work Items in {mobileLabel}.</p>
+                                ) : (
+                                  filteredFeatures
+                                    .filter((feature) => feature.status === value)
+                                    .map(itemCard)
+                                )}
+                              </div>
+                            </>
+                          ),
+                        };
+                      })}
                     />
                   </div>
                 ) : (
@@ -459,14 +553,54 @@ export function EpicDetailPage() {
                         key={boardStatus}
                         status={boardStatus}
                         emptyMessage="No Work Items in this status."
+                        compact
+                        headerCount={
+                          filteredFeatures.filter((feature) => feature.status === boardStatus)
+                            .length
+                        }
+                        onDrop={(event, destination) => {
+                          event.preventDefault();
+                          if (readOnly) return;
+                          const id = event.dataTransfer.getData('text/forge-feature-id');
+                          const item = features.find((feature) => feature.id === id);
+                          if (item && item.status !== destination)
+                            void moveFeature(item, { status: destination });
+                        }}
                       >
                         {filteredFeatures
                           .filter((feature) => feature.status === boardStatus)
                           .map(itemCard)}
+                        {!readOnly && (
+                          <Button
+                            variant="ghost"
+                            className={styles.addItem}
+                            onClick={() => setCreateItemOpen(true)}
+                          >
+                            + Add item
+                          </Button>
+                        )}
                       </KanbanColumn>
                     ))}
                   </div>
                 )}
+                {isMobile && !readOnly && (
+                  <Button className={styles.mobileNewItem} onClick={() => setCreateItemOpen(true)}>
+                    New Work Item
+                  </Button>
+                )}
+                {isMobile &&
+                  filteredFeatures.some(
+                    (feature) => feature.status === 'backlog' || feature.status === 'done',
+                  ) && (
+                    <details className={styles.otherStatuses}>
+                      <summary>Other workflow statuses</summary>
+                      {filteredFeatures
+                        .filter(
+                          (feature) => feature.status === 'backlog' || feature.status === 'done',
+                        )
+                        .map(itemCard)}
+                    </details>
+                  )}
                 {legacyFeatures.length > 0 && (
                   <section aria-label="Legacy Work Items" className={styles.legacyItems}>
                     <h3>Legacy Work Items requiring review</h3>
@@ -478,7 +612,7 @@ export function EpicDetailPage() {
                   </section>
                 )}
               </>
-            )}
+            }
           </section>
           <Dialog
             title="Create Work Item"

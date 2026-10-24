@@ -1,0 +1,32 @@
+{
+  "figmaNodeId": "347:145",
+  "implementationRoute": "/planning/{workspaceId}/{projectId}/features/{bugId}",
+  "reference": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\references\\05-bug-detail-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "actual": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\actual\\05-bug-detail-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "environment": "Chromium, 1440x960 desktop or 390x844 mobile, device scale factor 1, 100% zoom, Inter bundled, animations disabled",
+  "comparison": {
+    "channelThreshold": 0,
+    "antiAliasingIncluded": true,
+    "differentPixels": 83816,
+    "totalPixels": 1382400,
+    "differentPixelRatio": 0.06063078703703704
+  },
+  "geometry": null,
+  "mismatchClassification": {
+    "geometry": "Not independently measured for this frame.",
+    "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
+    "colorsAndSurfaces": "Raster difference is measured; color-region attribution requires review.",
+    "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
+    "masksApplied": false
+  },
+  "visualReview": "PENDING_HUMAN_REVIEW",
+  "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
+}

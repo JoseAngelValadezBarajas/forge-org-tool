@@ -15,6 +15,7 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     unassigned_features: [],
   });
   const [title, setTitle] = useState('');
+  const [epicDescription, setEpicDescription] = useState('');
   const [epicPriority, setEpicPriority] = useState<'low' | 'medium' | 'high' | 'critical'>(
     'medium',
   );
@@ -93,14 +94,21 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     event.preventDefault();
     if (!title.trim()) return;
     try {
-      await organizationApi.createEpic(workspaceId, projectId, title, undefined, {
-        priority: epicPriority,
-        tags: epicTags
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter(Boolean),
-      });
+      await organizationApi.createEpic(
+        workspaceId,
+        projectId,
+        title,
+        epicDescription || undefined,
+        {
+          priority: epicPriority,
+          tags: epicTags
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+        },
+      );
       setTitle('');
+      setEpicDescription('');
       setEpicPriority('medium');
       setEpicTags('');
       await load();
@@ -262,6 +270,8 @@ export function usePlanningController(workspaceId: string, projectId: string) {
     statusFilter,
     tagFilter,
     title,
+    epicDescription,
+    setEpicDescription,
     updateFeature,
     updateEpic,
     visibleFeatures,

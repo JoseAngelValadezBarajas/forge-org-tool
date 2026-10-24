@@ -114,7 +114,8 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /\$root\.FindAll\([\s\S]*TreeScope\]::Descendants/);
-  assert.match(smoke, /Current\.Name -match '\(\?i\)\(open\|abrir/);
+  assert.match(smoke, /candidateOwnedByApp/);
+  assert.match(smoke, /\$hasFileName -and \$hasOpenAction/);
   assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
   assert.match(smoke, /\$fileNameControl[\s\S]*nombre de archivo/);
   assert.match(smoke, /ControlType\]::ComboBox/);
@@ -126,6 +127,35 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
   assert.doesNotMatch(smoke, /SendWait\(\$filePath\)|ASC 95/);
   assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
   assert.match(smoke, /PASS installed UI -> authenticated API -> SQLite -> restart/);
+});
+
+test('native screenshot picker targets Open across Windows UIA control types and waits for selection to close', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const choose = smoke.slice(smoke.indexOf('function Choose-ForgeFile'), smoke.indexOf('\ntry {'));
+  assert.match(choose, /GetWindowOwner\(\$candidateHandle\)/);
+  assert.match(choose, /Picker UIA controls:/);
+  assert.doesNotMatch(
+    choose,
+    /ClassName -in @\('#32770', 'CabinetWClass'\)/,
+    'the smoke must not attach to arbitrary Explorer windows',
+  );
+  const closeWait = smoke.slice(
+    smoke.indexOf('function Wait-ForgeAutomationDialogClosed'),
+    smoke.indexOf('function Choose-ForgeFile'),
+  );
+  assert.match(choose, /SetForegroundWindow\(\$dialog\.Current\.NativeWindowHandle\)/);
+  assert.match(choose, /fileNameControl\.SetFocus\(\)[\s\S]*?SendWait\('\{ENTER\}'\)/);
+  assert.doesNotMatch(choose, /\$open\.SetFocus\(\)/);
+  assert.match(
+    choose,
+    /Wait-ForgeAutomationDialogClosed\s+\$desktop\s+\$root\s+\$dialog/,
+    'the file picker returns only after the native dialog is gone',
+  );
+  assert.match(closeWait, /NativeWindowHandle/);
+  assert.match(
+    closeWait,
+    /do\s*\{[\s\S]*?FindAll\([\s\S]*?TreeScope\]::Children[\s\S]*?Start-Sleep/,
+  );
 });
 
 test('native combobox selection does not collapse an already closed dropdown', async () => {
@@ -141,7 +171,8 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
   assert.match(smoke, /ToggleState\]::Off[\s\S]*?\.Toggle\(\)/);
   assert.match(smoke, /Unsupported UI Automation patterns for control/);
   assert.match(smoke, /Wait-ForgeAutomationNamedElement\s+\$root\s+\$buttonName/);
-  assert.match(smoke, /ClassName -in @\('#32770', 'CabinetWClass'\)/);
+  assert.match(smoke, /GetWindowOwner\(\$candidateHandle\)/);
+  assert.match(smoke, /hasFileName/);
   assert.match(smoke, /Top-level windows:/);
 });
 

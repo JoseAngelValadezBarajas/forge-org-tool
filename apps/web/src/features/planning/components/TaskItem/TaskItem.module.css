@@ -15,6 +15,66 @@
   flex-wrap: wrap;
   gap: var(--forge-space-2);
 }
+.compact {
+  position: relative;
+  display: flex;
+  min-height: 34px;
+  gap: 6px;
+  padding-block: 0;
+  border: 0;
+  font-size: 12px;
+}
+.compact > input {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+}
+.compact .title {
+  font-weight: 400;
+}
+.compact > select,
+.compact .actions {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  opacity: 0;
+  background: var(--forge-surface-raised);
+}
+.compact > select {
+  width: 94px;
+  min-height: 28px;
+  height: 28px;
+  padding: 0 4px;
+  font-size: 11px;
+}
+.compact .actions {
+  top: 30px;
+  padding: 4px;
+}
+.compact .actions button {
+  min-height: 28px;
+  padding: 4px;
+  font-size: 11px;
+}
+.compact:hover > select,
+.compact:focus-within > select,
+.compact:hover .actions,
+.compact:focus-within .actions {
+  opacity: 1;
+}
+@media (hover: none) {
+  .compact {
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr);
+    padding-block: 6px;
+  }
+  .compact > select,
+  .compact .actions {
+    position: static;
+    opacity: 1;
+    grid-column: 2;
+  }
+}
 @media (max-width: 640px) {
   .item {
     grid-template-columns: minmax(0, 1fr);

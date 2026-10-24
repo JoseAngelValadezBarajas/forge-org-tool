@@ -1,9 +1,11 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { isTauri } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { readFile } from '@tauri-apps/plugin-fs';
-import { Badge, Button, Card, Input, StatusChip, Textarea } from '@forge-org/ui';
+import { Badge, Button, Card, Dialog, Input, Select, Textarea } from '@forge-org/ui';
+import { organizationApi, type Feature } from '@forge-org/api-client';
+import { PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './FeatureDetailPage.module.css';
 import { useFeatureDetailController } from './useFeatureDetailController';
 import { CriterionItem, TaskItem } from './components';
@@ -117,535 +119,651 @@ export function FeatureDetailPage() {
   }
 
   const archived = Boolean(feature?.archived_at);
+  const isBug = feature?.kind === 'bug';
   const selectedTags = featureTags
     .split(',')
     .map((tag) => tag.trim())
     .filter(Boolean);
   const knownTags = new Set(workspaceTags.map((tag) => tag.name));
   const legacyTags = selectedTags.filter((tag) => !knownTags.has(tag));
+  const [parentEpic, setParentEpic] = useState<{ id: string; title: string } | null>(null);
+  const [moving, setMoving] = useState(false);
+  const [moveError, setMoveError] = useState('');
+  const activeFeature = useRef(featureId);
+  useEffect(() => {
+    activeFeature.current = featureId;
+  }, [featureId]);
+  const parentId = feature?.epic_id;
+  useEffect(() => {
+    if (!parentId) return;
+    let current = true;
+    void organizationApi
+      .planningOverview(workspaceId, projectId)
+      .then((overview) => {
+        const parent = overview.epics.find((item) => item.id === parentId);
+        if (current && parent) setParentEpic({ id: parent.id, title: parent.title });
+      })
+      .catch(() => {
+        /* Navigation remains available if the summary cannot load. */
+      });
+    return () => {
+      current = false;
+    };
+  }, [workspaceId, projectId, parentId]);
+  const epicName = parentEpic?.id === parentId ? parentEpic?.title : 'Epic board';
+  async function moveStatus(status: Feature['status']) {
+    if (!feature || archived || moving || editing || status === feature.status) return;
+    const id = feature.id;
+    setMoving(true);
+    setMoveError('');
+    try {
+      await organizationApi.updateFeature(workspaceId, projectId, id, { status });
+      if (activeFeature.current === id) await reload();
+    } catch (cause) {
+      if (activeFeature.current === id)
+        setMoveError(cause instanceof Error ? cause.message : 'Unable to move work item.');
+    } finally {
+      if (activeFeature.current === id) setMoving(false);
+    }
+  }
 
-  return (
-    <main className={styles.page}>
-      <header className={styles.detailHeader}>
+  const criteriaPanel = (
+    <Card as="section" aria-label="Acceptance criteria" className={styles.criteriaCard}>
+      <div className={styles.sectionHeading}>
         <div>
-          <p className={styles.eyebrow}>
-            FORGE / {feature?.kind === 'bug' ? 'Bug report' : 'User story'}
-          </p>
-          <h1>{feature?.title ?? 'Work item detail'}</h1>
+          <h2>
+            Acceptance criteria{' '}
+            <span className={styles.count}>
+              {criteria.filter((item) => item.satisfied).length} / {criteria.length}
+            </span>
+          </h2>
         </div>
-        {feature && !editing && !archived && (
-          <Button type="button" variant="secondary" onClick={() => setEditing(true)}>
-            Edit details
+      </div>
+      {criteria.length === 0 ? (
+        <p className={styles.muted}>No acceptance criteria yet.</p>
+      ) : (
+        <ul className={styles.list}>
+          {criteria.map((item, index) => (
+            <CriterionItem
+              key={item.id}
+              criterion={item}
+              compact
+              archived={archived}
+              onSatisfiedChange={(satisfied) => void updateCriterion(item.id, { satisfied })}
+            >
+              {editingCriterionId === item.id ? (
+                <div className={styles.inlineEditor}>
+                  <Input
+                    aria-label={`Edit criterion ${item.description}`}
+                    value={criterionDraft}
+                    onChange={(event) => setCriterionDraft(event.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      void updateCriterion(item.id, { description: criterionDraft });
+                      setEditingCriterionId(null);
+                    }}
+                  >
+                    Save criterion
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setEditingCriterionId(null)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                !archived && (
+                  <div className={styles.inlineActions}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => void updateCriterion(item.id, { satisfied: !item.satisfied })}
+                    >
+                      Mark {item.satisfied ? 'pending' : 'satisfied'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        setCriterionDraft(item.description);
+                        setEditingCriterionId(item.id);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={index === 0}
+                      onClick={() => void moveCriterion(index, -1)}
+                    >
+                      Move up
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={index === criteria.length - 1}
+                      onClick={() => void moveCriterion(index, 1)}
+                    >
+                      Move down
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => void removeCriterion(item.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )
+              )}
+            </CriterionItem>
+          ))}
+        </ul>
+      )}
+      {!archived && (
+        <details className={styles.addDetails}>
+          <summary>Add acceptance criterion</summary>
+          <form onSubmit={addCriterion}>
+            <label htmlFor="criterion-title">Acceptance criterion</label>
+            <Input
+              id="criterion-title"
+              aria-label="Acceptance criterion"
+              value={criterion}
+              onChange={(event) => setCriterion(event.target.value)}
+              required
+            />
+            <Button type="submit">Add criterion</Button>
+          </form>
+        </details>
+      )}
+    </Card>
+  );
+  const tasksPanel = (
+    <Card as="section" aria-label="Tasks" className={styles.tasksCard}>
+      <div className={styles.sectionHeading}>
+        <div>
+          <h2>
+            Tasks{' '}
+            <span className={styles.count}>
+              · {tasks.filter((task) => task.status === 'done').length} / {tasks.length}
+            </span>
+          </h2>
+        </div>
+      </div>
+      {tasks.length === 0 ? (
+        <p className={styles.muted}>No tasks yet.</p>
+      ) : (
+        <div className={styles.taskList}>
+          {tasks.map((task, index) => (
+            <TaskItem
+              compact
+              key={task.id}
+              task={task}
+              isFirst={index === 0}
+              isLast={index === tasks.length - 1}
+              archived={archived}
+              onStatusChange={(status) => void changeTask(task, status)}
+              onMoveUp={() => void moveTask(index, -1)}
+              onMoveDown={() => void moveTask(index, 1)}
+            />
+          ))}
+        </div>
+      )}
+      {!archived && (
+        <details className={styles.addDetails}>
+          <summary>Add task</summary>
+          <form onSubmit={addTask}>
+            <label htmlFor="task-title">Task title</label>
+            <Input
+              id="task-title"
+              aria-label="Task title"
+              value={taskTitle}
+              onChange={(event) => setTaskTitle(event.target.value)}
+              required
+            />
+            <Button type="submit">Add task</Button>
+          </form>
+        </details>
+      )}
+    </Card>
+  );
+  return (
+    <section
+      className={[styles.page, isBug && styles.bugPage].filter(Boolean).join(' ')}
+      aria-label={isBug ? 'Bug detail' : 'Story detail'}
+    >
+      <header className={styles.detailHeader}>
+        <div className={styles.titleGroup}>
+          <p className={styles.eyebrow}>{isBug ? 'Bug report' : 'User story'}</p>
+          <h1>{feature?.title ?? 'Work item detail'}</h1>
+          <p className={styles.subtitle}>
+            {feature?.epic_id ? (
+              <Link to={`/planning/${workspaceId}/${projectId}/epics/${feature.epic_id}`}>
+                {epicName}
+              </Link>
+            ) : (
+              'Unassigned work'
+            )}
+            {feature && <> · {titleCase(feature.status)}</>}
+          </p>
+        </div>
+        {feature && !archived && (
+          <Button
+            className={styles.editAction}
+            aria-label="Edit details"
+            disabled={moving}
+            onClick={() => setEditing(true)}
+          >
+            {isBug ? 'Edit Bug' : 'Edit Story'}
           </Button>
         )}
       </header>
-      <p className={styles.disclaimer}>
-        Planning records describe intended work; status changes do not claim execution or delivery.
-      </p>
-      {error && (
+      {feature && (
+        <div className={styles.metadata} aria-label="Work item metadata">
+          <Select
+            aria-label="Work item status"
+            value={feature.status ?? 'backlog'}
+            disabled={archived || moving || editing}
+            onChange={(event) => void moveStatus(event.target.value as Feature['status'])}
+          >
+            {!PLANNING_COLUMN_STATUSES.some((item) => item.value === feature.status) && (
+              <option value={feature.status}>{titleCase(feature.status)}</option>
+            )}
+            {PLANNING_COLUMN_STATUSES.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </Select>
+          {isBug && (
+            <Badge className={styles.pill}>
+              {titleCase(feature.bug_severity ?? 'medium')} severity
+            </Badge>
+          )}
+          <Badge className={styles.pill}>{titleCase(feature.priority)} priority</Badge>
+          {selectedTags.map((tag) => (
+            <Badge className={styles.pill} key={tag}>
+              {tag}
+            </Badge>
+          ))}
+          <details className={styles.moreActions}>
+            <summary>⋯ More</summary>
+            <nav aria-label="Work item navigation">
+              <Link to={`/planning/${workspaceId}/${projectId}`}>Project board</Link>
+              {feature.epic_id && (
+                <Link to={`/planning/${workspaceId}/${projectId}/epics/${feature.epic_id}`}>
+                  Epic board
+                </Link>
+              )}
+              <Link to={`/transfer/${workspaceId}/${projectId}/tasks/${feature.id}`}>
+                Import / export Tasks
+              </Link>
+            </nav>
+          </details>
+        </div>
+      )}
+      {(error || moveError) && (
         <p role="alert" className={styles.error}>
-          {error}
+          {error || moveError}
         </p>
       )}
-      {feature && (
-        <nav className={styles.breadcrumbs} aria-label="Work item navigation">
-          <Link to={`/planning/${workspaceId}/${projectId}`}>Project board</Link>
-          <span aria-hidden="true">/</span>
-          {feature.epic_id ? (
-            <Link to={`/planning/${workspaceId}/${projectId}/epics/${feature.epic_id}`}>
-              Epic board
-            </Link>
-          ) : (
-            <span>Unassigned work</span>
-          )}
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">{feature.title}</span>
-          <Link
-            className={styles.transferLink}
-            to={`/transfer/${workspaceId}/${projectId}/tasks/${feature.id}`}
-          >
-            Import / export Tasks
-          </Link>
-        </nav>
-      )}
-
       {archived && (
         <p role="status" className={styles.archived}>
           Archived work item · read-only
         </p>
       )}
-
       {feature && (
-        <div className={styles.layout}>
-          <div className={styles.content}>
-            <Card>
-              {editing ? (
-                <form className={styles.editForm} onSubmit={(event) => void submitFeature(event)}>
-                  <label htmlFor="feature-detail-title">Title</label>
-                  <Input
-                    id="feature-detail-title"
-                    aria-label="Edit feature title"
-                    value={featureTitle}
-                    onChange={(event) => setFeatureTitle(event.target.value)}
-                    required
-                  />
-                  <label htmlFor="feature-detail-description">Description</label>
-                  <Textarea
-                    id="feature-detail-description"
-                    aria-label="Edit feature description"
-                    value={featureDescription}
-                    onChange={(event) => setFeatureDescription(event.target.value)}
-                    rows={4}
-                  />
-                  <label htmlFor="feature-detail-goal">Goal</label>
-                  <Textarea
-                    id="feature-detail-goal"
-                    aria-label="Edit feature goal"
-                    value={featureGoal}
-                    onChange={(event) => setFeatureGoal(event.target.value)}
-                    rows={3}
-                  />
-                  <label htmlFor="feature-detail-notes">Notes</label>
-                  <Textarea
-                    id="feature-detail-notes"
-                    aria-label="Work item notes"
-                    value={notes}
-                    onChange={(event) => setNotes(event.target.value)}
-                    rows={5}
-                  />
-                  {feature.kind === 'bug' && (
-                    <section className={styles.editSection} aria-label="Bug details">
-                      <label htmlFor="bug-severity">Severity</label>
-                      <select
-                        id="bug-severity"
-                        aria-label="Bug severity"
-                        value={bugSeverity}
-                        onChange={(event) => setBugSeverity(event.target.value)}
-                      >
-                        {['low', 'medium', 'high', 'critical'].map((severity) => (
-                          <option key={severity}>{severity}</option>
-                        ))}
-                      </select>
-                      <label htmlFor="steps-to-reproduce">Steps to reproduce</label>
-                      <Textarea
-                        id="steps-to-reproduce"
-                        aria-label="Steps to reproduce"
-                        value={stepsToReproduce}
-                        onChange={(event) => setStepsToReproduce(event.target.value)}
-                        rows={4}
-                      />
-                      <label htmlFor="expected-result">Expected result</label>
-                      <Textarea
-                        id="expected-result"
-                        aria-label="Expected result"
-                        value={expectedResult}
-                        onChange={(event) => setExpectedResult(event.target.value)}
-                        rows={3}
-                      />
-                      <label htmlFor="actual-result">Actual result</label>
-                      <Textarea
-                        id="actual-result"
-                        aria-label="Actual result"
-                        value={actualResult}
-                        onChange={(event) => setActualResult(event.target.value)}
-                        rows={3}
-                      />
-                    </section>
-                  )}
-                  <fieldset className={styles.tagPicker}>
-                    <legend>Workspace tags</legend>
-                    {workspaceTags.length ? (
-                      workspaceTags.map((tag) => (
-                        <label key={tag.id} className={styles.checkTag}>
-                          <input
-                            type="checkbox"
-                            checked={selectedTags.includes(tag.name)}
-                            onChange={(event) => toggleTag(tag.name, event.target.checked)}
-                          />
-                          <span>{tag.name}</span>
-                        </label>
-                      ))
-                    ) : (
-                      <p className={styles.muted}>No workspace tags are available.</p>
-                    )}
-                    {legacyTags.length > 0 && (
-                      <p className={styles.muted}>
-                        Existing tags outside the catalog are preserved: {legacyTags.join(', ')}
-                      </p>
-                    )}
-                  </fieldset>
-                  <div className={styles.actions}>
-                    <Button type="submit">Save changes</Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => {
-                        void reload();
-                        setEditing(false);
-                      }}
+        <>
+          {editing && (
+            <Dialog
+              title={isBug ? 'Edit Bug' : 'Edit Story'}
+              open
+              onCancel={() => {
+                void reload();
+                setEditing(false);
+              }}
+            >
+              <form className={styles.editForm} onSubmit={(event) => void submitFeature(event)}>
+                <label htmlFor="feature-detail-title">Title</label>
+                <Input
+                  id="feature-detail-title"
+                  aria-label="Edit feature title"
+                  value={featureTitle}
+                  onChange={(event) => setFeatureTitle(event.target.value)}
+                  required
+                />
+                <label htmlFor="feature-detail-description">Description</label>
+                <Textarea
+                  id="feature-detail-description"
+                  aria-label="Edit feature description"
+                  value={featureDescription}
+                  onChange={(event) => setFeatureDescription(event.target.value)}
+                  rows={4}
+                />
+                <label htmlFor="feature-detail-goal">Goal</label>
+                <Textarea
+                  id="feature-detail-goal"
+                  aria-label="Edit feature goal"
+                  value={featureGoal}
+                  onChange={(event) => setFeatureGoal(event.target.value)}
+                  rows={3}
+                />
+                <label htmlFor="feature-detail-notes">Notes</label>
+                <Textarea
+                  id="feature-detail-notes"
+                  aria-label="Work item notes"
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  rows={5}
+                />
+                {feature.kind === 'bug' && (
+                  <section className={styles.editSection} aria-label="Bug details">
+                    <label htmlFor="bug-severity">Severity</label>
+                    <select
+                      id="bug-severity"
+                      aria-label="Bug severity"
+                      value={bugSeverity}
+                      onChange={(event) => setBugSeverity(event.target.value)}
                     >
-                      Cancel
-                    </Button>
+                      {['low', 'medium', 'high', 'critical'].map((severity) => (
+                        <option key={severity}>{severity}</option>
+                      ))}
+                    </select>
+                    <label htmlFor="steps-to-reproduce">Steps to reproduce</label>
+                    <Textarea
+                      id="steps-to-reproduce"
+                      aria-label="Steps to reproduce"
+                      value={stepsToReproduce}
+                      onChange={(event) => setStepsToReproduce(event.target.value)}
+                      rows={4}
+                    />
+                    <label htmlFor="expected-result">Expected result</label>
+                    <Textarea
+                      id="expected-result"
+                      aria-label="Expected result"
+                      value={expectedResult}
+                      onChange={(event) => setExpectedResult(event.target.value)}
+                      rows={3}
+                    />
+                    <label htmlFor="actual-result">Actual result</label>
+                    <Textarea
+                      id="actual-result"
+                      aria-label="Actual result"
+                      value={actualResult}
+                      onChange={(event) => setActualResult(event.target.value)}
+                      rows={3}
+                    />
+                  </section>
+                )}
+                <fieldset className={styles.tagPicker}>
+                  <legend>Workspace tags</legend>
+                  {workspaceTags.length ? (
+                    workspaceTags.map((tag) => (
+                      <label key={tag.id} className={styles.checkTag}>
+                        <input
+                          type="checkbox"
+                          checked={selectedTags.includes(tag.name)}
+                          onChange={(event) => toggleTag(tag.name, event.target.checked)}
+                        />
+                        <span>{tag.name}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className={styles.muted}>No workspace tags are available.</p>
+                  )}
+                  {legacyTags.length > 0 && (
+                    <p className={styles.muted}>
+                      Existing tags outside the catalog are preserved: {legacyTags.join(', ')}
+                    </p>
+                  )}
+                </fieldset>
+                <div className={styles.actions}>
+                  <Button type="submit">Save changes</Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      void reload();
+                      setEditing(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Dialog>
+          )}
+          <div className={styles.layout}>
+            <div className={styles.content}>
+              {isBug ? (
+                <>
+                  <Card as="section" aria-label="How to reproduce" className={styles.reproduction}>
+                    <h2>How to reproduce</h2>
+                    {feature.steps_to_reproduce ? (
+                      <ol className={styles.steps}>
+                        {feature.steps_to_reproduce
+                          .split('\n')
+                          .filter((line: string) => line.trim())
+                          .map((step: string, index: number) => (
+                            <li key={index}>{step.replace(/^\s*\d+[.)]\s*/, '')}</li>
+                          ))}
+                      </ol>
+                    ) : (
+                      <p>Not provided.</p>
+                    )}
+                    {feature.description && <p>{feature.description}</p>}
+                    {feature.goal && (
+                      <section>
+                        <h3>Goal</h3>
+                        <p>{feature.goal}</p>
+                      </section>
+                    )}
+                  </Card>
+                  <div className={styles.resultGrid}>
+                    <Card as="section" aria-label="Actual result" className={styles.actual}>
+                      <h2>Actual result</h2>
+                      <p>{feature.actual_result || 'Not provided.'}</p>
+                    </Card>
+                    <Card as="section" aria-label="Expected result" className={styles.expected}>
+                      <h2>Expected result</h2>
+                      <p>{feature.expected_result || 'Not provided.'}</p>
+                    </Card>
                   </div>
-                </form>
+                </>
               ) : (
                 <>
-                  <section
-                    className={styles.readSection}
-                    aria-labelledby="feature-description-heading"
-                  >
-                    <h2 id="feature-description-heading">Description</h2>
-                    {feature.description ? (
-                      <p className={styles.description}>{feature.description}</p>
-                    ) : (
-                      <p className={styles.muted}>No description yet.</p>
+                  <Card as="section" aria-label="Description" className={styles.descriptionCard}>
+                    <h2>Description</h2>
+                    <p>{feature.description || 'No description yet.'}</p>
+                    {feature.goal && (
+                      <section>
+                        <h3>Goal</h3>
+                        <p>{feature.goal}</p>
+                      </section>
                     )}
-                  </section>
-                  {feature.goal && (
-                    <section className={styles.readSection}>
-                      <h2>Goal</h2>
-                      <p>{feature.goal}</p>
-                    </section>
-                  )}
-                  {feature.kind === 'bug' && (
-                    <section className={styles.bugDetails} aria-label="Bug report details">
-                      <h2>Reproduction</h2>
-                      <div className={styles.proseBlock}>
-                        <h3>Steps to reproduce</h3>
-                        <p>{feature.steps_to_reproduce || 'Not provided.'}</p>
-                      </div>
-                      <div className={styles.resultGrid}>
-                        <div className={styles.proseBlock}>
-                          <h3>Expected result</h3>
-                          <p>{feature.expected_result || 'Not provided.'}</p>
-                        </div>
-                        <div className={styles.proseBlock}>
-                          <h3>Actual result</h3>
-                          <p>{feature.actual_result || 'Not provided.'}</p>
-                        </div>
-                      </div>
-                    </section>
-                  )}
-                  <section className={styles.readSection} aria-labelledby="notes-heading">
-                    <h2 id="notes-heading">Notes</h2>
-                    {feature.notes ? (
-                      <p className={styles.preformatted}>{feature.notes}</p>
-                    ) : (
-                      <p className={styles.muted}>No notes yet.</p>
-                    )}
-                  </section>
+                  </Card>
+                  {criteriaPanel}
                 </>
               )}
-
-              <section
-                className={styles.attachmentSection}
-                aria-labelledby="bug-screenshots-heading"
-              >
-                <div className={styles.sectionHeading}>
-                  <div>
-                    <h2 id="bug-screenshots-heading">Screenshots</h2>
-                    <p className={styles.muted}>Evidence is stored with this Bug.</p>
-                  </div>
-                  {feature.kind === 'bug' && !archived && (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      aria-label="Add Bug screenshot"
-                      onClick={() => void chooseBugScreenshot()}
-                      disabled={attachments.length >= 5}
-                    >
-                      Add screenshot
-                    </Button>
-                  )}
-                </div>
-                <input
-                  ref={bugScreenshotInput}
-                  id="bug-screenshot"
-                  className={styles.visuallyHidden}
-                  tabIndex={-1}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  aria-label="Choose Bug screenshot"
-                  disabled={attachments.length >= 5 || archived}
-                  onChange={(event) => {
-                    const file = event.currentTarget.files?.[0];
-                    if (file) void uploadAttachment(file);
-                    event.currentTarget.value = '';
-                  }}
-                />
-                {screenshotPickerError && <p role="alert">{screenshotPickerError}</p>}
-                {feature.kind !== 'bug' ? (
-                  <p className={styles.muted}>Screenshots are available for Bugs.</p>
-                ) : attachments.length === 0 ? (
-                  <p className={styles.muted}>No screenshots attached.</p>
-                ) : (
-                  <ul className={styles.attachmentGrid}>
-                    {attachments.map((attachment) => {
-                      const contentUrl = `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachment.id}/content`;
-                      return (
-                        <li key={attachment.id} className={styles.attachment}>
-                          <a href={contentUrl} target="_blank" rel="noreferrer">
-                            <img src={contentUrl} alt={`Bug screenshot: ${attachment.file_name}`} />
-                            <span>{attachment.file_name}</span>
-                          </a>
-                          {!archived && (
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              onClick={() => void removeAttachment(attachment.id)}
-                            >
-                              Remove {attachment.file_name}
-                            </Button>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </section>
-            </Card>
-
-            <Card>
-              <div className={styles.sectionHeading}>
-                <div>
-                  <h2>Acceptance criteria</h2>
-                  <p className={styles.muted}>
-                    {criteria.filter((item) => item.satisfied).length} of {criteria.length}{' '}
-                    satisfied
-                  </p>
-                </div>
-              </div>
-              {criteria.length === 0 ? (
-                <p className={styles.muted}>No acceptance criteria yet.</p>
-              ) : (
-                <ul className={styles.list}>
-                  {criteria.map((item, index) => (
-                    <CriterionItem key={item.id} criterion={item}>
-                      {editingCriterionId === item.id ? (
-                        <div className={styles.inlineEditor}>
-                          <Input
-                            aria-label={`Edit criterion ${item.description}`}
-                            value={criterionDraft}
-                            onChange={(event) => setCriterionDraft(event.target.value)}
-                          />
-                          <Button
-                            type="button"
-                            onClick={() => {
-                              void updateCriterion(item.id, { description: criterionDraft });
-                              setEditingCriterionId(null);
-                            }}
-                          >
-                            Save criterion
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => setEditingCriterionId(null)}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      ) : (
-                        !archived && (
-                          <div className={styles.inlineActions}>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              onClick={() =>
-                                void updateCriterion(item.id, { satisfied: !item.satisfied })
-                              }
-                            >
-                              Mark {item.satisfied ? 'pending' : 'satisfied'}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              onClick={() => {
-                                setCriterionDraft(item.description);
-                                setEditingCriterionId(item.id);
-                              }}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              disabled={index === 0}
-                              onClick={() => void moveCriterion(index, -1)}
-                            >
-                              Move up
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              disabled={index === criteria.length - 1}
-                              onClick={() => void moveCriterion(index, 1)}
-                            >
-                              Move down
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              onClick={() => void removeCriterion(item.id)}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        )
-                      )}
-                    </CriterionItem>
-                  ))}
-                </ul>
-              )}
-              {!archived && (
-                <details className={styles.addDetails}>
-                  <summary>Add acceptance criterion</summary>
-                  <form onSubmit={addCriterion}>
-                    <label htmlFor="criterion-title">Acceptance criterion</label>
-                    <Input
-                      id="criterion-title"
-                      aria-label="Acceptance criterion"
-                      value={criterion}
-                      onChange={(event) => setCriterion(event.target.value)}
-                      required
-                    />
-                    <Button type="submit">Add criterion</Button>
-                  </form>
-                </details>
-              )}
-            </Card>
-
-            <Card>
-              <div className={styles.sectionHeading}>
-                <div>
-                  <h2>Tasks</h2>
-                  <p className={styles.muted}>
-                    {tasks.filter((task) => task.status === 'done').length} of {tasks.length}{' '}
-                    complete
-                  </p>
-                </div>
-              </div>
-              {tasks.length === 0 ? (
-                <p className={styles.muted}>No tasks yet.</p>
-              ) : (
-                <div className={styles.taskList}>
-                  {tasks.map((task, index) => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      isFirst={index === 0}
-                      isLast={index === tasks.length - 1}
-                      archived={archived}
-                      onStatusChange={(status) => void changeTask(task, status)}
-                      onMoveUp={() => void moveTask(index, -1)}
-                      onMoveDown={() => void moveTask(index, 1)}
-                    />
-                  ))}
-                </div>
-              )}
-              {!archived && (
-                <details className={styles.addDetails}>
-                  <summary>Add task</summary>
-                  <form onSubmit={addTask}>
-                    <label htmlFor="task-title">Task title</label>
-                    <Input
-                      id="task-title"
-                      aria-label="Task title"
-                      value={taskTitle}
-                      onChange={(event) => setTaskTitle(event.target.value)}
-                      required
-                    />
-                    <Button type="submit">Add task</Button>
-                  </form>
-                </details>
-              )}
-            </Card>
-          </div>
-
-          <aside className={styles.sidebar} aria-label="Work item properties">
-            <Card>
-              <h2>Properties</h2>
-              <dl className={styles.properties}>
-                <div>
-                  <dt>Type</dt>
-                  <dd>{feature.kind === 'bug' ? 'Bug' : 'User Story'}</dd>
-                </div>
-                <div>
-                  <dt>Status</dt>
-                  <dd>
-                    <StatusChip
-                      tone={
-                        feature.status === 'done'
-                          ? 'success'
-                          : feature.status === 'in_progress'
-                            ? 'accent'
-                            : 'neutral'
-                      }
-                    >
-                      {titleCase(feature.status)}
-                    </StatusChip>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Priority</dt>
-                  <dd>
-                    <Badge
-                      tone={
-                        feature.priority === 'critical' || feature.priority === 'high'
-                          ? 'warning'
-                          : 'neutral'
-                      }
-                    >
-                      {titleCase(feature.priority)}
-                    </Badge>
-                  </dd>
-                </div>
-                {feature.kind === 'bug' && (
-                  <div>
-                    <dt>Severity</dt>
-                    <dd>{titleCase(feature.bug_severity ?? 'medium')}</dd>
-                  </div>
-                )}
-                <div>
-                  <dt>Tags</dt>
-                  <dd className={styles.tags}>
-                    {selectedTags.length ? (
-                      selectedTags.map((tag) => (
-                        <Badge key={tag} tone={knownTags.has(tag) ? 'accent' : 'neutral'}>
-                          {tag}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className={styles.muted}>No tags</span>
-                    )}
-                  </dd>
-                </div>
-              </dl>
-              {feature.epic_id && (
-                <p className={styles.parentLink}>
-                  Parent Epic:{' '}
-                  <Link to={`/planning/${workspaceId}/${projectId}/epics/${feature.epic_id}`}>
-                    {featureName(feature.epic_id)}
-                  </Link>
-                </p>
-              )}
-            </Card>
-            {dependencies.length > 0 && (
-              <Card>
-                <h2>Dependencies</h2>
-                <ul className={styles.dependencies}>
-                  {dependencies.map((item) => (
-                    <li key={item.id}>
-                      {featureName(item.blocking_feature_id)} blocks{' '}
-                      {featureName(item.blocked_feature_id)}
-                    </li>
-                  ))}
-                </ul>
+              <Card as="section" aria-label="Notes" className={styles.notesCard}>
+                <h2>Notes</h2>
+                <p>{feature.notes || 'No notes yet.'}</p>
               </Card>
-            )}
-          </aside>
-        </div>
+              {isBug && (
+                <details className={styles.extraDetails}>
+                  <summary>Acceptance criteria</summary>
+                  {criteriaPanel}
+                </details>
+              )}
+            </div>
+            <aside
+              className={styles.sidebar}
+              aria-label={isBug ? 'Bug evidence' : 'Work item properties'}
+            >
+              {isBug ? (
+                <>
+                  <Card as="section" aria-label="Screenshots" className={styles.screenshotsCard}>
+                    <h2>
+                      Screenshots{' '}
+                      <span className={styles.count}>
+                        · {attachments.length} {attachments.length === 1 ? 'file' : 'files'}
+                      </span>
+                    </h2>
+                    {attachments.length === 0 ? (
+                      <p>No screenshots attached.</p>
+                    ) : (
+                      <ul className={styles.attachmentGrid}>
+                        {attachments.map((attachment) => {
+                          const contentUrl = `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachment.id}/content`;
+                          return (
+                            <li key={attachment.id} className={styles.attachment}>
+                              <a href={contentUrl} target="_blank" rel="noreferrer">
+                                <img
+                                  src={contentUrl}
+                                  alt={`Bug screenshot: ${attachment.file_name}`}
+                                />
+                                <span>{attachment.file_name}</span>
+                              </a>
+                              {!archived && (
+                                <Button
+                                  variant="ghost"
+                                  onClick={() => void removeAttachment(attachment.id)}
+                                >
+                                  Remove {attachment.file_name}
+                                </Button>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </Card>
+                  <Card
+                    as="section"
+                    aria-label="Attach another screenshot"
+                    className={styles.uploadCard}
+                  >
+                    <h2>Attach another screenshot</h2>
+                    <p>PNG, JPG or WebP · up to 5 MB</p>
+                    {!archived && (
+                      <Button
+                        variant="secondary"
+                        className={styles.chooseImage}
+                        aria-label="Add Bug screenshot"
+                        disabled={attachments.length >= 5}
+                        onClick={() => void chooseBugScreenshot()}
+                      >
+                        + Choose image
+                      </Button>
+                    )}
+                    <input
+                      ref={bugScreenshotInput}
+                      className={styles.visuallyHidden}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      aria-label="Choose Bug screenshot"
+                      disabled={attachments.length >= 5 || archived}
+                      onChange={(event) => {
+                        const file = event.currentTarget.files?.[0];
+                        if (file) void uploadAttachment(file);
+                        event.currentTarget.value = '';
+                      }}
+                    />
+                    {screenshotPickerError && <p role="alert">{screenshotPickerError}</p>}
+                  </Card>
+                  <Card as="section" aria-label="Properties" className={styles.bugProperties}>
+                    <h2>
+                      {selectedTags.join(', ') || 'Bug'} · {titleCase(feature.priority)}
+                    </h2>
+                    <p>
+                      <span>{titleCase(feature.status)}</span> · Severity:{' '}
+                      <span>{titleCase(feature.bug_severity)}</span>
+                    </p>
+                    {feature.epic_id && (
+                      <Link to={`/planning/${workspaceId}/${projectId}/epics/${feature.epic_id}`}>
+                        {epicName}
+                      </Link>
+                    )}
+                  </Card>
+                  <details className={styles.extraDetails}>
+                    <summary>Tasks</summary>
+                    {tasksPanel}
+                  </details>
+                </>
+              ) : (
+                <>
+                  <Card as="section" aria-label="Properties" className={styles.propertiesCard}>
+                    <h2>Properties</h2>
+                    <dl className={styles.properties}>
+                      <div>
+                        <dt>Epic</dt>
+                        <dd>
+                          {feature.epic_id ? (
+                            <Link
+                              to={`/planning/${workspaceId}/${projectId}/epics/${feature.epic_id}`}
+                            >
+                              {epicName}
+                            </Link>
+                          ) : (
+                            'Unassigned'
+                          )}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Status</dt>
+                        <dd>{titleCase(feature.status)}</dd>
+                      </div>
+                      <div>
+                        <dt>Priority</dt>
+                        <dd>{titleCase(feature.priority)}</dd>
+                      </div>
+                      <div>
+                        <dt>Tags</dt>
+                        <dd>{selectedTags.length ? selectedTags.join(', ') : 'No tags'}</dd>
+                      </div>
+                    </dl>
+                  </Card>
+                  {tasksPanel}
+                  <Card as="section" aria-label="Quick actions" className={styles.quickActions}>
+                    <h2>Quick actions</h2>
+                    {feature.epic_id && (
+                      <Link
+                        to={`/transfer/${workspaceId}/${projectId}/work-items/${feature.epic_id}`}
+                      >
+                        Export Work Items ↗
+                      </Link>
+                    )}
+                    <Link to={`/transfer/${workspaceId}/${projectId}/tasks/${feature.id}`}>
+                      Import / export Tasks ↗
+                    </Link>
+                  </Card>
+                </>
+              )}
+              {dependencies.length > 0 && (
+                <Card as="section" aria-label="Dependencies" className={styles.dependencies}>
+                  <h2>Dependencies</h2>
+                  <ul>
+                    {dependencies.map((item) => (
+                      <li key={item.id}>
+                        {featureName(item.blocking_feature_id)} blocks{' '}
+                        {featureName(item.blocked_feature_id)}
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
+            </aside>
+          </div>
+        </>
       )}
-    </main>
+      <p className={styles.disclaimer}>
+        Planning records describe intended work; status changes do not claim execution or delivery.
+      </p>
+    </section>
   );
 }

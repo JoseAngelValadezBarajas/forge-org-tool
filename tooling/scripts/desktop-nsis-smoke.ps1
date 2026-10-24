@@ -44,6 +44,9 @@ public static class ForgeWindowNative {
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int command);
+  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+  [DllImport("user32.dll")] static extern IntPtr GetWindow(IntPtr hWnd, uint command);
+  public static IntPtr GetWindowOwner(IntPtr hWnd) { return GetWindow(hWnd, 4); }
   [DllImport("user32.dll")] static extern IntPtr GetWindowDC(IntPtr hWnd);
   [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
   [DllImport("gdi32.dll")] static extern IntPtr CreateCompatibleDC(IntPtr hDC);
@@ -207,6 +210,40 @@ function Select-ForgeOption($root, [string]$comboBoxName, [string]$optionName) {
   }
 }
 
+function Wait-ForgeAutomationDialogClosed($desktop, $ownerRoot, $dialog, [int]$timeoutSeconds = 15) {
+  $dialogHandle = $dialog.Current.NativeWindowHandle
+  $dialogRuntimeId = $dialog.GetRuntimeId() -join '.'
+  $dialogName = $dialog.Current.Name
+  $deadline = [DateTime]::UtcNow.AddSeconds($timeoutSeconds)
+  do {
+    $windows = $desktop.FindAll(
+      [System.Windows.Automation.TreeScope]::Children,
+      [System.Windows.Automation.Condition]::TrueCondition
+    )
+    $ownerDescendants = $ownerRoot.FindAll(
+      [System.Windows.Automation.TreeScope]::Descendants,
+      [System.Windows.Automation.Condition]::TrueCondition
+    )
+    $dialogStillOpen = @($windows | Where-Object {
+      $dialogHandle -ne [IntPtr]::Zero -and $_.Current.NativeWindowHandle -eq $dialogHandle
+    }).Count -gt 0
+    if (-not $dialogStillOpen) {
+      $dialogStillOpen = @($ownerDescendants | Where-Object {
+        $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Window -and
+        (
+          ($dialogHandle -ne [IntPtr]::Zero -and $_.Current.NativeWindowHandle -eq $dialogHandle) -or
+          ($dialogRuntimeId -and (($_.GetRuntimeId() -join '.') -eq $dialogRuntimeId)) -or
+          ($dialogName -and $_.Current.Name -eq $dialogName -and
+            [ForgeWindowNative]::GetWindowOwner($_.Current.NativeWindowHandle) -eq $ownerRoot.Current.NativeWindowHandle)
+        )
+      }).Count -gt 0
+    }
+    if (-not $dialogStillOpen) { return }
+    Start-Sleep -Milliseconds 100
+  } while ([DateTime]::UtcNow -lt $deadline)
+  throw "The native file picker remained open after selecting '$($dialog.Current.Name)'."
+}
+
 function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
   $fileControl = Wait-ForgeAutomationNamedElement $root $buttonName
   Invoke-ForgeAutomationElement $fileControl $buttonName
@@ -223,14 +260,31 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
       ))
     }
     foreach ($candidate in $candidates) {
+      $candidateHandle = [IntPtr]$candidate.Current.NativeWindowHandle
+      $candidateOwnedByApp = $candidateHandle -ne [IntPtr]::Zero -and
+        [ForgeWindowNative]::GetWindowOwner($candidateHandle) -eq $root.Current.NativeWindowHandle
       if (
         $candidate.Current.ControlType -eq [System.Windows.Automation.ControlType]::Window -and
-        $candidate.Current.NativeWindowHandle -ne $root.Current.NativeWindowHandle -and
+        $candidateOwnedByApp -and
+        $candidateHandle -ne $root.Current.NativeWindowHandle -and
         (
-          $candidate.Current.Name -match '(?i)(open|abrir|file|choose|select)' -or
-          $candidate.Current.ClassName -in @('#32770', 'CabinetWClass')
+          $candidate.Current.ClassName -eq '#32770' -or
+          $candidate.Current.Name -match '(?i)^(open|abrir|choose|select|seleccionar)$'
         )
-      ) { $dialog = $candidate; break }
+      ) {
+        $candidateControls = $candidate.FindAll(
+          [System.Windows.Automation.TreeScope]::Descendants,
+          [System.Windows.Automation.Condition]::TrueCondition
+        )
+        $hasFileName = @($candidateControls | Where-Object {
+          $_.Current.AutomationId -eq '1148' -or
+          $_.Current.Name -match '(?i)(file name|nombre de archivo)'
+        }).Count -gt 0
+        $hasOpenAction = @($candidateControls | Where-Object {
+          $_.Current.Name -match '(?i)^(open|abrir)$' -or $_.Current.AutomationId -eq '1'
+        }).Count -gt 0
+        if ($hasFileName -and $hasOpenAction) { $dialog = $candidate; break }
+      }
     }
     if ($null -eq $dialog) { Start-Sleep -Milliseconds 250 }
   } while ($null -eq $dialog -and [DateTime]::UtcNow -lt $deadline)
@@ -266,12 +320,14 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
   } | Select-Object -First 1
   $valuePattern = $null
   $forceClipboardPath = $env:FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER -eq '1'
+  [ForgeWindowNative]::SetForegroundWindow($dialog.Current.NativeWindowHandle) | Out-Null
   if (-not $forceClipboardPath -and $null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
       [System.Windows.Automation.ValuePattern]::Pattern,
       [ref]$valuePattern
     )) {
     $valuePattern.SetValue($filePath)
     try { $fileNameControl.SetFocus() } catch { }
+    [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
   } else {
     # Some common-dialog providers expose no usable UIA value pattern or HWND.
     # Paste through the native filename field so keyboard layout cannot alter
@@ -279,9 +335,11 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
     $previousClipboard = [System.Windows.Forms.Clipboard]::GetDataObject()
     try {
       [System.Windows.Forms.SendKeys]::SendWait('%n')
+      [System.Windows.Forms.SendKeys]::SendWait('^a')
       [System.Windows.Forms.Clipboard]::SetText($filePath)
       [System.Windows.Forms.SendKeys]::SendWait('^v')
       Start-Sleep -Milliseconds 250
+      [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
     } finally {
       if ($null -ne $previousClipboard) {
         [System.Windows.Forms.Clipboard]::SetDataObject($previousClipboard, $true)
@@ -290,27 +348,26 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
       }
     }
   }
-  $open = $dialog.FindFirst(
-    [System.Windows.Automation.TreeScope]::Descendants,
-    [System.Windows.Automation.AndCondition]::new(@(
-      [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::ControlTypeProperty, [System.Windows.Automation.ControlType]::Button),
-      [System.Windows.Automation.PropertyCondition]::new([System.Windows.Automation.AutomationElement]::NameProperty, 'Open')
-    ))
-  )
-  if ($null -eq $open) {
-    $open = $dialogControls | Where-Object {
-      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Button -and (
-        $_.Current.AutomationId -eq '1' -or
-        $_.Current.Name -match '(?i)(open|abrir)'
-      )
-    } | Select-Object -First 1
-  }
-  if ($null -ne $open) {
-    Invoke-ForgeAutomationElement $open 'Open screenshot'
-  } else {
-    # Enter activates the native picker's default Open/Abrir action even when
-    # its localized button is absent from the UI Automation subtree.
-    [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+  try {
+    Wait-ForgeAutomationDialogClosed $desktop $root $dialog
+  } catch {
+    $fieldValuePattern = $null
+    $fieldValue = ''
+    if ($null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
+        [System.Windows.Automation.ValuePattern]::Pattern,
+        [ref]$fieldValuePattern
+      )) {
+      $fieldValue = [System.IO.Path]::GetFileName([string]$fieldValuePattern.Current.Value)
+    }
+    $pickerControls = @($dialogControls | Select-Object -First 80 | ForEach-Object {
+      "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)'"
+    })
+    $fieldDescription = if ($null -eq $fileNameControl) {
+      'not found'
+    } else {
+      "type='$($fileNameControl.Current.ControlType.ProgrammaticName)' name='$($fileNameControl.Current.Name)' id='$($fileNameControl.Current.AutomationId)' value-basename='$fieldValue'"
+    }
+    throw "Native file picker did not close. File field: $fieldDescription. Picker UIA controls: $($pickerControls -join '; '). Original failure: $($_.Exception.Message)"
   }
 }
 
