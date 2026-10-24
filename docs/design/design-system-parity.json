@@ -17,23 +17,23 @@
       "figmaNodeId": "173:27",
       "figmaName": "Button",
       "sourceName": "Actions / Button",
-      "owner": "packages/ui/src/components/actions/Button/",
+      "owner": "@corefoundry-labs/forge-ui/components/actions/Button/",
       "component": {
         "name": "Button",
-        "target": "packages/ui/src/components/actions/Button/Button.tsx",
-        "current": ["packages/ui/src/components/actions/Button/Button.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/Button/Button.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/Button/Button.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Button",
-        "current": ["packages/ui/src/index.ts#Button"]
+        "target": "@corefoundry-labs/forge-ui#Button",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Button"]
       },
       "styles": {
-        "target": "packages/ui/src/components/actions/Button/Button.module.css",
-        "current": ["packages/ui/src/components/actions/Button/Button.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/Button/Button.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/Button/Button.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/actions/Button/Button.test.tsx",
-        "current": ["packages/ui/src/components/actions/Button/Button.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/Button/Button.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/Button/Button.test.tsx"]
       },
       "componentHost": {
         "id": "button",
@@ -205,26 +205,26 @@
       "figmaNodeId": "206:690",
       "figmaName": "ButtonSize",
       "sourceName": "Actions / ButtonSize",
-      "owner": "packages/ui/src/components/actions/Button/",
+      "owner": "@corefoundry-labs/forge-ui/components/actions/Button/",
       "component": {
         "name": "Button",
-        "target": "packages/ui/src/components/actions/Button/Button.tsx",
-        "current": ["packages/ui/src/components/actions/Button/Button.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/Button/Button.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/Button/Button.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#ButtonProps.size",
+        "target": "@corefoundry-labs/forge-ui#ButtonProps.size",
         "current": [
-          "packages/ui/src/index.ts#ButtonSize",
-          "packages/ui/src/index.ts#ButtonProps.size"
+          "@corefoundry-labs/forge-ui/index.ts#ButtonSize",
+          "@corefoundry-labs/forge-ui/index.ts#ButtonProps.size"
         ]
       },
       "styles": {
-        "target": "packages/ui/src/components/actions/Button/Button.module.css",
-        "current": ["packages/ui/src/components/actions/Button/Button.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/Button/Button.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/Button/Button.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/actions/Button/Button.test.tsx",
-        "current": ["packages/ui/src/components/actions/Button/Button.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/Button/Button.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/Button/Button.test.tsx"]
       },
       "componentHost": {
         "id": "button-size",
@@ -275,23 +275,25 @@
       "figmaNodeId": "177:150",
       "figmaName": "IconButton",
       "sourceName": "Actions / IconButton",
-      "owner": "packages/ui/src/components/actions/IconButton/",
+      "owner": "@corefoundry-labs/forge-ui/components/actions/IconButton/",
       "component": {
         "name": "IconButton",
-        "target": "packages/ui/src/components/actions/IconButton/IconButton.tsx",
-        "current": ["packages/ui/src/components/actions/IconButton/IconButton.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/IconButton/IconButton.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/IconButton/IconButton.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#IconButton",
-        "current": ["packages/ui/src/index.ts#IconButton"]
+        "target": "@corefoundry-labs/forge-ui#IconButton",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#IconButton"]
       },
       "styles": {
-        "target": "packages/ui/src/components/actions/IconButton/IconButton.module.css",
-        "current": ["packages/ui/src/components/actions/IconButton/IconButton.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/IconButton/IconButton.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/actions/IconButton/IconButton.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/actions/IconButton/IconButton.test.tsx",
-        "current": ["packages/ui/src/components/actions/IconButton/IconButton.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/actions/IconButton/IconButton.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/actions/IconButton/IconButton.test.tsx"]
       },
       "componentHost": {
         "id": "icon-button",
@@ -343,23 +345,26 @@
       "figmaNodeId": "173:47",
       "figmaName": "TextInput",
       "sourceName": "Forms / TextInput",
-      "owner": "packages/ui/src/components/forms/TextInput/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/TextInput/",
       "component": {
         "name": "Input",
-        "target": "packages/ui/src/components/forms/TextInput/TextInput.tsx",
-        "current": ["packages/ui/src/components/forms/TextInput/TextInput.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/TextInput/TextInput.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/TextInput/TextInput.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Input",
-        "current": ["packages/ui/src/index.ts#TextInput", "packages/ui/src/index.ts#Input"]
+        "target": "@corefoundry-labs/forge-ui#Input",
+        "current": [
+          "@corefoundry-labs/forge-ui/index.ts#TextInput",
+          "@corefoundry-labs/forge-ui/index.ts#Input"
+        ]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/TextInput/TextInput.module.css",
-        "current": ["packages/ui/src/components/forms/TextInput/TextInput.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/TextInput/TextInput.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/TextInput/TextInput.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/TextInput/TextInput.test.tsx",
-        "current": ["packages/ui/src/components/forms/TextInput/TextInput.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/TextInput/TextInput.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/TextInput/TextInput.test.tsx"]
       },
       "componentHost": {
         "id": "input",
@@ -417,23 +422,23 @@
       "figmaNodeId": "173:58",
       "figmaName": "Checkbox",
       "sourceName": "Forms / Checkbox",
-      "owner": "packages/ui/src/components/forms/Checkbox/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/Checkbox/",
       "component": {
         "name": "Checkbox",
-        "target": "packages/ui/src/components/forms/Checkbox/Checkbox.tsx",
-        "current": ["packages/ui/src/components/forms/Checkbox/Checkbox.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Checkbox/Checkbox.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Checkbox/Checkbox.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Checkbox",
-        "current": ["packages/ui/src/index.ts#Checkbox"]
+        "target": "@corefoundry-labs/forge-ui#Checkbox",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Checkbox"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/Checkbox/Checkbox.module.css",
-        "current": ["packages/ui/src/components/forms/Checkbox/Checkbox.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Checkbox/Checkbox.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Checkbox/Checkbox.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/Checkbox/Checkbox.test.tsx",
-        "current": ["packages/ui/src/components/forms/Checkbox/Checkbox.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Checkbox/Checkbox.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Checkbox/Checkbox.test.tsx"]
       },
       "componentHost": {
         "id": "checkbox",
@@ -491,23 +496,23 @@
       "figmaNodeId": "177:160",
       "figmaName": "Select",
       "sourceName": "Forms / Select",
-      "owner": "packages/ui/src/components/forms/Select/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/Select/",
       "component": {
         "name": "Select",
-        "target": "packages/ui/src/components/forms/Select/Select.tsx",
-        "current": ["packages/ui/src/components/forms/Select/Select.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Select/Select.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Select/Select.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Select",
-        "current": ["packages/ui/src/index.ts#Select"]
+        "target": "@corefoundry-labs/forge-ui#Select",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Select"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/Select/Select.module.css",
-        "current": ["packages/ui/src/components/forms/Select/Select.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Select/Select.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Select/Select.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/Select/Select.test.tsx",
-        "current": ["packages/ui/src/components/forms/Select/Select.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Select/Select.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Select/Select.test.tsx"]
       },
       "componentHost": {
         "id": "select",
@@ -559,23 +564,23 @@
       "figmaNodeId": "177:165",
       "figmaName": "Textarea",
       "sourceName": "Forms / Textarea",
-      "owner": "packages/ui/src/components/forms/Textarea/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/Textarea/",
       "component": {
         "name": "Textarea",
-        "target": "packages/ui/src/components/forms/Textarea/Textarea.tsx",
-        "current": ["packages/ui/src/components/forms/Textarea/Textarea.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Textarea/Textarea.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Textarea/Textarea.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Textarea",
-        "current": ["packages/ui/src/index.ts#Textarea"]
+        "target": "@corefoundry-labs/forge-ui#Textarea",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Textarea"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/Textarea/Textarea.module.css",
-        "current": ["packages/ui/src/components/forms/Textarea/Textarea.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Textarea/Textarea.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Textarea/Textarea.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/Textarea/Textarea.test.tsx",
-        "current": ["packages/ui/src/components/forms/Textarea/Textarea.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Textarea/Textarea.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Textarea/Textarea.test.tsx"]
       },
       "componentHost": {
         "id": "textarea",
@@ -627,23 +632,23 @@
       "figmaNodeId": "181:223",
       "figmaName": "FormField",
       "sourceName": "Forms / FormField",
-      "owner": "packages/ui/src/components/forms/FormField/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/FormField/",
       "component": {
         "name": "FormField",
-        "target": "packages/ui/src/components/forms/FormField/FormField.tsx",
-        "current": ["packages/ui/src/components/forms/FormField/FormField.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FormField/FormField.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FormField/FormField.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#FormField",
-        "current": ["packages/ui/src/index.ts#FormField"]
+        "target": "@corefoundry-labs/forge-ui#FormField",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#FormField"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/FormField/FormField.module.css",
-        "current": ["packages/ui/src/components/forms/FormField/FormField.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FormField/FormField.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FormField/FormField.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/FormField/FormField.test.tsx",
-        "current": ["packages/ui/src/components/forms/FormField/FormField.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FormField/FormField.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FormField/FormField.test.tsx"]
       },
       "componentHost": {
         "id": "form-field",
@@ -695,23 +700,25 @@
       "figmaNodeId": "181:234",
       "figmaName": "SearchField",
       "sourceName": "Forms / SearchField",
-      "owner": "packages/ui/src/components/forms/SearchField/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/SearchField/",
       "component": {
         "name": "SearchField",
-        "target": "packages/ui/src/components/forms/SearchField/SearchField.tsx",
-        "current": ["packages/ui/src/components/forms/SearchField/SearchField.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/SearchField/SearchField.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/SearchField/SearchField.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#SearchField",
-        "current": ["packages/ui/src/index.ts#SearchField"]
+        "target": "@corefoundry-labs/forge-ui#SearchField",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#SearchField"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/SearchField/SearchField.module.css",
-        "current": ["packages/ui/src/components/forms/SearchField/SearchField.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/SearchField/SearchField.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/forms/SearchField/SearchField.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/SearchField/SearchField.test.tsx",
-        "current": ["packages/ui/src/components/forms/SearchField/SearchField.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/SearchField/SearchField.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/SearchField/SearchField.test.tsx"]
       },
       "componentHost": {
         "id": "search-field",
@@ -757,23 +764,25 @@
       "figmaNodeId": "181:312",
       "figmaName": "MultiSelect",
       "sourceName": "Forms / MultiSelect",
-      "owner": "packages/ui/src/components/forms/MultiSelect/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/MultiSelect/",
       "component": {
         "name": "MultiSelect",
-        "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.tsx",
-        "current": ["packages/ui/src/components/forms/MultiSelect/MultiSelect.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/MultiSelect/MultiSelect.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/MultiSelect/MultiSelect.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#MultiSelect",
-        "current": ["packages/ui/src/index.ts#MultiSelect"]
+        "target": "@corefoundry-labs/forge-ui#MultiSelect",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#MultiSelect"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.module.css",
-        "current": ["packages/ui/src/components/forms/MultiSelect/MultiSelect.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/MultiSelect/MultiSelect.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/forms/MultiSelect/MultiSelect.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/MultiSelect/MultiSelect.test.tsx",
-        "current": ["packages/ui/src/components/forms/MultiSelect/MultiSelect.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/MultiSelect/MultiSelect.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/MultiSelect/MultiSelect.test.tsx"]
       },
       "componentHost": {
         "id": "multi-select",
@@ -813,23 +822,23 @@
       "figmaNodeId": "206:606",
       "figmaName": "FilePicker",
       "sourceName": "Forms / FilePicker",
-      "owner": "packages/ui/src/components/forms/FilePicker/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/FilePicker/",
       "component": {
         "name": "FilePicker",
-        "target": "packages/ui/src/components/forms/FilePicker/FilePicker.tsx",
-        "current": ["packages/ui/src/components/forms/FilePicker/FilePicker.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FilePicker/FilePicker.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FilePicker/FilePicker.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#FilePicker",
-        "current": ["packages/ui/src/index.ts#FilePicker"]
+        "target": "@corefoundry-labs/forge-ui#FilePicker",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#FilePicker"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/FilePicker/FilePicker.module.css",
-        "current": ["packages/ui/src/components/forms/FilePicker/FilePicker.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FilePicker/FilePicker.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FilePicker/FilePicker.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/FilePicker/FilePicker.test.tsx",
-        "current": ["packages/ui/src/components/forms/FilePicker/FilePicker.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FilePicker/FilePicker.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FilePicker/FilePicker.test.tsx"]
       },
       "componentHost": {
         "id": "file-picker",
@@ -875,23 +884,25 @@
       "figmaNodeId": "206:616",
       "figmaName": "FormActions",
       "sourceName": "Forms / FormActions",
-      "owner": "packages/ui/src/components/forms/FormActions/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/FormActions/",
       "component": {
         "name": "FormActions",
-        "target": "packages/ui/src/components/forms/FormActions/FormActions.tsx",
-        "current": ["packages/ui/src/components/forms/FormActions/FormActions.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FormActions/FormActions.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FormActions/FormActions.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#FormActions",
-        "current": ["packages/ui/src/index.ts#FormActions"]
+        "target": "@corefoundry-labs/forge-ui#FormActions",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#FormActions"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/FormActions/FormActions.module.css",
-        "current": ["packages/ui/src/components/forms/FormActions/FormActions.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FormActions/FormActions.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/forms/FormActions/FormActions.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/FormActions/FormActions.test.tsx",
-        "current": ["packages/ui/src/components/forms/FormActions/FormActions.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/FormActions/FormActions.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/FormActions/FormActions.test.tsx"]
       },
       "componentHost": {
         "id": "form-actions",
@@ -937,23 +948,23 @@
       "figmaNodeId": "206:670",
       "figmaName": "Radio",
       "sourceName": "Forms / Radio",
-      "owner": "packages/ui/src/components/forms/Radio/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/Radio/",
       "component": {
         "name": "Radio",
-        "target": "packages/ui/src/components/forms/Radio/Radio.tsx",
-        "current": ["packages/ui/src/components/forms/Radio/Radio.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Radio/Radio.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Radio/Radio.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Radio",
-        "current": ["packages/ui/src/index.ts#Radio"]
+        "target": "@corefoundry-labs/forge-ui#Radio",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Radio"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/Radio/Radio.module.css",
-        "current": ["packages/ui/src/components/forms/Radio/Radio.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Radio/Radio.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Radio/Radio.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/Radio/Radio.test.tsx",
-        "current": ["packages/ui/src/components/forms/Radio/Radio.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Radio/Radio.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Radio/Radio.test.tsx"]
       },
       "componentHost": {
         "id": "radio",
@@ -999,23 +1010,23 @@
       "figmaNodeId": "206:683",
       "figmaName": "Switch",
       "sourceName": "Forms / Switch",
-      "owner": "packages/ui/src/components/forms/Switch/",
+      "owner": "@corefoundry-labs/forge-ui/components/forms/Switch/",
       "component": {
         "name": "Switch",
-        "target": "packages/ui/src/components/forms/Switch/Switch.tsx",
-        "current": ["packages/ui/src/components/forms/Switch/Switch.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Switch/Switch.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Switch/Switch.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Switch",
-        "current": ["packages/ui/src/index.ts#Switch"]
+        "target": "@corefoundry-labs/forge-ui#Switch",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Switch"]
       },
       "styles": {
-        "target": "packages/ui/src/components/forms/Switch/Switch.module.css",
-        "current": ["packages/ui/src/components/forms/Switch/Switch.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Switch/Switch.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Switch/Switch.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/forms/Switch/Switch.test.tsx",
-        "current": ["packages/ui/src/components/forms/Switch/Switch.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/forms/Switch/Switch.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/forms/Switch/Switch.test.tsx"]
       },
       "componentHost": {
         "id": "switch",
@@ -1061,23 +1072,23 @@
       "figmaNodeId": "173:87",
       "figmaName": "Tab/Tabs",
       "sourceName": "Navigation / Tab",
-      "owner": "packages/ui/src/components/navigation/Tabs/",
+      "owner": "@corefoundry-labs/forge-ui/components/navigation/Tabs/",
       "component": {
         "name": "Tabs",
-        "target": "packages/ui/src/components/navigation/Tabs/Tabs.tsx",
-        "current": ["packages/ui/src/components/navigation/Tabs/Tabs.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/Tabs/Tabs.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/Tabs/Tabs.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Tabs",
-        "current": ["packages/ui/src/index.ts#Tabs"]
+        "target": "@corefoundry-labs/forge-ui#Tabs",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Tabs"]
       },
       "styles": {
-        "target": "packages/ui/src/components/navigation/Tabs/Tabs.module.css",
-        "current": ["packages/ui/src/components/navigation/Tabs/Tabs.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/Tabs/Tabs.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/Tabs/Tabs.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/navigation/Tabs/Tabs.test.tsx",
-        "current": ["packages/ui/src/components/navigation/Tabs/Tabs.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/Tabs/Tabs.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/Tabs/Tabs.test.tsx"]
       },
       "componentHost": {
         "id": "tabs",
@@ -1129,23 +1140,27 @@
       "figmaNodeId": "177:186",
       "figmaName": "Breadcrumbs",
       "sourceName": "Breadcrumbs",
-      "owner": "packages/ui/src/components/navigation/Breadcrumbs/",
+      "owner": "@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/",
       "component": {
         "name": "Breadcrumbs",
-        "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.tsx",
-        "current": ["packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/Breadcrumbs.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/Breadcrumbs.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Breadcrumbs",
-        "current": ["packages/ui/src/index.ts#Breadcrumbs"]
+        "target": "@corefoundry-labs/forge-ui#Breadcrumbs",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Breadcrumbs"]
       },
       "styles": {
-        "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.module.css",
-        "current": ["packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/Breadcrumbs.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/Breadcrumbs.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx",
-        "current": ["packages/ui/src/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/navigation/Breadcrumbs/Breadcrumbs.test.tsx"
+        ]
       },
       "componentHost": {
         "id": "breadcrumbs",
@@ -1179,23 +1194,23 @@
       "figmaNodeId": "181:242",
       "figmaName": "MenuItem",
       "sourceName": "Navigation / MenuItem",
-      "owner": "packages/ui/src/components/navigation/MenuItem/",
+      "owner": "@corefoundry-labs/forge-ui/components/navigation/MenuItem/",
       "component": {
         "name": "MenuItem",
-        "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.tsx",
-        "current": ["packages/ui/src/components/navigation/MenuItem/MenuItem.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/MenuItem/MenuItem.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/MenuItem/MenuItem.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#MenuItem",
-        "current": ["packages/ui/src/index.ts#MenuItem"]
+        "target": "@corefoundry-labs/forge-ui#MenuItem",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#MenuItem"]
       },
       "styles": {
-        "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.module.css",
-        "current": ["packages/ui/src/components/navigation/MenuItem/MenuItem.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/MenuItem/MenuItem.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/MenuItem/MenuItem.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/navigation/MenuItem/MenuItem.test.tsx",
-        "current": ["packages/ui/src/components/navigation/MenuItem/MenuItem.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/MenuItem/MenuItem.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/MenuItem/MenuItem.test.tsx"]
       },
       "componentHost": {
         "id": "menu-item",
@@ -1241,23 +1256,27 @@
       "figmaNodeId": "181:255",
       "figmaName": "StepperStep",
       "sourceName": "Navigation / StepperStep",
-      "owner": "packages/ui/src/components/navigation/StepperStep/",
+      "owner": "@corefoundry-labs/forge-ui/components/navigation/StepperStep/",
       "component": {
         "name": "StepperStep",
-        "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.tsx",
-        "current": ["packages/ui/src/components/navigation/StepperStep/StepperStep.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/StepperStep/StepperStep.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/navigation/StepperStep/StepperStep.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#StepperStep",
-        "current": ["packages/ui/src/index.ts#StepperStep"]
+        "target": "@corefoundry-labs/forge-ui#StepperStep",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#StepperStep"]
       },
       "styles": {
-        "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.module.css",
-        "current": ["packages/ui/src/components/navigation/StepperStep/StepperStep.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/StepperStep/StepperStep.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/navigation/StepperStep/StepperStep.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/navigation/StepperStep/StepperStep.test.tsx",
-        "current": ["packages/ui/src/components/navigation/StepperStep/StepperStep.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/navigation/StepperStep/StepperStep.test.tsx",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/navigation/StepperStep/StepperStep.test.tsx"
+        ]
       },
       "componentHost": {
         "id": "stepper-step",
@@ -1303,23 +1322,23 @@
       "figmaNodeId": "173:65",
       "figmaName": "Card",
       "sourceName": "Surfaces / Card",
-      "owner": "packages/ui/src/components/surfaces/Card/",
+      "owner": "@corefoundry-labs/forge-ui/components/surfaces/Card/",
       "component": {
         "name": "Card",
-        "target": "packages/ui/src/components/surfaces/Card/Card.tsx",
-        "current": ["packages/ui/src/components/surfaces/Card/Card.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/surfaces/Card/Card.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/surfaces/Card/Card.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Card",
-        "current": ["packages/ui/src/index.ts#Card"]
+        "target": "@corefoundry-labs/forge-ui#Card",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Card"]
       },
       "styles": {
-        "target": "packages/ui/src/components/surfaces/Card/Card.module.css",
-        "current": ["packages/ui/src/components/surfaces/Card/Card.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/surfaces/Card/Card.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/surfaces/Card/Card.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/surfaces/Card/Card.test.tsx",
-        "current": ["packages/ui/src/components/surfaces/Card/Card.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/surfaces/Card/Card.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/surfaces/Card/Card.test.tsx"]
       },
       "componentHost": {
         "id": "card",
@@ -1359,23 +1378,25 @@
       "figmaNodeId": "173:66",
       "figmaName": "MetricCard",
       "sourceName": "MetricCard",
-      "owner": "packages/ui/src/components/surfaces/MetricCard/",
+      "owner": "@corefoundry-labs/forge-ui/components/surfaces/MetricCard/",
       "component": {
         "name": "MetricCard",
-        "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.tsx",
-        "current": ["packages/ui/src/components/surfaces/MetricCard/MetricCard.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/surfaces/MetricCard/MetricCard.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/surfaces/MetricCard/MetricCard.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#MetricCard",
-        "current": ["packages/ui/src/index.ts#MetricCard"]
+        "target": "@corefoundry-labs/forge-ui#MetricCard",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#MetricCard"]
       },
       "styles": {
-        "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.module.css",
-        "current": ["packages/ui/src/components/surfaces/MetricCard/MetricCard.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/surfaces/MetricCard/MetricCard.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/surfaces/MetricCard/MetricCard.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/surfaces/MetricCard/MetricCard.test.tsx",
-        "current": ["packages/ui/src/components/surfaces/MetricCard/MetricCard.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/surfaces/MetricCard/MetricCard.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/surfaces/MetricCard/MetricCard.test.tsx"]
       },
       "componentHost": {
         "id": "metric-card",
@@ -1409,23 +1430,23 @@
       "figmaNodeId": "173:40",
       "figmaName": "StatusChip",
       "sourceName": "Status / StatusChip",
-      "owner": "packages/ui/src/components/status/StatusChip/",
+      "owner": "@corefoundry-labs/forge-ui/components/status/StatusChip/",
       "component": {
         "name": "StatusChip",
-        "target": "packages/ui/src/components/status/StatusChip/StatusChip.tsx",
-        "current": ["packages/ui/src/components/status/StatusChip/StatusChip.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/status/StatusChip/StatusChip.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/status/StatusChip/StatusChip.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#StatusChip",
-        "current": ["packages/ui/src/index.ts#StatusChip"]
+        "target": "@corefoundry-labs/forge-ui#StatusChip",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#StatusChip"]
       },
       "styles": {
-        "target": "packages/ui/src/components/status/StatusChip/StatusChip.module.css",
-        "current": ["packages/ui/src/components/status/StatusChip/StatusChip.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/status/StatusChip/StatusChip.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/status/StatusChip/StatusChip.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/status/StatusChip/StatusChip.test.tsx",
-        "current": ["packages/ui/src/components/status/StatusChip/StatusChip.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/status/StatusChip/StatusChip.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/status/StatusChip/StatusChip.test.tsx"]
       },
       "componentHost": {
         "id": "status-chip",
@@ -1489,23 +1510,23 @@
       "figmaNodeId": "177:172",
       "figmaName": "Badge",
       "sourceName": "Status / Badge",
-      "owner": "packages/ui/src/components/status/Badge/",
+      "owner": "@corefoundry-labs/forge-ui/components/status/Badge/",
       "component": {
         "name": "Badge",
-        "target": "packages/ui/src/components/status/Badge/Badge.tsx",
-        "current": ["packages/ui/src/components/status/Badge/Badge.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/status/Badge/Badge.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/status/Badge/Badge.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Badge",
-        "current": ["packages/ui/src/index.ts#Badge"]
+        "target": "@corefoundry-labs/forge-ui#Badge",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Badge"]
       },
       "styles": {
-        "target": "packages/ui/src/components/status/Badge/Badge.module.css",
-        "current": ["packages/ui/src/components/status/Badge/Badge.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/status/Badge/Badge.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/status/Badge/Badge.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/status/Badge/Badge.test.tsx",
-        "current": ["packages/ui/src/components/status/Badge/Badge.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/status/Badge/Badge.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/status/Badge/Badge.test.tsx"]
       },
       "componentHost": {
         "id": "badge",
@@ -1552,23 +1573,23 @@
       "figmaNodeId": "173:82",
       "figmaName": "Alert",
       "sourceName": "Feedback / Alert",
-      "owner": "packages/ui/src/components/feedback/Alert/",
+      "owner": "@corefoundry-labs/forge-ui/components/feedback/Alert/",
       "component": {
         "name": "Alert",
-        "target": "packages/ui/src/components/feedback/Alert/Alert.tsx",
-        "current": ["packages/ui/src/components/feedback/Alert/Alert.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Alert/Alert.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Alert/Alert.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Alert",
-        "current": ["packages/ui/src/index.ts#Alert"]
+        "target": "@corefoundry-labs/forge-ui#Alert",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Alert"]
       },
       "styles": {
-        "target": "packages/ui/src/components/feedback/Alert/Alert.module.css",
-        "current": ["packages/ui/src/components/feedback/Alert/Alert.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Alert/Alert.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Alert/Alert.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/feedback/Alert/Alert.test.tsx",
-        "current": ["packages/ui/src/components/feedback/Alert/Alert.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Alert/Alert.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Alert/Alert.test.tsx"]
       },
       "componentHost": {
         "id": "alert",
@@ -1621,23 +1642,25 @@
       "figmaNodeId": "177:182",
       "figmaName": "StatePanel",
       "sourceName": "Feedback / StatePanel",
-      "owner": "packages/ui/src/components/feedback/StatePanel/",
+      "owner": "@corefoundry-labs/forge-ui/components/feedback/StatePanel/",
       "component": {
         "name": "StatePanel",
-        "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.tsx",
-        "current": ["packages/ui/src/components/feedback/StatePanel/StatePanel.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/StatePanel/StatePanel.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/StatePanel/StatePanel.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#StatePanel",
-        "current": ["packages/ui/src/index.ts#StatePanel"]
+        "target": "@corefoundry-labs/forge-ui#StatePanel",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#StatePanel"]
       },
       "styles": {
-        "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.module.css",
-        "current": ["packages/ui/src/components/feedback/StatePanel/StatePanel.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/StatePanel/StatePanel.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/feedback/StatePanel/StatePanel.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/feedback/StatePanel/StatePanel.test.tsx",
-        "current": ["packages/ui/src/components/feedback/StatePanel/StatePanel.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/StatePanel/StatePanel.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/StatePanel/StatePanel.test.tsx"]
       },
       "componentHost": {
         "id": "state-panel",
@@ -1684,15 +1707,15 @@
       "implementationNotes": "Public StatePanel supports loading, empty, read-only and error states with status/alert semantics. Human visual review remains NOT_HUMAN_REVIEWED.",
       "relatedImplementation": [
         {
-          "path": "packages/ui/src/components/feedback/EmptyState/EmptyState.tsx",
+          "path": "@corefoundry-labs/forge-ui/components/feedback/EmptyState/EmptyState.tsx",
           "kind": "RELATED_COMPONENT"
         },
         {
-          "path": "packages/ui/src/components/feedback/LoadingState/LoadingState.tsx",
+          "path": "@corefoundry-labs/forge-ui/components/feedback/LoadingState/LoadingState.tsx",
           "kind": "RELATED_COMPONENT"
         },
         {
-          "path": "packages/ui/src/components/feedback/ErrorState/ErrorState.tsx",
+          "path": "@corefoundry-labs/forge-ui/components/feedback/ErrorState/ErrorState.tsx",
           "kind": "RELATED_COMPONENT"
         }
       ]
@@ -1702,23 +1725,23 @@
       "figmaNodeId": "181:300",
       "figmaName": "Progress",
       "sourceName": "Feedback / Progress",
-      "owner": "packages/ui/src/components/feedback/Progress/",
+      "owner": "@corefoundry-labs/forge-ui/components/feedback/Progress/",
       "component": {
         "name": "Progress",
-        "target": "packages/ui/src/components/feedback/Progress/Progress.tsx",
-        "current": ["packages/ui/src/components/feedback/Progress/Progress.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Progress/Progress.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Progress/Progress.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Progress",
-        "current": ["packages/ui/src/index.ts#Progress"]
+        "target": "@corefoundry-labs/forge-ui#Progress",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Progress"]
       },
       "styles": {
-        "target": "packages/ui/src/components/feedback/Progress/Progress.module.css",
-        "current": ["packages/ui/src/components/feedback/Progress/Progress.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Progress/Progress.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Progress/Progress.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/feedback/Progress/Progress.test.tsx",
-        "current": ["packages/ui/src/components/feedback/Progress/Progress.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Progress/Progress.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Progress/Progress.test.tsx"]
       },
       "componentHost": {
         "id": "progress",
@@ -1764,23 +1787,23 @@
       "figmaNodeId": "206:641",
       "figmaName": "Tooltip",
       "sourceName": "Feedback / Tooltip",
-      "owner": "packages/ui/src/components/feedback/Tooltip/",
+      "owner": "@corefoundry-labs/forge-ui/components/feedback/Tooltip/",
       "component": {
         "name": "Tooltip",
-        "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.tsx",
-        "current": ["packages/ui/src/components/feedback/Tooltip/Tooltip.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Tooltip/Tooltip.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Tooltip/Tooltip.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Tooltip",
-        "current": ["packages/ui/src/index.ts#Tooltip"]
+        "target": "@corefoundry-labs/forge-ui#Tooltip",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Tooltip"]
       },
       "styles": {
-        "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.module.css",
-        "current": ["packages/ui/src/components/feedback/Tooltip/Tooltip.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Tooltip/Tooltip.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Tooltip/Tooltip.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/feedback/Tooltip/Tooltip.test.tsx",
-        "current": ["packages/ui/src/components/feedback/Tooltip/Tooltip.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Tooltip/Tooltip.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Tooltip/Tooltip.test.tsx"]
       },
       "componentHost": {
         "id": "tooltip",
@@ -1820,23 +1843,23 @@
       "figmaNodeId": "206:650",
       "figmaName": "Skeleton",
       "sourceName": "Feedback / Skeleton",
-      "owner": "packages/ui/src/components/feedback/Skeleton/",
+      "owner": "@corefoundry-labs/forge-ui/components/feedback/Skeleton/",
       "component": {
         "name": "Skeleton",
-        "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.tsx",
-        "current": ["packages/ui/src/components/feedback/Skeleton/Skeleton.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Skeleton/Skeleton.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Skeleton/Skeleton.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Skeleton",
-        "current": ["packages/ui/src/index.ts#Skeleton"]
+        "target": "@corefoundry-labs/forge-ui#Skeleton",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Skeleton"]
       },
       "styles": {
-        "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.module.css",
-        "current": ["packages/ui/src/components/feedback/Skeleton/Skeleton.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Skeleton/Skeleton.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Skeleton/Skeleton.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/feedback/Skeleton/Skeleton.test.tsx",
-        "current": ["packages/ui/src/components/feedback/Skeleton/Skeleton.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Skeleton/Skeleton.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Skeleton/Skeleton.test.tsx"]
       },
       "componentHost": {
         "id": "skeleton",
@@ -1876,23 +1899,23 @@
       "figmaNodeId": "206:660",
       "figmaName": "Toast",
       "sourceName": "Feedback / Toast",
-      "owner": "packages/ui/src/components/feedback/Toast/",
+      "owner": "@corefoundry-labs/forge-ui/components/feedback/Toast/",
       "component": {
         "name": "Toast",
-        "target": "packages/ui/src/components/feedback/Toast/Toast.tsx",
-        "current": ["packages/ui/src/components/feedback/Toast/Toast.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Toast/Toast.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Toast/Toast.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Toast",
-        "current": ["packages/ui/src/index.ts#Toast"]
+        "target": "@corefoundry-labs/forge-ui#Toast",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Toast"]
       },
       "styles": {
-        "target": "packages/ui/src/components/feedback/Toast/Toast.module.css",
-        "current": ["packages/ui/src/components/feedback/Toast/Toast.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Toast/Toast.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Toast/Toast.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/feedback/Toast/Toast.test.tsx",
-        "current": ["packages/ui/src/components/feedback/Toast/Toast.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/feedback/Toast/Toast.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/feedback/Toast/Toast.test.tsx"]
       },
       "componentHost": {
         "id": "toast",
@@ -1938,23 +1961,27 @@
       "figmaNodeId": "181:271",
       "figmaName": "RecordRow",
       "sourceName": "Data / RecordRow",
-      "owner": "packages/ui/src/components/data-display/",
+      "owner": "@corefoundry-labs/forge-ui/components/data-display/",
       "component": {
         "name": "RecordRow",
-        "target": "packages/ui/src/components/data-display/RecordRow/RecordRow.tsx",
-        "current": ["packages/ui/src/components/data-display/RecordRow/RecordRow.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/RecordRow/RecordRow.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/data-display/RecordRow/RecordRow.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#RecordRow",
-        "current": ["packages/ui/src/index.ts#RecordRow"]
+        "target": "@corefoundry-labs/forge-ui#RecordRow",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#RecordRow"]
       },
       "styles": {
-        "target": "packages/ui/src/components/data-display/RecordRow/RecordRow.module.css",
-        "current": ["packages/ui/src/components/data-display/RecordRow/RecordRow.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/RecordRow/RecordRow.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/data-display/RecordRow/RecordRow.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/data-display/RecordRow/RecordRow.test.tsx",
-        "current": ["packages/ui/src/components/data-display/RecordRow/RecordRow.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/RecordRow/RecordRow.test.tsx",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/data-display/RecordRow/RecordRow.test.tsx"
+        ]
       },
       "componentHost": {
         "id": "record-row",
@@ -2000,23 +2027,29 @@
       "figmaNodeId": "181:278",
       "figmaName": "KeyValueRow",
       "sourceName": "Data / KeyValueRow",
-      "owner": "packages/ui/src/components/data-display/",
+      "owner": "@corefoundry-labs/forge-ui/components/data-display/",
       "component": {
         "name": "KeyValueRow",
-        "target": "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.tsx",
-        "current": ["packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/KeyValueRow/KeyValueRow.tsx",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/data-display/KeyValueRow/KeyValueRow.tsx"
+        ]
       },
       "publicApi": {
-        "target": "@forge-org/ui#KeyValueRow",
-        "current": ["packages/ui/src/index.ts#KeyValueRow"]
+        "target": "@corefoundry-labs/forge-ui#KeyValueRow",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#KeyValueRow"]
       },
       "styles": {
-        "target": "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.module.css",
-        "current": ["packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/KeyValueRow/KeyValueRow.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/data-display/KeyValueRow/KeyValueRow.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.test.tsx",
-        "current": ["packages/ui/src/components/data-display/KeyValueRow/KeyValueRow.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/KeyValueRow/KeyValueRow.test.tsx",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/data-display/KeyValueRow/KeyValueRow.test.tsx"
+        ]
       },
       "componentHost": {
         "id": "key-value-row",
@@ -2056,23 +2089,25 @@
       "figmaNodeId": "181:334",
       "figmaName": "TableRow",
       "sourceName": "Data / TableRow",
-      "owner": "packages/ui/src/components/data-display/",
+      "owner": "@corefoundry-labs/forge-ui/components/data-display/",
       "component": {
         "name": "TableRow",
-        "target": "packages/ui/src/components/data-display/TableRow/TableRow.tsx",
-        "current": ["packages/ui/src/components/data-display/TableRow/TableRow.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/TableRow/TableRow.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/data-display/TableRow/TableRow.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#TableRow",
-        "current": ["packages/ui/src/index.ts#TableRow"]
+        "target": "@corefoundry-labs/forge-ui#TableRow",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#TableRow"]
       },
       "styles": {
-        "target": "packages/ui/src/components/data-display/TableRow/TableRow.module.css",
-        "current": ["packages/ui/src/components/data-display/TableRow/TableRow.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/TableRow/TableRow.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/data-display/TableRow/TableRow.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/data-display/TableRow/TableRow.test.tsx",
-        "current": ["packages/ui/src/components/data-display/TableRow/TableRow.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/TableRow/TableRow.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/data-display/TableRow/TableRow.test.tsx"]
       },
       "componentHost": {
         "id": "table-row",
@@ -2118,23 +2153,23 @@
       "figmaNodeId": "206:636",
       "figmaName": "Table",
       "sourceName": "Data / Table",
-      "owner": "packages/ui/src/components/data-display/",
+      "owner": "@corefoundry-labs/forge-ui/components/data-display/",
       "component": {
         "name": "Table",
-        "target": "packages/ui/src/components/data-display/Table/Table.tsx",
-        "current": ["packages/ui/src/components/data-display/Table/Table.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/Table/Table.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/data-display/Table/Table.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Table",
-        "current": ["packages/ui/src/index.ts#Table"]
+        "target": "@corefoundry-labs/forge-ui#Table",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Table"]
       },
       "styles": {
-        "target": "packages/ui/src/components/data-display/Table/Table.module.css",
-        "current": ["packages/ui/src/components/data-display/Table/Table.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/Table/Table.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/data-display/Table/Table.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/data-display/Table/Table.test.tsx",
-        "current": ["packages/ui/src/components/data-display/Table/Table.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/data-display/Table/Table.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/data-display/Table/Table.test.tsx"]
       },
       "componentHost": {
         "id": "table",
@@ -2174,23 +2209,23 @@
       "figmaNodeId": "206:580",
       "figmaName": "Dialog",
       "sourceName": "Overlays / Dialog",
-      "owner": "packages/ui/src/components/overlays/Dialog/",
+      "owner": "@corefoundry-labs/forge-ui/components/overlays/Dialog/",
       "component": {
         "name": "Dialog",
-        "target": "packages/ui/src/components/overlays/Dialog/Dialog.tsx",
-        "current": ["packages/ui/src/components/overlays/Dialog/Dialog.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/overlays/Dialog/Dialog.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/overlays/Dialog/Dialog.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Dialog",
-        "current": ["packages/ui/src/index.ts#Dialog"]
+        "target": "@corefoundry-labs/forge-ui#Dialog",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Dialog"]
       },
       "styles": {
-        "target": "packages/ui/src/components/overlays/Dialog/Dialog.module.css",
-        "current": ["packages/ui/src/components/overlays/Dialog/Dialog.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/overlays/Dialog/Dialog.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/overlays/Dialog/Dialog.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/overlays/Dialog/Dialog.test.tsx",
-        "current": ["packages/ui/src/components/overlays/Dialog/Dialog.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/overlays/Dialog/Dialog.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/overlays/Dialog/Dialog.test.tsx"]
       },
       "componentHost": {
         "id": "dialog",
@@ -2236,23 +2271,23 @@
       "figmaNodeId": "206:593",
       "figmaName": "Popover",
       "sourceName": "Overlays / Popover",
-      "owner": "packages/ui/src/components/overlays/Popover/",
+      "owner": "@corefoundry-labs/forge-ui/components/overlays/Popover/",
       "component": {
         "name": "Popover",
-        "target": "packages/ui/src/components/overlays/Popover/Popover.tsx",
-        "current": ["packages/ui/src/components/overlays/Popover/Popover.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/overlays/Popover/Popover.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/overlays/Popover/Popover.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Popover",
-        "current": ["packages/ui/src/index.ts#Popover"]
+        "target": "@corefoundry-labs/forge-ui#Popover",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Popover"]
       },
       "styles": {
-        "target": "packages/ui/src/components/overlays/Popover/Popover.module.css",
-        "current": ["packages/ui/src/components/overlays/Popover/Popover.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/overlays/Popover/Popover.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/overlays/Popover/Popover.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/overlays/Popover/Popover.test.tsx",
-        "current": ["packages/ui/src/components/overlays/Popover/Popover.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/overlays/Popover/Popover.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/overlays/Popover/Popover.test.tsx"]
       },
       "componentHost": {
         "id": "popover",
@@ -2292,23 +2327,27 @@
       "figmaNodeId": "177:183",
       "figmaName": "SectionHeader",
       "sourceName": "SectionHeader",
-      "owner": "packages/ui/src/components/layout/SectionHeader/",
+      "owner": "@corefoundry-labs/forge-ui/components/layout/SectionHeader/",
       "component": {
         "name": "SectionHeader",
-        "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.tsx",
-        "current": ["packages/ui/src/components/layout/SectionHeader/SectionHeader.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/SectionHeader/SectionHeader.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/SectionHeader/SectionHeader.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#SectionHeader",
-        "current": ["packages/ui/src/index.ts#SectionHeader"]
+        "target": "@corefoundry-labs/forge-ui#SectionHeader",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#SectionHeader"]
       },
       "styles": {
-        "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.module.css",
-        "current": ["packages/ui/src/components/layout/SectionHeader/SectionHeader.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/SectionHeader/SectionHeader.module.css",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/layout/SectionHeader/SectionHeader.module.css"
+        ]
       },
       "tests": {
-        "target": "packages/ui/src/components/layout/SectionHeader/SectionHeader.test.tsx",
-        "current": ["packages/ui/src/components/layout/SectionHeader/SectionHeader.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/SectionHeader/SectionHeader.test.tsx",
+        "current": [
+          "@corefoundry-labs/forge-ui/components/layout/SectionHeader/SectionHeader.test.tsx"
+        ]
       },
       "componentHost": {
         "id": "section-header",
@@ -2342,23 +2381,23 @@
       "figmaNodeId": "181:335",
       "figmaName": "Divider",
       "sourceName": "Divider",
-      "owner": "packages/ui/src/components/layout/Divider/",
+      "owner": "@corefoundry-labs/forge-ui/components/layout/Divider/",
       "component": {
         "name": "Divider",
-        "target": "packages/ui/src/components/layout/Divider/Divider.tsx",
-        "current": ["packages/ui/src/components/layout/Divider/Divider.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/Divider/Divider.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/Divider/Divider.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#Divider",
-        "current": ["packages/ui/src/index.ts#Divider"]
+        "target": "@corefoundry-labs/forge-ui#Divider",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#Divider"]
       },
       "styles": {
-        "target": "packages/ui/src/components/layout/Divider/Divider.module.css",
-        "current": ["packages/ui/src/components/layout/Divider/Divider.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/Divider/Divider.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/Divider/Divider.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/layout/Divider/Divider.test.tsx",
-        "current": ["packages/ui/src/components/layout/Divider/Divider.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/Divider/Divider.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/Divider/Divider.test.tsx"]
       },
       "componentHost": {
         "id": "divider",
@@ -2392,23 +2431,23 @@
       "figmaNodeId": "181:337",
       "figmaName": "CodeLabel",
       "sourceName": "Technical / CodeLabel",
-      "owner": "packages/ui/src/components/layout/CodeLabel/",
+      "owner": "@corefoundry-labs/forge-ui/components/layout/CodeLabel/",
       "component": {
         "name": "CodeLabel",
-        "target": "packages/ui/src/components/layout/CodeLabel/CodeLabel.tsx",
-        "current": ["packages/ui/src/components/layout/CodeLabel/CodeLabel.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/CodeLabel/CodeLabel.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/CodeLabel/CodeLabel.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/ui#CodeLabel",
-        "current": ["packages/ui/src/index.ts#CodeLabel"]
+        "target": "@corefoundry-labs/forge-ui#CodeLabel",
+        "current": ["@corefoundry-labs/forge-ui/index.ts#CodeLabel"]
       },
       "styles": {
-        "target": "packages/ui/src/components/layout/CodeLabel/CodeLabel.module.css",
-        "current": ["packages/ui/src/components/layout/CodeLabel/CodeLabel.module.css"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/CodeLabel/CodeLabel.module.css",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/CodeLabel/CodeLabel.module.css"]
       },
       "tests": {
-        "target": "packages/ui/src/components/layout/CodeLabel/CodeLabel.test.tsx",
-        "current": ["packages/ui/src/components/layout/CodeLabel/CodeLabel.test.tsx"]
+        "target": "@corefoundry-labs/forge-ui/components/layout/CodeLabel/CodeLabel.test.tsx",
+        "current": ["@corefoundry-labs/forge-ui/components/layout/CodeLabel/CodeLabel.test.tsx"]
       },
       "componentHost": {
         "id": "code-label",
@@ -2442,23 +2481,23 @@
       "figmaNodeId": "208:740",
       "figmaName": "Plus",
       "sourceName": "Icon / Plus",
-      "owner": "packages/icons/src/icons/Plus/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Plus/",
       "component": {
         "name": "Plus",
-        "target": "packages/icons/src/icons/Plus/Plus.tsx",
-        "current": ["packages/icons/src/icons/Plus/Plus.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Plus/Plus.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Plus/Plus.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Plus",
-        "current": ["packages/icons/src/index.ts#Plus"]
+        "target": "@corefoundry-labs/forge-icons#Plus",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Plus"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Plus/Plus.module.css",
-        "current": ["packages/icons/src/icons/Plus/Plus.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Plus/Plus.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Plus/Plus.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Plus/Plus.test.tsx",
-        "current": ["packages/icons/src/icons/Plus/Plus.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Plus/Plus.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Plus/Plus.test.tsx"]
       },
       "componentHost": {
         "id": "icon-plus",
@@ -2492,23 +2531,23 @@
       "figmaNodeId": "208:743",
       "figmaName": "Close",
       "sourceName": "Icon / Close",
-      "owner": "packages/icons/src/icons/Close/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Close/",
       "component": {
         "name": "Close",
-        "target": "packages/icons/src/icons/Close/Close.tsx",
-        "current": ["packages/icons/src/icons/Close/Close.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Close/Close.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Close/Close.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Close",
-        "current": ["packages/icons/src/index.ts#Close"]
+        "target": "@corefoundry-labs/forge-icons#Close",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Close"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Close/Close.module.css",
-        "current": ["packages/icons/src/icons/Close/Close.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Close/Close.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Close/Close.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Close/Close.test.tsx",
-        "current": ["packages/icons/src/icons/Close/Close.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Close/Close.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Close/Close.test.tsx"]
       },
       "componentHost": {
         "id": "icon-close",
@@ -2542,23 +2581,23 @@
       "figmaNodeId": "208:746",
       "figmaName": "Chevron",
       "sourceName": "Icon / Chevron",
-      "owner": "packages/icons/src/icons/Chevron/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Chevron/",
       "component": {
         "name": "Chevron",
-        "target": "packages/icons/src/icons/Chevron/Chevron.tsx",
-        "current": ["packages/icons/src/icons/Chevron/Chevron.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Chevron/Chevron.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Chevron/Chevron.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Chevron",
-        "current": ["packages/icons/src/index.ts#Chevron"]
+        "target": "@corefoundry-labs/forge-icons#Chevron",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Chevron"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Chevron/Chevron.module.css",
-        "current": ["packages/icons/src/icons/Chevron/Chevron.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Chevron/Chevron.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Chevron/Chevron.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Chevron/Chevron.test.tsx",
-        "current": ["packages/icons/src/icons/Chevron/Chevron.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Chevron/Chevron.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Chevron/Chevron.test.tsx"]
       },
       "componentHost": {
         "id": "icon-chevron",
@@ -2592,23 +2631,23 @@
       "figmaNodeId": "208:749",
       "figmaName": "Check",
       "sourceName": "Icon / Check",
-      "owner": "packages/icons/src/icons/Check/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Check/",
       "component": {
         "name": "Check",
-        "target": "packages/icons/src/icons/Check/Check.tsx",
-        "current": ["packages/icons/src/icons/Check/Check.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Check/Check.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Check/Check.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Check",
-        "current": ["packages/icons/src/index.ts#Check"]
+        "target": "@corefoundry-labs/forge-icons#Check",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Check"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Check/Check.module.css",
-        "current": ["packages/icons/src/icons/Check/Check.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Check/Check.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Check/Check.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Check/Check.test.tsx",
-        "current": ["packages/icons/src/icons/Check/Check.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Check/Check.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Check/Check.test.tsx"]
       },
       "componentHost": {
         "id": "icon-check",
@@ -2642,23 +2681,23 @@
       "figmaNodeId": "208:752",
       "figmaName": "Minus",
       "sourceName": "Icon / Minus",
-      "owner": "packages/icons/src/icons/Minus/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Minus/",
       "component": {
         "name": "Minus",
-        "target": "packages/icons/src/icons/Minus/Minus.tsx",
-        "current": ["packages/icons/src/icons/Minus/Minus.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Minus/Minus.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Minus/Minus.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Minus",
-        "current": ["packages/icons/src/index.ts#Minus"]
+        "target": "@corefoundry-labs/forge-icons#Minus",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Minus"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Minus/Minus.module.css",
-        "current": ["packages/icons/src/icons/Minus/Minus.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Minus/Minus.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Minus/Minus.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Minus/Minus.test.tsx",
-        "current": ["packages/icons/src/icons/Minus/Minus.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Minus/Minus.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Minus/Minus.test.tsx"]
       },
       "componentHost": {
         "id": "icon-minus",
@@ -2692,23 +2731,23 @@
       "figmaNodeId": "236:2225",
       "figmaName": "Search",
       "sourceName": "Icon / Search",
-      "owner": "packages/icons/src/icons/Search/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Search/",
       "component": {
         "name": "Search",
-        "target": "packages/icons/src/icons/Search/Search.tsx",
-        "current": ["packages/icons/src/icons/Search/Search.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Search/Search.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Search/Search.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Search",
-        "current": ["packages/icons/src/index.ts#Search"]
+        "target": "@corefoundry-labs/forge-icons#Search",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Search"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Search/Search.module.css",
-        "current": ["packages/icons/src/icons/Search/Search.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Search/Search.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Search/Search.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Search/Search.test.tsx",
-        "current": ["packages/icons/src/icons/Search/Search.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Search/Search.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Search/Search.test.tsx"]
       },
       "componentHost": {
         "id": "icon-search",
@@ -2742,23 +2781,23 @@
       "figmaNodeId": "237:826",
       "figmaName": "Menu",
       "sourceName": "Icon / Menu",
-      "owner": "packages/icons/src/icons/Menu/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Menu/",
       "component": {
         "name": "Menu",
-        "target": "packages/icons/src/icons/Menu/Menu.tsx",
-        "current": ["packages/icons/src/icons/Menu/Menu.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Menu/Menu.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Menu/Menu.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Menu",
-        "current": ["packages/icons/src/index.ts#Menu"]
+        "target": "@corefoundry-labs/forge-icons#Menu",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Menu"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Menu/Menu.module.css",
-        "current": ["packages/icons/src/icons/Menu/Menu.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Menu/Menu.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Menu/Menu.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Menu/Menu.test.tsx",
-        "current": ["packages/icons/src/icons/Menu/Menu.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Menu/Menu.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Menu/Menu.test.tsx"]
       },
       "componentHost": {
         "id": "icon-menu",
@@ -2792,23 +2831,23 @@
       "figmaNodeId": "237:829",
       "figmaName": "Edit",
       "sourceName": "Icon / Edit",
-      "owner": "packages/icons/src/icons/Edit/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Edit/",
       "component": {
         "name": "Edit",
-        "target": "packages/icons/src/icons/Edit/Edit.tsx",
-        "current": ["packages/icons/src/icons/Edit/Edit.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Edit/Edit.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Edit/Edit.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Edit",
-        "current": ["packages/icons/src/index.ts#Edit"]
+        "target": "@corefoundry-labs/forge-icons#Edit",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Edit"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Edit/Edit.module.css",
-        "current": ["packages/icons/src/icons/Edit/Edit.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Edit/Edit.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Edit/Edit.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Edit/Edit.test.tsx",
-        "current": ["packages/icons/src/icons/Edit/Edit.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Edit/Edit.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Edit/Edit.test.tsx"]
       },
       "componentHost": {
         "id": "icon-edit",
@@ -2842,23 +2881,23 @@
       "figmaNodeId": "237:833",
       "figmaName": "Trash",
       "sourceName": "Icon / Trash",
-      "owner": "packages/icons/src/icons/Trash/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Trash/",
       "component": {
         "name": "Trash",
-        "target": "packages/icons/src/icons/Trash/Trash.tsx",
-        "current": ["packages/icons/src/icons/Trash/Trash.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Trash/Trash.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Trash/Trash.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Trash",
-        "current": ["packages/icons/src/index.ts#Trash"]
+        "target": "@corefoundry-labs/forge-icons#Trash",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Trash"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Trash/Trash.module.css",
-        "current": ["packages/icons/src/icons/Trash/Trash.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Trash/Trash.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Trash/Trash.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Trash/Trash.test.tsx",
-        "current": ["packages/icons/src/icons/Trash/Trash.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Trash/Trash.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Trash/Trash.test.tsx"]
       },
       "componentHost": {
         "id": "icon-trash",
@@ -2892,23 +2931,23 @@
       "figmaNodeId": "237:836",
       "figmaName": "Download",
       "sourceName": "Icon / Download",
-      "owner": "packages/icons/src/icons/Download/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Download/",
       "component": {
         "name": "Download",
-        "target": "packages/icons/src/icons/Download/Download.tsx",
-        "current": ["packages/icons/src/icons/Download/Download.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Download/Download.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Download/Download.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Download",
-        "current": ["packages/icons/src/index.ts#Download"]
+        "target": "@corefoundry-labs/forge-icons#Download",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Download"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Download/Download.module.css",
-        "current": ["packages/icons/src/icons/Download/Download.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Download/Download.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Download/Download.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Download/Download.test.tsx",
-        "current": ["packages/icons/src/icons/Download/Download.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Download/Download.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Download/Download.test.tsx"]
       },
       "componentHost": {
         "id": "icon-download",
@@ -2942,23 +2981,23 @@
       "figmaNodeId": "237:839",
       "figmaName": "Upload",
       "sourceName": "Icon / Upload",
-      "owner": "packages/icons/src/icons/Upload/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Upload/",
       "component": {
         "name": "Upload",
-        "target": "packages/icons/src/icons/Upload/Upload.tsx",
-        "current": ["packages/icons/src/icons/Upload/Upload.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Upload/Upload.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Upload/Upload.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Upload",
-        "current": ["packages/icons/src/index.ts#Upload"]
+        "target": "@corefoundry-labs/forge-icons#Upload",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Upload"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Upload/Upload.module.css",
-        "current": ["packages/icons/src/icons/Upload/Upload.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Upload/Upload.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Upload/Upload.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Upload/Upload.test.tsx",
-        "current": ["packages/icons/src/icons/Upload/Upload.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Upload/Upload.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Upload/Upload.test.tsx"]
       },
       "componentHost": {
         "id": "icon-upload",
@@ -2992,23 +3031,23 @@
       "figmaNodeId": "237:842",
       "figmaName": "Filter",
       "sourceName": "Icon / Filter",
-      "owner": "packages/icons/src/icons/Filter/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Filter/",
       "component": {
         "name": "Filter",
-        "target": "packages/icons/src/icons/Filter/Filter.tsx",
-        "current": ["packages/icons/src/icons/Filter/Filter.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Filter/Filter.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Filter/Filter.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Filter",
-        "current": ["packages/icons/src/index.ts#Filter"]
+        "target": "@corefoundry-labs/forge-icons#Filter",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Filter"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Filter/Filter.module.css",
-        "current": ["packages/icons/src/icons/Filter/Filter.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Filter/Filter.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Filter/Filter.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Filter/Filter.test.tsx",
-        "current": ["packages/icons/src/icons/Filter/Filter.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Filter/Filter.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Filter/Filter.test.tsx"]
       },
       "componentHost": {
         "id": "icon-filter",
@@ -3042,23 +3081,23 @@
       "figmaNodeId": "237:845",
       "figmaName": "ArrowLeft",
       "sourceName": "Icon / ArrowLeft",
-      "owner": "packages/icons/src/icons/ArrowLeft/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ArrowLeft/",
       "component": {
         "name": "ArrowLeft",
-        "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.tsx",
-        "current": ["packages/icons/src/icons/ArrowLeft/ArrowLeft.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowLeft/ArrowLeft.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowLeft/ArrowLeft.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ArrowLeft",
-        "current": ["packages/icons/src/index.ts#ArrowLeft"]
+        "target": "@corefoundry-labs/forge-icons#ArrowLeft",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ArrowLeft"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.module.css",
-        "current": ["packages/icons/src/icons/ArrowLeft/ArrowLeft.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowLeft/ArrowLeft.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowLeft/ArrowLeft.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ArrowLeft/ArrowLeft.test.tsx",
-        "current": ["packages/icons/src/icons/ArrowLeft/ArrowLeft.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowLeft/ArrowLeft.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowLeft/ArrowLeft.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-left",
@@ -3092,23 +3131,23 @@
       "figmaNodeId": "237:848",
       "figmaName": "ArrowRight",
       "sourceName": "Icon / ArrowRight",
-      "owner": "packages/icons/src/icons/ArrowRight/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ArrowRight/",
       "component": {
         "name": "ArrowRight",
-        "target": "packages/icons/src/icons/ArrowRight/ArrowRight.tsx",
-        "current": ["packages/icons/src/icons/ArrowRight/ArrowRight.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowRight/ArrowRight.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowRight/ArrowRight.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ArrowRight",
-        "current": ["packages/icons/src/index.ts#ArrowRight"]
+        "target": "@corefoundry-labs/forge-icons#ArrowRight",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ArrowRight"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ArrowRight/ArrowRight.module.css",
-        "current": ["packages/icons/src/icons/ArrowRight/ArrowRight.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowRight/ArrowRight.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowRight/ArrowRight.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ArrowRight/ArrowRight.test.tsx",
-        "current": ["packages/icons/src/icons/ArrowRight/ArrowRight.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowRight/ArrowRight.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowRight/ArrowRight.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-right",
@@ -3142,23 +3181,23 @@
       "figmaNodeId": "237:851",
       "figmaName": "ArrowUp",
       "sourceName": "Icon / ArrowUp",
-      "owner": "packages/icons/src/icons/ArrowUp/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ArrowUp/",
       "component": {
         "name": "ArrowUp",
-        "target": "packages/icons/src/icons/ArrowUp/ArrowUp.tsx",
-        "current": ["packages/icons/src/icons/ArrowUp/ArrowUp.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowUp/ArrowUp.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowUp/ArrowUp.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ArrowUp",
-        "current": ["packages/icons/src/index.ts#ArrowUp"]
+        "target": "@corefoundry-labs/forge-icons#ArrowUp",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ArrowUp"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ArrowUp/ArrowUp.module.css",
-        "current": ["packages/icons/src/icons/ArrowUp/ArrowUp.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowUp/ArrowUp.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowUp/ArrowUp.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ArrowUp/ArrowUp.test.tsx",
-        "current": ["packages/icons/src/icons/ArrowUp/ArrowUp.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowUp/ArrowUp.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowUp/ArrowUp.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-up",
@@ -3192,23 +3231,23 @@
       "figmaNodeId": "237:854",
       "figmaName": "ArrowDown",
       "sourceName": "Icon / ArrowDown",
-      "owner": "packages/icons/src/icons/ArrowDown/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ArrowDown/",
       "component": {
         "name": "ArrowDown",
-        "target": "packages/icons/src/icons/ArrowDown/ArrowDown.tsx",
-        "current": ["packages/icons/src/icons/ArrowDown/ArrowDown.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowDown/ArrowDown.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowDown/ArrowDown.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ArrowDown",
-        "current": ["packages/icons/src/index.ts#ArrowDown"]
+        "target": "@corefoundry-labs/forge-icons#ArrowDown",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ArrowDown"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ArrowDown/ArrowDown.module.css",
-        "current": ["packages/icons/src/icons/ArrowDown/ArrowDown.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowDown/ArrowDown.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowDown/ArrowDown.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ArrowDown/ArrowDown.test.tsx",
-        "current": ["packages/icons/src/icons/ArrowDown/ArrowDown.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ArrowDown/ArrowDown.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ArrowDown/ArrowDown.test.tsx"]
       },
       "componentHost": {
         "id": "icon-arrow-down",
@@ -3242,23 +3281,23 @@
       "figmaNodeId": "237:857",
       "figmaName": "AlertTriangle",
       "sourceName": "Icon / AlertTriangle",
-      "owner": "packages/icons/src/icons/AlertTriangle/",
+      "owner": "@corefoundry-labs/forge-icons/icons/AlertTriangle/",
       "component": {
         "name": "AlertTriangle",
-        "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.tsx",
-        "current": ["packages/icons/src/icons/AlertTriangle/AlertTriangle.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/AlertTriangle/AlertTriangle.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/AlertTriangle/AlertTriangle.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#AlertTriangle",
-        "current": ["packages/icons/src/index.ts#AlertTriangle"]
+        "target": "@corefoundry-labs/forge-icons#AlertTriangle",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#AlertTriangle"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.module.css",
-        "current": ["packages/icons/src/icons/AlertTriangle/AlertTriangle.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/AlertTriangle/AlertTriangle.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/AlertTriangle/AlertTriangle.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/AlertTriangle/AlertTriangle.test.tsx",
-        "current": ["packages/icons/src/icons/AlertTriangle/AlertTriangle.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/AlertTriangle/AlertTriangle.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/AlertTriangle/AlertTriangle.test.tsx"]
       },
       "componentHost": {
         "id": "icon-alert-triangle",
@@ -3292,23 +3331,23 @@
       "figmaNodeId": "237:861",
       "figmaName": "Info",
       "sourceName": "Icon / Info",
-      "owner": "packages/icons/src/icons/Info/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Info/",
       "component": {
         "name": "Info",
-        "target": "packages/icons/src/icons/Info/Info.tsx",
-        "current": ["packages/icons/src/icons/Info/Info.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Info/Info.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Info/Info.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Info",
-        "current": ["packages/icons/src/index.ts#Info"]
+        "target": "@corefoundry-labs/forge-icons#Info",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Info"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Info/Info.module.css",
-        "current": ["packages/icons/src/icons/Info/Info.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Info/Info.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Info/Info.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Info/Info.test.tsx",
-        "current": ["packages/icons/src/icons/Info/Info.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Info/Info.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Info/Info.test.tsx"]
       },
       "componentHost": {
         "id": "icon-info",
@@ -3342,23 +3381,23 @@
       "figmaNodeId": "237:865",
       "figmaName": "Clock",
       "sourceName": "Icon / Clock",
-      "owner": "packages/icons/src/icons/Clock/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Clock/",
       "component": {
         "name": "Clock",
-        "target": "packages/icons/src/icons/Clock/Clock.tsx",
-        "current": ["packages/icons/src/icons/Clock/Clock.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Clock/Clock.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Clock/Clock.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Clock",
-        "current": ["packages/icons/src/index.ts#Clock"]
+        "target": "@corefoundry-labs/forge-icons#Clock",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Clock"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Clock/Clock.module.css",
-        "current": ["packages/icons/src/icons/Clock/Clock.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Clock/Clock.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Clock/Clock.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Clock/Clock.test.tsx",
-        "current": ["packages/icons/src/icons/Clock/Clock.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Clock/Clock.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Clock/Clock.test.tsx"]
       },
       "componentHost": {
         "id": "icon-clock",
@@ -3392,23 +3431,23 @@
       "figmaNodeId": "237:869",
       "figmaName": "Folder",
       "sourceName": "Icon / Folder",
-      "owner": "packages/icons/src/icons/Folder/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Folder/",
       "component": {
         "name": "Folder",
-        "target": "packages/icons/src/icons/Folder/Folder.tsx",
-        "current": ["packages/icons/src/icons/Folder/Folder.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Folder/Folder.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Folder/Folder.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Folder",
-        "current": ["packages/icons/src/index.ts#Folder"]
+        "target": "@corefoundry-labs/forge-icons#Folder",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Folder"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Folder/Folder.module.css",
-        "current": ["packages/icons/src/icons/Folder/Folder.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Folder/Folder.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Folder/Folder.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Folder/Folder.test.tsx",
-        "current": ["packages/icons/src/icons/Folder/Folder.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Folder/Folder.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Folder/Folder.test.tsx"]
       },
       "componentHost": {
         "id": "icon-folder",
@@ -3442,23 +3481,23 @@
       "figmaNodeId": "237:872",
       "figmaName": "GitBranch",
       "sourceName": "Icon / GitBranch",
-      "owner": "packages/icons/src/icons/GitBranch/",
+      "owner": "@corefoundry-labs/forge-icons/icons/GitBranch/",
       "component": {
         "name": "GitBranch",
-        "target": "packages/icons/src/icons/GitBranch/GitBranch.tsx",
-        "current": ["packages/icons/src/icons/GitBranch/GitBranch.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/GitBranch/GitBranch.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/GitBranch/GitBranch.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#GitBranch",
-        "current": ["packages/icons/src/index.ts#GitBranch"]
+        "target": "@corefoundry-labs/forge-icons#GitBranch",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#GitBranch"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/GitBranch/GitBranch.module.css",
-        "current": ["packages/icons/src/icons/GitBranch/GitBranch.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/GitBranch/GitBranch.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/GitBranch/GitBranch.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/GitBranch/GitBranch.test.tsx",
-        "current": ["packages/icons/src/icons/GitBranch/GitBranch.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/GitBranch/GitBranch.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/GitBranch/GitBranch.test.tsx"]
       },
       "componentHost": {
         "id": "icon-git-branch",
@@ -3492,23 +3531,23 @@
       "figmaNodeId": "237:878",
       "figmaName": "Refresh",
       "sourceName": "Icon / Refresh",
-      "owner": "packages/icons/src/icons/Refresh/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Refresh/",
       "component": {
         "name": "Refresh",
-        "target": "packages/icons/src/icons/Refresh/Refresh.tsx",
-        "current": ["packages/icons/src/icons/Refresh/Refresh.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Refresh/Refresh.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Refresh/Refresh.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Refresh",
-        "current": ["packages/icons/src/index.ts#Refresh"]
+        "target": "@corefoundry-labs/forge-icons#Refresh",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Refresh"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Refresh/Refresh.module.css",
-        "current": ["packages/icons/src/icons/Refresh/Refresh.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Refresh/Refresh.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Refresh/Refresh.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Refresh/Refresh.test.tsx",
-        "current": ["packages/icons/src/icons/Refresh/Refresh.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Refresh/Refresh.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Refresh/Refresh.test.tsx"]
       },
       "componentHost": {
         "id": "icon-refresh",
@@ -3542,23 +3581,23 @@
       "figmaNodeId": "237:881",
       "figmaName": "ExternalLink",
       "sourceName": "Icon / ExternalLink",
-      "owner": "packages/icons/src/icons/ExternalLink/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ExternalLink/",
       "component": {
         "name": "ExternalLink",
-        "target": "packages/icons/src/icons/ExternalLink/ExternalLink.tsx",
-        "current": ["packages/icons/src/icons/ExternalLink/ExternalLink.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ExternalLink/ExternalLink.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ExternalLink/ExternalLink.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ExternalLink",
-        "current": ["packages/icons/src/index.ts#ExternalLink"]
+        "target": "@corefoundry-labs/forge-icons#ExternalLink",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ExternalLink"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ExternalLink/ExternalLink.module.css",
-        "current": ["packages/icons/src/icons/ExternalLink/ExternalLink.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ExternalLink/ExternalLink.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ExternalLink/ExternalLink.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ExternalLink/ExternalLink.test.tsx",
-        "current": ["packages/icons/src/icons/ExternalLink/ExternalLink.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ExternalLink/ExternalLink.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ExternalLink/ExternalLink.test.tsx"]
       },
       "componentHost": {
         "id": "icon-external-link",
@@ -3592,23 +3631,23 @@
       "figmaNodeId": "237:884",
       "figmaName": "Lock",
       "sourceName": "Icon / Lock",
-      "owner": "packages/icons/src/icons/Lock/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Lock/",
       "component": {
         "name": "Lock",
-        "target": "packages/icons/src/icons/Lock/Lock.tsx",
-        "current": ["packages/icons/src/icons/Lock/Lock.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Lock/Lock.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Lock/Lock.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Lock",
-        "current": ["packages/icons/src/index.ts#Lock"]
+        "target": "@corefoundry-labs/forge-icons#Lock",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Lock"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Lock/Lock.module.css",
-        "current": ["packages/icons/src/icons/Lock/Lock.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Lock/Lock.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Lock/Lock.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Lock/Lock.test.tsx",
-        "current": ["packages/icons/src/icons/Lock/Lock.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Lock/Lock.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Lock/Lock.test.tsx"]
       },
       "componentHost": {
         "id": "icon-lock",
@@ -3642,23 +3681,23 @@
       "figmaNodeId": "237:888",
       "figmaName": "History",
       "sourceName": "Icon / History",
-      "owner": "packages/icons/src/icons/History/",
+      "owner": "@corefoundry-labs/forge-icons/icons/History/",
       "component": {
         "name": "History",
-        "target": "packages/icons/src/icons/History/History.tsx",
-        "current": ["packages/icons/src/icons/History/History.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/History/History.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/History/History.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#History",
-        "current": ["packages/icons/src/index.ts#History"]
+        "target": "@corefoundry-labs/forge-icons#History",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#History"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/History/History.module.css",
-        "current": ["packages/icons/src/icons/History/History.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/History/History.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/History/History.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/History/History.test.tsx",
-        "current": ["packages/icons/src/icons/History/History.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/History/History.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/History/History.test.tsx"]
       },
       "componentHost": {
         "id": "icon-history",
@@ -3692,23 +3731,23 @@
       "figmaNodeId": "237:891",
       "figmaName": "CheckCircle",
       "sourceName": "Icon / CheckCircle",
-      "owner": "packages/icons/src/icons/CheckCircle/",
+      "owner": "@corefoundry-labs/forge-icons/icons/CheckCircle/",
       "component": {
         "name": "CheckCircle",
-        "target": "packages/icons/src/icons/CheckCircle/CheckCircle.tsx",
-        "current": ["packages/icons/src/icons/CheckCircle/CheckCircle.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/CheckCircle/CheckCircle.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/CheckCircle/CheckCircle.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#CheckCircle",
-        "current": ["packages/icons/src/index.ts#CheckCircle"]
+        "target": "@corefoundry-labs/forge-icons#CheckCircle",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#CheckCircle"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/CheckCircle/CheckCircle.module.css",
-        "current": ["packages/icons/src/icons/CheckCircle/CheckCircle.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/CheckCircle/CheckCircle.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/CheckCircle/CheckCircle.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/CheckCircle/CheckCircle.test.tsx",
-        "current": ["packages/icons/src/icons/CheckCircle/CheckCircle.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/CheckCircle/CheckCircle.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/CheckCircle/CheckCircle.test.tsx"]
       },
       "componentHost": {
         "id": "icon-check-circle",
@@ -3742,23 +3781,23 @@
       "figmaNodeId": "237:895",
       "figmaName": "XCircle",
       "sourceName": "Icon / XCircle",
-      "owner": "packages/icons/src/icons/XCircle/",
+      "owner": "@corefoundry-labs/forge-icons/icons/XCircle/",
       "component": {
         "name": "XCircle",
-        "target": "packages/icons/src/icons/XCircle/XCircle.tsx",
-        "current": ["packages/icons/src/icons/XCircle/XCircle.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/XCircle/XCircle.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/XCircle/XCircle.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#XCircle",
-        "current": ["packages/icons/src/index.ts#XCircle"]
+        "target": "@corefoundry-labs/forge-icons#XCircle",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#XCircle"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/XCircle/XCircle.module.css",
-        "current": ["packages/icons/src/icons/XCircle/XCircle.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/XCircle/XCircle.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/XCircle/XCircle.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/XCircle/XCircle.test.tsx",
-        "current": ["packages/icons/src/icons/XCircle/XCircle.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/XCircle/XCircle.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/XCircle/XCircle.test.tsx"]
       },
       "componentHost": {
         "id": "icon-xcircle",
@@ -3792,23 +3831,23 @@
       "figmaNodeId": "237:899",
       "figmaName": "Bell",
       "sourceName": "Icon / Bell",
-      "owner": "packages/icons/src/icons/Bell/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Bell/",
       "component": {
         "name": "Bell",
-        "target": "packages/icons/src/icons/Bell/Bell.tsx",
-        "current": ["packages/icons/src/icons/Bell/Bell.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Bell/Bell.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Bell/Bell.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Bell",
-        "current": ["packages/icons/src/index.ts#Bell"]
+        "target": "@corefoundry-labs/forge-icons#Bell",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Bell"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Bell/Bell.module.css",
-        "current": ["packages/icons/src/icons/Bell/Bell.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Bell/Bell.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Bell/Bell.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Bell/Bell.test.tsx",
-        "current": ["packages/icons/src/icons/Bell/Bell.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Bell/Bell.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Bell/Bell.test.tsx"]
       },
       "componentHost": {
         "id": "icon-bell",
@@ -3842,23 +3881,23 @@
       "figmaNodeId": "237:902",
       "figmaName": "ChevronDown",
       "sourceName": "Icon / ChevronDown",
-      "owner": "packages/icons/src/icons/ChevronDown/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ChevronDown/",
       "component": {
         "name": "ChevronDown",
-        "target": "packages/icons/src/icons/ChevronDown/ChevronDown.tsx",
-        "current": ["packages/icons/src/icons/ChevronDown/ChevronDown.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ChevronDown/ChevronDown.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ChevronDown/ChevronDown.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ChevronDown",
-        "current": ["packages/icons/src/index.ts#ChevronDown"]
+        "target": "@corefoundry-labs/forge-icons#ChevronDown",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ChevronDown"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ChevronDown/ChevronDown.module.css",
-        "current": ["packages/icons/src/icons/ChevronDown/ChevronDown.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ChevronDown/ChevronDown.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ChevronDown/ChevronDown.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ChevronDown/ChevronDown.test.tsx",
-        "current": ["packages/icons/src/icons/ChevronDown/ChevronDown.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ChevronDown/ChevronDown.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ChevronDown/ChevronDown.test.tsx"]
       },
       "componentHost": {
         "id": "icon-chevron-down",
@@ -3892,23 +3931,23 @@
       "figmaNodeId": "237:905",
       "figmaName": "ChevronRight",
       "sourceName": "Icon / ChevronRight",
-      "owner": "packages/icons/src/icons/ChevronRight/",
+      "owner": "@corefoundry-labs/forge-icons/icons/ChevronRight/",
       "component": {
         "name": "ChevronRight",
-        "target": "packages/icons/src/icons/ChevronRight/ChevronRight.tsx",
-        "current": ["packages/icons/src/icons/ChevronRight/ChevronRight.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ChevronRight/ChevronRight.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ChevronRight/ChevronRight.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#ChevronRight",
-        "current": ["packages/icons/src/index.ts#ChevronRight"]
+        "target": "@corefoundry-labs/forge-icons#ChevronRight",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#ChevronRight"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/ChevronRight/ChevronRight.module.css",
-        "current": ["packages/icons/src/icons/ChevronRight/ChevronRight.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/ChevronRight/ChevronRight.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/ChevronRight/ChevronRight.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/ChevronRight/ChevronRight.test.tsx",
-        "current": ["packages/icons/src/icons/ChevronRight/ChevronRight.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/ChevronRight/ChevronRight.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/ChevronRight/ChevronRight.test.tsx"]
       },
       "componentHost": {
         "id": "icon-chevron-right",
@@ -3942,23 +3981,23 @@
       "figmaNodeId": "237:908",
       "figmaName": "GripVertical",
       "sourceName": "Icon / GripVertical",
-      "owner": "packages/icons/src/icons/GripVertical/",
+      "owner": "@corefoundry-labs/forge-icons/icons/GripVertical/",
       "component": {
         "name": "GripVertical",
-        "target": "packages/icons/src/icons/GripVertical/GripVertical.tsx",
-        "current": ["packages/icons/src/icons/GripVertical/GripVertical.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/GripVertical/GripVertical.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/GripVertical/GripVertical.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#GripVertical",
-        "current": ["packages/icons/src/index.ts#GripVertical"]
+        "target": "@corefoundry-labs/forge-icons#GripVertical",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#GripVertical"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/GripVertical/GripVertical.module.css",
-        "current": ["packages/icons/src/icons/GripVertical/GripVertical.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/GripVertical/GripVertical.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/GripVertical/GripVertical.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/GripVertical/GripVertical.test.tsx",
-        "current": ["packages/icons/src/icons/GripVertical/GripVertical.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/GripVertical/GripVertical.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/GripVertical/GripVertical.test.tsx"]
       },
       "componentHost": {
         "id": "icon-grip-vertical",
@@ -3992,23 +4031,23 @@
       "figmaNodeId": "237:916",
       "figmaName": "Link",
       "sourceName": "Icon / Link",
-      "owner": "packages/icons/src/icons/Link/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Link/",
       "component": {
         "name": "Link",
-        "target": "packages/icons/src/icons/Link/Link.tsx",
-        "current": ["packages/icons/src/icons/Link/Link.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Link/Link.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Link/Link.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Link",
-        "current": ["packages/icons/src/index.ts#Link"]
+        "target": "@corefoundry-labs/forge-icons#Link",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Link"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Link/Link.module.css",
-        "current": ["packages/icons/src/icons/Link/Link.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Link/Link.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Link/Link.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Link/Link.test.tsx",
-        "current": ["packages/icons/src/icons/Link/Link.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Link/Link.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Link/Link.test.tsx"]
       },
       "componentHost": {
         "id": "icon-link",
@@ -4042,23 +4081,23 @@
       "figmaNodeId": "237:919",
       "figmaName": "Eye",
       "sourceName": "Icon / Eye",
-      "owner": "packages/icons/src/icons/Eye/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Eye/",
       "component": {
         "name": "Eye",
-        "target": "packages/icons/src/icons/Eye/Eye.tsx",
-        "current": ["packages/icons/src/icons/Eye/Eye.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Eye/Eye.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Eye/Eye.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Eye",
-        "current": ["packages/icons/src/index.ts#Eye"]
+        "target": "@corefoundry-labs/forge-icons#Eye",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Eye"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Eye/Eye.module.css",
-        "current": ["packages/icons/src/icons/Eye/Eye.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Eye/Eye.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Eye/Eye.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Eye/Eye.test.tsx",
-        "current": ["packages/icons/src/icons/Eye/Eye.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Eye/Eye.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Eye/Eye.test.tsx"]
       },
       "componentHost": {
         "id": "icon-eye",
@@ -4092,23 +4131,23 @@
       "figmaNodeId": "237:923",
       "figmaName": "Layers",
       "sourceName": "Icon / Layers",
-      "owner": "packages/icons/src/icons/Layers/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Layers/",
       "component": {
         "name": "Layers",
-        "target": "packages/icons/src/icons/Layers/Layers.tsx",
-        "current": ["packages/icons/src/icons/Layers/Layers.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Layers/Layers.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Layers/Layers.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Layers",
-        "current": ["packages/icons/src/index.ts#Layers"]
+        "target": "@corefoundry-labs/forge-icons#Layers",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Layers"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Layers/Layers.module.css",
-        "current": ["packages/icons/src/icons/Layers/Layers.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Layers/Layers.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Layers/Layers.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Layers/Layers.test.tsx",
-        "current": ["packages/icons/src/icons/Layers/Layers.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Layers/Layers.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Layers/Layers.test.tsx"]
       },
       "componentHost": {
         "id": "icon-layers",
@@ -4142,23 +4181,23 @@
       "figmaNodeId": "237:926",
       "figmaName": "Settings",
       "sourceName": "Icon / Settings",
-      "owner": "packages/icons/src/icons/Settings/",
+      "owner": "@corefoundry-labs/forge-icons/icons/Settings/",
       "component": {
         "name": "Settings",
-        "target": "packages/icons/src/icons/Settings/Settings.tsx",
-        "current": ["packages/icons/src/icons/Settings/Settings.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Settings/Settings.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Settings/Settings.tsx"]
       },
       "publicApi": {
-        "target": "@forge-org/icons#Settings",
-        "current": ["packages/icons/src/index.ts#Settings"]
+        "target": "@corefoundry-labs/forge-icons#Settings",
+        "current": ["@corefoundry-labs/forge-icons/index.ts#Settings"]
       },
       "styles": {
-        "target": "packages/icons/src/icons/Settings/Settings.module.css",
-        "current": ["packages/icons/src/icons/Settings/Settings.module.css"]
+        "target": "@corefoundry-labs/forge-icons/icons/Settings/Settings.module.css",
+        "current": ["@corefoundry-labs/forge-icons/icons/Settings/Settings.module.css"]
       },
       "tests": {
-        "target": "packages/icons/src/icons/Settings/Settings.test.tsx",
-        "current": ["packages/icons/src/icons/Settings/Settings.test.tsx"]
+        "target": "@corefoundry-labs/forge-icons/icons/Settings/Settings.test.tsx",
+        "current": ["@corefoundry-labs/forge-icons/icons/Settings/Settings.test.tsx"]
       },
       "componentHost": {
         "id": "icon-settings",
@@ -6024,22 +6063,22 @@
   "codeOnlyComponents": [
     {
       "name": "EmptyState",
-      "source": "packages/ui/src/components/feedback/EmptyState/EmptyState.tsx",
-      "publicApi": "@forge-org/ui#EmptyState",
+      "source": "@corefoundry-labs/forge-ui/components/feedback/EmptyState/EmptyState.tsx",
+      "publicApi": "@corefoundry-labs/forge-ui#EmptyState",
       "relationship": "Related to StatePanel; not an additional canonical Figma row.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"
     },
     {
       "name": "LoadingState",
-      "source": "packages/ui/src/components/feedback/LoadingState/LoadingState.tsx",
-      "publicApi": "@forge-org/ui#LoadingState",
+      "source": "@corefoundry-labs/forge-ui/components/feedback/LoadingState/LoadingState.tsx",
+      "publicApi": "@corefoundry-labs/forge-ui#LoadingState",
       "relationship": "Related to StatePanel; not an additional canonical Figma row.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"
     },
     {
       "name": "ErrorState",
-      "source": "packages/ui/src/components/feedback/ErrorState/ErrorState.tsx",
-      "publicApi": "@forge-org/ui#ErrorState",
+      "source": "@corefoundry-labs/forge-ui/components/feedback/ErrorState/ErrorState.tsx",
+      "publicApi": "@corefoundry-labs/forge-ui#ErrorState",
       "relationship": "Related to StatePanel; not an additional canonical Figma row.",
       "visualReviewStatus": "NOT_HUMAN_REVIEWED"
     },

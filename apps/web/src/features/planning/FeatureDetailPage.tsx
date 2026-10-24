@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { isTauri } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { readFile } from '@tauri-apps/plugin-fs';
-import { Badge, Button, Card, Dialog, Input, Select, Textarea } from '@forge-org/ui';
+import { Badge, Button, Card, Dialog, Input, Select, Textarea } from '@corefoundry-labs/forge-ui';
 import { organizationApi, type Feature } from '@forge-org/api-client';
 import { PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './FeatureDetailPage.module.css';

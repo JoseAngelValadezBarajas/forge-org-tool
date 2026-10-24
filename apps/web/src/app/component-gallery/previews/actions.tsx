@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Button, Card, IconButton } from '@forge-org/ui';
-import { Plus } from '@forge-org/icons';
+import { Button, Card, IconButton } from '@corefoundry-labs/forge-ui';
+import { Plus } from '@corefoundry-labs/forge-icons';
 import styles from '../ComponentGallery.module.css';
 
 interface ActionPreviewContext {

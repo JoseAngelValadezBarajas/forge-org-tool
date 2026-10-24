@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Select } from '@forge-org/ui';
+import { Select } from '@corefoundry-labs/forge-ui';
 import styles from './WorkspaceSwitcher.module.css';
 export interface WorkspaceOption {
   id: string;

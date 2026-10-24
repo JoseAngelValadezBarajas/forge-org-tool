@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Criterion } from '@forge-org/api-client';
-import { Checkbox, StatusChip } from '@forge-org/ui';
+import { Checkbox, StatusChip } from '@corefoundry-labs/forge-ui';
 import styles from './CriterionItem.module.css';
 
 type CriterionItemProps = {

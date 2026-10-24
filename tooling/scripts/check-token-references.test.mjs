@@ -12,9 +12,13 @@ function cssFiles(directory) {
 }
 
 test('emitted tokens cover every static CSS reference', () => {
-  const css = readFileSync(resolve('packages/tokens/src/tokens.css'), 'utf8');
-  const references = cssFiles(resolve('packages/ui/src')).flatMap((file) =>
-    [...readFileSync(file, 'utf8').matchAll(/var\((--forge-[\w-]+)/g)].map((match) => match[1]),
+  const css = readFileSync(
+    resolve('node_modules/@corefoundry-labs/forge-tokens/dist/tokens.css'),
+    'utf8',
+  );
+  const references = cssFiles(resolve('node_modules/@corefoundry-labs/forge-ui/dist')).flatMap(
+    (file) =>
+      [...readFileSync(file, 'utf8').matchAll(/var\((--forge-[\w-]+)/g)].map((match) => match[1]),
   );
   const declared = new Set([...css.matchAll(/(--forge-[\w-]+)\s*:/g)].map((match) => match[1]));
   assert.ok(references.length > 0);

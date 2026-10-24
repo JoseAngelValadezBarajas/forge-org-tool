@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Dialog, FormField, Input, Select, Textarea } from '@forge-org/ui';
+import { Button, Dialog, FormField, Input, Select, Textarea } from '@corefoundry-labs/forge-ui';
 import { organizationApi, type EpicStatus, type WorkspaceTag } from '@forge-org/api-client';
 import styles from './PlanningPage.module.css';
 import { CreateEpicDrawer } from './CreateEpicDrawer';

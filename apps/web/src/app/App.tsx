@@ -6,8 +6,8 @@ import {
   type Project,
   type Workspace,
 } from '@forge-org/api-client';
-import { Button, SearchField } from '@forge-org/ui';
-import { ChevronDown, ChevronRight, Search } from '@forge-org/icons';
+import { Button, SearchField } from '@corefoundry-labs/forge-ui';
+import { ChevronDown, ChevronRight, Search } from '@corefoundry-labs/forge-icons';
 import {
   OrganizationPage,
   ProjectOverviewPage,

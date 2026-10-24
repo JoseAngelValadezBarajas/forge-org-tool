@@ -11,14 +11,14 @@
 | `apps/web/src/features/<domain>/` | Routes, hooks, `components/`, `model/`, `api/`, styles; domain-to-tone mapping     | Shared primitives                    |
 | `packages/api-client/`            | Small compatibility facade over transport, errors, types and capability modules    | UI and business transformations      |
 
-**Import rules**: web features may import `@forge-org/ui`, `@forge-org/api-client` and `@forge-org/tokens`; shared UI may import React and tokens, but not app, features or api-client. Feature imports across capabilities must use `index.ts` public exports. No new `apps/web/src/shared/ui` or feature-local copies of generic primitives.
+**Import rules**: web features may import `@corefoundry-labs/forge-ui`, `@forge-org/api-client` and `@corefoundry-labs/forge-tokens`; shared UI may import React and tokens, but not app, features or api-client. Feature imports across capabilities must use `index.ts` public exports. No new `apps/web/src/shared/ui` or feature-local copies of generic primitives.
 
 ## Component API conventions
 
 - One canonical primitive with explicit typed props, styles scoped to its package, semantic tokens only, native HTML attributes and ref forwarding when useful.
 - `StatusChip` should receive `tone` and `children`; a Planning status such as `in_progress` is mapped to a display label and tone inside `features/planning`, never inside the generic UI component.
 - Loading, error, empty and read-only have distinct behavior. A visual success style is not proof of CI or deployment.
-- Package barrel `@forge-org/ui` is the supported import. Do not deep import internal files.
+- Package barrel `@corefoundry-labs/forge-ui` is the supported import. Do not deep import internal files.
 - Test props, focus order, keyboard, input labels, reduced motion, long text, 1440×900 and 390×844, Dark and Light.
 - Figma page 19 -> primitives/components. Figma page 20 -> feature-owned components, not an excuse to move business UI into packages/ui.
 
@@ -28,4 +28,4 @@
 
 ## Examples
 
-`OrganizationEmptyState` below `features/organization/components` composes `Card`, `Button` and `SectionHeader` from `@forge-org/ui` while owning its copy and behaviors. It may not define its own `.button` or duplicate a shared `Card` implementation.
+`OrganizationEmptyState` below `features/organization/components` composes `Card`, `Button` and `SectionHeader` from `@corefoundry-labs/forge-ui` while owning its copy and behaviors. It may not define its own `.button` or duplicate a shared `Card` implementation.

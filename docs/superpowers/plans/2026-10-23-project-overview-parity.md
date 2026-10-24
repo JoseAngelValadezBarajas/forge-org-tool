@@ -6,7 +6,7 @@
 
 **Architecture:** Add only the missing generated-contract API-client operations for reading/updating a Project, then compose a feature-owned Organization overview route from existing shared UI and the already-supported planning and transfer workflows. Keep the planning board URL intact and expose an independent Epic detail workflow in Planning as a second vertical slice, with full browser coverage added after both pages are available.
 
-**Tech Stack:** React 19, React Router, `@forge-org/ui`, `@forge-org/api-client`, FastAPI/OpenAPI, Vitest, Playwright, disposable SQLite.
+**Tech Stack:** React 19, React Router, `@corefoundry-labs/forge-ui`, `@forge-org/api-client`, FastAPI/OpenAPI, Vitest, Playwright, disposable SQLite.
 
 **Spec:** `docs/specs/ORG-001-organization/spec.md` (`REQ-ORG-001-PROJECT-OVERVIEW`); Epic detail behavior is grounded in the canonical original source `cadc4223d3c08c793b4f39152108997b697a7a75`, `frontend/src/app/router.tsx`, `frontend/src/features/planning/pages/EpicDetailPage.tsx`, and `frontend/e2e/ux01a-navigation.spec.ts`.
 
@@ -55,7 +55,7 @@
 
 **Interfaces:**
 - Route: `/projects/:workspaceId/:projectId`.
-- Consume only `organizationApi`, the public `@forge-org/ui` exports, and workspace-scoped route parameters.
+- Consume only `organizationApi`, the public `@corefoundry-labs/forge-ui` exports, and workspace-scoped route parameters.
 - Provide owning Workspace and Project metadata/timestamps; real counts for Features, Tasks, Epics, satisfied/total declared criteria and Dependencies; total Decision and active Invariant counts; and up to four pending Features ordered by priority then update time. Provide edit/save, archive after explicit confirmation, restore, retryable loading/error states, Planning navigation, and a link to existing Transfer export. Reuse API-client capability operations; make no delivery/evidence claims from planning state.
 - Retain an explicit direct board link from the Organization project card.
 

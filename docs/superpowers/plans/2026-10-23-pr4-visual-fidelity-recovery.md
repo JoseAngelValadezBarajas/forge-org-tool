@@ -6,7 +6,7 @@
 
 **Architecture:** Keep React feature ownership and semantic tokens. Make visual-reference states deterministic through the existing isolated Playwright/SQLite fixture, retain controls that are absent from Figma behind legitimate secondary interactions, and make visual tooling distinguish measured evidence from human acceptance.
 
-**Tech Stack:** React, TypeScript, CSS Modules, `@forge-org/ui`, FastAPI/SQLite fixtures, Playwright, pixelmatch, Tauri/NSIS.
+**Tech Stack:** React, TypeScript, CSS Modules, `@corefoundry-labs/forge-ui`, FastAPI/SQLite fixtures, Playwright, pixelmatch, Tauri/NSIS.
 
 **Spec:** `C:\Users\josea\.codex\attachments\fabd0b1a-94ed-4d42-8c21-0594c7ca8cff\Pasted text.txt`
 

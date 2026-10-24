@@ -19,7 +19,7 @@ import {
   Select,
   Tabs,
   Textarea,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './EpicDetailPage.module.css';
 

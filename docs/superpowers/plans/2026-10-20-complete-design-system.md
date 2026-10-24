@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use the authorized native subagents for disjoint component domains. Steps use checkbox syntax for tracking.
 
-**Goal:** Deliver a reusable `@forge-org/ui` and `@forge-org/icons` system that accounts for every Figma page 19 and 20 master, preserves current FORGE behavior, and exposes every implemented public component through `/__components`.
+**Goal:** Deliver a reusable `@corefoundry-labs/forge-ui` and `@corefoundry-labs/forge-icons` system that accounts for every Figma page 19 and 20 master, preserves current FORGE behavior, and exposes every implemented public component through `/__components`.
 
 **Architecture:** Keep generic controls and content primitives in the UI package, icon assets in a tree-shakeable licensed/original icon package, and FORGE business compositions within their owning feature. Every public component gets a self-contained directory with its implementation, CSS Module, tests, and barrel; the package root remains the stable public compatibility facade. A generated/validated parity registry joins Figma master, owner, API, styles, tests, and host preview.
 

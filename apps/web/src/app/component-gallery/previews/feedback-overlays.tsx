@@ -14,7 +14,7 @@ import {
   StatePanel,
   Toast,
   Tooltip,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 import styles from '../ComponentGallery.module.css';
 
 type DialogVariant = 'confirm' | 'destructive' | 'busy';

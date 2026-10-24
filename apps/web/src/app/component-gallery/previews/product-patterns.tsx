@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Button } from '@forge-org/ui';
+import { Button } from '@corefoundry-labs/forge-ui';
 import { OrganizationEmptyState } from '../../../features/organization';
 import {
   CriterionItem,

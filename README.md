@@ -12,11 +12,11 @@ source reference under its own license; see [reconstruction provenance](docs/rec
 
 ## Scope and architecture
 
-- `packages/tokens`: versioned semantic design-token JSON, generated CSS, token-reference checks, and a distributable CSS artifact.
-- `packages/ui`: independently buildable, domain-independent accessible React components with declarations and CSS delivery. No feature, app, API or route imports.
+- `@corefoundry-labs/forge-tokens`, `@corefoundry-labs/forge-icons`, and `@corefoundry-labs/forge-ui`: public, versioned visual packages published from [`forge-org-packages`](https://github.com/JoseAngelValadezBarajas/forge-org-packages) on GitHub Packages.
+- `packages/api-client`: the only package kept locally in FORGE; it is private, application-specific, and is never published.
 - `packages/api-client`: independently buildable HTTP client with transport, error, typed capability modules, declarations, and a compatibility facade.
 - `apps/web/src/app`: app composition, routes, shell and providers. No primitives here.
-- `apps/web/src/features/<domain>`: feature routes, domain-specific presentation and business statuses. Compose `@forge-org/ui` rather than re-implementing buttons/cards.
+- `apps/web/src/features/<domain>`: feature routes, domain-specific presentation and business statuses. Compose `@corefoundry-labs/forge-ui` rather than re-implementing buttons/cards.
 - `apps/api`: Python FastAPI modular monolith with bounded capability routers, application services, migration runner, and persistence boundary; it owns durable state, rules, provenance and contracts.
 - `apps/desktop`: Tauri 2 runtime boundary with Rust-owned capabilities and a separately certified sidecar/packaging workflow.
 

@@ -38,7 +38,7 @@ Keep the existing tests for search semantics, clear behavior, and disabled state
 
 - [ ] **Step 2: Run the focused SearchField tests**
 
-Run `npm test --workspace=@forge-org/ui -- --run src/components/forms/SearchField/SearchField.test.tsx` and confirm the current behavior is green before the CSS-only change.
+Run `npm test --workspace=@corefoundry-labs/forge-ui -- --run src/components/forms/SearchField/SearchField.test.tsx` and confirm the current behavior is green before the CSS-only change.
 
 - [ ] **Step 3: Apply the CSS-only focus refinement**
 

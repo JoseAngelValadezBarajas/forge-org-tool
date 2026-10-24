@@ -129,6 +129,7 @@ export function validateParity(registry, { root = repositoryRoot } = {}) {
   const ids = new Set();
   const previews = new Set();
   const checkCurrentPath = (reference, label, expectedType = 'file') => {
+    if (reference.startsWith('@corefoundry-labs/') || /^https?:\/\//.test(reference)) return;
     const path = reference.split('#', 1)[0];
     const absolutePath = resolve(root, path);
     const pathFromRoot = relative(root, absolutePath);
@@ -258,7 +259,7 @@ export function validateParity(registry, { root = repositoryRoot } = {}) {
     (sizes.component?.name !== 'Button' ||
       sizes.owner !== button?.owner ||
       sizes.component?.target !== button?.component?.target ||
-      sizes.publicApi?.target !== '@forge-org/ui#ButtonProps.size' ||
+      sizes.publicApi?.target !== '@corefoundry-labs/forge-ui#ButtonProps.size' ||
       sizes.integration?.component !== 'Button' ||
       sizes.integration?.prop !== 'size' ||
       typeof sizes.integration?.implemented !== 'boolean' ||

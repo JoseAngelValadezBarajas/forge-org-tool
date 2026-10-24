@@ -7,7 +7,7 @@
 ## Global Constraints
 
 - Preserve ORG-001–009 routes, behavior, domain truth, public package contracts, and development-only `/__components`.
-- Generic primitives stay in `@forge-org/ui`; business compositions remain feature-owned. No duplicate controls or speculative variants.
+- Generic primitives stay in `@corefoundry-labs/forge-ui`; business compositions remain feature-owned. No duplicate controls or speculative variants.
 - The original checkout's two deletions (`FORGE_Org_Tool_Architecture_RFC_v0.2.md`, `FORGE_Org_Tool_Codex_M0_M1_Prompt.md`) and `package-lock.json` modification are out of scope and must remain untouched.
 - Every visual correction needs node-backed Figma evidence. Do not change global palette or infer production dimensions from specimen bounds.
 - Keep visual review separate from automation. Never mark a component human-certified; use `PASS_AUTOMATED`, `NEEDS_CHANGES`, `REQUIRES_DESIGN_DECISION`, `READY_FOR_HUMAN_REVIEW` accurately.
@@ -43,7 +43,7 @@ Retain the existing package/token/feature ownership architecture. Correct eviden
 
 ### Task 4: Foundations and actual screen quality
 
-- Map Foundation frame `2:45` to real `@forge-org/tokens` values and document comparison evidence. Do not silently change canonical palette.
+- Map Foundation frame `2:45` to real `@corefoundry-labs/forge-tokens` values and document comparison evidence. Do not silently change canonical palette.
 - Compare Workspace Home, Organization/Projects, Planning, Epic/Feature Detail, Board, Readiness, Repositories, Context Packages, Runs/Handoffs, Evidence/Delivery, Transfer, shell/navigation against concrete screen frames.
 - Fix substantial supported deviations in feature-owned code; preserve functional workflows, routes, accessibility, responsive behavior, and truthful domain states. Record missing masters/ambiguous alternatives as design decisions or UX-02.
 - Verify focused feature tests; run API checks only if API contracts change (not intended).

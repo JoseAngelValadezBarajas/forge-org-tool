@@ -14,7 +14,7 @@ import {
   SectionHeader,
   StatusChip,
   Textarea,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 import styles from './ProjectOverviewPage.module.css';
 
 type Overview = {

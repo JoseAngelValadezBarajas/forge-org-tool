@@ -6,12 +6,21 @@ on:
 jobs:
   web:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@forge-org'
+      - name: Authenticate GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
       - uses: astral-sh/setup-uv@v6
       - run: npm ci
       - run: npm run check:acceptance:registry
@@ -52,12 +61,21 @@ jobs:
       - run: uv run --project apps/api --locked python tooling/scripts/export-openapi.py --check
   desktop:
     runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@forge-org'
+      - name: Authenticate GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-python@v5
         with:

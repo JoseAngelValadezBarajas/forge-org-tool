@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { organizationApi, type WorkspaceTag } from '@forge-org/api-client';
-import { Button, Card, FormField, Input } from '@forge-org/ui';
+import { Button, Card, FormField, Input } from '@corefoundry-labs/forge-ui';
 import styles from './WorkspaceTagsPanel.module.css';
 
 type Draft = { name: string; color: string };

@@ -3,8 +3,8 @@ import { join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const tokenCss = resolve(root, 'packages/tokens/src/tokens.css');
-const tokenSource = JSON.parse(readFileSync(resolve(root, 'packages/tokens/tokens.json'), 'utf8'));
+const tokenCss = resolve(root, 'node_modules/@corefoundry-labs/forge-tokens/dist/tokens.css');
+const tokenSource = JSON.parse(readFileSync(resolve(root, 'node_modules/@corefoundry-labs/forge-tokens/dist/tokens.json'), 'utf8'));
 
 const walk = (directory) =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -17,9 +17,7 @@ const declared = new Set(
   [...readFileSync(tokenCss, 'utf8').matchAll(/(--forge-[\w-]+)\s*:/g)].map((match) => match[1]),
 );
 const references = /var\((--forge-[\w-]+)/g;
-const files = ['packages/ui/src', 'apps/web/src'].flatMap((directory) =>
-  walk(resolve(root, directory)),
-);
+const files = ['apps/web/src'].flatMap((directory) => walk(resolve(root, directory)));
 const missing = [];
 
 for (const file of files) {

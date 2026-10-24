@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Breadcrumbs, Card, MenuItem, StepperStep, Tabs } from '@forge-org/ui';
+import { Breadcrumbs, Card, MenuItem, StepperStep, Tabs } from '@corefoundry-labs/forge-ui';
 import styles from '../ComponentGallery.module.css';
 
 export function renderNavigationPreview(

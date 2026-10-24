@@ -23,39 +23,23 @@ export function issuesFor(filename, source) {
   const issues = [];
   for (const target of imports(source)) {
     if (
-      target.startsWith('@forge-org/ui/src/') ||
+      target.startsWith('@corefoundry-labs/forge-ui/src/') ||
       target.startsWith('@forge-org/api-client/src/') ||
-      target.startsWith('@forge-org/tokens/src/') ||
-      target.startsWith('@forge-org/icons/src/')
+      target.startsWith('@corefoundry-labs/forge-tokens/src/') ||
+      target.startsWith('@corefoundry-labs/forge-icons/src/')
     ) {
       issues.push(`${from}: do not deep-import package internals: ${target}`);
     }
     if (
-      contained(from, 'packages/ui') &&
-      (target.startsWith('@forge-org/api-client') ||
-        target.startsWith('apps/') ||
-        target.includes('/features/') ||
-        target.includes('/app/'))
-    ) {
-      issues.push(`${from}: generic UI must not import product, app, or API: ${target}`);
-    }
-    if (
       contained(from, 'packages/api-client') &&
-      (target.startsWith('@forge-org/ui') || target.includes('/features/'))
+      (target.startsWith('@corefoundry-labs/forge-ui') || target.includes('/features/'))
     ) {
       issues.push(`${from}: API transport must not import UI/features: ${target}`);
     }
-    if (contained(from, 'packages/icons') && target.startsWith('@forge-org/')) {
-      issues.push(`${from}: icon package must not depend on other Forge packages: ${target}`);
-    }
     if (target.startsWith('.')) {
       const destination = rel(resolve(root, dirname(from), target));
-      if (contained(from, 'packages/ui') && !contained(destination, 'packages/ui'))
-        issues.push(`${from}: UI source crossed package boundary: ${target}`);
       if (contained(from, 'packages/api-client') && !contained(destination, 'packages/api-client'))
         issues.push(`${from}: API client source crossed package boundary: ${target}`);
-      if (contained(from, 'packages/icons') && !contained(destination, 'packages/icons'))
-        issues.push(`${from}: icon package source crossed package boundary: ${target}`);
       if (contained(from, 'apps/web/src/features')) {
         const current = from.match(/^apps\/web\/src\/features\/([^/]+)/)?.[1];
         const targetFeature = destination.match(/^apps\/web\/src\/features\/([^/]+)/)?.[1];
@@ -73,7 +57,7 @@ export function issuesFor(filename, source) {
 }
 
 export function checkRepo() {
-  const dirs = ['packages/ui/src', 'packages/api-client/src', 'packages/icons/src', 'apps/web/src'];
+  const dirs = ['packages/api-client/src', 'apps/web/src'];
   return dirs.flatMap((dir) =>
     walk(resolve(root, dir)).flatMap((file) => issuesFor(rel(file), readFileSync(file, 'utf8'))),
   );

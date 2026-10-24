@@ -1,4 +1,4 @@
-import { Button, Card, SectionHeader, StatusChip } from '@forge-org/ui';
+import { Button, Card, SectionHeader, StatusChip } from '@corefoundry-labs/forge-ui';
 import styles from './OrganizationEmptyState.module.css';
 /** Feature-owned composition. UI primitives remain package-owned. */
 export function OrganizationEmptyState() {

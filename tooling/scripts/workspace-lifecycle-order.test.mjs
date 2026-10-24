@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
 
-test('root postinstall builds workspace packages sequentially after install', () => {
+test('root postinstall builds only the local API workspace after install', () => {
   const rootPackage = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
   const workspaces = rootPackage.workspaces.map((workspace) => {
     const packagePath = resolve(root, workspace, 'package.json');
@@ -15,14 +15,11 @@ test('root postinstall builds workspace packages sequentially after install', ()
   });
 
   assert.equal(rootPackage.scripts.postinstall, 'npm run build:packages');
-  assert.ok(
-    rootPackage.scripts['build:packages'].indexOf('@forge-org/icons') <
-      rootPackage.scripts['build:packages'].indexOf('@forge-org/ui'),
+  assert.equal(
+    rootPackage.scripts['build:packages'],
+    'npm run build --workspace=@forge-org/api-client',
   );
-  assert.ok(
-    rootPackage.scripts['build:packages'].indexOf('@forge-org/tokens') <
-      rootPackage.scripts['build:packages'].indexOf('@forge-org/ui'),
-  );
+  assert.deepEqual(rootPackage.workspaces, ['apps/web', 'packages/api-client']);
   for (const workspace of workspaces)
     assert.notEqual(
       workspace.scripts?.prepare,

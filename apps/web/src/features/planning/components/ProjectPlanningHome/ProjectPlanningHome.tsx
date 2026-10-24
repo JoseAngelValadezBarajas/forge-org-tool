@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Card } from '@forge-org/ui';
+import { Card } from '@corefoundry-labs/forge-ui';
 import styles from './ProjectPlanningHome.module.css';
 
 export type ProjectPlanningHomeState = 'Default' | 'Empty' | 'Archived';

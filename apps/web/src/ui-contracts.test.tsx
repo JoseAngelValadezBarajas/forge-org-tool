@@ -18,7 +18,7 @@ import {
   Textarea,
   Button,
   Card,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 
 describe('public shared component contracts', () => {
   it('renders Card as a neutral div by default and forwards native props and refs', () => {

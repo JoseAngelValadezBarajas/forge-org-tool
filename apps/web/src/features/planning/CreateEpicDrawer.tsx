@@ -1,5 +1,5 @@
 import { useEffect, useRef, type FormEvent } from 'react';
-import { Button, FormField, Input, Select, Textarea } from '@forge-org/ui';
+import { Button, FormField, Input, Select, Textarea } from '@corefoundry-labs/forge-ui';
 import type { WorkspaceTag } from '@forge-org/api-client';
 import styles from './CreateEpicDrawer.module.css';
 

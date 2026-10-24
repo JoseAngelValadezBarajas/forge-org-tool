@@ -1,6 +1,6 @@
 import type { DragEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, StatusChip } from '@forge-org/ui';
+import { Card, StatusChip } from '@corefoundry-labs/forge-ui';
 import type { Epic, EpicStatus, Feature } from '@forge-org/api-client';
 import styles from './EpicCard.module.css';
 

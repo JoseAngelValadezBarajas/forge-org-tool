@@ -5,7 +5,7 @@ export const foundationCatalog: CatalogItem[] = [
     id: 'tokens',
     name: 'Semantic tokens',
     section: 'Foundations and tokens',
-    owner: '@forge-org/tokens',
+    owner: '@corefoundry-labs/forge-tokens',
     status: 'IMPLEMENTED_NOT_REVIEWED',
     figma: 'Page 02: Foundations and Tokens',
     variants: 'dark, light',

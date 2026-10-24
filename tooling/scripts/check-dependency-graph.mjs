@@ -5,10 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const sourceRoots = [
-  'packages/ui/src',
   'packages/api-client/src',
-  'packages/icons/src',
-  'packages/tokens/src',
   'apps/web/src',
 ];
 const sourceExtensions = ['.ts', '.tsx'];

@@ -11,7 +11,7 @@ import {
   SearchField,
   StatusChip,
   Textarea,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 import styles from './OrganizationPage.module.css';
 import { useOrganizationController } from './useOrganizationController';
 

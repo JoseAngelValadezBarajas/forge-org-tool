@@ -1,5 +1,5 @@
 import type { Task } from '@forge-org/api-client';
-import { Button, Checkbox, Select } from '@forge-org/ui';
+import { Button, Checkbox, Select } from '@corefoundry-labs/forge-ui';
 import styles from './TaskItem.module.css';
 
 type TaskItemProps = {
