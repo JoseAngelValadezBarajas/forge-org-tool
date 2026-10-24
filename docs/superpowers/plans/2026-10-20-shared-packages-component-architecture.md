@@ -4,7 +4,7 @@
 
 **Goal:** Make the existing shared packages the reusable foundation for implemented FORGE screens while preserving public API compatibility and ORG-001–007 behavior.
 
-**Architecture:** Expand `@forge-org/ui` only with controls and compositions that have current feature consumers, then refactor those consumers while keeping business behavior in feature-owned components. Split `@forge-org/api-client` into transport, errors, types, and capability modules while preserving the `organizationApi` facade. Do not create icons or testing packages until licensed assets or genuinely shared test utilities have real consumers.
+**Architecture:** Expand `@corefoundry-labs/forge-ui` only with controls and compositions that have current feature consumers, then refactor those consumers while keeping business behavior in feature-owned components. Split `@forge-org/api-client` into transport, errors, types, and capability modules while preserving the `organizationApi` facade. Do not create icons or testing packages until licensed assets or genuinely shared test utilities have real consumers.
 
 **Tech Stack:** React 19, TypeScript, Vitest, Testing Library, Playwright, Vite, FastAPI OpenAPI export, npm workspaces.
 
@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Generic controls belong in `@forge-org/ui`; business-specific compositions remain feature-owned.
+- Generic controls belong in `@corefoundry-labs/forge-ui`; business-specific compositions remain feature-owned.
 - Preserve accessibility, interactions, existing business behavior, API contracts, and responsive layouts.
 - Preserve the current public `organizationApi` export during the transition.
 - Use Figma page 19 for shared UI contracts and page 20 for feature-owned product patterns.

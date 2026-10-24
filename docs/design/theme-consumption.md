@@ -1,16 +1,16 @@
 # Using FORGE themes in an external React application
 
-`@forge-org/tokens` owns the semantic CSS variables and the `data-theme="dark"` /
-`data-theme="light"` contract. `@forge-org/ui` consumes those variables but does
+`@corefoundry-labs/forge-tokens` owns the semantic CSS variables and the `data-theme="dark"` /
+`data-theme="light"` contract. `@corefoundry-labs/forge-ui` consumes those variables but does
 not own application preference, browser storage, or operating-system state.
 An unrelated React application can therefore use the compiled packages without
 depending on `apps/web`:
 
 ```tsx
 import { useState } from 'react';
-import '@forge-org/tokens/tokens.css';
-import '@forge-org/ui/styles.css';
-import { Button, Card, useSystemTheme } from '@forge-org/ui';
+import '@corefoundry-labs/forge-tokens/tokens.css';
+import '@corefoundry-labs/forge-ui/styles.css';
+import { Button, Card, useSystemTheme } from '@corefoundry-labs/forge-ui';
 
 type ThemeMode = 'dark' | 'light' | 'system';
 

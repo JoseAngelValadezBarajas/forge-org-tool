@@ -1,0 +1,40 @@
+{
+  "figmaNodeId": "348:129",
+  "implementationRoute": "/planning/{workspaceId}/{projectId} (light)",
+  "reference": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\references\\09-project-board-light-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "actual": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\actual\\09-project-board-light-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "environment": "Chromium, 1440x960 desktop or 390x844 mobile, device scale factor 1, 100% zoom, Inter bundled, animations disabled",
+  "comparison": {
+    "channelThreshold": 0,
+    "antiAliasingIncluded": true,
+    "differentPixels": 43303,
+    "totalPixels": 1382400,
+    "differentPixelRatio": 0.031324508101851854
+  },
+  "referenceSha256": "84590dec4f19dc78e47eb464e6329f288aba4b4950ce9a161a90ac1c400f2cb7",
+  "geometry": null,
+  "measurement": {
+    "status": "MEASURED",
+    "structuralTolerancePx": null
+  },
+  "mismatchClassification": {
+    "geometry": "Not independently measured for this frame.",
+    "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
+    "colorsAndSurfaces": "Raster difference is measured; color-region attribution requires review.",
+    "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
+    "masksApplied": false
+  },
+  "review": {
+    "status": "HUMAN_REVIEW_PENDING"
+  },
+  "visualReview": "HUMAN_REVIEW_PENDING",
+  "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
+}

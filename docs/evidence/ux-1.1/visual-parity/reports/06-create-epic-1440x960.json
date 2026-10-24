@@ -1,0 +1,98 @@
+{
+  "figmaNodeId": "347:224",
+  "implementationRoute": "/planning/{workspaceId}/{projectId} (create drawer open)",
+  "reference": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\references\\06-create-epic-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "actual": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\actual\\06-create-epic-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "environment": "Chromium, 1440x960 desktop or 390x844 mobile, device scale factor 1, 100% zoom, Inter bundled, animations disabled",
+  "comparison": {
+    "channelThreshold": 0,
+    "antiAliasingIncluded": true,
+    "differentPixels": 94606,
+    "totalPixels": 1382400,
+    "differentPixelRatio": 0.06843605324074074
+  },
+  "referenceSha256": "dc179654dfa84d612c0da455ef1c7818e7482f745f8c2463387cd46b146dc113",
+  "geometry": {
+    "figmaNodeId": "347:224",
+    "viewport": {
+      "width": 1440,
+      "height": 960,
+      "deviceScaleFactor": 1,
+      "zoomPercent": 100
+    },
+    "actual": {
+      "boardAndDrawer": {
+        "x": 268,
+        "y": 205,
+        "width": 1148,
+        "height": 658
+      },
+      "drawer": {
+        "x": 980,
+        "y": 205,
+        "width": 436,
+        "height": 658
+      }
+    },
+    "expectedFigma": {
+      "boardAndDrawer": {
+        "x": 268,
+        "y": 205,
+        "width": 1148,
+        "height": 658
+      },
+      "board": {
+        "width": 695
+      },
+      "gap": 17,
+      "drawer": {
+        "x": 980,
+        "y": 205,
+        "width": 436,
+        "height": 658
+      }
+    },
+    "humanReview": "PENDING",
+    "deviations": {
+      "boardAndDrawer": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      },
+      "drawer": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "maxAbsoluteDeviation": 0
+      }
+    },
+    "tolerancePx": 1
+  },
+  "measurement": {
+    "status": "MEASURED",
+    "structuralTolerancePx": 1
+  },
+  "mismatchClassification": {
+    "geometry": "Geometry measured; see per-container deviations.",
+    "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
+    "colorsAndSurfaces": "Raster difference is measured; color-region attribution requires review.",
+    "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
+    "masksApplied": false
+  },
+  "review": {
+    "status": "HUMAN_REVIEW_PENDING"
+  },
+  "visualReview": "HUMAN_REVIEW_PENDING",
+  "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
+}

@@ -1,251 +1,31 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { spawn, spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import test from 'node:test';
-import { tmpdir } from 'node:os';
 
 const root = resolve(import.meta.dirname, '../..');
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const packages = [
+  ['@corefoundry-labs/forge-tokens', ['dist/tokens.css', 'dist/tokens.json']],
+  ['@corefoundry-labs/forge-icons', ['dist/index.js', 'dist/index.d.ts']],
+  ['@corefoundry-labs/forge-ui', ['dist/index.js', 'dist/index.d.ts', 'dist/styles.css']],
+];
 
-function run(command, args, cwd) {
-  const result =
-    process.platform === 'win32'
-      ? spawnSync(
-          process.env.ComSpec ?? 'cmd.exe',
-          ['/d', '/s', '/c', [command, ...args].join(' ')],
-          { cwd, encoding: 'utf8', stdio: 'pipe' },
-        )
-      : spawnSync(command, args, { cwd, encoding: 'utf8', stdio: 'pipe' });
-  if (result.status !== 0) {
-    throw new Error(
-      `${command} ${args.join(' ')}\n${result.error ?? ''}\n${result.stdout}\n${result.stderr}`,
-    );
+test('frontend installs published visual package artifacts', () => {
+  for (const [name, files] of packages) {
+    const packagePath = resolve(root, 'node_modules', ...name.split('/'));
+    const manifest = JSON.parse(readFileSync(resolve(packagePath, 'package.json'), 'utf8'));
+    assert.equal(manifest.name, name);
+    assert.equal(manifest.version, '1.0.2');
+    for (const file of files)
+      assert.equal(existsSync(resolve(packagePath, file)), true, `${name}/${file}`);
   }
-  return result.stdout;
-}
+});
 
-function pack(packageDirectory, destination) {
-  const output = run(
-    npm,
-    ['pack', '--silent', '--pack-destination', destination],
-    packageDirectory,
+test('api-client remains local and private', () => {
+  const manifest = JSON.parse(
+    readFileSync(resolve(root, 'packages/api-client/package.json'), 'utf8'),
   );
-  return join(destination, output.trim().split(/\r?\n/).at(-1));
-}
-
-test('packed UI, tokens, icons, and API client work in an external React consumer', async () => {
-  const consumer = mkdtempSync(join(tmpdir(), 'forge-package-consumer-'));
-  const artifacts = join(consumer, 'artifacts');
-  const ui = resolve(root, 'packages/ui');
-  const icons = resolve(root, 'packages/icons');
-  const tokens = resolve(root, 'packages/tokens');
-  const apiClient = resolve(root, 'packages/api-client');
-  run(npm, ['run', 'build', '--workspace=@forge-org/tokens'], root);
-  run(npm, ['run', 'build', '--workspace=@forge-org/ui'], root);
-  run(npm, ['run', 'build', '--workspace=@forge-org/icons'], root);
-  run(npm, ['run', 'build', '--workspace=@forge-org/api-client'], root);
-  mkdirSync(artifacts, { recursive: true });
-  const uiTar = pack(ui, artifacts);
-  const iconsTar = pack(icons, artifacts);
-  const tokensTar = pack(tokens, artifacts);
-  const apiTar = pack(apiClient, artifacts);
-
-  writeFileSync(
-    join(consumer, 'package.json'),
-    JSON.stringify(
-      {
-        name: 'forge-external-consumer',
-        private: true,
-        type: 'module',
-        scripts: { build: 'vite build', typecheck: 'tsc --noEmit' },
-        dependencies: {
-          '@forge-org/api-client': `file:${apiTar}`,
-          '@forge-org/icons': `file:${iconsTar}`,
-          '@forge-org/tokens': `file:${tokensTar}`,
-          '@forge-org/ui': `file:${uiTar}`,
-          '@vitejs/plugin-react': '^6.1.2',
-          react: '^19.3.0',
-          'react-dom': '^19.3.0',
-          vite: '^8.3.4',
-        },
-        devDependencies: {
-          '@types/react': '^19.2.0',
-          '@types/react-dom': '^19.2.0',
-          typescript: '^6.0.3',
-        },
-      },
-      null,
-      2,
-    ),
-  );
-  writeFileSync(
-    join(consumer, 'index.html'),
-    '<div id="root"></div><script type="module" src="/src/main.tsx"></script>',
-  );
-  mkdirSync(join(consumer, 'src'), { recursive: true });
-  writeFileSync(
-    join(consumer, 'src/main.tsx'),
-    `import { useState } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { Alert, Button, Card, Checkbox, Dialog, FormField, Input, KeyValueRow, StatusChip, Tabs, useSystemTheme } from '@forge-org/ui';\nimport '@forge-org/tokens/tokens.css';\nimport '@forge-org/ui/styles.css';\nimport { organizationApi } from '@forge-org/api-client';\nvoid organizationApi.listWorkspaces;\nfunction Consumer() {\n  const [count, setCount] = useState(0);\n  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>(() => { const saved = localStorage.getItem('external-theme'); return saved === 'dark' || saved === 'light' || saved === 'system' ? saved : 'dark'; });\n  const systemTheme = useSystemTheme();\n  const resolvedTheme = theme === 'system' ? systemTheme : theme;\n  return <main data-theme={resolvedTheme} style={{ fontFamily: 'var(--forge-font-ui)' }}><label>Appearance mode<select aria-label="Appearance mode" value={theme} onChange={(event) => { const next = event.target.value as typeof theme; setTheme(next); localStorage.setItem('external-theme', next); }}><option value="dark">Dark</option><option value="light">Light</option><option value="system">System</option></select></label><div className="button" data-testid="host-class">Host class</div><FormField label="Name"><Input /></FormField><label>Include metadata <Checkbox /></label><Button onClick={() => setCount(count + 1)}>Save {count}</Button><Card variant="elevated" data-testid="external-card"><StatusChip tone="success">Available</StatusChip><Alert heading="Review" message="Human review remains required." /></Card><dl><KeyValueRow label="Repository" value="atlas" /></dl><Tabs label="External tabs" tabs={[{ id: 'overview', label: 'Overview', content: 'Overview panel' }, { id: 'details', label: 'Details', content: 'Details panel' }]} /><Dialog title="External dialog" description="Dialog package contract" data-testid="external-dialog" /></main>;\n}\ncreateRoot(document.getElementById('root')!).render(<Consumer />);\n`,
-  );
-  writeFileSync(
-    join(consumer, 'vite.config.ts'),
-    `import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nexport default defineConfig({ plugins: [react()] });\n`,
-  );
-  writeFileSync(
-    join(consumer, 'icons.html'),
-    '<div id="root"></div><script type="module" src="/src/icons.tsx"></script>',
-  );
-  writeFileSync(
-    join(consumer, 'src/icons.tsx'),
-    `import { createRoot } from 'react-dom/client';\nimport { Search } from '@forge-org/icons';\ncreateRoot(document.getElementById('root')!).render(<Search aria-label="Search icon" />);\n`,
-  );
-  writeFileSync(
-    join(consumer, 'tsconfig.json'),
-    JSON.stringify(
-      {
-        compilerOptions: {
-          jsx: 'react-jsx',
-          module: 'ESNext',
-          moduleResolution: 'Bundler',
-          strict: true,
-          noEmit: true,
-          skipLibCheck: true,
-        },
-        include: ['src'],
-      },
-      null,
-      2,
-    ),
-  );
-  run(npm, ['install', '--ignore-scripts', '--no-audit', '--no-fund'], consumer);
-  const installedUi = join(consumer, 'node_modules/@forge-org/ui');
-  const installedUiPackage = JSON.parse(readFileSync(join(installedUi, 'package.json'), 'utf8'));
-  assert.equal(installedUiPackage.name, '@forge-org/ui');
-  assert.equal(existsSync(join(installedUi, 'dist/index.js')), true);
-  assert.equal(existsSync(join(installedUi, 'dist/styles.css')), true);
-  const packedAggregate = readFileSync(join(installedUi, 'dist/styles.css'), 'utf8');
-  for (const selector of ['.button', '.control', '.card', '.state']) {
-    assert.doesNotMatch(packedAggregate, new RegExp(`\\.${selector.slice(1)}(?=[\\s,{:#>+~.])`));
-  }
-  run(npm, ['run', 'typecheck'], consumer);
-  run(npm, ['run', 'build'], consumer);
-
-  const port = 4173 + Math.floor(Math.random() * 300);
-  const server =
-    process.platform === 'win32'
-      ? spawn(
-          process.env.ComSpec ?? 'cmd.exe',
-          ['/d', '/s', '/c', `npm exec -- vite --host 127.0.0.1 --port ${port}`],
-          { cwd: consumer, stdio: 'ignore' },
-        )
-      : spawn('npm', ['exec', '--', 'vite', '--host', '127.0.0.1', '--port', String(port)], {
-          cwd: consumer,
-          stdio: 'ignore',
-        });
-  try {
-    let ready = false;
-    for (let attempt = 0; attempt < 30; attempt += 1) {
-      try {
-        const response = await globalThis.fetch(`http://127.0.0.1:${port}`);
-        if (response.ok) {
-          ready = true;
-          break;
-        }
-      } catch {
-        await new Promise((resolve) => globalThis.setTimeout(resolve, 200));
-      }
-    }
-    assert.equal(ready, true, 'external Vite consumer did not start');
-    const { chromium } = await import('@playwright/test');
-    const browser = await chromium.launch({ headless: true });
-    try {
-      const page = await browser.newPage();
-      await page.goto(`http://127.0.0.1:${port}`);
-      assert.equal(await page.getByLabel('Name').isVisible(), true);
-      assert.equal(await page.getByLabel('Include metadata').isVisible(), true);
-      assert.equal(await page.getByText('Available').getAttribute('data-tone'), 'success');
-      assert.equal(
-        await page.getByRole('alert').textContent(),
-        'ReviewHuman review remains required.',
-      );
-      assert.equal(await page.getByText('atlas').isVisible(), true);
-      assert.equal(await page.getByRole('tabpanel').textContent(), 'Overview panel');
-      await page.getByRole('tab', { name: 'Details' }).click();
-      assert.equal(await page.getByRole('tabpanel').textContent(), 'Details panel');
-      assert.equal(
-        (await page.getByTestId('external-dialog').getAttribute('aria-labelledby')) !== null,
-        true,
-      );
-      assert.equal(
-        await page
-          .getByTestId('host-class')
-          .evaluate((element) => getComputedStyle(element).minHeight),
-        '0px',
-      );
-      await page.goto(`http://127.0.0.1:${port}/icons.html`);
-      assert.equal(
-        await page.getByLabel('Search icon').evaluate((element) => element.tagName.toLowerCase()),
-        'svg',
-      );
-      await page.goto(`http://127.0.0.1:${port}`);
-      assert.notEqual(
-        await page.getByRole('button', { name: 'Save 0' }).getAttribute('class'),
-        'button',
-      );
-      await page.getByRole('button', { name: 'Save 0' }).click();
-      assert.equal(await page.getByRole('button', { name: 'Save 1' }).isVisible(), true);
-      const before = await page
-        .getByLabel('Name')
-        .evaluate((element) => globalThis.getComputedStyle(element).backgroundColor);
-      assert.notEqual(
-        await page
-          .locator('main')
-          .evaluate((element) => getComputedStyle(element).getPropertyValue('--forge-bg').trim()),
-        '',
-      );
-      assert.match(
-        await page
-          .locator('main')
-          .evaluate((element) => getComputedStyle(element).getPropertyValue('--forge-font-ui')),
-        /system-ui/,
-      );
-      await page.getByLabel('Appearance mode').selectOption('light');
-      assert.equal(await page.locator('main').getAttribute('data-theme'), 'light');
-      const after = await page
-        .getByLabel('Name')
-        .evaluate((element) => globalThis.getComputedStyle(element).backgroundColor);
-      assert.notEqual(before, after);
-      await page.getByLabel('Appearance mode').selectOption('system');
-      assert.equal(await page.locator('main').getAttribute('data-theme'), 'light');
-      await page.emulateMedia({ colorScheme: 'dark' });
-      await page.waitForFunction(
-        () => globalThis.document.querySelector('main')?.getAttribute('data-theme') === 'dark',
-      );
-      assert.equal(await page.locator('main').getAttribute('data-theme'), 'dark');
-      assert.equal(
-        await page.evaluate(() => globalThis.localStorage.getItem('external-theme')),
-        'system',
-      );
-      await page.reload();
-      assert.equal(await page.getByLabel('Appearance mode').inputValue(), 'system');
-      assert.equal(await page.locator('main').getAttribute('data-theme'), 'dark');
-    } finally {
-      await browser.close();
-    }
-  } finally {
-    if (process.platform === 'win32') {
-      spawnSync('taskkill.exe', ['/PID', String(server.pid), '/T', '/F'], { stdio: 'ignore' });
-    } else {
-      server.kill();
-    }
-  }
-
-  assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/dist/index.js')), true);
-  assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/icons/dist/index.js')), true);
-  assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/dist/styles.css')), true);
-  assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/tokens/dist/tokens.css')), true);
-  assert.equal(existsSync(join(consumer, 'node_modules/react')), true);
-  assert.equal(existsSync(join(consumer, 'node_modules/@forge-org/ui/node_modules/react')), false);
-  assert.equal(readFileSync(join(consumer, 'dist/index.html'), 'utf8').includes('root'), true);
+  assert.equal(manifest.name, '@forge-org/api-client');
+  assert.equal(manifest.private, true);
+  assert.equal(existsSync(resolve(root, 'node_modules/@forge-org/api-client')), true);
 });

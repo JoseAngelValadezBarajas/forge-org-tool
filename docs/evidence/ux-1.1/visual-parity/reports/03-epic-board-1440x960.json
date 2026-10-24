@@ -1,0 +1,40 @@
+{
+  "figmaNodeId": "344:182",
+  "implementationRoute": "/planning/{workspaceId}/{projectId}/epics/{epicId}",
+  "reference": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\references\\03-epic-board-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "actual": {
+    "path": "C:\\Dev\\Forge-UX-1.1\\docs\\evidence\\ux-1.1\\visual-parity\\actual\\03-epic-board-1440x960.png",
+    "width": 1440,
+    "height": 960
+  },
+  "environment": "Chromium, 1440x960 desktop or 390x844 mobile, device scale factor 1, 100% zoom, Inter bundled, animations disabled",
+  "comparison": {
+    "channelThreshold": 0,
+    "antiAliasingIncluded": true,
+    "differentPixels": 86825,
+    "totalPixels": 1382400,
+    "differentPixelRatio": 0.06280743634259259
+  },
+  "referenceSha256": "b62d16e8423a9db905180e923b2fa3ee67e367374dac34fdcb0589b41f82c64c",
+  "geometry": null,
+  "measurement": {
+    "status": "MEASURED",
+    "structuralTolerancePx": null
+  },
+  "mismatchClassification": {
+    "geometry": "Not independently measured for this frame.",
+    "typography": "Raster difference is measured; font metrics and glyph-level mismatch classification require review.",
+    "colorsAndSurfaces": "Raster difference is measured; color-region attribution requires review.",
+    "missingOrUnexpectedElements": "Not inferred from pixels; review actual and overlay against the exact reference.",
+    "masksApplied": false
+  },
+  "review": {
+    "status": "HUMAN_REVIEW_PENDING"
+  },
+  "visualReview": "HUMAN_REVIEW_PENDING",
+  "status": "VISUAL_FIDELITY_NOT_ACCEPTED"
+}

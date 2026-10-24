@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { organizationApi, type WorkspaceTag } from '@forge-org/api-client';
-import { Button, Card, FormField, Input } from '@forge-org/ui';
+import { Button, Card, FormField, Input } from '@corefoundry-labs/forge-ui';
+import styles from './WorkspaceTagsPanel.module.css';
 
 type Draft = { name: string; color: string };
 
@@ -79,89 +80,100 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
   if (!workspaceId) return null;
   return (
     <Card>
-      <section aria-labelledby="workspace-tags-heading">
-        <h2 id="workspace-tags-heading">Workspace tags</h2>
-        <p>
-          Tags are shared across this Workspace. Removing a tag never deletes its Epics or Work
-          Items.
-        </p>
-        {error && <p role="alert">{error}</p>}
-        <form onSubmit={createTag}>
-          <FormField label="New tag name">
-            <Input
-              aria-label="New tag name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-              maxLength={40}
-            />
-          </FormField>
-          <FormField label="New tag color">
-            <Input
-              aria-label="New tag color"
-              type="color"
-              value={color}
-              onChange={(event) => setColor(event.target.value)}
-            />
-          </FormField>
-          <Button type="submit">Create workspace tag</Button>
-        </form>
-        {tags.length === 0 ? (
-          <p>No workspace tags yet.</p>
-        ) : (
-          <ul>
-            {tags.map((tag) => {
-              const draft = drafts[tag.id] ?? { name: tag.name, color: tag.color };
-              return (
-                <li key={tag.id}>
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      void saveTag(tag.id);
-                    }}
-                  >
-                    <FormField label={`Name for tag ${tag.name}`}>
-                      <Input
-                        aria-label={`Name for tag ${tag.name}`}
-                        value={draft.name}
-                        maxLength={40}
-                        onChange={(event) =>
-                          setDrafts((items) => ({
-                            ...items,
-                            [tag.id]: { ...draft, name: event.target.value },
-                          }))
-                        }
-                        required
-                      />
-                    </FormField>
-                    <FormField label={`Color for tag ${tag.name}`}>
-                      <Input
-                        aria-label={`Color for tag ${tag.name}`}
-                        type="color"
-                        value={draft.color}
-                        onChange={(event) =>
-                          setDrafts((items) => ({
-                            ...items,
-                            [tag.id]: { ...draft, color: event.target.value },
-                          }))
-                        }
-                      />
-                    </FormField>
-                    <Button type="submit">Save tag {tag.name}</Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => void deleteTag(tag.id)}
+      <div className={styles.layout}>
+        <section aria-labelledby="workspace-tags-heading" className={styles.catalog}>
+          <h2 id="workspace-tags-heading">Manage workspace tags</h2>
+          <p>
+            Tags are shared across this Workspace. Removing a tag never deletes its Epics or Work
+            Items.
+          </p>
+          {error && <p role="alert">{error}</p>}
+          <form onSubmit={createTag}>
+            <FormField label="New tag name">
+              <Input
+                aria-label="New tag name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                required
+                maxLength={40}
+              />
+            </FormField>
+            <FormField label="New tag color">
+              <Input
+                aria-label="New tag color"
+                type="color"
+                value={color}
+                onChange={(event) => setColor(event.target.value)}
+              />
+            </FormField>
+            <Button type="submit">Create workspace tag</Button>
+          </form>
+          {tags.length === 0 ? (
+            <p>No workspace tags yet.</p>
+          ) : (
+            <ul>
+              {tags.map((tag) => {
+                const draft = drafts[tag.id] ?? { name: tag.name, color: tag.color };
+                return (
+                  <li key={tag.id}>
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        void saveTag(tag.id);
+                      }}
                     >
-                      Delete tag {tag.name}
-                    </Button>
-                  </form>
-                </li>
-              );
-            })}
+                      <FormField label={`Name for tag ${tag.name}`}>
+                        <Input
+                          aria-label={`Name for tag ${tag.name}`}
+                          value={draft.name}
+                          maxLength={40}
+                          onChange={(event) =>
+                            setDrafts((items) => ({
+                              ...items,
+                              [tag.id]: { ...draft, name: event.target.value },
+                            }))
+                          }
+                          required
+                        />
+                      </FormField>
+                      <FormField label={`Color for tag ${tag.name}`}>
+                        <Input
+                          aria-label={`Color for tag ${tag.name}`}
+                          type="color"
+                          value={draft.color}
+                          onChange={(event) =>
+                            setDrafts((items) => ({
+                              ...items,
+                              [tag.id]: { ...draft, color: event.target.value },
+                            }))
+                          }
+                        />
+                      </FormField>
+                      <Button type="submit">Save tag {tag.name}</Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => void deleteTag(tag.id)}
+                      >
+                        Delete tag {tag.name}
+                      </Button>
+                    </form>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+        <aside aria-labelledby="tag-guidance-heading" className={styles.guidance}>
+          <h3 id="tag-guidance-heading">Tag guidance</h3>
+          <p>Keep tags short and consistent so teams can filter related work quickly.</p>
+          <ul>
+            <li>Tags are shared by every project in this Workspace.</li>
+            <li>Renaming a tag updates its label without deleting linked work.</li>
+            <li>Deleting a tag removes only the label, never an Epic or Work Item.</li>
           </ul>
-        )}
-      </section>
+        </aside>
+      </div>
     </Card>
   );
 }

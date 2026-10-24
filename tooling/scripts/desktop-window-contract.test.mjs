@@ -78,7 +78,7 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
   );
   assert.match(
     workflow,
-    /run: npm run test:desktop:acceptance\s+env:\s+FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER: '1'\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
+    /run: npm run test:desktop:acceptance\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
   );
 });
 
@@ -114,18 +114,85 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /\$root\.FindAll\([\s\S]*TreeScope\]::Descendants/);
-  assert.match(smoke, /Current\.Name -match '\(\?i\)\(open\|abrir/);
-  assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
+  assert.match(smoke, /candidateOwnedByApp/);
+  assert.match(
+    smoke,
+    /\$hasFileName -and \(\$hasOpenAction -or \$nativeOpenButton -ne \[IntPtr\]::Zero\)/,
+  );
+  assert.match(
+    smoke,
+    /Current\.ControlType -in @\([\s\S]*?ControlType\]::Edit[\s\S]*?ControlType\]::ComboBox/,
+  );
+  assert.doesNotMatch(smoke, /SendWait\('%n'\)/);
+  assert.match(smoke, /GetDlgItem\(\$dialog\.Current\.NativeWindowHandle, 1148\)/);
+  assert.match(smoke, /fileNameControl\.Current\.NativeWindowHandle/);
+  assert.match(smoke, /FindDescendantByClass\(\$nativeFileNameHandle, 'Edit'\)/);
+  assert.match(smoke, /AutomationElement\]::FromHandle\(\$nativeFileNameEditHandle\)/);
+  assert.match(smoke, /ClickControlCenter\(\$nativeFileNameEditHandle\)/);
+  assert.match(smoke, /Clipboard\]::SetText\(\$filePath\)[\s\S]*?SendWait\('\^v'\)/);
+  assert.match(smoke, /Clipboard\]::SetDataObject\(\$previousClipboard, \$true\)/);
+  assert.match(smoke, /ReadWindowText\(\$nativeFileNameEditHandle\) -cne \$filePath/);
+  assert.match(smoke, /0x000D[\s\S]*?WM_GETTEXT across process boundary/);
+  assert.doesNotMatch(smoke, /EnterTextIntoEdit|WM_CHAR/);
+  assert.doesNotMatch(smoke, /SetWindowText\(/);
   assert.match(smoke, /\$fileNameControl[\s\S]*nombre de archivo/);
   assert.match(smoke, /ControlType\]::ComboBox/);
   assert.match(smoke, /AutomationId.*1148|1148.*AutomationId/);
-  assert.match(smoke, /FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER/);
-  assert.match(smoke, /Clipboard\]::SetText\(\$filePath\)/);
-  assert.match(smoke, /SendWait\('\^v'\)/);
-  assert.match(smoke, /Clipboard\]::SetDataObject\(\$previousClipboard, \$true\)/);
+  assert.doesNotMatch(smoke, /FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER/);
+  assert.doesNotMatch(smoke, /SetCommonDialogControlText|GetCommonDialogSpec/);
   assert.doesNotMatch(smoke, /SendWait\(\$filePath\)|ASC 95/);
-  assert.match(smoke, /SendWait\('\{ENTER\}'\)/);
+  assert.match(smoke, /Invoke-ForgeAutomationElement \$openControl 'Open screenshot picker'/);
   assert.match(smoke, /PASS installed UI -> authenticated API -> SQLite -> restart/);
+});
+
+test('native screenshot picker targets Open across Windows UIA control types and waits for selection to close', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const choose = smoke.slice(smoke.indexOf('function Choose-ForgeFile'), smoke.indexOf('\ntry {'));
+  assert.match(choose, /GetWindowOwner\(\$candidateHandle\)/);
+  assert.match(choose, /Picker UIA controls:/);
+  assert.match(
+    choose,
+    /ControlType\]::Button -and\s+\$_.Current.Name -match '\(\?i\)\^\(open\|abrir\)\$'/,
+  );
+  assert.match(choose, /GetDlgItem\(\$candidateHandle, 1\)/);
+  assert.match(
+    choose,
+    /if \(\$null -ne \$openControl\)[\s\S]*?elseif \(\$nativeOpenButton -ne \[IntPtr\]::Zero\)[\s\S]*?ClickDialogButton\(\$nativeOpenButton\)/,
+  );
+  assert.doesNotMatch(choose, /AutomationId -eq '1'|InvokeDialogOpen/);
+  assert.doesNotMatch(
+    choose,
+    /ClassName -in @\('#32770', 'CabinetWClass'\)/,
+    'the smoke must not attach to arbitrary Explorer windows',
+  );
+  const closeWait = smoke.slice(
+    smoke.indexOf('function Wait-ForgeAutomationDialogClosed'),
+    smoke.indexOf('function Choose-ForgeFile'),
+  );
+  assert.match(choose, /SetForegroundWindow\(\$dialog\.Current\.NativeWindowHandle\)/);
+  assert.match(choose, /GetDlgItem\(\$dialog\.Current\.NativeWindowHandle, 1148\)/);
+  assert.match(choose, /ClickControlCenter\(\$nativeFileNameEditHandle\)/);
+  assert.match(choose, /Invoke-ForgeAutomationElement \$openControl 'Open screenshot picker'/);
+  assert.match(
+    choose,
+    /IsWindowVisible\(\$dialog\.Current\.NativeWindowHandle\)[\s\S]*?ClickDialogButton\(\$nativeOpenButton\)/,
+  );
+  assert.match(choose, /\$nativeOpenButton = \[IntPtr\]\$openControl\.Current\.NativeWindowHandle/);
+  assert.match(
+    choose,
+    /Wait-ForgeAutomationDialogClosed\s+\$desktop\s+\$root\s+\$dialog/,
+    'the file picker returns only after the native dialog is gone',
+  );
+  assert.match(closeWait, /NativeWindowHandle/);
+  assert.match(closeWait, /IsWindowVisible\(\$dialogHandle\)/);
+  assert.match(
+    closeWait,
+    /if \(-not \[ForgeWindowNative\]::IsWindowVisible\(\$dialogHandle\)\) \{ return \}/,
+  );
+  assert.match(
+    closeWait,
+    /do\s*\{[\s\S]*?FindAll\([\s\S]*?TreeScope\]::Children[\s\S]*?Start-Sleep/,
+  );
 });
 
 test('native combobox selection does not collapse an already closed dropdown', async () => {
@@ -141,8 +208,62 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
   assert.match(smoke, /ToggleState\]::Off[\s\S]*?\.Toggle\(\)/);
   assert.match(smoke, /Unsupported UI Automation patterns for control/);
   assert.match(smoke, /Wait-ForgeAutomationNamedElement\s+\$root\s+\$buttonName/);
-  assert.match(smoke, /ClassName -in @\('#32770', 'CabinetWClass'\)/);
+  assert.match(smoke, /GetWindowOwner\(\$candidateHandle\)/);
+  assert.match(smoke, /hasFileName/);
   assert.match(smoke, /Top-level windows:/);
+});
+
+test('installed acceptance opens Project Overview and follows its board link', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+
+  assert.match(
+    smoke,
+    /\$projectName = [\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New project'[\s\S]*?\$projectInput = Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Project name'/,
+  );
+  assert.match(
+    smoke,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$projectName[\s\S]*?Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) 'Project Overview'[\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) 'Open planning board'[\s\S]*?Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) 'Project Board'/,
+  );
+  assert.match(
+    smoke,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New Epic'[\s\S]*?Set-ForgeElementValue \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Epic title'/,
+  );
+  assert.match(
+    smoke,
+    /Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$epicName[\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$epicName[\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New Work Item'[\s\S]*?Set-ForgeElementValue \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Work Item title'[\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'Create Work Item'/,
+  );
+  assert.doesNotMatch(smoke, /Select-ForgeOption \$root 'Epic for new feature'/);
+});
+
+test('installed acceptance follows the current workspace landing state and verifies workspace persistence in SQLite', async () => {
+  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const databaseVerifier = await readFile('tooling/scripts/verify-desktop-smoke-db.py', 'utf8');
+
+  assert.match(
+    smoke,
+    /Create Workspace'[\s\S]*?\[System\.Windows\.Automation\.ControlType\]::Button\) 'Create your first project'/,
+    'workspace creation should be verified by the product landing action rather than a workspace label that is not rendered',
+  );
+  assert.match(smoke, /function Assert-ForgeSqliteRecord/);
+  assert.match(smoke, /verify-desktop-smoke-db\.py \$databasePath \$table \$name/);
+  assert.match(databaseVerifier, /SELECT COUNT\(\*\) FROM \{table\} WHERE \{column\} = \?/);
+  assert.match(
+    databaseVerifier,
+    /"workspaces": \("workspaces", "name"\),\s*"projects": \("projects", "name"\)/,
+  );
+  assert.match(databaseVerifier, /database_path\.is_file\(\)/);
+  assert.match(smoke, /Assert-ForgeSqliteRecord \$databasePath 'workspaces' \$workspaceName/);
+  assert.match(smoke, /Assert-ForgeSqliteRecord \$databasePath 'projects' \$projectName/);
+  assert.match(
+    smoke,
+    /Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$projectName/,
+    'the project card exposes its title as a link, not a Text control',
+  );
+  assert.doesNotMatch(
+    smoke,
+    /Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) \$(workspaceName|projectName)/,
+    'the workspace is not exposed as a text node in the current overview layout',
+  );
 });
 
 test('local installed-app acceptance prepares current frontend and Python sidecar artifacts', async () => {

@@ -12,7 +12,7 @@ import {
   Select,
   Switch,
   Textarea,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 import styles from '../ComponentGallery.module.css';
 
 export function renderFormPreview(componentId: string): ReactNode | null {

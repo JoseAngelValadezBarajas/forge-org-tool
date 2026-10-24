@@ -77,6 +77,6 @@ claim of exact Figma parity; the chip’s visual review remains open.
 
 `npm run check:tokens` checks generated-file freshness, component token
 references, and 4.5:1 contrast for semantic text/status foreground pairs in both
-modes. `npm test --workspace=@forge-org/tokens` repeats the contrast and
+modes. `npm test --workspace=@corefoundry-labs/forge-tokens` repeats the contrast and
 semantic-coverage assertions. Passing these checks is code evidence, not human
 visual certification.

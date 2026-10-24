@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Card, StatusChip } from '@forge-org/ui';
+import { Card, StatusChip } from '@corefoundry-labs/forge-ui';
 import type { Feature } from '@forge-org/api-client';
 import { Link } from 'react-router-dom';
 import styles from './FeatureCard.module.css';

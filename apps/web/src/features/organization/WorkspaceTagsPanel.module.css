@@ -1,0 +1,37 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  align-items: start;
+  gap: var(--forge-space-6);
+}
+
+.catalog {
+  min-width: 0;
+}
+
+.guidance {
+  padding: var(--forge-space-4);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+}
+
+.guidance h3,
+.guidance p {
+  margin-top: 0;
+}
+
+.guidance p,
+.guidance li {
+  color: var(--forge-text-muted);
+}
+
+.guidance li + li {
+  margin-top: var(--forge-space-2);
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -36,6 +36,7 @@ describe('WorkspaceTagsPanel', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
     render(<WorkspaceTagsPanel workspaceId="w1" />);
+    expect(screen.getByRole('complementary', { name: 'Tag guidance' })).toBeInTheDocument();
 
     const input = await screen.findByRole('textbox', { name: 'Name for tag Desktop' });
     fireEvent.change(input, { target: { value: 'Screenshots' } });

@@ -19,6 +19,8 @@ export default tseslint.config(
     rules: {
       ...jsxA11y.flatConfigs?.recommended?.rules,
       ...reactHooks.configs['recommended-latest'].rules,
+      // Named scrollable regions (the five-lane Planning board) need keyboard focus to scroll.
+      'jsx-a11y/no-noninteractive-tabindex': ['error', { roles: ['region', 'tabpanel'] }],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

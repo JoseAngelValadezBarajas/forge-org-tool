@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function downloadJson(page: Page, url: string, buttonName: string) {
   await page.goto(url);
+  await page.locator('summary').filter({ hasText: 'Export existing' }).click();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: buttonName }).click();
   const download = await downloadPromise;
@@ -52,8 +53,11 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
 
   await page.goto(`/planning/${workspaceData.id}/${projectData.id}`);
   const destinationEpicTitle = `Destination Epic ${suffix}`;
+  await page.getByRole('button', { name: 'New Epic', exact: true }).click();
   await page.getByLabel('Epic title').fill(destinationEpicTitle);
   await page.getByRole('button', { name: 'Create Epic' }).click();
+  await page.locator('summary').filter({ hasText: 'Board' }).click();
+  await page.getByRole('button', { name: 'New work item', exact: true }).click();
   await page.getByLabel('Feature title').fill(`Destination Story ${suffix}`);
   await page.getByLabel('Epic for new feature').selectOption({ label: destinationEpicTitle });
   await page.getByRole('button', { name: 'Create Feature' }).click();
@@ -88,9 +92,14 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(epicDocument)),
   });
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: `Import into ${projectData.name}` }),
+  ).toBeVisible();
+  await expect(page.getByText(`${workspaceData.name} / ${projectData.name}`)).toBeVisible();
+  await expect(page.getByText(`Destination: epics (${projectData.id})`)).toHaveCount(0);
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(`Destination: epics (${projectData.id})`)).toBeVisible();
-  await page.getByRole('button', { name: 'Confirm planning import' }).click();
+  await page.getByRole('button', { name: 'Confirm Import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
 
   const planningUrl = `/api/v1/workspaces/${workspaceData.id}/projects/${projectData.id}/planning/overview`;
@@ -108,7 +117,12 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   expect(exportedEpic.epics.map((item) => item.title)).toEqual([`Imported Epic ${suffix}`]);
   expect(exportedEpic.features.map((item) => item.title)).toContain(`Imported Story ${suffix}`);
   await page.goto(epicPage);
-  await page.getByRole('link', { name: 'Import / export Stories and Bugs' }).click();
+  if (test.info().project.name === 'chromium-mobile') {
+    await page.getByRole('link', { name: `Imported Story ${suffix}` }).click();
+    await page.getByRole('link', { name: /Export Work Items/ }).click();
+  } else {
+    await page.getByRole('link', { name: 'Import / export Stories and Bugs' }).click();
+  }
   const workItemsDocument = {
     schema_version: 'forge-project-transfer-v2',
     project: { name: 'Work item fixture' },
@@ -147,9 +161,15 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(workItemsDocument)),
   });
+  await expect(
+    page.getByRole('heading', { name: `Import into Imported Epic ${suffix}` }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`${workspaceData.name} / ${projectData.name} / Imported Epic ${suffix}`),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(`Destination: work-items (${importedEpic.id})`)).toBeVisible();
-  await page.getByRole('button', { name: 'Confirm planning import' }).click();
+  await expect(page.getByText(`Destination: work-items (${importedEpic.id})`)).toHaveCount(0);
+  await page.getByRole('button', { name: 'Confirm Import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
 
   overview = await (await page.request.get(planningUrl)).json();
@@ -169,7 +189,7 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     (item: { title: string }) => item.title === `Scoped Story ${suffix}`,
   );
   await page.goto(`/planning/${workspaceData.id}/${projectData.id}/features/${importedStory.id}`);
-  await expect(page.getByRole('heading', { name: 'Feature detail' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Work item detail' })).toBeVisible();
   await page.getByRole('link', { name: 'Import / export Tasks' }).click();
   const taskDocument = {
     schema_version: 'forge-project-transfer-v2',
@@ -199,9 +219,15 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(taskDocument)),
   });
+  await expect(
+    page.getByRole('heading', { name: `Import into Scoped Story ${suffix}` }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`${workspaceData.name} / ${projectData.name} / Scoped Story ${suffix}`),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(`Destination: tasks (${importedStory.id})`)).toBeVisible();
-  await page.getByRole('button', { name: 'Confirm planning import' }).click();
+  await expect(page.getByText(`Destination: tasks (${importedStory.id})`)).toHaveCount(0);
+  await page.getByRole('button', { name: 'Confirm Import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
   const tasksResponse = await page.request.get(
     `/api/v1/workspaces/${workspaceData.id}/projects/${projectData.id}/features/${importedStory.id}/tasks`,

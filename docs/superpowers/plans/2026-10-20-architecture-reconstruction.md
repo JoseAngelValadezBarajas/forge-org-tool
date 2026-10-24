@@ -4,7 +4,7 @@
 
 **Goal:** Make the existing FORGE monorepo independently reusable, capability-oriented, accessible, and verifiably maintainable without changing product semantics or safety boundaries.
 
-**Architecture:** Keep the existing app/package dependency direction, but make package outputs distributable, move generic UI contracts into `@forge-org/ui`, derive/validate API types from the backend contract, and split backend HTTP/persistence by capability. Product composition remains feature-owned.
+**Architecture:** Keep the existing app/package dependency direction, but make package outputs distributable, move generic UI contracts into `@corefoundry-labs/forge-ui`, derive/validate API types from the backend contract, and split backend HTTP/persistence by capability. Product composition remains feature-owned.
 
 **Tech Stack:** npm workspaces, TypeScript/React/Vite, FastAPI/Pydantic/SQLite, Vitest/Playwright, Ruff/mypy, Rust/Tauri.
 

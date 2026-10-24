@@ -34,7 +34,7 @@ import {
   Trash,
   Upload,
   XCircle,
-} from '@forge-org/icons';
+} from '@corefoundry-labs/forge-icons';
 
 export const iconCatalog = [
   ['Plus', Plus],

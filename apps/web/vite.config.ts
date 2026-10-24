@@ -10,5 +10,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: { dedupe: ['react', 'react-dom'] },
   server: { host: '127.0.0.1', proxy: { '/api': `http://127.0.0.1:${apiPort}` } },
-  test: { environment: 'jsdom', include: ['src/**/*.test.{ts,tsx}'], exclude: ['e2e/**'] },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['e2e/**'],
+    server: { deps: { inline: [/@corefoundry-labs/] } },
+  },
 });

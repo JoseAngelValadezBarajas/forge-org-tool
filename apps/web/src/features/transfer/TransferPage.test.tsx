@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -294,5 +294,150 @@ describe('TransferPage', () => {
     expect(
       screen.queryByRole('button', { name: 'Confirm planning import' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('presents an Epic transfer as a destination-aware page and returns navigation to its project', async () => {
+    const contextualPreview = {
+      ...preview,
+      destination: { scope: 'epics', id: 'p1' },
+    };
+    const fetchMock = vi.fn().mockImplementation((input: string) => {
+      if (String(input).endsWith('/transfer/epics/p1/export'))
+        return Promise.resolve(new Response(JSON.stringify(document), { status: 200 }));
+      if (String(input).endsWith('/transfer/epics/p1/preview'))
+        return Promise.resolve(new Response(JSON.stringify(contextualPreview), { status: 200 }));
+      if (String(input).endsWith('/transfer/epics/p1'))
+        return Promise.resolve(
+          new Response(JSON.stringify({ project_id: 'p1', fingerprint: 'transfer-fp' }), {
+            status: 201,
+          }),
+        );
+      return Promise.resolve(new Response('{}', { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    render(
+      <MemoryRouter initialEntries={['/projects/w1/p1', '/transfer/w1/p1/epics/p1']}>
+        <Routes>
+          <Route path="/projects/:workspaceId/:projectId" element={<p>Project overview</p>} />
+          <Route path="/planning/:workspaceId/:projectId" element={<p>Project board</p>} />
+          <Route
+            path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+            element={<TransferPage projectName="FormiAI" workspaceName="Personal" />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Import an Epic' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Import source' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Preview · FormiAI' })).toHaveTextContent(
+      'Choose a source to see a validated preview.',
+    );
+    expect(screen.getByRole('heading', { name: 'Import into FormiAI' })).toBeInTheDocument();
+    expect(screen.getByText('Destination')).toBeInTheDocument();
+    expect(screen.getByText('Personal / FormiAI')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Project' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(screen.getByLabelText('Choose a project transfer file')).toHaveAttribute(
+      'accept',
+      'application/json,.json',
+    );
+
+    const file = new File([JSON.stringify(document)], 'epics.json', {
+      type: 'application/json',
+    });
+    Object.defineProperty(file, 'text', { value: async () => JSON.stringify(document) });
+    fireEvent.change(screen.getByLabelText('Choose a project transfer file'), {
+      target: { files: [file] },
+    });
+    await waitFor(() =>
+      expect(screen.getByText('Selected source: epics.json')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
+    expect(await screen.findByText('transfer-fp')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Preview · FormiAI' })).toHaveTextContent(
+      'Import safeguards',
+    );
+    const featureCount = screen.getByText('features').nextElementSibling;
+    expect(featureCount).toHaveTextContent('0');
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm Import' }));
+
+    const returnLink = await screen.findByRole('link', { name: 'Return to project board' });
+    expect(returnLink).toHaveAttribute('href', '/planning/w1/p1');
+    fireEvent.click(returnLink);
+    expect(await screen.findByText('Project board')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/workspaces/w1/projects/p1/transfer/epics/p1',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('keeps the contextual preview compact while exposing fingerprint safeguards on demand', async () => {
+    const contextualPreview = { ...preview, destination: { scope: 'epics', id: 'p1' } };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input).endsWith('/transfer/epics/p1/preview'))
+          return Promise.resolve(new Response(JSON.stringify(contextualPreview), { status: 200 }));
+        return Promise.resolve(new Response('{}', { status: 200 }));
+      }),
+    );
+    render(
+      <MemoryRouter initialEntries={['/transfer/w1/p1/epics/p1']}>
+        <Routes>
+          <Route
+            path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+            element={<TransferPage projectName="FormiAI" workspaceName="Personal" />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByText('Advanced JSON paste'));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Advanced JSON document' }), {
+      target: { value: JSON.stringify(document) },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
+
+    const previewRegion = await screen.findByRole('region', { name: 'Preview · FormiAI' });
+    expect(within(previewRegion).getByRole('heading', { name: 'Preview · FormiAI' })).toBeVisible();
+    expect(within(previewRegion).getByRole('button', { name: 'Confirm Import' })).toBeEnabled();
+    expect(screen.getByText('Drop a .json file here')).toBeVisible();
+    expect(screen.queryByText('Advanced JSON paste')).not.toBeInTheDocument();
+    expect(screen.queryByText('Export existing epics')).not.toBeInTheDocument();
+    expect(screen.getByText('FINGERPRINT_REQUIRED')).not.toBeVisible();
+    expect(screen.getByText('Import safeguards')).toBeVisible();
+    fireEvent.click(screen.getByText('Import safeguards'));
+    expect(screen.getByText('FINGERPRINT_REQUIRED')).toBeVisible();
+    expect(screen.getByText('transfer-fp')).toBeVisible();
+  });
+
+  it('keeps a contextual transfer page in place on Escape and links back to the owning Epic', async () => {
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1', '/transfer/w1/p1/work-items/e1']}>
+        <Routes>
+          <Route path="/planning/:workspaceId/:projectId" element={<p>Project board</p>} />
+          <Route
+            path="/planning/:workspaceId/:projectId/epics/:epicId"
+            element={<p>Epic board</p>}
+          />
+          <Route
+            path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+            element={<TransferPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole('heading', { name: 'Import work items' }), {
+      key: 'Escape',
+    });
+    expect(screen.queryByText('Epic board')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: 'Back to Epic' }));
+    expect(await screen.findByText('Epic board')).toBeInTheDocument();
   });
 });

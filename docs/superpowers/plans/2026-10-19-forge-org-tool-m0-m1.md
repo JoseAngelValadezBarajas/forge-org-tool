@@ -1,4 +1,4 @@
-﻿# FORGE Org Tool M0/M1 Implementation Plan
+# FORGE Org Tool M0/M1 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -126,7 +126,7 @@
 
 - [ ] **Step 1: Write focused frontend tests first**
 
-  Add tests for the truthful `/` empty state, Button loading/disabled native behavior and accessible state, gallery counter interaction, and theme switch from dark to light. Tests must use public `@forge-org/ui` exports and make no API calls.
+  Add tests for the truthful `/` empty state, Button loading/disabled native behavior and accessible state, gallery counter interaction, and theme switch from dark to light. Tests must use public `@corefoundry-labs/forge-ui` exports and make no API calls.
 
 - [ ] **Step 2: Run focused tests RED**
 

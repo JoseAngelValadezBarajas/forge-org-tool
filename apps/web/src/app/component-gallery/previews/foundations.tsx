@@ -1,4 +1,4 @@
-import { Card } from '@forge-org/ui';
+import { Card } from '@corefoundry-labs/forge-ui';
 import styles from '../ComponentGallery.module.css';
 
 export function TokenPreview() {

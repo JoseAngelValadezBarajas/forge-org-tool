@@ -2,6 +2,61 @@
   display: grid;
   gap: var(--forge-space-4);
 }
+.contextStack {
+  gap: 16px;
+}
+.contextHeading {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  min-height: 101px;
+}
+.contextHeading > span {
+  color: var(--forge-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.contextHeading h1 {
+  margin: 0;
+  color: var(--forge-text-primary);
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 40px;
+}
+.contextHeading p {
+  margin: 0;
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 23px;
+}
+.stack > header h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+.stack > header p {
+  color: var(--forge-accent);
+}
+.destination {
+  display: grid;
+  gap: var(--forge-space-2);
+  padding: 0;
+}
+.destination span {
+  color: var(--forge-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.destination strong {
+  display: block;
+  padding: var(--forge-space-3);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
 .stack p {
   color: var(--forge-text-muted);
   line-height: 1.5;
@@ -10,6 +65,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--forge-space-2);
+  scroll-margin-block: var(--forge-space-4) 96px;
 }
 .steps {
   display: grid;
@@ -43,6 +99,98 @@
   gap: var(--forge-space-4);
   align-items: start;
 }
+.contextWorkflowGrid {
+  grid-template-columns: minmax(0, 648px) minmax(0, 482px);
+  gap: 18px;
+}
+.contextWorkflowGrid > * {
+  min-width: 0;
+}
+.previewPanel {
+  align-content: start;
+  min-height: 540px;
+}
+.contextCard {
+  min-height: 582px;
+  padding: 20px;
+}
+.contextCard .panel {
+  height: 100%;
+}
+.previewEmpty {
+  display: grid;
+  min-height: 12rem;
+  place-items: center;
+  padding: var(--forge-space-5);
+  border: 1px dashed var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  text-align: center;
+}
+.previewCounts {
+  display: grid;
+  padding: var(--forge-space-2) var(--forge-space-4);
+  border: 1px solid var(--forge-border);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+}
+.previewCount {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: var(--forge-space-3);
+  padding: var(--forge-space-3) 0;
+  border-bottom: 1px solid var(--forge-border);
+  color: var(--forge-text-muted);
+  text-transform: capitalize;
+}
+.previewCount:last-child {
+  border-bottom: 0;
+}
+.previewCount strong {
+  color: var(--forge-text);
+  font-variant-numeric: tabular-nums;
+}
+.previewNotes {
+  font-family: var(--forge-font-mono);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.safeguards {
+  display: grid;
+  gap: var(--forge-space-2);
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-3);
+}
+.safeguards summary {
+  cursor: pointer;
+  color: var(--forge-text-muted);
+  font-size: 11px;
+}
+.contextFilePicker {
+  min-height: 173px;
+  padding: 28px 20px;
+  border-radius: 12px;
+}
+.contextFilePicker::before {
+  content: '↑';
+  color: var(--forge-accent);
+  font-size: 40px;
+  line-height: 1;
+}
+.contextReviewAction {
+  min-width: 132px;
+}
+.exportDetails {
+  display: grid;
+  gap: var(--forge-space-3);
+  border-top: 1px solid var(--forge-border);
+  padding-top: var(--forge-space-3);
+}
+.exportDetails summary {
+  cursor: pointer;
+  color: var(--forge-text);
+}
 .panel {
   display: grid;
   gap: var(--forge-space-3);
@@ -53,16 +201,24 @@
 .panel p {
   margin: 0;
 }
-.fileInput {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: var(--forge-space-2);
-  border: 1px solid var(--forge-border);
-  border-radius: var(--forge-radius-sm);
-  background: var(--forge-surface);
+.returnLink {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--forge-space-2);
+  padding: var(--forge-space-3);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-muted);
+  text-decoration: none;
+}
+.returnLink:hover {
+  background: var(--forge-surface-interactive);
   color: var(--forge-text);
+}
+.returnLink:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
 }
 .fileName,
 .fingerprint {
@@ -105,5 +261,22 @@
   .steps,
   .workflowGrid {
     grid-template-columns: 1fr;
+  }
+  .contextWorkflowGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .contextCard,
+  .previewPanel {
+    min-height: 0;
+  }
+  .previewPanel {
+    min-height: 0;
+  }
+  .actions {
+    position: sticky;
+    z-index: 7;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-block: var(--forge-space-2);
+    background: var(--forge-surface);
   }
 }

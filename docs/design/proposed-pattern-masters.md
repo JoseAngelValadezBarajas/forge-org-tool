@@ -25,7 +25,7 @@ screen's visual parity.
 
 Use existing generic primitives (for example `Card`, `StatusChip`, `KeyValueRow`,
 `RecordRow`, `StepperStep`, `Dialog`, and `Button`) inside these compositions.
-Do not duplicate those primitives, move domain contracts into `@forge-org/ui`,
+Do not duplicate those primitives, move domain contracts into `@corefoundry-labs/forge-ui`,
 or implement the proposed screen set solely to increase inventory counts.
 The screen/node mapping is evidence of a design gap; promoting any proposal to
 the canonical Figma library requires a separate design decision.
@@ -56,7 +56,7 @@ connected to that global composition.
   Reuse and test the existing page-20 `WorkspaceSwitcher` (`229:40`) contract
   first; do not promote proposal-only card styling into a new master without a
   product-design decision. If later approved, ownership belongs to the
-  application shell, not `@forge-org/ui`.
+  application shell, not `@corefoundry-labs/forge-ui`.
 - **Journey cards:** Page 18's journey hub `133:3`, cards `133:47`, `133:50`,
   `133:53`, `133:57`, `133:60`, `133:63`, and `133:66` are in the
   `Advanced UX-00` exploration. Existing page-20 product cards should be

@@ -122,7 +122,9 @@ function fixture() {
       owner,
       component: { name: component, ...mapping(`${owner}${component}.tsx`) },
       publicApi: mapping(
-        name === 'ButtonSize' ? '@forge-org/ui#ButtonProps.size' : `@forge-org/ui#${component}`,
+        name === 'ButtonSize'
+          ? '@corefoundry-labs/forge-ui#ButtonProps.size'
+          : `@corefoundry-labs/forge-ui#${component}`,
       ),
       styles: mapping(`${owner}${component}.module.css`),
       tests: mapping(`${owner}${component}.test.tsx`),
@@ -234,7 +236,10 @@ test('host IDs must be non-empty and unique including planned previews', () => {
 test('ButtonSize must integrate with Button directory and size API', () => {
   invalid((r) => (r.inventory[1].component.name = 'ButtonSize'), /ButtonSize/);
   invalid((r) => (r.inventory[1].owner += 'ButtonSize/'), /ButtonSize/);
-  invalid((r) => (r.inventory[1].publicApi.target = '@forge-org/ui#ButtonSize'), /ButtonSize/);
+  invalid(
+    (r) => (r.inventory[1].publicApi.target = '@corefoundry-labs/forge-ui#ButtonSize'),
+    /ButtonSize/,
+  );
   invalid((r) => delete r.inventory[1].integration, /ButtonSize/);
   invalid((r) => (r.inventory[1].integration.prop = 'variant'), /ButtonSize/);
   invalid((r) => (r.inventory[1].component.target += 'Size'), /ButtonSize/);

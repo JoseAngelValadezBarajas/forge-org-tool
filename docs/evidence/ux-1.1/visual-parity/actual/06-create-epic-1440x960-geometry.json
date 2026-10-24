@@ -1,0 +1,42 @@
+{
+  "figmaNodeId": "347:224",
+  "viewport": {
+    "width": 1440,
+    "height": 960,
+    "deviceScaleFactor": 1,
+    "zoomPercent": 100
+  },
+  "actual": {
+    "boardAndDrawer": {
+      "x": 268,
+      "y": 205,
+      "width": 1148,
+      "height": 658
+    },
+    "drawer": {
+      "x": 980,
+      "y": 205,
+      "width": 436,
+      "height": 658
+    }
+  },
+  "expectedFigma": {
+    "boardAndDrawer": {
+      "x": 268,
+      "y": 205,
+      "width": 1148,
+      "height": 658
+    },
+    "board": {
+      "width": 695
+    },
+    "gap": 17,
+    "drawer": {
+      "x": 980,
+      "y": 205,
+      "width": 436,
+      "height": 658
+    }
+  },
+  "humanReview": "PENDING"
+}

@@ -1,5 +1,6 @@
 ﻿import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { act } from '@testing-library/react';
 import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -28,42 +29,458 @@ describe('M1 application shell', () => {
   });
 
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('[]', { status: 200 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response('[]', { status: 200 }))),
+    );
   });
 
   it('shows an actionable empty organization state', async () => {
     renderRoute('/');
 
-    expect(await screen.findByRole('heading', { name: 'Organization' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'No workspaces yet' })).toBeInTheDocument();
     expect(screen.getByText('No workspaces yet')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create workspace/i })).toBeEnabled();
   });
 
-  it('opens an Epic detail route with project context', async () => {
-    renderRoute('/planning/w1/p1/epics/e1');
-    expect(await screen.findByRole('heading', { name: 'Epic detail' })).toBeInTheDocument();
-  });
-
-  it('exposes the product shell hierarchy without inventing project routes', () => {
+  it('does not let a late initial workspace read erase a just-created active workspace', async () => {
+    const workspaceResponses: ((response: Response) => void)[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input) === '/api/v1/workspaces') {
+          return new Promise<Response>((resolve) => workspaceResponses.push(resolve));
+        }
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
     renderRoute('/');
+    await waitFor(() => expect(workspaceResponses.length).toBeGreaterThan(0));
 
-    expect(screen.getByRole('navigation', { name: 'Product navigation' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Workspace' })).toHaveAttribute('href', '/');
-    expect(screen.getByText('LOCAL MODE')).toBeInTheDocument();
+    const workspace = {
+      id: 'created-workspace',
+      name: 'Created during startup',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    await act(async () => {
+      window.dispatchEvent(new CustomEvent('forge:workspace-created', { detail: { workspace } }));
+      window.dispatchEvent(
+        new CustomEvent('forge:active-workspace-change', {
+          detail: { workspaceId: workspace.id },
+        }),
+      );
+      for (const resolve of workspaceResponses) resolve(new Response('[]', { status: 200 }));
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('combobox', { name: 'Workspace' })).toHaveLength(2);
+      for (const selector of screen.getAllByRole('combobox', { name: 'Workspace' })) {
+        expect(selector).toHaveValue(workspace.id);
+      }
+      expect(screen.getByRole('heading', { name: 'Your workspace, in focus' })).toBeInTheDocument();
+    });
+    expect(localStorage.getItem('forge-active-workspace')).toBe(workspace.id);
   });
 
-  it('exposes only the supported 1.0 product destinations on project routes', () => {
-    renderRoute('/planning/w1/p1');
-
-    const navigation = screen.getByRole('navigation', { name: 'Product navigation' });
-    expect(within(navigation).getByRole('link', { name: 'Planning' })).toHaveAttribute(
+  it('opens an Epic detail route with project context', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Research',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'Atlas',
+      description: null,
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const epic = {
+      id: 'e1',
+      project_id: 'p1',
+      title: 'Release',
+      description: null,
+      status: 'backlog',
+      archived_at: null,
+      priority: 'medium',
+      tags: [],
+      feature_count: 0,
+      completed_feature_count: 0,
+      progress: 0,
+      features: [],
+      created_at: '',
+      updated_at: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [workspace]
+            : path === '/api/v1/workspaces/w1/projects?search=&status=active'
+              ? [project]
+              : path === '/api/v1/workspaces/w1/projects/p1'
+                ? project
+                : path === '/api/v1/workspaces/w1/projects/p1/planning/overview'
+                  ? { epics: [epic], unassigned_features: [] }
+                  : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/planning/w1/p1/epics/e1');
+    expect(await screen.findByRole('heading', { name: 'Release' })).toBeInTheDocument();
+    const topbarNavigation = screen.getByRole('navigation', { name: 'Current location' });
+    expect(within(topbarNavigation).getByRole('link', { name: 'Research' })).toHaveAttribute(
+      'href',
+      '/',
+    );
+    expect(within(topbarNavigation).getByRole('link', { name: 'Atlas' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    expect(within(topbarNavigation).getByRole('link', { name: 'EPICS' })).toHaveAttribute(
       'href',
       '/planning/w1/p1',
     );
-    expect(within(navigation).getByRole('link', { name: 'Transfer' })).toHaveAttribute(
-      'href',
-      '/transfer/w1/p1',
+    expect(within(topbarNavigation).getByText('Release')).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByRole('link', {
+        name: 'Atlas',
+      }),
+    ).toHaveAttribute('href', '/planning/w1/p1');
+  });
+
+  it('exposes the Figma sidebar hierarchy and keeps workspace controls in the shell', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Personal',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'FormiAI',
+      description: null,
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [workspace]
+            : path.includes('/projects?')
+              ? [project]
+              : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
     );
+    renderRoute('/');
+
+    const sidebar = screen.getByTestId('app-sidebar');
+    expect(
+      await within(sidebar).findByRole('navigation', { name: 'Project navigation' }),
+    ).toBeInTheDocument();
+    expect(within(sidebar).getByRole('combobox', { name: 'Workspace' })).toBeInTheDocument();
+    expect(await within(sidebar).findByRole('heading', { name: 'Project' })).toBeInTheDocument();
+    const projectNavigation = await within(sidebar).findByRole('navigation', {
+      name: 'Project navigation',
+    });
+    expect(within(projectNavigation).queryByRole('link', { name: 'Overview' })).toBeNull();
+    expect(
+      within(projectNavigation).getByRole('link', { name: 'Workspace Overview' }),
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
+    ).not.toHaveAttribute('aria-current', 'page');
+    expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
+  });
+
+  it('filters projects and collapses the project list from the sidebar controls', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Personal',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const projects = [
+      {
+        id: 'p1',
+        workspace_id: 'w1',
+        name: 'Forge',
+        description: null,
+        status: 'active',
+        created_at: '',
+        updated_at: '',
+        archived_at: null,
+      },
+      {
+        id: 'p2',
+        workspace_id: 'w1',
+        name: 'FormiAI',
+        description: null,
+        status: 'active',
+        created_at: '',
+        updated_at: '',
+        archived_at: null,
+      },
+    ];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload = path === '/api/v1/workspaces' ? [workspace] : projects;
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+
+    const sidebar = screen.getByRole('complementary');
+    const projectNavigation = await within(sidebar).findByRole('navigation', {
+      name: 'Project navigation',
+    });
+    expect(await within(projectNavigation).findByRole('link', { name: 'Forge' })).toBeVisible();
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Open project search' }));
+    expect(
+      within(projectNavigation).getByRole('searchbox', { name: 'Search projects' }),
+    ).toBeInTheDocument();
+
+    fireEvent.change(
+      within(projectNavigation).getByRole('searchbox', { name: 'Search projects' }),
+      {
+        target: { value: 'form' },
+      },
+    );
+    expect(within(projectNavigation).queryByRole('link', { name: 'Forge' })).toBeNull();
+    expect(within(projectNavigation).getByRole('link', { name: 'FormiAI' })).toBeVisible();
+
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Collapse projects' }));
+    expect(
+      within(projectNavigation).getByRole('button', { name: 'Expand projects' }),
+    ).toBeInTheDocument();
+    expect(within(projectNavigation).queryByRole('link', { name: 'FormiAI' })).toBeNull();
+
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Expand projects' }));
+    expect(within(projectNavigation).getByRole('link', { name: 'FormiAI' })).toBeVisible();
+  });
+
+  it('provides compact mobile navigation for Projects, the current Board, Search and Settings', () => {
+    renderRoute('/planning/w1/p1');
+
+    const navigation = screen.getByRole('navigation', { name: 'Mobile navigation' });
+    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '/');
+    expect(within(navigation).getByRole('link', { name: 'Board' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(within(navigation).getByRole('button', { name: 'Search' })).toBeInTheDocument();
+    expect(within(navigation).getByRole('link', { name: 'Settings' })).toHaveAttribute(
+      'href',
+      '/workspaces/w1/settings',
+    );
+  });
+
+  it('keeps the active Workspace and its Projects in the persistent shell navigation', async () => {
+    const workspaces = [
+      { id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' },
+      { id: 'w2', name: 'Studio', status: 'active', created_at: '', updated_at: '' },
+    ];
+    const projects = {
+      w1: [
+        {
+          id: 'p1',
+          workspace_id: 'w1',
+          name: 'Atlas',
+          description: null,
+          status: 'active',
+          created_at: '',
+          updated_at: '',
+          archived_at: null,
+        },
+      ],
+      w2: [
+        {
+          id: 'p2',
+          workspace_id: 'w2',
+          name: 'Signal',
+          description: null,
+          status: 'active',
+          created_at: '',
+          updated_at: '',
+          archived_at: null,
+        },
+      ],
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const workspaceId = path.match(/workspaces\/(w[12])\/projects\?/u)?.[1] as
+          'w1' | 'w2' | undefined;
+        const payload =
+          path === '/api/v1/workspaces' ? workspaces : workspaceId ? projects[workspaceId] : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    localStorage.setItem('forge-active-workspace', 'w1');
+    const app = render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    const sidebar = screen.getByRole('complementary');
+    const projectNavigation = within(sidebar).getByRole('navigation', {
+      name: 'Project navigation',
+    });
+    expect(await within(projectNavigation).findByRole('link', { name: 'Atlas' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
+      target: { value: 'w2' },
+    });
+
+    expect(await within(projectNavigation).findByRole('link', { name: 'Signal' })).toHaveAttribute(
+      'href',
+      '/projects/w2/p2',
+    );
+    expect(localStorage.getItem('forge-active-workspace')).toBe('w2');
+    expect(
+      await screen.findByRole('heading', { name: 'Your workspace, in focus' }),
+    ).toBeInTheDocument();
+    app.unmount();
+    renderRoute('/');
+    const restoredSidebar = screen.getByRole('complementary');
+    expect(await within(restoredSidebar).findByRole('link', { name: 'Signal' })).toHaveAttribute(
+      'href',
+      '/projects/w2/p2',
+    );
+    expect(within(restoredSidebar).getByRole('combobox', { name: 'Workspace' })).toHaveValue('w2');
+  });
+
+  it('discards an old Workspace project response after changing the global selector', async () => {
+    const pending = new Map<string, Array<(response: Response) => void>>();
+    const project = (workspaceId: string, id: string, name: string) => ({
+      id,
+      workspace_id: workspaceId,
+      name,
+      description: null,
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        if (path === '/api/v1/workspaces')
+          return Promise.resolve(
+            new Response(
+              JSON.stringify([
+                { id: 'w1', name: 'One', status: 'active', created_at: '', updated_at: '' },
+                { id: 'w2', name: 'Two', status: 'active', created_at: '', updated_at: '' },
+              ]),
+              { status: 200 },
+            ),
+          );
+        const workspaceId = path.match(/workspaces\/(w[12])\/projects\?/u)?.[1];
+        if (workspaceId)
+          return new Promise<Response>((resolve) => {
+            pending.set(workspaceId, [...(pending.get(workspaceId) ?? []), resolve]);
+          });
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    const sidebar = screen.getByRole('complementary');
+    await within(sidebar).findByRole('option', { name: 'One' });
+    await waitFor(() => expect(pending.get('w1')).toHaveLength(2));
+    fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
+      target: { value: 'w2' },
+    });
+    await waitFor(() => expect(pending.get('w2')).toHaveLength(2));
+    pending
+      .get('w2')
+      ?.forEach((resolve) =>
+        resolve(
+          new Response(JSON.stringify([project('w2', 'p2', 'Current project')]), { status: 200 }),
+        ),
+      );
+    expect(await screen.findByRole('heading', { name: 'Current project' })).toBeInTheDocument();
+    pending
+      .get('w1')
+      ?.forEach((resolve) =>
+        resolve(
+          new Response(JSON.stringify([project('w1', 'p1', 'Stale project')]), { status: 200 }),
+        ),
+      );
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: 'Stale project' })).not.toBeInTheDocument(),
+    );
+  });
+
+  it('keeps Workspace tag administration on its own settings route', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Research',
+      description: 'Planning workspace',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload = path === '/api/v1/workspaces' ? [workspace] : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/workspaces/w1/settings');
+
+    expect(
+      await screen.findByRole('heading', { name: 'Manage workspace tags' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Projects' })).toHaveAttribute('href', '/');
+  });
+
+  it('keeps supported product destinations reachable from the compact project sidebar and palette', () => {
+    renderRoute('/planning/w1/p1');
+
+    const navigation = screen.getByRole('navigation', { name: 'Project navigation' });
+    expect(within(navigation).getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute(
+      'href',
+      '/',
+    );
+    fireEvent.click(
+      within(screen.getByRole('banner', { name: 'Application controls' })).getByRole('button', {
+        name: 'Search',
+      }),
+    );
+    expect(screen.getByRole('button', { name: 'Go to Planning' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Go to Transfer' })).toBeInTheDocument();
     expect(
       within(navigation).queryAllByText(/Readiness|Workbench|Delivery|Repositories|Context/),
     ).toHaveLength(0);
@@ -85,7 +502,7 @@ describe('M1 application shell', () => {
       'href',
       '/',
     );
-    expect(within(breadcrumb).getByText('Planning')).toHaveAttribute('aria-current', 'page');
+    expect(within(breadcrumb).getByText('Project board')).toHaveAttribute('aria-current', 'page');
   });
 
   it('exposes loading state and prevents native button interaction', async () => {
@@ -184,7 +601,9 @@ describe('M1 application shell', () => {
   it('provides a three-mode persistent application appearance control', () => {
     renderRoute('/');
 
-    const appearance = screen.getByRole('combobox', { name: 'Appearance' });
+    const appearance = within(screen.getByTestId('app-topbar')).getByRole('combobox', {
+      name: 'Appearance',
+    });
     expect(appearance).toHaveValue('dark');
     expect(screen.getByTestId('application-shell')).toHaveAttribute('data-theme', 'dark');
     fireEvent.change(appearance, { target: { value: 'light' } });

@@ -6,12 +6,15 @@ on:
 jobs:
   web:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+          registry-url: https://registry.npmjs.org
       - uses: astral-sh/setup-uv@v6
       - run: npm ci
       - run: npm run check:acceptance:registry
@@ -20,6 +23,13 @@ jobs:
       - run: npm run build:packages
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e:smoke
+      - run: npm run test:e2e:ux11-visual
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ux11-figma-comparison-${{ github.sha }}
+          path: docs/evidence/ux-1.1/visual-parity/
+          if-no-files-found: warn
       - run: npm run test:packages
       - run: npm run test
       - run: npm run build
@@ -45,12 +55,15 @@ jobs:
       - run: uv run --project apps/api --locked python tooling/scripts/export-openapi.py --check
   desktop:
     runs-on: windows-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
+          registry-url: https://registry.npmjs.org
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-python@v5
         with:
@@ -70,8 +83,6 @@ jobs:
       - run: node --test tooling/scripts/desktop-window-contract.test.mjs
       - run: cargo build --manifest-path apps/desktop/src-tauri/Cargo.toml --release
       - run: npm run test:desktop:acceptance
-        env:
-          FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER: '1'
       - uses: actions/upload-artifact@v4
         if: always()
         with:

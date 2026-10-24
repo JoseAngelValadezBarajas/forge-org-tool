@@ -32,13 +32,7 @@ test('PA-TRN-002 ZIP export/import preserves a Bug screenshot across workspaces'
   ).json();
 
   await page.goto(`/planning/${workspace.id}/${project.id}/features/${bug.id}`);
-  await expect(page.getByRole('textbox', { name: 'Edit feature title' })).toHaveValue(
-    `Screenshot bug ${suffix}`,
-  );
-  const screenshotPicker = page.waitForEvent('filechooser');
-  await page.getByRole('button', { name: 'Add Bug screenshot' }).click();
-  const fileChooser = await screenshotPicker;
-  await fileChooser.setFiles({
+  await page.getByLabel('Choose Bug screenshot').setInputFiles({
     name: 'crash-screen.png',
     mimeType: 'image/png',
     buffer: syntheticPng,
@@ -78,6 +72,15 @@ test('PA-TRN-002 ZIP export/import preserves a Bug screenshot across workspaces'
   ).json();
   const importedBug = importedItems.find((item: { kind: string }) => item.kind === 'bug');
   expect(importedBug.actual_result).toBe('The crash screen appears');
+  const importedOverview = await (
+    await page.request.get(
+      `/api/v1/workspaces/${targetWorkspace.id}/projects/${importedProjectId}/planning/overview`,
+    )
+  ).json();
+  expect([
+    ...importedOverview.epics.flatMap((epic: { features: unknown[] }) => epic.features),
+    ...importedOverview.unassigned_features,
+  ]).toContainEqual(expect.objectContaining({ id: importedBug.id, kind: 'bug' }));
   const attachmentPath =
     `/api/v1/workspaces/${targetWorkspace.id}/projects/${importedProjectId}` +
     `/features/${importedBug.id}/attachments`;
@@ -94,5 +97,6 @@ test('PA-TRN-002 ZIP export/import preserves a Bug screenshot across workspaces'
   await page.goto(
     `/planning/${targetWorkspace.id}/${importedProjectId}/features/${importedBug.id}`,
   );
+  await expect(page.getByRole('heading', { name: importedBug.title, exact: true })).toBeVisible();
   await expect(page.getByRole('img', { name: 'Bug screenshot: crash-screen.png' })).toBeVisible();
 });

@@ -18,7 +18,7 @@ FORGE Org Tool 1.0 is a local-first project organization app. SQLite is the syst
 
 ## In scope / preserve
 
-Keep Organization, Planning Tasks, Acceptance Criteria, Dependencies, Project Transfer, and genuinely reusable shared packages. Generic controls belong in `@forge-org/ui`; business compositions remain feature-owned. Keep React, Vite, TypeScript, FastAPI, SQLite, Tauri 2, npm workspaces and OpenAPI. Preserve ORG-001–007 behavior unless superseded by an explicit criterion above.
+Keep Organization, Planning Tasks, Acceptance Criteria, Dependencies, Project Transfer, and genuinely reusable shared packages. Generic controls belong in `@corefoundry-labs/forge-ui`; business compositions remain feature-owned. Keep React, Vite, TypeScript, FastAPI, SQLite, Tauri 2, npm workspaces and OpenAPI. Preserve ORG-001–007 behavior unless superseded by an explicit criterion above.
 
 ## Retire from active product
 

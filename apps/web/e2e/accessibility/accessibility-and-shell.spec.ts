@@ -5,6 +5,7 @@ test('PA-A11Y-01 shell themes, keyboard command navigation, focus restoration an
   page,
 }) => {
   const suffix = `${test.info().project.name}-${Date.now()}`;
+  const mobile = test.info().project.name === 'chromium-mobile';
   const workspace = await (
     await page.request.post('/api/v1/workspaces', { data: { name: `A11y ${suffix}` } })
   ).json();
@@ -15,7 +16,14 @@ test('PA-A11Y-01 shell themes, keyboard command navigation, focus restoration an
   ).json();
 
   await page.goto('/');
-  const appearance = page.getByRole('combobox', { name: 'Appearance' });
+  const appearance = mobile
+    ? page.getByRole('banner', { name: 'Workspace controls' }).getByRole('combobox', {
+        name: 'Appearance',
+      })
+    : page.getByRole('banner', { name: 'Application controls' }).getByRole('combobox', {
+        name: 'Appearance',
+      });
+  await expect(page.getByRole('combobox', { name: 'Appearance' })).toHaveCount(1);
   for (const theme of ['dark', 'light', 'system']) {
     await appearance.selectOption(theme);
     await expect(page.locator('[data-testid="application-shell"]')).toHaveAttribute(
@@ -28,7 +36,18 @@ test('PA-A11Y-01 shell themes, keyboard command navigation, focus restoration an
   await expect(appearance).toHaveValue('light');
   await page.goto(`/planning/${workspace.id}/${project.id}`);
 
-  const openPalette = page.getByRole('button', { name: 'Open command palette' });
+  const openPalette = mobile
+    ? page.getByRole('banner', { name: 'Workspace controls' }).getByRole('button', {
+        name: 'Search',
+      })
+    : page.getByTestId('app-topbar').getByRole('button', { name: 'Search' });
+  if (mobile) {
+    const workspaceBox = await page.getByRole('combobox', { name: 'Workspace' }).boundingBox();
+    const paletteBox = await openPalette.boundingBox();
+    expect(workspaceBox).not.toBeNull();
+    expect(paletteBox).not.toBeNull();
+    expect(workspaceBox!.x + workspaceBox!.width).toBeLessThanOrEqual(paletteBox!.x);
+  }
   await openPalette.focus();
   await page.keyboard.press('Enter');
   const dialog = page.getByRole('dialog', { name: 'Command palette' });
@@ -49,7 +68,8 @@ test('PA-A11Y-01 shell themes, keyboard command navigation, focus restoration an
   await page.getByRole('searchbox', { name: 'Search commands' }).fill('Planning');
   await page.getByRole('button', { name: 'Go to Planning' }).click();
   await expect(page).toHaveURL(`/planning/${workspace.id}/${project.id}`);
-  await expect(page.getByRole('heading', { name: 'Planning', exact: true })).toBeVisible();
+  await expect(page.getByTestId('project-board-title')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Project Board', exact: true })).toBeVisible();
   const pageScan = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();

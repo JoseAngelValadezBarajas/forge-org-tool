@@ -134,6 +134,7 @@ describe('Project Overview route', () => {
   beforeEach(() => {
     vi.spyOn(organizationApi, 'getProject').mockResolvedValue(project);
     vi.spyOn(organizationApi, 'listWorkspaces').mockResolvedValue([workspace]);
+    vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([project]);
     vi.spyOn(organizationApi, 'planningOverview').mockResolvedValue(overview);
     vi.spyOn(organizationApi, 'listTasks').mockImplementation(async (_w, _p, id) =>
       tasks.filter((item) => item.feature_id === id),
@@ -403,48 +404,55 @@ describe('Project Overview route', () => {
   it('keeps shell project context on Overview while Planning still opens the board', async () => {
     renderOverview();
     await screen.findByRole('heading', { name: 'Atlas' });
-    const nav = within(screen.getByRole('navigation', { name: 'Product navigation' }));
-    expect(nav.getByRole('link', { name: 'Overview' })).toHaveAttribute('href', '/projects/w1/p1');
-    expect(nav.getByRole('link', { name: 'Planning' })).toHaveAttribute('href', '/planning/w1/p1');
-    for (const [name, section] of [['Transfer', 'transfer']]) {
-      expect(nav.getByRole('link', { name: name! })).toHaveAttribute('href', `/${section}/w1/p1`);
-    }
+    const nav = within(screen.getByRole('navigation', { name: 'Project navigation' }));
+    expect(nav.getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute('href', '/');
+    expect(nav.getByRole('link', { name: 'Atlas' })).toHaveAttribute('href', '/projects/w1/p1');
     const breadcrumb = within(screen.getByRole('navigation', { name: 'Breadcrumb' }));
-    expect(breadcrumb.getByRole('link', { name: 'Project' })).toHaveAttribute(
+    expect(breadcrumb.getByRole('link', { name: 'Project board' })).toHaveAttribute(
       'href',
-      '/projects/w1/p1',
+      '/planning/w1/p1',
     );
     expect(breadcrumb.getByText('Overview')).toHaveAttribute('aria-current', 'page');
   });
 
-  it('routes both Organization project names to Overview and retains direct board and management access', async () => {
+  it('routes Organization project entry points to the Board and retains Overview management access', async () => {
     vi.mocked(organizationApi.planningOverview).mockResolvedValue({
       epics: [],
       unassigned_features: [],
     });
-    vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([project]);
     render(
       <MemoryRouter>
         <App />
       </MemoryRouter>,
     );
     await waitFor(() => expect(screen.getAllByRole('link', { name: 'Atlas' })).toHaveLength(2));
-    for (const link of screen.getAllByRole('link', { name: 'Atlas' })) {
-      expect(link).toHaveAttribute('href', '/projects/w1/p1');
-    }
-    expect(screen.getByRole('link', { name: 'Open planning board' })).toHaveAttribute(
+    expect(
+      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
+        name: 'Atlas',
+      }),
+    ).toHaveAttribute('href', '/projects/w1/p1');
+    expect(screen.getByRole('link', { name: 'Open Board' })).toHaveAttribute(
       'href',
       '/planning/w1/p1',
     );
     expect(screen.getByRole('button', { name: 'Archive' })).toBeEnabled();
-    for (const name of ['Transfer']) {
-      expect(screen.getByRole('link', { name })).toHaveAttribute(
-        'href',
-        `/${name.toLowerCase()}/w1/p1`,
-      );
-    }
-    fireEvent.click(screen.getAllByRole('link', { name: 'Atlas' })[0]!);
-    expect(await screen.findByRole('button', { name: 'Edit project' })).toBeEnabled();
-    expect(screen.getByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
+    const projectNavigation = within(
+      screen.getByRole('navigation', { name: 'Project navigation' }),
+    );
+    expect(
+      projectNavigation.queryByRole('link', { name: 'Workspace Overview' }),
+    ).toBeInTheDocument();
+    expect(projectNavigation.getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    fireEvent.click(screen.getByRole('link', { name: 'Open Board' }));
+    expect(await screen.findByLabelText('Epic workflow board')).toBeInTheDocument();
+    expect(projectNavigation.getByRole('link', { name: 'Atlas' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    fireEvent.click(projectNavigation.getByRole('link', { name: 'Atlas' }));
+    expect(await screen.findByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
   });
 });

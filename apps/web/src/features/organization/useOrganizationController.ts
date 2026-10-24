@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { organizationApi, type Project, type Workspace } from '@forge-org/api-client';
 
 const ACTIVE_WORKSPACE_KEY = 'forge-active-workspace';
 
 type ProjectDashboardSummary = {
   project: Project;
+  epicCount: number;
   featureCount: number;
-  statusCounts: Record<string, number>;
+  completedFeatureCount: number;
+  progress: number;
   unavailable: boolean;
 };
 
@@ -26,6 +28,7 @@ export function useOrganizationController() {
   const [loading, setLoading] = useState(true);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardSummaries, setDashboardSummaries] = useState<ProjectDashboardSummary[]>([]);
+  const workspaceRevision = useRef(0);
 
   const selectedWorkspace = workspaces.find((item) => item.id === workspaceId);
   const activeProjects = projects.filter((item) => item.status === 'active').length;
@@ -40,11 +43,24 @@ export function useOrganizationController() {
   });
 
   const loadWorkspaces = useCallback(async (isCurrent: () => boolean = () => true) => {
+    const initialRevision = workspaceRevision.current;
     setLoading(true);
     setError('');
     try {
       const next = await organizationApi.listWorkspaces();
       if (!isCurrent()) return;
+      if (workspaceRevision.current !== initialRevision) {
+        setWorkspaces((existing) => {
+          const merged = [...next];
+          for (const workspace of existing) {
+            const index = merged.findIndex((item) => item.id === workspace.id);
+            if (index < 0) merged.push(workspace);
+            else merged[index] = workspace;
+          }
+          return merged;
+        });
+        return;
+      }
       setWorkspaces(next);
       const saved = localStorage.getItem(ACTIVE_WORKSPACE_KEY) ?? '';
       const selected = next.some((item) => item.id === saved) ? saved : (next[0]?.id ?? '');
@@ -55,7 +71,7 @@ export function useOrganizationController() {
       if (selected) localStorage.setItem(ACTIVE_WORKSPACE_KEY, selected);
       else localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
     } catch (cause) {
-      if (isCurrent()) {
+      if (isCurrent() && workspaceRevision.current === initialRevision) {
         setError(cause instanceof Error ? cause.message : 'Unable to load workspaces.');
       }
     } finally {
@@ -107,6 +123,36 @@ export function useOrganizationController() {
   }, [loadProjects, workspaceId]);
 
   useEffect(() => {
+    function onWorkspaceChange(event: Event) {
+      const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
+      if (id) {
+        workspaceRevision.current += 1;
+        selectWorkspace(id);
+      }
+    }
+    function onWorkspaceCreated(event: Event) {
+      const workspace = (event as CustomEvent<{ workspace?: Workspace }>).detail?.workspace;
+      if (!workspace) return;
+      workspaceRevision.current += 1;
+      setWorkspaces((items) => [...items.filter((item) => item.id !== workspace.id), workspace]);
+    }
+    function onWorkspaceUpdated(event: Event) {
+      const workspace = (event as CustomEvent<{ workspace?: Workspace }>).detail?.workspace;
+      if (!workspace) return;
+      workspaceRevision.current += 1;
+      setWorkspaces((items) => items.map((item) => (item.id === workspace.id ? workspace : item)));
+    }
+    window.addEventListener('forge:active-workspace-change', onWorkspaceChange);
+    window.addEventListener('forge:workspace-created', onWorkspaceCreated);
+    window.addEventListener('forge:workspace-updated', onWorkspaceUpdated);
+    return () => {
+      window.removeEventListener('forge:active-workspace-change', onWorkspaceChange);
+      window.removeEventListener('forge:workspace-created', onWorkspaceCreated);
+      window.removeEventListener('forge:workspace-updated', onWorkspaceUpdated);
+    };
+  }, [selectWorkspace]);
+
+  useEffect(() => {
     let current = true;
     const activeProjects = projects.filter(
       (project) => project.workspace_id === workspaceId && project.status === 'active',
@@ -124,21 +170,26 @@ export function useOrganizationController() {
             const features = overview.epics
               .flatMap((epic) => epic.features)
               .concat(overview.unassigned_features);
-            const statusCounts: Record<string, number> = {};
-            for (const feature of features) {
-              statusCounts[feature.status] = (statusCounts[feature.status] ?? 0) + 1;
-            }
+            const completedFeatureCount = features.filter(
+              (feature) => feature.status === 'done',
+            ).length;
             return {
               project,
+              epicCount: overview.epics.length,
               featureCount: features.length,
-              statusCounts,
+              completedFeatureCount,
+              progress: features.length
+                ? Math.round((completedFeatureCount / features.length) * 100)
+                : 0,
               unavailable: false,
             };
           } catch {
             return {
               project,
+              epicCount: 0,
               featureCount: 0,
-              statusCounts: {},
+              completedFeatureCount: 0,
+              progress: 0,
               unavailable: true,
             };
           }
@@ -164,7 +215,13 @@ export function useOrganizationController() {
       setWorkspaceName('');
       setWorkspaceDescription('');
       setWorkspaces((items) => [...items, created]);
+      window.dispatchEvent(
+        new CustomEvent('forge:workspace-created', { detail: { workspace: created } }),
+      );
       selectWorkspace(created.id);
+      window.dispatchEvent(
+        new CustomEvent('forge:active-workspace-change', { detail: { workspaceId: created.id } }),
+      );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to create workspace.');
     }
@@ -199,16 +256,20 @@ export function useOrganizationController() {
     }
   }
 
-  async function createProject(event: FormEvent) {
+  async function createProject(event: FormEvent): Promise<boolean> {
     event.preventDefault();
-    if (!workspaceId || !projectName.trim()) return;
+    if (!workspaceId || !projectName.trim()) return false;
     try {
       await organizationApi.createProject(workspaceId, projectName, projectDescription);
       setProjectName('');
       setProjectDescription('');
       await loadProjects(workspaceId);
+      window.dispatchEvent(new Event('forge:projects-changed'));
+      setError('');
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to create project.');
+      return false;
     }
   }
 
@@ -220,6 +281,7 @@ export function useOrganizationController() {
         project.status === 'active' ? 'archived' : 'active',
       );
       await loadProjects(workspaceId);
+      window.dispatchEvent(new Event('forge:projects-changed'));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to update project.');
     }

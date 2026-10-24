@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Breadcrumbs, type BreadcrumbItem } from '@forge-org/ui';
+import { Breadcrumbs, type BreadcrumbItem } from '@corefoundry-labs/forge-ui';
 import styles from './PageHeader.module.css';
 export interface PageHeaderProps {
   title: string;

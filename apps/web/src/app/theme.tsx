@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useSystemTheme, type SystemTheme } from '@forge-org/ui';
+import { useSystemTheme, type SystemTheme } from '@corefoundry-labs/forge-ui';
 
 export type ThemeMode = SystemTheme | 'system';
 export type ResolvedTheme = SystemTheme;

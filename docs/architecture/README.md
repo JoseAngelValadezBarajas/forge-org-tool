@@ -5,7 +5,7 @@ Status: implementation target for the local-first 1.0 MVP. `docs/product/mvp-1.0
 ## Runtime and ownership
 
 - **Web:** React + Vite + TypeScript. The app composes feature-owned workflows; feature modules own business UI and domain mapping.
-- **Shared UI:** `@forge-org/ui` owns generic controls and surfaces; `@forge-org/tokens` owns semantic design tokens. Shared UI must not import app, feature, API, or backend code.
+- **Shared UI:** `@corefoundry-labs/forge-ui` owns generic controls and surfaces; `@corefoundry-labs/forge-tokens` owns semantic design tokens. Shared UI must not import app, feature, API, or backend code.
 - **API client:** `@forge-org/api-client` owns generated OpenAPI types, transport, and typed capability operations. The compatibility `organizationApi` facade remains available during the public API transition.
 - **Backend:** FastAPI exposes Pydantic/OpenAPI adapters; application services coordinate domain actions and transaction boundaries; infrastructure owns SQLite connections, migrations, and persistence. Domain rules remain independent of the web framework.
 - **Desktop:** Tauri 2 hosts the same React app and a bounded Python sidecar. IPC does not expose arbitrary filesystem access, shell/process control, credentials, ports, or unrestricted URLs.
@@ -13,7 +13,7 @@ Status: implementation target for the local-first 1.0 MVP. `docs/product/mvp-1.0
 
 ## Dependency direction
 
-`web app → feature → @forge-org/ui + @forge-org/api-client`; `@forge-org/ui → @forge-org/tokens`; backend `API → application → domain`, with infrastructure implementing persistence. Cross-feature imports use documented public feature barrels. No feature-specific product composition is moved into a generic package.
+`web app → feature → @corefoundry-labs/forge-ui + @forge-org/api-client`; `@corefoundry-labs/forge-ui → @corefoundry-labs/forge-tokens`; backend `API → application → domain`, with infrastructure implementing persistence. Cross-feature imports use documented public feature barrels. No feature-specific product composition is moved into a generic package.
 
 ## Capability scope
 

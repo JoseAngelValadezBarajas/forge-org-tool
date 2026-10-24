@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
@@ -11,54 +11,233 @@ describe('OrganizationPage', () => {
     localStorage.clear();
   });
 
-  it('restores and persists the explicitly selected workspace across a page reload', async () => {
-    localStorage.setItem('forge-active-workspace', 'w2');
-    const workspaces = [
-      { id: 'w1', name: 'One', status: 'active', created_at: '', updated_at: '' },
-      { id: 'w2', name: 'Two', status: 'active', created_at: '', updated_at: '' },
-    ];
-    const fetchMock = vi.fn().mockImplementation((input: string) => {
-      const path = String(input);
-      const payload =
-        path === '/api/v1/workspaces'
-          ? workspaces
-          : path.includes('/workspaces/w2/')
-            ? [
-                {
-                  id: 'p2',
-                  workspace_id: 'w2',
-                  name: 'Two project',
-                  description: null,
-                  status: 'active',
-                  created_at: '',
-                  updated_at: '',
-                  archived_at: null,
-                },
-              ]
-            : [];
-      return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
-    });
-    vi.stubGlobal('fetch', fetchMock);
-    const renderPage = () =>
-      render(
-        <MemoryRouter>
-          <OrganizationPage />
-        </MemoryRouter>,
-      );
-    const first = renderPage();
-    const selector = await screen.findByRole('combobox', { name: 'Workspace' });
-    await waitFor(() => expect(selector).toHaveValue('w2'));
-    expect(await screen.findByRole('link', { name: 'Two project' })).toBeInTheDocument();
-    fireEvent.change(selector, { target: { value: 'w1' } });
-    await waitFor(() => expect(localStorage.getItem('forge-active-workspace')).toBe('w1'));
-    first.unmount();
-
+  it('keeps the Workspace home project-first and opens project creation contextually', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Research',
+      description: 'Product work',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+    };
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'Atlas',
+      description: 'Navigation redesign',
+      status: 'active',
+      archived_at: null,
+      created_at: '',
+      updated_at: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [workspace]
+            : path.includes('/projects?')
+              ? [project]
+              : path.includes('/planning/overview')
+                ? { epics: [], unassigned_features: [] }
+                : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
     render(
       <MemoryRouter>
         <OrganizationPage />
       </MemoryRouter>,
     );
-    expect(await screen.findByRole('combobox', { name: 'Workspace' })).toHaveValue('w1');
+
+    expect(
+      await screen.findByRole('heading', { name: 'Your workspace, in focus' }),
+    ).toBeInTheDocument();
+    const workspaceSummary = screen.getByRole('region', { name: 'Workspace summary' });
+    expect(within(workspaceSummary).getByText('Projects')).toBeInTheDocument();
+    expect(within(workspaceSummary).getByText('Epics')).toBeInTheDocument();
+    expect(within(workspaceSummary).getByText('Work items')).toBeInTheDocument();
+    expect(within(workspaceSummary).queryByText('Completed')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Projects' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Atlas' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Continue working' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'New project' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Import Project' })).toHaveAttribute(
+      'href',
+      '/transfer/workspaces/w1',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
+    expect(screen.getByRole('link', { name: 'Workspace settings' })).toHaveAttribute(
+      'href',
+      '/workspaces/w1/settings',
+    );
+    expect(screen.getByRole('dialog', { hidden: true })).not.toHaveAttribute('open');
+    expect(screen.queryByRole('textbox', { name: 'Project name' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Edit workspace name')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Workspace tags' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'New project' }));
+    expect(await screen.findByRole('dialog', { name: 'Create project' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Project name')).toBeInTheDocument();
+  });
+
+  it('orders the approved home toolbar, metrics, compact cards and persisted continuation links', async () => {
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'Atlas',
+      description: 'Map work',
+      status: 'active',
+      archived_at: null,
+      created_at: '',
+      updated_at: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', archived_at: null, created_at: '', updated_at: '' }]
+            : path.includes('/projects?')
+              ? [project]
+              : {
+                  epics: [
+                    {
+                      id: 'e1',
+                      project_id: 'p1',
+                      title: 'Detection Research',
+                      archived_at: null,
+                      status: 'in_progress',
+                      updated_at: '2026-10-23T10:00:00Z',
+                      features: [],
+                    },
+                  ],
+                  unassigned_features: [],
+                };
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText('WORKSPACE OVERVIEW')).toBeInTheDocument();
+    expect(
+      screen.getByText('Pick up where you left off. Organize work without the noise.'),
+    ).toBeInTheDocument();
+    const toolbar = screen.getByRole('heading', { name: 'Projects' });
+    const metrics = screen.getByRole('region', { name: 'Workspace summary' });
+    expect(
+      toolbar.compareDocumentPosition(metrics) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    const card = await screen.findByRole('article', { name: 'Atlas' });
+    expect(within(card).getByRole('link', { name: 'Atlas' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(within(card).getByText('PROJECT · ACTIVE')).toBeInTheDocument();
+    expect(within(card).getByText('Map work')).toBeInTheDocument();
+    fireEvent.click(within(card).getByText('Project actions'));
+    expect(within(card).getByRole('button', { name: 'Archive' })).toBeInTheDocument();
+    expect(within(card).getByRole('link', { name: 'Overview' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
+    );
+    const continuation = screen.getByRole('region', { name: 'Continue working' });
+    expect(
+      await within(continuation).findByRole('link', { name: 'Detection Research' }),
+    ).toHaveAttribute('href', '/planning/w1/p1/epics/e1');
+    expect(within(continuation).getByText('Atlas · 0 work items')).toBeInTheDocument();
+  });
+
+  it('continues only open Epics and reports their own persisted work item counts', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const epic = {
+          project_id: 'p1',
+          archived_at: null,
+          created_at: '',
+          updated_at: '2026-10-23T10:00:00Z',
+          status: 'in_progress',
+          features: [],
+        };
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', archived_at: null, created_at: '', updated_at: '' }]
+            : path.includes('/projects?')
+              ? [
+                  {
+                    id: 'p1',
+                    workspace_id: 'w1',
+                    name: 'Atlas',
+                    description: null,
+                    status: 'active',
+                    archived_at: null,
+                    created_at: '',
+                    updated_at: '',
+                  },
+                ]
+              : {
+                  epics: [
+                    {
+                      ...epic,
+                      id: 'closed',
+                      title: 'Closed research',
+                      status: 'done',
+                      updated_at: '2026-10-23T14:00:00Z',
+                    },
+                    {
+                      ...epic,
+                      id: 'archived',
+                      title: 'Archived research',
+                      archived_at: '2026-10-23T13:00:00Z',
+                      updated_at: '2026-10-23T13:00:00Z',
+                    },
+                    {
+                      ...epic,
+                      id: 'e1',
+                      title: 'Detection Research',
+                      features: [{ id: 'f1', title: 'Research story', status: 'ready' }],
+                    },
+                    {
+                      ...epic,
+                      id: 'e2',
+                      title: 'Tracking',
+                      updated_at: '2026-10-23T09:00:00Z',
+                      features: [
+                        { id: 'f2', title: 'Tracking story', status: 'ready' },
+                        { id: 'f3', title: 'Tracking bug', status: 'backlog' },
+                      ],
+                    },
+                  ],
+                  unassigned_features: [],
+                };
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    render(
+      <MemoryRouter>
+        <OrganizationPage />
+      </MemoryRouter>,
+    );
+    const continuation = await screen.findByRole('region', { name: 'Continue working' });
+    expect(
+      await within(continuation).findByRole('link', { name: 'Detection Research' }),
+    ).toHaveAttribute('href', '/planning/w1/p1/epics/e1');
+    expect(within(continuation).getByText('Atlas · 1 work item')).toBeInTheDocument();
+    expect(within(continuation).getByText('Atlas · 2 work items')).toBeInTheDocument();
+    expect(
+      within(continuation).queryByRole('link', { name: 'Closed research' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(continuation).queryByRole('link', { name: 'Archived research' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows an actionable empty state and creates a workspace', async () => {
@@ -102,105 +281,6 @@ describe('OrganizationPage', () => {
     );
   });
 
-  it('edits the selected workspace name and description through the API', async () => {
-    const workspace = {
-      id: 'w1',
-      name: 'Research',
-      description: 'Old description',
-      created_at: '',
-      updated_at: '',
-    };
-    const fetchMock = vi.fn().mockImplementation((input: string, init?: RequestInit) => {
-      const path = String(input);
-      if (path === '/api/v1/workspaces')
-        return Promise.resolve(new Response(JSON.stringify([workspace]), { status: 200 }));
-      if (path === '/api/v1/workspaces/w1' && init?.method === 'PATCH')
-        return Promise.resolve(
-          new Response(
-            JSON.stringify({ ...workspace, name: 'Research Lab', description: 'Updated' }),
-            { status: 200 },
-          ),
-        );
-      if (path.endsWith('/tags')) return Promise.resolve(new Response('[]', { status: 200 }));
-      return Promise.resolve(new Response('[]', { status: 200 }));
-    });
-    vi.stubGlobal('fetch', fetchMock);
-    render(
-      <MemoryRouter>
-        <OrganizationPage />
-      </MemoryRouter>,
-    );
-
-    fireEvent.change(await screen.findByLabelText('Edit workspace name'), {
-      target: { value: 'Research Lab' },
-    });
-    fireEvent.change(screen.getByLabelText('Edit workspace description'), {
-      target: { value: 'Updated' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'Save workspace' }));
-    await waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith(
-        '/api/v1/workspaces/w1',
-        expect.objectContaining({
-          method: 'PATCH',
-          body: JSON.stringify({ name: 'Research Lab', description: 'Updated' }),
-        }),
-      ),
-    );
-  });
-
-  it('archives and restores the selected Workspace through its API lifecycle', async () => {
-    const active = {
-      id: 'w1',
-      name: 'Research',
-      description: null,
-      created_at: '',
-      updated_at: '',
-      archived_at: null,
-    };
-    const fetchMock = vi.fn().mockImplementation((input: string) => {
-      if (String(input) === '/api/v1/workspaces')
-        return Promise.resolve(new Response(JSON.stringify([active]), { status: 200 }));
-      if (String(input).endsWith('/archive'))
-        return Promise.resolve(
-          new Response(JSON.stringify({ ...active, archived_at: '2026-10-23T00:00:00Z' }), {
-            status: 200,
-          }),
-        );
-      if (String(input).endsWith('/restore'))
-        return Promise.resolve(new Response(JSON.stringify(active), { status: 200 }));
-      if (String(input).endsWith('/projects?search=&status=all'))
-        return Promise.resolve(new Response('[]', { status: 200 }));
-      return Promise.resolve(new Response('[]', { status: 200 }));
-    });
-    vi.stubGlobal('fetch', fetchMock);
-    render(
-      <MemoryRouter>
-        <OrganizationPage />
-      </MemoryRouter>,
-    );
-
-    fireEvent.click(await screen.findByRole('button', { name: 'Archive workspace' }));
-    await waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith(
-        '/api/v1/workspaces/w1/archive',
-        expect.objectContaining({ method: 'POST' }),
-      ),
-    );
-    expect(
-      await screen.findByText(
-        'This workspace is archived. Restore it to create projects or edit its settings.',
-      ),
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Restore workspace' }));
-    await waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith(
-        '/api/v1/workspaces/w1/restore',
-        expect.objectContaining({ method: 'POST' }),
-      ),
-    );
-  });
-
   it('renders projects for the selected workspace', async () => {
     vi.stubGlobal(
       'fetch',
@@ -235,7 +315,8 @@ describe('OrganizationPage', () => {
     expect(await screen.findAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
     expect(screen.getByText('Map work')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Projects' })).toBeInTheDocument();
-    expect(screen.getByText('1 total')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
+    expect(screen.getByText('1 active · 0 archived')).toBeVisible();
   });
 
   it('keeps workspace totals truthful while searching across active and archived projects', async () => {
@@ -287,16 +368,15 @@ describe('OrganizationPage', () => {
     );
 
     expect(await screen.findAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
-    expect(screen.getByText('2 total')).toBeInTheDocument();
-    expect(screen.getByText('Active').parentElement).toHaveTextContent(/1\s*currently active/);
-    expect(screen.getByText('Archived').parentElement).toHaveTextContent(/1\s*kept for history/);
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
+    expect(screen.getByText('1 active · 1 archived')).toBeVisible();
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search projects' }), {
       target: { value: 'Atlas' },
     });
 
-    expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(2);
+    expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
     expect(screen.queryByRole('heading', { name: 'Legacy' })).not.toBeInTheDocument();
-    expect(screen.getByText('2 total')).toBeInTheDocument();
+    expect(screen.getByText('1 active · 1 archived')).toBeVisible();
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search projects' }), {
       target: { value: '' },
     });
@@ -332,7 +412,7 @@ describe('OrganizationPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Connection unavailable');
     fireEvent.click(screen.getByRole('button', { name: 'Retry loading workspaces' }));
 
-    expect(await screen.findByText('No projects in this workspace yet.')).toBeInTheDocument();
+    expect(await screen.findByText('No projects yet')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -370,12 +450,13 @@ describe('OrganizationPage', () => {
     );
 
     await screen.findAllByRole('heading', { name: 'Atlas' });
+    fireEvent.click(screen.getByRole('button', { name: 'Project filters' }));
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search projects' }), {
       target: { value: 'Discovery' },
     });
 
     await waitFor(() => {
-      expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(2);
+      expect(screen.getAllByRole('heading', { name: 'Atlas' })).toHaveLength(1);
     });
   });
 
@@ -452,7 +533,7 @@ describe('OrganizationPage', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText('2 planned features')).toBeInTheDocument();
+    expect(await screen.findByText('2 work items')).toBeInTheDocument();
     expect(
       fetchMock.mock.calls
         .map(([path]) => String(path))
@@ -587,75 +668,5 @@ describe('OrganizationPage', () => {
     );
     expect(await screen.findByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
     expect(screen.queryByText(/recent activity/i)).not.toBeInTheDocument();
-  });
-
-  it('does not show a prior workspace project after a selection race', async () => {
-    const pending = new Map<string, Array<(response: Response) => void>>();
-    const fetchMock = vi.fn().mockImplementation((input: string) => {
-      const path = String(input);
-      if (path === '/api/v1/workspaces') {
-        return Promise.resolve(
-          new Response(
-            JSON.stringify([
-              { id: 'w1', name: 'One', status: 'active', created_at: '', updated_at: '' },
-              { id: 'w2', name: 'Two', status: 'active', created_at: '', updated_at: '' },
-            ]),
-            { status: 200 },
-          ),
-        );
-      }
-      const workspaceId = path.match(/workspaces\/(w\d+)\/projects/)?.[1] ?? '';
-      return new Promise<Response>((resolve) => {
-        pending.set(workspaceId, [...(pending.get(workspaceId) ?? []), resolve]);
-      });
-    });
-    vi.stubGlobal('fetch', fetchMock);
-    render(
-      <MemoryRouter>
-        <OrganizationPage />
-      </MemoryRouter>,
-    );
-
-    await screen.findByRole('option', { name: 'One' });
-    await waitFor(() => expect(pending.get('w1')).toHaveLength(1));
-    fireEvent.change(screen.getByLabelText('Workspace'), { target: { value: 'w2' } });
-    await waitFor(() => expect(pending.get('w2')).toHaveLength(1));
-    pending.get('w2')?.[0]?.(
-      new Response(
-        JSON.stringify([
-          {
-            id: 'p2',
-            workspace_id: 'w2',
-            name: 'Two project',
-            description: null,
-            status: 'active',
-            created_at: '',
-            updated_at: '',
-            archived_at: null,
-          },
-        ]),
-        { status: 200 },
-      ),
-    );
-    expect(await screen.findByRole('heading', { name: 'Two project' })).toBeInTheDocument();
-    pending.get('w1')?.[0]?.(
-      new Response(
-        JSON.stringify([
-          {
-            id: 'p1',
-            workspace_id: 'w1',
-            name: 'Stale project',
-            description: null,
-            status: 'active',
-            created_at: '',
-            updated_at: '',
-            archived_at: null,
-          },
-        ]),
-        { status: 200 },
-      ),
-    );
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(screen.queryByRole('heading', { name: 'Stale project' })).not.toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { Button, SearchField } from '@forge-org/ui';
+import { Button, SearchField } from '@corefoundry-labs/forge-ui';
 import styles from './CommandPalette.module.css';
 export interface PaletteCommand {
   id: string;

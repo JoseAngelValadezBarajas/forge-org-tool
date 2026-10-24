@@ -11,7 +11,7 @@ import {
   StatusChip,
   Table,
   TableRow,
-} from '@forge-org/ui';
+} from '@corefoundry-labs/forge-ui';
 import styles from '../ComponentGallery.module.css';
 
 export function renderSurfaceDataPreview(componentId: string): ReactNode | null {

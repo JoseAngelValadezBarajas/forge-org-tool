@@ -1,5 +1,5 @@
 import type { Task } from '@forge-org/api-client';
-import { Button, Select } from '@forge-org/ui';
+import { Button, Checkbox, Select } from '@corefoundry-labs/forge-ui';
 import styles from './TaskItem.module.css';
 
 type TaskItemProps = {
@@ -11,6 +11,7 @@ type TaskItemProps = {
   isLast?: boolean;
   editing?: boolean;
   archived?: boolean;
+  compact?: boolean;
 };
 
 export function TaskItem({
@@ -22,6 +23,7 @@ export function TaskItem({
   isLast = false,
   editing = false,
   archived = false,
+  compact = false,
 }: TaskItemProps) {
   const state = archived
     ? 'Archived'
@@ -33,7 +35,18 @@ export function TaskItem({
           ? 'Done'
           : 'Todo';
   return (
-    <article className={styles.item} data-state={state}>
+    <article
+      className={[styles.item, compact && styles.compact].filter(Boolean).join(' ')}
+      data-state={state}
+    >
+      {compact && (
+        <Checkbox
+          aria-label={`Complete ${task.title}`}
+          checked={task.status === 'done'}
+          disabled={archived}
+          onChange={(event) => onStatusChange(event.target.checked ? 'done' : 'todo')}
+        />
+      )}
       <strong className={styles.title}>{task.title}</strong>
       <Select
         aria-label={`Status for ${task.title}`}

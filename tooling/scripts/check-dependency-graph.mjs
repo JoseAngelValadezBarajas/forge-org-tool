@@ -4,13 +4,7 @@ import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const sourceRoots = [
-  'packages/ui/src',
-  'packages/api-client/src',
-  'packages/icons/src',
-  'packages/tokens/src',
-  'apps/web/src',
-];
+const sourceRoots = ['packages/api-client/src', 'apps/web/src'];
 const sourceExtensions = ['.ts', '.tsx'];
 const normalize = (file) => relative(root, file).split(sep).join('/');
 

@@ -1,0 +1,97 @@
+.board {
+  display: flex;
+  box-sizing: border-box;
+  flex: 0 0 695px;
+  flex-direction: column;
+  gap: 18px;
+  width: 695px;
+  height: 658px;
+  overflow: hidden;
+  padding: 13px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 12px;
+  background: var(--forge-surface);
+}
+.board h2 {
+  box-sizing: border-box;
+  flex: 0 0 31px;
+  width: 632px;
+  height: 31px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--forge-text-secondary);
+  font:
+    600 19px/31px Inter,
+    sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lane {
+  display: flex;
+  flex: 0 0 130px;
+  gap: 10px;
+  width: 656px;
+  height: 130px;
+  overflow: hidden;
+}
+.status {
+  box-sizing: border-box;
+  flex: 0 0 139px;
+  width: 139px;
+  height: 30px;
+  overflow: hidden;
+  padding: 7px 8px;
+  border-radius: 9px;
+  background: var(--forge-surface-interactive);
+  color: var(--forge-text-secondary);
+  font:
+    500 11px/16px Inter,
+    sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cards {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+.epicCard {
+  display: flex;
+  box-sizing: border-box;
+  flex: 0 0 239px;
+  flex-direction: column;
+  gap: 8px;
+  width: 239px;
+  height: 110px;
+  overflow: hidden;
+  padding: 13px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 12px;
+  background: var(--forge-surface);
+  color: var(--forge-text-primary);
+  text-decoration: none;
+}
+.epicCard > span {
+  display: -webkit-box;
+  height: 37px;
+  overflow: hidden;
+  font:
+    600 14px/18px Inter,
+    sans-serif;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.epicCard small {
+  overflow: hidden;
+  color: var(--forge-text-secondary);
+  font:
+    400 11px/20px Inter,
+    sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  .board {
+    display: none;
+  }
+}
