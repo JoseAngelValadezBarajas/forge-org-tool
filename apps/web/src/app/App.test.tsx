@@ -259,7 +259,7 @@ describe('M1 application shell', () => {
       name: 'Project navigation',
     });
     expect(await within(projectNavigation).findByRole('link', { name: 'Forge' })).toBeVisible();
-    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Search projects' }));
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Open project search' }));
     expect(
       within(projectNavigation).getByRole('searchbox', { name: 'Search projects' }),
     ).toBeInTheDocument();

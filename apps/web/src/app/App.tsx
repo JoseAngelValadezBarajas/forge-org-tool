@@ -333,7 +333,7 @@ function ApplicationShell() {
                 <button
                   type="button"
                   className={styles.projectSectionButton}
-                  aria-label="Search projects"
+                  aria-label="Open project search"
                   aria-expanded={projectSearchOpen}
                   onClick={() => setProjectSearchOpen((open) => !open)}
                 >

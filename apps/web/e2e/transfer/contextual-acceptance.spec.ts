@@ -99,7 +99,7 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   await expect(page.getByText(`${workspaceData.name} / ${projectData.name}`)).toBeVisible();
   await expect(page.getByText(`Destination: epics (${projectData.id})`)).toHaveCount(0);
   await page.getByRole('button', { name: 'Review import' }).click();
-  await page.getByRole('button', { name: 'Confirm planning import' }).click();
+  await page.getByRole('button', { name: 'Confirm Import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
 
   const planningUrl = `/api/v1/workspaces/${workspaceData.id}/projects/${projectData.id}/planning/overview`;
@@ -169,7 +169,7 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   ).toBeVisible();
   await page.getByRole('button', { name: 'Review import' }).click();
   await expect(page.getByText(`Destination: work-items (${importedEpic.id})`)).toHaveCount(0);
-  await page.getByRole('button', { name: 'Confirm planning import' }).click();
+  await page.getByRole('button', { name: 'Confirm Import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
 
   overview = await (await page.request.get(planningUrl)).json();
@@ -227,7 +227,7 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
   ).toBeVisible();
   await page.getByRole('button', { name: 'Review import' }).click();
   await expect(page.getByText(`Destination: tasks (${importedStory.id})`)).toHaveCount(0);
-  await page.getByRole('button', { name: 'Confirm planning import' }).click();
+  await page.getByRole('button', { name: 'Confirm Import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
   const tasksResponse = await page.request.get(
     `/api/v1/workspaces/${workspaceData.id}/projects/${projectData.id}/features/${importedStory.id}/tasks`,

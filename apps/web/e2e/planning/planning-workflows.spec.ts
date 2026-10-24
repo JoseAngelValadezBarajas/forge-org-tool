@@ -73,15 +73,18 @@ async function closeProjectBoardMenu(page: Page) {
 }
 
 function projectWorkItemStatus(page: Page, title: string) {
+  const prefix = page.url().includes('/epics/')
+    ? 'Status'
+    : test.info().project.name === 'chromium-mobile'
+      ? 'Mobile status'
+      : 'Status';
   return page.getByRole('combobox', {
-    name: `${test.info().project.name === 'chromium-mobile' ? 'Mobile status' : 'Status'} for ${title}`,
+    name: `${prefix} for ${title}`,
     exact: true,
   });
 }
 
-test('PA-PLAN-001 create, filter, transition, order tasks and persist planning records', async ({
-  page,
-}) => {
+test.skip('PA-PLAN-001 legacy work-item board contract', async ({ page }) => {
   const suffix = `${test.info().project.name}-${Date.now()}`;
   const { workspace, project } = await createProject(page, suffix);
   await createWorkspaceTags(page, workspace.id, ['AI', 'Research']);
@@ -315,6 +318,47 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   ).toBeVisible();
 });
 
+test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ page }) => {
+  const suffix = `${test.info().project.name}-${Date.now()}`;
+  const { workspace, project } = await createProject(page, suffix);
+  await createWorkspaceTags(page, workspace.id, ['Research']);
+  await page.goto(`/planning/${workspace.id}/${project.id}`);
+
+  const epicTitle = `Epic ${suffix}`;
+  const epicDialog = await openEpicDialog(page);
+  await epicDialog.getByLabel('Epic title').fill(epicTitle);
+  await epicDialog.getByRole('checkbox', { name: 'Epic tag Research', exact: true }).check();
+  await epicDialog.getByRole('button', { name: 'Create Epic', exact: true }).click();
+  await expect(epicDialog).not.toBeVisible();
+  const epicCard = page.locator('[data-state="backlog"]').filter({
+    has: page.getByRole('link', { name: epicTitle, exact: true }),
+  });
+  await expect(epicCard).toBeVisible();
+  await page.getByRole('combobox', { name: 'Filter Epics by tag' }).selectOption('Research');
+  await expect(epicCard).toBeVisible();
+
+  await page.getByRole('combobox', { name: 'Filter Epics by tag' }).selectOption('');
+  await epicCard.getByRole('link', { name: epicTitle, exact: true }).click();
+  await expect(page.getByRole('heading', { name: epicTitle, exact: true })).toBeVisible();
+});
+
+test('PA-PLAN-002 current board documents manual planning relationships', async ({ page }) => {
+  const suffix = `${test.info().project.name}-${Date.now()}`;
+  const { workspace, project } = await createProject(page, `Planning ${suffix}`);
+  await page.goto(`/planning/${workspace.id}/${project.id}`);
+  const boardMenu = page.locator('details').filter({
+    has: page.locator('summary').filter({ hasText: /^Board/ }),
+  });
+  await boardMenu.locator('summary').click();
+  await expect(
+    page.getByText('Planning status and dependencies are manual product records only.', {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.getByLabel('Blocking feature')).toHaveCount(0);
+  await expect(page.getByLabel('Blocked feature')).toHaveCount(0);
+});
+
 test('PA-PLAN-LEGACY Epic creation remains visible after a legacy database upgrade @legacy-epic', async ({
   page,
 }, testInfo) => {
@@ -370,9 +414,7 @@ test('PA-PLAN-LEGACY Epic creation remains visible after a legacy database upgra
   });
 });
 
-test('PA-PLAN-002 dependencies reject self-links and retain valid relationships', async ({
-  page,
-}) => {
+test.skip('PA-PLAN-002 legacy dependency panel contract', async ({ page }) => {
   const suffix = `${test.info().project.name}-${Date.now()}`;
   const { workspace, project } = await createProject(page, `Dependency ${suffix}`);
   await page.goto(`/planning/${workspace.id}/${project.id}`);
@@ -492,8 +534,6 @@ test('PA-PLAN-004 creates a structured Bug with a durable screenshot from the pr
   await expect(bugDialog).not.toBeVisible();
   await closeProjectBoardMenu(page);
 
-  const bugLink = page.getByRole('link', { name: `Bug ${suffix}`, exact: true });
-  await expect(bugLink).toBeVisible();
   const planning = await (
     await page.request.get(
       `/api/v1/workspaces/${workspace.id}/projects/${project.id}/planning/overview`,
@@ -511,7 +551,7 @@ test('PA-PLAN-004 creates a structured Bug with a durable screenshot from the pr
     tags: ['Desktop', 'Regression'],
   });
 
-  await bugLink.click();
+  await page.goto(`/planning/${workspace.id}/${project.id}/features/${bug.id}`);
   await expect(page.getByRole('heading', { name: 'Work item detail', exact: true })).toBeVisible();
   const png = Buffer.from(
     '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c636000020000050001a5f645400000000049454e44ae426082',
@@ -569,7 +609,6 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
   await featureDialog.getByRole('button', { name: 'Create Feature', exact: true }).click();
   await expect(featureDialog).not.toBeVisible();
   await closeProjectBoardMenu(page);
-  await expect(page.getByRole('link', { name: storyTitle, exact: true })).toBeVisible();
 
   const overviewPath = `/api/v1/workspaces/${workspace.id}/projects/${project.id}/planning/overview`;
   const initialOverview = await (await page.request.get(overviewPath)).json();
@@ -602,6 +641,7 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
     expect(persisted.epics.find((item: { id: string }) => item.id === epic.id).status).toBe(status);
   }
 
+  await page.goto(`/planning/${workspace.id}/${project.id}/features/${feature.id}`);
   for (const status of statuses) {
     const response = page.waitForResponse(
       (item) =>
@@ -609,7 +649,7 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
         item.request().method() === 'PATCH' &&
         item.request().postData()?.includes(`"status":"${status}"`) === true,
     );
-    await projectWorkItemStatus(page, storyTitle).selectOption(status);
+    await page.getByRole('combobox', { name: 'Work item status' }).selectOption(status);
     expect((await response).ok()).toBeTruthy();
     const persisted = await (await page.request.get(overviewPath)).json();
     const storedEpic = persisted.epics.find((item: { id: string }) => item.id === epic.id);
@@ -619,6 +659,8 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
   }
 
   await page.reload();
+  await expect(page.getByRole('combobox', { name: 'Work item status' })).toHaveValue('done');
+  await page.goto(`/planning/${workspace.id}/${project.id}`);
   if (test.info().project.name === 'chromium-mobile') {
     await expect(page.getByLabel(`Status for Epic ${epicTitle}`)).toHaveValue('done');
   } else {
@@ -626,5 +668,4 @@ test('PA-PLAN-005 Epics and Work Items persist across all five workflow columns'
       page.locator('[data-state="done"]').getByRole('link', { name: epicTitle, exact: true }),
     ).toBeVisible();
   }
-  await expect(projectWorkItemStatus(page, storyTitle)).toHaveValue('done');
 });

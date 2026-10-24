@@ -246,8 +246,8 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
     await boardMenu.getByRole('link', { name: 'Project overview', exact: true }).click();
   } else {
     await page
-      .getByRole('navigation', { name: 'Project navigation' })
-      .getByRole('link', { name: 'Overview', exact: true })
+      .getByTestId('app-topbar')
+      .locator(`a[href="/projects/${workspace.id}/${project.id}"]`)
       .click();
   }
   await expect(page).toHaveURL(`/projects/${workspace.id}/${project.id}`);
@@ -291,8 +291,8 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
     await boardMenu.getByRole('link', { name: 'Project overview', exact: true }).click();
   } else {
     await page
-      .getByRole('navigation', { name: 'Project navigation' })
-      .getByRole('link', { name: 'Overview', exact: true })
+      .getByTestId('app-topbar')
+      .locator(`a[href="/projects/${workspace.id}/${project.id}"]`)
       .click();
   }
   await expect(page.getByRole('heading', { name: 'Project Overview' })).toBeVisible();
