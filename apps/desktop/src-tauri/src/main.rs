@@ -328,8 +328,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::{
-        database_path, should_hide_on_close, should_hide_on_close_with_exit_override, startup_log_path,
-        TRAY_QUIT_ID, TRAY_SHOW_ID,
+        database_path, should_hide_on_close, should_hide_on_close_with_exit_override,
+        startup_log_path, TRAY_QUIT_ID, TRAY_SHOW_ID,
     };
     use std::path::Path;
 
