@@ -47,6 +47,10 @@ function ApplicationShell() {
   const [navigationError, setNavigationError] = useState('');
   const workspaceRevision = useRef(0);
   const context = getProjectContext(location.pathname);
+  const contextWorkspaceId = context?.workspaceId;
+  const contextProjectId = context?.projectId;
+  const contextEpicId = context?.epicId;
+  const contextFeatureId = context?.featureId;
   const routeWorkspaceId = context?.workspaceId;
   const navigationWorkspaceId = routeWorkspaceId ?? activeWorkspaceId;
   const activeWorkspace = workspaces.find((workspace) => workspace.id === navigationWorkspaceId);
@@ -160,14 +164,10 @@ function ApplicationShell() {
     };
   }, [navigationWorkspaceId, projectRefresh]);
   useEffect(() => {
-    const nestedContext = context;
-    if (!nestedContext?.epicId && !nestedContext?.featureId) {
-      setContextOverview(null);
-      return;
-    }
+    if (!contextEpicId && !contextFeatureId) return;
     let current = true;
     void organizationApi
-      .planningOverview(nestedContext.workspaceId, nestedContext.projectId)
+      .planningOverview(contextWorkspaceId!, contextProjectId!)
       .then((overview) => {
         if (current) setContextOverview(overview);
       })
@@ -177,7 +177,7 @@ function ApplicationShell() {
     return () => {
       current = false;
     };
-  }, [context?.epicId, context?.featureId, context?.projectId, context?.workspaceId]);
+  }, [contextEpicId, contextFeatureId, contextProjectId, contextWorkspaceId]);
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -207,11 +207,14 @@ function ApplicationShell() {
   const activeProject = context
     ? projects.find((project) => project.id === context.projectId)
     : null;
-  const activeEpic = contextOverview?.epics.find(
-    (epic) =>
-      epic.id === context?.epicId ||
-      epic.features.some((feature: { id: string }) => feature.id === context?.featureId),
-  );
+  const activeEpic =
+    contextEpicId || contextFeatureId
+      ? contextOverview?.epics.find(
+          (epic) =>
+            epic.id === contextEpicId ||
+            epic.features.some((feature: { id: string }) => feature.id === contextFeatureId),
+        )
+      : undefined;
   const isPlanningContext = location.pathname.startsWith('/planning/');
   const isFeatureContext = Boolean(context?.featureId);
   const isEpicContext = Boolean(context?.epicId);

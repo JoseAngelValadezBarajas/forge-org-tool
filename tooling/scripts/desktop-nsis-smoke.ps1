@@ -581,6 +581,8 @@ try {
   [System.IO.File]::WriteAllBytes($bugAttachmentPath, $pngBytes)
 
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Overview'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Board'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New Epic'
   Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Epic title' $epicName
@@ -635,6 +637,8 @@ try {
   Assert-ForgeSqliteRecord $databasePath 'workspaces' $workspaceName
   Assert-ForgeSqliteRecord $databasePath 'projects' $projectName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Overview'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Board'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName

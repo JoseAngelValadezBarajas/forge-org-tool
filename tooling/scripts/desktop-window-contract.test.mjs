@@ -213,7 +213,7 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
   assert.match(smoke, /Top-level windows:/);
 });
 
-test('installed acceptance opens the contextual project form and follows its board link', async () => {
+test('installed acceptance opens Project Overview and follows its board link', async () => {
   const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(
@@ -222,11 +222,7 @@ test('installed acceptance opens the contextual project form and follows its boa
   );
   assert.match(
     smoke,
-    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$projectName[\s\S]*?Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) 'Project Board'/,
-  );
-  assert.doesNotMatch(
-    smoke,
-    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) 'Open planning board'/,
+    /Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) \$projectName[\s\S]*?Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) 'Project Overview'[\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Hyperlink\) 'Open planning board'[\s\S]*?Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Text\) 'Project Board'/,
   );
   assert.match(
     smoke,

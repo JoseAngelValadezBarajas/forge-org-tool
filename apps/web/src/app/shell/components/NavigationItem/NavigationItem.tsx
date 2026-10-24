@@ -9,7 +9,7 @@ export function NavigationItem({
   label,
   className,
   disabled = false,
-  icon = "◦",
+  icon = '◦',
   ...props
 }: NavigationItemProps) {
   if (disabled) {
