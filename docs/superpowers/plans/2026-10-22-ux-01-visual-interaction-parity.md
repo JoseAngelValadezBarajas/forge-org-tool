@@ -8,7 +8,6 @@
 
 - Preserve ORG-001–009 routes, behavior, domain truth, public package contracts, and development-only `/__components`.
 - Generic primitives stay in `@corefoundry-labs/forge-ui`; business compositions remain feature-owned. No duplicate controls or speculative variants.
-- The original checkout's two deletions (`FORGE_Org_Tool_Architecture_RFC_v0.2.md`, `FORGE_Org_Tool_Codex_M0_M1_Prompt.md`) and `package-lock.json` modification are out of scope and must remain untouched.
 - Every visual correction needs node-backed Figma evidence. Do not change global palette or infer production dimensions from specimen bounds.
 - Keep visual review separate from automation. Never mark a component human-certified; use `PASS_AUTOMATED`, `NEEDS_CHANGES`, `REQUIRES_DESIGN_DECISION`, `READY_FOR_HUMAN_REVIEW` accurately.
 - Browser tests must use disposable synthetic data, strict isolated server startup, deterministic viewport/theme, and loaded content. Do not weaken assertions or regenerate baselines to conceal differences.
