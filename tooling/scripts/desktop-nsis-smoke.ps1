@@ -21,6 +21,10 @@ $isolatedLocalAppData = Join-Path $testRoot 'local-app-data'
 New-Item -ItemType Directory -Path $installRoot, $isolatedLocalAppData | Out-Null
 $previousLocalAppData = $env:LOCALAPPDATA
 $env:LOCALAPPDATA = $isolatedLocalAppData
+$previousDesktopSmokeExitOnClose = $env:FORGE_DESKTOP_SMOKE_EXIT_ON_CLOSE
+# Production keeps the app in the notification area when its window closes.
+# This smoke needs a deterministic graceful exit to verify sidecar cleanup.
+$env:FORGE_DESKTOP_SMOKE_EXIT_ON_CLOSE = '1'
 $process = $null
 $preexistingSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
 $sidecarPids = @()
@@ -695,6 +699,7 @@ finally {
     }
   }
   $env:LOCALAPPDATA = $previousLocalAppData
+  $env:FORGE_DESKTOP_SMOKE_EXIT_ON_CLOSE = $previousDesktopSmokeExitOnClose
   $resolvedTestRoot = [System.IO.Path]::GetFullPath($testRoot)
   $rootPrefix = $temporaryBase.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
   if (-not $resolvedTestRoot.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or

@@ -16,8 +16,14 @@ const READINESS_TIMEOUT: Duration = Duration::from_secs(15);
 const TRAY_SHOW_ID: &str = "tray-show";
 const TRAY_QUIT_ID: &str = "tray-quit";
 
+fn should_hide_on_close_with_exit_override(exit_on_close: bool) -> bool {
+    !exit_on_close
+}
+
 fn should_hide_on_close() -> bool {
-    true
+    let exit_on_close = std::env::var_os("FORGE_DESKTOP_SMOKE_EXIT_ON_CLOSE")
+        .is_some_and(|value| value == "1");
+    should_hide_on_close_with_exit_override(exit_on_close)
 }
 
 fn show_main_window(app: &AppHandle) {
@@ -322,7 +328,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::{
-        database_path, should_hide_on_close, startup_log_path, TRAY_QUIT_ID, TRAY_SHOW_ID,
+        database_path, should_hide_on_close, should_hide_on_close_with_exit_override,
+        startup_log_path, TRAY_QUIT_ID, TRAY_SHOW_ID,
     };
     use std::path::Path;
 
@@ -347,5 +354,10 @@ mod tests {
         assert_eq!(TRAY_SHOW_ID, "tray-show");
         assert_eq!(TRAY_QUIT_ID, "tray-quit");
         assert!(should_hide_on_close());
+    }
+
+    #[test]
+    fn desktop_smoke_can_request_a_terminal_window_close() {
+        assert!(!should_hide_on_close_with_exit_override(true));
     }
 }
