@@ -312,15 +312,13 @@ function ApplicationShell() {
           )}
           {navigationWorkspaceId && (
             <nav aria-label="Project navigation" className={styles.projectNav}>
-              <h2>Your projects</h2>
-              {context && (
-                <NavigationItem
-                  to={`/projects/${context.workspaceId}/${context.projectId}`}
-                  label="◦   Overview"
-                  aria-label="Overview"
-                />
-              )}
-              <NavigationItem to="/" end label="◦   Projects" aria-label="Projects" />
+              <NavigationItem
+                to="/"
+                end
+                label="Workspace Overview"
+                aria-label="Workspace Overview"
+              />
+              <h2>Project</h2>
               {projectWorkspaceId !== navigationWorkspaceId ? (
                 <span className={styles.emptyProjects}>Loading projects…</span>
               ) : projects.length === 0 ? (
@@ -329,11 +327,11 @@ function ApplicationShell() {
                 orderedProjects.map((project) => (
                   <Link
                     key={project.id}
-                    to={`/planning/${navigationWorkspaceId}/${project.id}`}
+                    to={`/projects/${navigationWorkspaceId}/${project.id}`}
                     aria-current={context?.projectId === project.id ? 'page' : undefined}
                   >
                     <span className={styles.projectIcon} aria-hidden="true">
-                      {project.name === 'FormiAI' ? '◈' : project.name === 'Forge' ? '◇' : '◦'}
+                      ◈
                     </span>
                     {project.name}
                   </Link>

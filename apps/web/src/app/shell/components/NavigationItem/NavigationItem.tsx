@@ -3,11 +3,13 @@ import styles from './NavigationItem.module.css';
 export interface NavigationItemProps extends Omit<NavLinkProps, 'children'> {
   label: string;
   disabled?: boolean;
+  icon?: string;
 }
 export function NavigationItem({
   label,
   className,
   disabled = false,
+  icon = "◦",
   ...props
 }: NavigationItemProps) {
   if (disabled) {
@@ -18,7 +20,8 @@ export function NavigationItem({
           .join(' ')}
         aria-disabled="true"
       >
-        {label}
+        {icon}
+        <span className={styles.label}>{label}</span>
       </span>
     );
   }
@@ -32,7 +35,8 @@ export function NavigationItem({
           .join(' ')
       }
     >
-      {label}
+      {icon}
+      <span className={styles.label}>{label}</span>
     </NavLink>
   );
 }

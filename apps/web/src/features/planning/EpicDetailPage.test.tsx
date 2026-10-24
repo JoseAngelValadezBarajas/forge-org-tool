@@ -270,6 +270,7 @@ describe('EpicDetailPage', () => {
   it('renders the five-column Epic Board and persists keyboard status changes', async () => {
     renderPage();
     expect(await screen.findByRole('region', { name: 'Epic Board' })).toBeInTheDocument();
+    expect(screen.getByTestId('epic-work-item-board')).toHaveAttribute('data-scroll-axis', 'both');
     for (const name of ['Backlog', 'Ready', 'In progress', 'Verify', 'Done']) {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
