@@ -6,7 +6,8 @@ import {
   type Project,
   type Workspace,
 } from '@forge-org/api-client';
-import { Button } from '@forge-org/ui';
+import { Button, SearchField } from '@forge-org/ui';
+import { ChevronDown, ChevronRight, Search } from '@forge-org/icons';
 import {
   OrganizationPage,
   ProjectOverviewPage,
@@ -51,6 +52,9 @@ function ApplicationShell() {
   const activeWorkspace = workspaces.find((workspace) => workspace.id === navigationWorkspaceId);
   const [projectWorkspaceId, setProjectWorkspaceId] = useState('');
   const [projectRefresh, setProjectRefresh] = useState(0);
+  const [projectsExpanded, setProjectsExpanded] = useState(true);
+  const [projectSearchOpen, setProjectSearchOpen] = useState(false);
+  const [projectQuery, setProjectQuery] = useState('');
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
   useEffect(() => {
     let current = true;
@@ -222,6 +226,9 @@ function ApplicationShell() {
     (left, right) =>
       Number(right.id === context?.projectId) - Number(left.id === context?.projectId),
   );
+  const filteredProjects = orderedProjects.filter((project) =>
+    project.name.toLocaleLowerCase().includes(projectQuery.trim().toLocaleLowerCase()),
+  );
   const mobileWorkspaceId = navigationWorkspaceId || activeWorkspaceId;
   const mobileBoardPath = context
     ? `/planning/${context.workspaceId}/${context.projectId}`
@@ -318,24 +325,61 @@ function ApplicationShell() {
                 label="Workspace Overview"
                 aria-label="Workspace Overview"
               />
-              <h2>Project</h2>
-              {projectWorkspaceId !== navigationWorkspaceId ? (
-                <span className={styles.emptyProjects}>Loading projects…</span>
-              ) : projects.length === 0 ? (
-                <span className={styles.emptyProjects}>No active projects</span>
-              ) : (
-                orderedProjects.map((project) => (
-                  <Link
-                    key={project.id}
-                    to={`/projects/${navigationWorkspaceId}/${project.id}`}
-                    aria-current={context?.projectId === project.id ? 'page' : undefined}
-                  >
-                    <span className={styles.projectIcon} aria-hidden="true">
-                      ◈
-                    </span>
-                    {project.name}
-                  </Link>
-                ))
+              <div className={styles.projectSectionControls}>
+                <h2>Project</h2>
+                <button
+                  type="button"
+                  className={styles.projectSectionButton}
+                  aria-label="Search projects"
+                  aria-expanded={projectSearchOpen}
+                  onClick={() => setProjectSearchOpen((open) => !open)}
+                >
+                  <Search aria-hidden="true" size={17} />
+                </button>
+                <button
+                  type="button"
+                  className={styles.projectSectionButton}
+                  aria-label={projectsExpanded ? 'Collapse projects' : 'Expand projects'}
+                  aria-expanded={projectsExpanded}
+                  onClick={() => setProjectsExpanded((expanded) => !expanded)}
+                >
+                  {projectsExpanded ? <ChevronDown size={17} /> : <ChevronRight size={17} />}
+                </button>
+              </div>
+              {projectsExpanded && (
+                <div className={styles.projectList}>
+                  {projectSearchOpen && (
+                    <SearchField
+                      aria-label="Search projects"
+                      className={styles.projectSearch}
+                      value={projectQuery}
+                      onChange={(event) => setProjectQuery(event.currentTarget.value)}
+                      placeholder="Search projects"
+                      clearLabel="Clear project search"
+                      onClear={() => setProjectQuery('')}
+                    />
+                  )}
+                  {projectWorkspaceId !== navigationWorkspaceId ? (
+                    <span className={styles.emptyProjects}>Loading projects…</span>
+                  ) : projects.length === 0 ? (
+                    <span className={styles.emptyProjects}>No active projects</span>
+                  ) : filteredProjects.length === 0 ? (
+                    <span className={styles.emptyProjects}>No matching projects</span>
+                  ) : (
+                    filteredProjects.map((project) => (
+                      <Link
+                        key={project.id}
+                        to={`/projects/${navigationWorkspaceId}/${project.id}`}
+                        aria-current={context?.projectId === project.id ? 'page' : undefined}
+                      >
+                        <span className={styles.projectIcon} aria-hidden="true">
+                          ◈
+                        </span>
+                        {project.name}
+                      </Link>
+                    ))
+                  )}
+                </div>
               )}
             </nav>
           )}

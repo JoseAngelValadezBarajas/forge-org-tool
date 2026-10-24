@@ -200,7 +200,7 @@ describe('M1 application shell', () => {
     ).toBeInTheDocument();
     expect(within(sidebar).getByRole('combobox', { name: 'Workspace' })).toBeInTheDocument();
     expect(await within(sidebar).findByRole('heading', { name: 'Project' })).toBeInTheDocument();
-    const projectNavigation = within(sidebar).getByRole('navigation', {
+    const projectNavigation = await within(sidebar).findByRole('navigation', {
       name: 'Project navigation',
     });
     expect(within(projectNavigation).queryByRole('link', { name: 'Overview' })).toBeNull();
@@ -211,6 +211,76 @@ describe('M1 application shell', () => {
       await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
     ).not.toHaveAttribute('aria-current', 'page');
     expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
+  });
+
+  it('filters projects and collapses the project list from the sidebar controls', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Personal',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const projects = [
+      {
+        id: 'p1',
+        workspace_id: 'w1',
+        name: 'Forge',
+        description: null,
+        status: 'active',
+        created_at: '',
+        updated_at: '',
+        archived_at: null,
+      },
+      {
+        id: 'p2',
+        workspace_id: 'w1',
+        name: 'FormiAI',
+        description: null,
+        status: 'active',
+        created_at: '',
+        updated_at: '',
+        archived_at: null,
+      },
+    ];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload = path === '/api/v1/workspaces' ? [workspace] : projects;
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+
+    const sidebar = screen.getByRole('complementary');
+    const projectNavigation = await within(sidebar).findByRole('navigation', {
+      name: 'Project navigation',
+    });
+    expect(await within(projectNavigation).findByRole('link', { name: 'Forge' })).toBeVisible();
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Search projects' }));
+    expect(
+      within(projectNavigation).getByRole('searchbox', { name: 'Search projects' }),
+    ).toBeInTheDocument();
+
+    fireEvent.change(
+      within(projectNavigation).getByRole('searchbox', { name: 'Search projects' }),
+      {
+        target: { value: 'form' },
+      },
+    );
+    expect(within(projectNavigation).queryByRole('link', { name: 'Forge' })).toBeNull();
+    expect(within(projectNavigation).getByRole('link', { name: 'FormiAI' })).toBeVisible();
+
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Collapse projects' }));
+    expect(
+      within(projectNavigation).getByRole('button', { name: 'Expand projects' }),
+    ).toBeInTheDocument();
+    expect(within(projectNavigation).queryByRole('link', { name: 'FormiAI' })).toBeNull();
+
+    fireEvent.click(within(projectNavigation).getByRole('button', { name: 'Expand projects' }));
+    expect(within(projectNavigation).getByRole('link', { name: 'FormiAI' })).toBeVisible();
   });
 
   it('provides compact mobile navigation for Projects, the current Board, Search and Settings', () => {
