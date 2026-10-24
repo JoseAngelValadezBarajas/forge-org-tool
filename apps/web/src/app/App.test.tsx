@@ -148,7 +148,11 @@ describe('M1 application shell', () => {
       'href',
       '/projects/w1/p1',
     );
-    expect(within(topbarNavigation).getByText('EPIC')).toHaveAttribute('aria-current', 'page');
+    expect(within(topbarNavigation).getByRole('link', { name: 'EPICS' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
+    expect(within(topbarNavigation).getByText('Release')).toHaveAttribute('aria-current', 'page');
     expect(
       within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByRole('link', {
         name: 'Atlas',

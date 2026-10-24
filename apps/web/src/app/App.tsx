@@ -1,6 +1,11 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { organizationApi, type Project, type Workspace } from '@forge-org/api-client';
+import {
+  organizationApi,
+  type PlanningOverview,
+  type Project,
+  type Workspace,
+} from '@forge-org/api-client';
 import { Button } from '@forge-org/ui';
 import {
   OrganizationPage,
@@ -40,11 +45,13 @@ function ApplicationShell() {
   );
   const [navigationError, setNavigationError] = useState('');
   const workspaceRevision = useRef(0);
-  const routeWorkspaceId = getProjectContext(location.pathname)?.workspaceId;
+  const context = getProjectContext(location.pathname);
+  const routeWorkspaceId = context?.workspaceId;
   const navigationWorkspaceId = routeWorkspaceId ?? activeWorkspaceId;
   const activeWorkspace = workspaces.find((workspace) => workspace.id === navigationWorkspaceId);
   const [projectWorkspaceId, setProjectWorkspaceId] = useState('');
   const [projectRefresh, setProjectRefresh] = useState(0);
+  const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
   useEffect(() => {
     let current = true;
     const initialRevision = workspaceRevision.current;
@@ -149,6 +156,25 @@ function ApplicationShell() {
     };
   }, [navigationWorkspaceId, projectRefresh]);
   useEffect(() => {
+    const nestedContext = context;
+    if (!nestedContext?.epicId && !nestedContext?.featureId) {
+      setContextOverview(null);
+      return;
+    }
+    let current = true;
+    void organizationApi
+      .planningOverview(nestedContext.workspaceId, nestedContext.projectId)
+      .then((overview) => {
+        if (current) setContextOverview(overview);
+      })
+      .catch(() => {
+        if (current) setContextOverview(null);
+      });
+    return () => {
+      current = false;
+    };
+  }, [context?.epicId, context?.featureId, context?.projectId, context?.workspaceId]);
+  useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
@@ -171,13 +197,27 @@ function ApplicationShell() {
     );
     navigate('/');
   }
-  const context = getProjectContext(location.pathname);
   const isMobileEpicBoard = /^\/planning\/[^/]+\/[^/]+\/epics\/[^/]+(?:\/|$)/.test(
     location.pathname,
   );
   const activeProject = context
     ? projects.find((project) => project.id === context.projectId)
     : null;
+  const activeEpic = contextOverview?.epics.find(
+    (epic) =>
+      epic.id === context?.epicId ||
+      epic.features.some((feature: { id: string }) => feature.id === context?.featureId),
+  );
+  const isPlanningContext = location.pathname.startsWith('/planning/');
+  const isFeatureContext = Boolean(context?.featureId);
+  const isEpicContext = Boolean(context?.epicId);
+  const currentContextLabel = isFeatureContext
+    ? 'WORK ITEM'
+    : isEpicContext
+      ? (activeEpic?.title ?? 'EPIC')
+      : isPlanningContext
+        ? 'EPICS'
+        : 'OVERVIEW';
   const orderedProjects = [...projects].sort(
     (left, right) =>
       Number(right.id === context?.projectId) - Number(left.id === context?.projectId),
@@ -326,16 +366,39 @@ function ApplicationShell() {
                 <Link to={`/projects/${context.workspaceId}/${context.projectId}`}>
                   {activeProject?.name ?? 'Project'}
                 </Link>
-                <span aria-hidden="true">/</span>
-                <span aria-current="page">
-                  {location.pathname.includes('/features/')
-                    ? 'WORK ITEM'
-                    : location.pathname.includes('/epics/')
-                      ? 'EPIC'
-                      : location.pathname.startsWith('/planning/')
-                        ? 'EPICS'
-                        : 'OVERVIEW'}
-                </span>
+                {isPlanningContext && (
+                  <>
+                    <span aria-hidden="true">/</span>
+                    {isEpicContext || isFeatureContext ? (
+                      <Link to={`/planning/${context.workspaceId}/${context.projectId}`}>
+                        EPICS
+                      </Link>
+                    ) : (
+                      <span aria-current="page">EPICS</span>
+                    )}
+                    {activeEpic && (
+                      <>
+                        <span aria-hidden="true">/</span>
+                        {isFeatureContext ? (
+                          <Link
+                            to={`/planning/${context.workspaceId}/${context.projectId}/epics/${activeEpic.id}`}
+                          >
+                            {activeEpic.title}
+                          </Link>
+                        ) : (
+                          <span aria-current="page">{activeEpic.title}</span>
+                        )}
+                      </>
+                    )}
+                    {isFeatureContext && (
+                      <>
+                        <span aria-hidden="true">/</span>
+                        <span aria-current="page">{currentContextLabel}</span>
+                      </>
+                    )}
+                  </>
+                )}
+                {!isPlanningContext && <span aria-current="page">{currentContextLabel}</span>}
               </nav>
             )}
             <div className={styles.topbarActions}>
@@ -553,6 +616,7 @@ function getProjectContext(pathname: string) {
   if (!['projects', 'planning', 'transfer'].includes(section)) {
     return null;
   }
+  const epicId = section === 'planning' && fourth === 'epics' ? fifth : undefined;
   const featureId = section === 'planning' && fourth === 'features' ? fifth : undefined;
-  return { workspaceId, projectId, featureId };
+  return { workspaceId, projectId, epicId, featureId };
 }
