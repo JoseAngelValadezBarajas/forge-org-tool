@@ -38,6 +38,7 @@ async function openEpicDialog(page: Page) {
   await page.getByRole('button', { name: 'New Epic', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'New Epic', exact: true });
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('heading', { name: 'New Epic', exact: true })).toBeInViewport();
   return dialog;
 }
 
@@ -219,6 +220,7 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
       response.url().includes('/acceptance-criteria/reorder') &&
       response.request().method() === 'POST',
   );
+  await firstCriterionRow.getByText('More criterion actions', { exact: true }).click();
   await firstCriterionRow.getByRole('button', { name: 'Move up', exact: true }).click();
   expect((await criterionReorder).ok()).toBe(true);
   let criteria = await (await page.request.get(criterionPath)).json();
@@ -228,6 +230,7 @@ test('PA-PLAN-001 create, filter, transition, order tasks and persist planning r
   const primaryCriterion = page
     .getByRole('listitem')
     .filter({ has: page.getByText(`Criterion ${suffix}`, { exact: true }) });
+  await primaryCriterion.getByText('More criterion actions', { exact: true }).click();
   await primaryCriterion.getByRole('button', { name: 'Edit', exact: true }).click();
   const safeCriterion = `Updated <script>no-run</script> ${suffix}`;
   await page.getByLabel(`Edit criterion Criterion ${suffix}`).fill(safeCriterion);
@@ -323,7 +326,9 @@ test('PA-PLAN-LEGACY Epic creation remains visible after a legacy database upgra
   const projectId = 'legacy-project';
   const overviewPath = `/api/v1/workspaces/${workspaceId}/projects/${projectId}/planning/overview`;
   await page.goto(`/planning/${workspaceId}/${projectId}`);
-  await expect(page.getByRole('heading', { name: 'Project Board', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Legacy Board · Epics', exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole('link', { name: 'Legacy planning Epic' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Legacy planned Epic' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Archived Epics' })).toContainText('Archived Epic');

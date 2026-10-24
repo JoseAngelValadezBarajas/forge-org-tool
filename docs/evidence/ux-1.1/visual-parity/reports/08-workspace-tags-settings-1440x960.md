@@ -4,7 +4,7 @@
 - Reference: `C:\Dev\Forge-UX-1.1\docs\evidence\ux-1.1\visual-parity\references\08-workspace-tags-1440x960.png` (1440×960)
 - Actual: `C:\Dev\Forge-UX-1.1\docs\evidence\ux-1.1\visual-parity\actual\08-workspace-tags-settings-1440x960.png` (1440×960)
 - Environment: Chromium, 1440x960 desktop or 390x844 mobile, device scale factor 1, 100% zoom, Inter bundled, animations disabled
-- Exact differing pixels (threshold 0, antialias included): 281175/1382400 (20.3396%)
+- Exact differing pixels (threshold 0, antialias included): 281215/1382400 (20.3425%)
 - Geometry: Not independently measured for this frame.
 - Typography: Raster difference is measured; font metrics and glyph-level mismatch classification require review.
 - Colors and surfaces: Raster difference is measured; color-region attribution requires review.

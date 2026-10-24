@@ -296,7 +296,7 @@ describe('TransferPage', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('presents an Epic transfer as a destination-aware dialog and returns focus/navigation to its project', async () => {
+  it('presents an Epic transfer as a destination-aware page and returns navigation to its project', async () => {
     const contextualPreview = {
       ...preview,
       destination: { scope: 'epics', id: 'p1' },
@@ -322,30 +322,29 @@ describe('TransferPage', () => {
           <Route path="/planning/:workspaceId/:projectId" element={<p>Project board</p>} />
           <Route
             path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
-            element={<TransferPage />}
+            element={<TransferPage projectName="FormiAI" workspaceName="Personal" />}
           />
         </Routes>
       </MemoryRouter>,
     );
 
-    const dialog = screen.getByRole('dialog', { name: /Import and export epics/i });
-    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Import an Epic' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Import source' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Import preview' })).toHaveTextContent(
       'Choose a source to see a validated preview.',
     );
-    expect(dialog).toHaveTextContent('Destination: epics (p1)');
-    const closeButton = screen.getByRole('button', { name: /close transfer/i });
-    expect(closeButton).toHaveFocus();
+    expect(screen.getByRole('heading', { name: 'Import into FormiAI' })).toBeInTheDocument();
+    expect(screen.getByText('Destination')).toBeInTheDocument();
+    expect(screen.getByText('Personal / FormiAI')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to Project' })).toHaveAttribute(
+      'href',
+      '/planning/w1/p1',
+    );
     expect(screen.getByLabelText('Choose a project transfer file')).toHaveAttribute(
       'accept',
       'application/json,.json',
     );
-    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
-    expect(screen.getByText('Export existing epics')).toHaveFocus();
-    fireEvent.keyDown(dialog, { key: 'Tab' });
-    expect(closeButton).toHaveFocus();
 
     const file = new File([JSON.stringify(document)], 'epics.json', {
       type: 'application/json',
@@ -376,7 +375,7 @@ describe('TransferPage', () => {
     );
   });
 
-  it('closes a contextual transfer dialog with Escape and navigates to the owning Epic', async () => {
+  it('keeps a contextual transfer page in place on Escape and links back to the owning Epic', async () => {
     render(
       <MemoryRouter initialEntries={['/planning/w1/p1', '/transfer/w1/p1/work-items/e1']}>
         <Routes>
@@ -393,8 +392,12 @@ describe('TransferPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('dialog', { name: /Import and export work-items/i })).toBeVisible();
-    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole('heading', { name: 'Import work items' }), {
+      key: 'Escape',
+    });
+    expect(screen.queryByText('Epic board')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: 'Back to Epic' }));
     expect(await screen.findByText('Epic board')).toBeInTheDocument();
   });
 });

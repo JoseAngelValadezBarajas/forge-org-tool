@@ -83,6 +83,78 @@ describe('FeatureDetailPage', () => {
     expect(await screen.findByLabelText('Edit feature title')).toHaveValue('Readable story');
   });
 
+  it('keeps criterion progression visible and progressively reveals secondary touch actions', async () => {
+    const story = {
+      id: 'story-1',
+      project_id: 'p1',
+      epic_id: null,
+      title: 'Readable story',
+      description: 'A clear summary for the team.',
+      goal: 'Make the detail easy to scan.',
+      priority: 'high',
+      status: 'ready',
+      kind: 'story',
+      tags: [],
+      notes: '',
+      created_at: '',
+      updated_at: '',
+    };
+    const criterion = {
+      id: 'criterion-1',
+      feature_id: story.id,
+      description: 'The primary reading flow stays clear.',
+      position: 0,
+      satisfied: false,
+      created_at: '',
+      updated_at: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        if (path.endsWith('/planning/overview'))
+          return Promise.resolve(
+            new Response(JSON.stringify({ epics: [], unassigned_features: [story] }), {
+              status: 200,
+            }),
+          );
+        if (path.endsWith('/acceptance-criteria'))
+          return Promise.resolve(new Response(JSON.stringify([criterion]), { status: 200 }));
+        if (path.endsWith('/tasks') || path.endsWith('/dependencies'))
+          return Promise.resolve(new Response('[]', { status: 200 }));
+        return Promise.resolve(new Response('null', { status: 200 }));
+      }),
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/planning/w1/p1/features/story-1']}>
+        <Routes>
+          <Route
+            path="/planning/:workspaceId/:projectId/features/:featureId"
+            element={<FeatureDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const description = await screen.findByText(criterion.description);
+    const criterionRow = description.closest('li');
+    expect(criterionRow).not.toBeNull();
+    const row = within(criterionRow!);
+    expect(row.getByRole('checkbox', { name: `Satisfy ${criterion.description}` })).toBeVisible();
+    expect(
+      row.queryByRole('button', { name: /Mark (pending|satisfied)/u }),
+    ).not.toBeInTheDocument();
+    const moreActions = row.getByText('More criterion actions').closest('details');
+    expect(moreActions).not.toBeNull();
+    expect(moreActions).not.toHaveAttribute('open');
+
+    fireEvent.click(row.getByText('More criterion actions'));
+    expect(moreActions).toHaveAttribute('open');
+    expect(row.getByRole('button', { name: 'Edit' })).toBeVisible();
+    expect(row.getByRole('button', { name: 'Delete' })).toBeVisible();
+  });
+
   it('reorders tasks through the planning API and keeps the action manual', async () => {
     const tasks = [
       {

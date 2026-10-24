@@ -92,8 +92,13 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(epicDocument)),
   });
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: `Import into ${projectData.name}` }),
+  ).toBeVisible();
+  await expect(page.getByText(`${workspaceData.name} / ${projectData.name}`)).toBeVisible();
+  await expect(page.getByText(`Destination: epics (${projectData.id})`)).toHaveCount(0);
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(`Destination: epics (${projectData.id})`)).toBeVisible();
   await page.getByRole('button', { name: 'Confirm planning import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
 
@@ -156,8 +161,14 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(workItemsDocument)),
   });
+  await expect(
+    page.getByRole('heading', { name: `Import into Imported Epic ${suffix}` }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`${workspaceData.name} / ${projectData.name} / Imported Epic ${suffix}`),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(`Destination: work-items (${importedEpic.id})`)).toBeVisible();
+  await expect(page.getByText(`Destination: work-items (${importedEpic.id})`)).toHaveCount(0);
   await page.getByRole('button', { name: 'Confirm planning import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
 
@@ -208,8 +219,14 @@ test('PA-TRN-003 contextual Epic, Work Item and Task transfer uses product UI de
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(taskDocument)),
   });
+  await expect(
+    page.getByRole('heading', { name: `Import into Scoped Story ${suffix}` }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`${workspaceData.name} / ${projectData.name} / Scoped Story ${suffix}`),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByText(`Destination: tasks (${importedStory.id})`)).toBeVisible();
+  await expect(page.getByText(`Destination: tasks (${importedStory.id})`)).toHaveCount(0);
   await page.getByRole('button', { name: 'Confirm planning import' }).click();
   await expect(page.getByText(`Imported into project: ${projectData.id}`)).toBeVisible();
   const tasksResponse = await page.request.get(

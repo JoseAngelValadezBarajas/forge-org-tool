@@ -1,5 +1,6 @@
 ﻿import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { act } from '@testing-library/react';
 import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -40,6 +41,48 @@ describe('M1 application shell', () => {
     expect(await screen.findByRole('heading', { name: 'No workspaces yet' })).toBeInTheDocument();
     expect(screen.getByText('No workspaces yet')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create workspace/i })).toBeEnabled();
+  });
+
+  it('does not let a late initial workspace read erase a just-created active workspace', async () => {
+    const workspaceResponses: ((response: Response) => void)[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input) === '/api/v1/workspaces') {
+          return new Promise<Response>((resolve) => workspaceResponses.push(resolve));
+        }
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    await waitFor(() => expect(workspaceResponses.length).toBeGreaterThan(0));
+
+    const workspace = {
+      id: 'created-workspace',
+      name: 'Created during startup',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    await act(async () => {
+      window.dispatchEvent(new CustomEvent('forge:workspace-created', { detail: { workspace } }));
+      window.dispatchEvent(
+        new CustomEvent('forge:active-workspace-change', {
+          detail: { workspaceId: workspace.id },
+        }),
+      );
+      for (const resolve of workspaceResponses) resolve(new Response('[]', { status: 200 }));
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('combobox', { name: 'Workspace' })).toHaveLength(2);
+      for (const selector of screen.getAllByRole('combobox', { name: 'Workspace' })) {
+        expect(selector).toHaveValue(workspace.id);
+      }
+      expect(screen.getByRole('heading', { name: 'Your workspace, in focus' })).toBeInTheDocument();
+    });
+    expect(localStorage.getItem('forge-active-workspace')).toBe(workspace.id);
   });
 
   it('opens an Epic detail route with project context', async () => {
@@ -145,6 +188,17 @@ describe('M1 application shell', () => {
     expect(
       await within(sidebar).findByRole('heading', { name: 'Your projects' }),
     ).toBeInTheDocument();
+    const projectNavigation = within(sidebar).getByRole('navigation', {
+      name: 'Project navigation',
+    });
+    expect(within(projectNavigation).queryByRole('link', { name: 'Overview' })).toBeNull();
+    expect(within(projectNavigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(
+      await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
+    ).not.toHaveAttribute('aria-current', 'page');
     expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
   });
 

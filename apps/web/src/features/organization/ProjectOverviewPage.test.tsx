@@ -434,23 +434,21 @@ describe('Project Overview route', () => {
       '/planning/w1/p1',
     );
     expect(screen.getByRole('button', { name: 'Archive' })).toBeEnabled();
-    expect(
-      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
-        name: 'Overview',
-      }),
-    ).toHaveAttribute('href', '/');
+    const projectNavigation = within(
+      screen.getByRole('navigation', { name: 'Project navigation' }),
+    );
+    expect(projectNavigation.queryByRole('link', { name: 'Overview' })).not.toBeInTheDocument();
+    expect(projectNavigation.getByRole('link', { name: 'Projects' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
     fireEvent.click(screen.getByRole('link', { name: 'Open Board' }));
     expect(await screen.findByLabelText('Epic workflow board')).toBeInTheDocument();
-    expect(
-      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
-        name: 'Overview',
-      }),
-    ).toHaveAttribute('href', '/projects/w1/p1');
-    fireEvent.click(
-      within(screen.getByRole('navigation', { name: 'Project navigation' })).getByRole('link', {
-        name: 'Overview',
-      }),
+    expect(projectNavigation.getByRole('link', { name: 'Overview' })).toHaveAttribute(
+      'href',
+      '/projects/w1/p1',
     );
+    fireEvent.click(projectNavigation.getByRole('link', { name: 'Overview' }));
     expect(await screen.findByRole('heading', { name: 'Atlas' })).toBeInTheDocument();
   });
 });

@@ -296,6 +296,30 @@
   padding: 4px;
   font-size: 11px;
 }
+.criterionMoreActions {
+  position: relative;
+}
+.criterionMoreActions > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: var(--forge-radius-sm);
+  color: var(--forge-text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  list-style: none;
+}
+.criterionMoreActions > summary::-webkit-details-marker {
+  display: none;
+}
+.criterionMoreActionsMenu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-top: 4px;
+}
 .inlineEditor {
   display: flex;
   flex-wrap: wrap;

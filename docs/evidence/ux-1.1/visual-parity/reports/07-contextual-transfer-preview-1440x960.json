@@ -15,9 +15,9 @@
   "comparison": {
     "channelThreshold": 0,
     "antiAliasingIncluded": true,
-    "differentPixels": 1025839,
+    "differentPixels": 501636,
     "totalPixels": 1382400,
-    "differentPixelRatio": 0.7420710358796296
+    "differentPixelRatio": 0.3628732638888889
   },
   "geometry": null,
   "mismatchClassification": {

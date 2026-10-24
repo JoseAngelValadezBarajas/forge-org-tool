@@ -222,6 +222,17 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     });
   }
 
+  async function reviewContextualTransfer() {
+    await page.getByRole('button', { name: 'Review import' }).click();
+    await expect(page.getByRole('heading', { name: 'Import preview' })).toBeVisible();
+    await page.locator('summary').filter({ hasText: 'Advanced JSON paste' }).click();
+    await expect(page.getByLabel('Advanced JSON document')).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'Import an Epic' })).toHaveCSS(
+      'font-size',
+      '28px',
+    );
+  }
+
   if (info.project.name === 'chromium-mobile') {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
@@ -284,8 +295,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     };
     await page.locator('summary').filter({ hasText: 'Advanced JSON paste' }).click();
     await page.getByLabel('Advanced JSON document').fill(JSON.stringify(transferDocument, null, 2));
-    await page.getByRole('button', { name: 'Review import' }).click();
-    await expect(page.getByRole('heading', { name: 'Import preview' })).toBeVisible();
+    await reviewContextualTransfer();
     await capture('07-mobile-contextual-transfer');
     await page.goto(`/workspaces/${workspace.id}/settings`);
     await expect(page.getByRole('heading', { name: 'Manage workspace tags' })).toBeVisible();
@@ -532,8 +542,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   };
   await page.locator('summary').filter({ hasText: 'Advanced JSON paste' }).click();
   await page.getByLabel('Advanced JSON document').fill(JSON.stringify(transferDocument, null, 2));
-  await page.getByRole('button', { name: 'Review import' }).click();
-  await expect(page.getByRole('heading', { name: 'Import preview' })).toBeVisible();
+  await reviewContextualTransfer();
   await capture('07-contextual-transfer-preview-1440x960');
   await page.goto(`/workspaces/${workspace.id}/settings`);
   await expect(page.getByRole('heading', { name: 'Manage workspace tags' })).toBeVisible();

@@ -45,8 +45,63 @@ public static class ForgeWindowNative {
   [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hWnd);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int command);
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);
+  [DllImport("user32.dll")] static extern bool SetCursorPos(int x, int y);
+  [DllImport("user32.dll")] static extern void mouse_event(uint flags, uint dx, uint dy, uint data, UIntPtr extraInfo);
+  [DllImport("user32.dll")] public static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
+  [DllImport("user32.dll", SetLastError = true)]
+  static extern IntPtr SendMessage(IntPtr hWnd, uint message, IntPtr wParam, IntPtr lParam);
+  [DllImport("user32.dll", EntryPoint = "SendMessageW", CharSet = CharSet.Unicode, SetLastError = true)]
+  static extern IntPtr SendMessageBuffer(IntPtr hWnd, uint message, IntPtr wParam, System.Text.StringBuilder text);
+  public static string ReadWindowText(IntPtr hWnd) {
+    System.Text.StringBuilder text = new System.Text.StringBuilder(2048);
+    SendMessageBuffer(hWnd, 0x000D, new IntPtr(text.Capacity), text); // WM_GETTEXT across process boundary
+    return text.ToString();
+  }
+  public static void ClickDialogButton(IntPtr hWnd) {
+    SendMessage(hWnd, 0x00F5, IntPtr.Zero, IntPtr.Zero); // BM_CLICK: activate the native button control
+  }
+  public static void ClickControlCenter(IntPtr hWnd) {
+    RECT rect;
+    if (!GetWindowRect(hWnd, out rect)) throw new InvalidOperationException("Could not locate the native input control.");
+    SetCursorPos((rect.Left + rect.Right) / 2, (rect.Top + rect.Bottom) / 2);
+    mouse_event(0x0002, 0, 0, 0, UIntPtr.Zero);
+    mouse_event(0x0004, 0, 0, 0, UIntPtr.Zero);
+  }
   [DllImport("user32.dll")] static extern IntPtr GetWindow(IntPtr hWnd, uint command);
   public static IntPtr GetWindowOwner(IntPtr hWnd) { return GetWindow(hWnd, 4); }
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+  static extern int GetClassName(IntPtr hWnd, System.Text.StringBuilder className, int maxCount);
+  public static string ReadClassName(IntPtr hWnd) {
+    System.Text.StringBuilder className = new System.Text.StringBuilder(256);
+    GetClassName(hWnd, className, className.Capacity);
+    return className.ToString();
+  }
+  public static IntPtr FindDescendantByClass(IntPtr parent, string expectedClass) {
+    IntPtr child = GetWindow(parent, 5);
+    while (child != IntPtr.Zero) {
+      if (String.Equals(ReadClassName(child), expectedClass, StringComparison.OrdinalIgnoreCase)) return child;
+      IntPtr nested = FindDescendantByClass(child, expectedClass);
+      if (nested != IntPtr.Zero) return nested;
+      child = GetWindow(child, 2);
+    }
+    return IntPtr.Zero;
+  }
+  static void AppendChildClasses(IntPtr parent, System.Text.StringBuilder output, int depth, int[] count) {
+    if (depth > 5 || count[0] >= 80) return;
+    IntPtr child = GetWindow(parent, 5);
+    while (child != IntPtr.Zero && count[0] < 80) {
+      output.Append("hwnd=").Append(child.ToInt64()).Append(":").Append(ReadClassName(child)).Append("; ");
+      count[0]++;
+      AppendChildClasses(child, output, depth + 1, count);
+      child = GetWindow(child, 2);
+    }
+  }
+  public static string DescribeChildClasses(IntPtr parent) {
+    System.Text.StringBuilder output = new System.Text.StringBuilder();
+    int[] count = new int[] { 0 };
+    AppendChildClasses(parent, output, 0, count);
+    return output.ToString();
+  }
   [DllImport("user32.dll")] static extern IntPtr GetWindowDC(IntPtr hWnd);
   [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
   [DllImport("gdi32.dll")] static extern IntPtr CreateCompatibleDC(IntPtr hDC);
@@ -192,6 +247,11 @@ function Set-ForgeElementValue($root, [System.Windows.Automation.ControlType]$co
   $element.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($value)
 }
 
+function Assert-ForgeSqliteRecord([string]$databasePath, [string]$table, [string]$name) {
+  $result = & uv run --project apps/api --locked python tooling/scripts/verify-desktop-smoke-db.py $databasePath $table $name
+  if ($LASTEXITCODE -ne 0) { throw "Could not verify synthetic '$table' record in SQLite." }
+}
+
 function Select-ForgeOption($root, [string]$comboBoxName, [string]$optionName) {
   $combo = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ComboBox) $comboBoxName
   $expandPattern = $combo.GetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern)
@@ -216,31 +276,37 @@ function Wait-ForgeAutomationDialogClosed($desktop, $ownerRoot, $dialog, [int]$t
   $dialogName = $dialog.Current.Name
   $deadline = [DateTime]::UtcNow.AddSeconds($timeoutSeconds)
   do {
-    $windows = $desktop.FindAll(
-      [System.Windows.Automation.TreeScope]::Children,
-      [System.Windows.Automation.Condition]::TrueCondition
-    )
-    $ownerDescendants = $ownerRoot.FindAll(
-      [System.Windows.Automation.TreeScope]::Descendants,
-      [System.Windows.Automation.Condition]::TrueCondition
-    )
-    $dialogStillOpen = @($windows | Where-Object {
-      $dialogHandle -ne [IntPtr]::Zero -and $_.Current.NativeWindowHandle -eq $dialogHandle
-    }).Count -gt 0
-    if (-not $dialogStillOpen) {
-      $dialogStillOpen = @($ownerDescendants | Where-Object {
-        $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Window -and
-        (
-          ($dialogHandle -ne [IntPtr]::Zero -and $_.Current.NativeWindowHandle -eq $dialogHandle) -or
-          ($dialogRuntimeId -and (($_.GetRuntimeId() -join '.') -eq $dialogRuntimeId)) -or
-          ($dialogName -and $_.Current.Name -eq $dialogName -and
-            [ForgeWindowNative]::GetWindowOwner($_.Current.NativeWindowHandle) -eq $ownerRoot.Current.NativeWindowHandle)
-        )
+    if (-not [ForgeWindowNative]::IsWindowVisible($dialogHandle)) { return }
+    try {
+      $windows = $desktop.FindAll(
+        [System.Windows.Automation.TreeScope]::Children,
+        [System.Windows.Automation.Condition]::TrueCondition
+      )
+      $ownerDescendants = $ownerRoot.FindAll(
+        [System.Windows.Automation.TreeScope]::Descendants,
+        [System.Windows.Automation.Condition]::TrueCondition
+      )
+      $dialogStillOpen = @($windows | Where-Object {
+        $dialogHandle -ne [IntPtr]::Zero -and $_.Current.NativeWindowHandle -eq $dialogHandle
       }).Count -gt 0
+      if (-not $dialogStillOpen) {
+        $dialogStillOpen = @($ownerDescendants | Where-Object {
+          $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Window -and
+          (
+            ($dialogHandle -ne [IntPtr]::Zero -and $_.Current.NativeWindowHandle -eq $dialogHandle) -or
+            ($dialogRuntimeId -and (($_.GetRuntimeId() -join '.') -eq $dialogRuntimeId)) -or
+            ($dialogName -and $_.Current.Name -eq $dialogName -and
+              [ForgeWindowNative]::GetWindowOwner($_.Current.NativeWindowHandle) -eq $ownerRoot.Current.NativeWindowHandle)
+          )
+        }).Count -gt 0
+      }
+      if (-not $dialogStillOpen -and -not [ForgeWindowNative]::IsWindowVisible($dialogHandle)) { return }
+    } catch {
+      if (-not [ForgeWindowNative]::IsWindowVisible($dialogHandle)) { return }
     }
-    if (-not $dialogStillOpen) { return }
     Start-Sleep -Milliseconds 100
   } while ([DateTime]::UtcNow -lt $deadline)
+  if (-not [ForgeWindowNative]::IsWindowVisible($dialogHandle)) { return }
   throw "The native file picker remained open after selecting '$($dialog.Current.Name)'."
 }
 
@@ -278,12 +344,22 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
         )
         $hasFileName = @($candidateControls | Where-Object {
           $_.Current.AutomationId -eq '1148' -or
-          $_.Current.Name -match '(?i)(file name|nombre de archivo)'
+          (
+            $_.Current.ControlType -in @(
+              [System.Windows.Automation.ControlType]::Edit,
+              [System.Windows.Automation.ControlType]::ComboBox
+            ) -and $_.Current.Name -match '(?i)(file name|nombre de archivo|^nombre$)'
+          )
         }).Count -gt 0
         $hasOpenAction = @($candidateControls | Where-Object {
-          $_.Current.Name -match '(?i)^(open|abrir)$' -or $_.Current.AutomationId -eq '1'
+          $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Button -and
+          $_.Current.Name -match '(?i)^(open|abrir)$'
         }).Count -gt 0
-        if ($hasFileName -and $hasOpenAction) { $dialog = $candidate; break }
+        $nativeOpenButton = [ForgeWindowNative]::GetDlgItem($candidateHandle, 1)
+        if ($hasFileName -and ($hasOpenAction -or $nativeOpenButton -ne [IntPtr]::Zero)) {
+          $dialog = $candidate
+          break
+        }
       }
     }
     if ($null -eq $dialog) { Start-Sleep -Milliseconds 250 }
@@ -295,7 +371,11 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
       [System.Windows.Automation.Condition]::TrueCondition
     )
     $rootSummary = @($rootControls | Select-Object -First 80 | ForEach-Object {
-      "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)'"
+      $candidateHandle = [IntPtr]$_.Current.NativeWindowHandle
+      $candidateOwner = if ($candidateHandle -ne [IntPtr]::Zero) {
+        [ForgeWindowNative]::GetWindowOwner($candidateHandle).ToInt64()
+      } else { 0 }
+      "type='$($_.Current.ControlType.ProgrammaticName)' id='$($_.Current.AutomationId)' class='$($_.Current.ClassName)' hwnd=$($candidateHandle.ToInt64()) owner=$candidateOwner"
     })
     Write-Output "Native picker failure UIA elements: $($rootSummary -join '; ')"
     if (-not [ForgeWindowNative]::CaptureWindow($root.Current.NativeWindowHandle, $screenshotPath)) {
@@ -310,36 +390,76 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
   )
   $fileNameControl = $dialogControls | Where-Object {
     $_.Current.AutomationId -eq '1148' -or
-    $_.Current.Name -match '(?i)(file name|nombre de archivo)' -or
     (
-      $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Edit -and
-      $_.Current.Name -match '(?i)^nombre$' -and
-      $_.Current.AutomationId -ne 'System.ItemNameDisplay' -and
-      $_.Current.ClassName -eq 'Edit'
+      $_.Current.ControlType -in @(
+        [System.Windows.Automation.ControlType]::Edit,
+        [System.Windows.Automation.ControlType]::ComboBox
+      ) -and
+      $_.Current.Name -match '(?i)(file name|nombre de archivo|^nombre$)' -and
+      $_.Current.AutomationId -ne 'System.ItemNameDisplay'
     )
   } | Select-Object -First 1
+  $fileNameInput = if (
+    $null -ne $fileNameControl -and
+    $fileNameControl.Current.ControlType -in @(
+      [System.Windows.Automation.ControlType]::Edit,
+      [System.Windows.Automation.ControlType]::ComboBox
+    )
+  ) { $fileNameControl } else { $null }
   $valuePattern = $null
-  $forceClipboardPath = $env:FORGE_DESKTOP_SMOKE_FORCE_CLIPBOARD_PICKER -eq '1'
   [ForgeWindowNative]::SetForegroundWindow($dialog.Current.NativeWindowHandle) | Out-Null
-  if (-not $forceClipboardPath -and $null -ne $fileNameControl -and $fileNameControl.TryGetCurrentPattern(
+  $nativeFileNameHandle = [ForgeWindowNative]::GetDlgItem($dialog.Current.NativeWindowHandle, 1148)
+  if ($nativeFileNameHandle -eq [IntPtr]::Zero -and $null -ne $fileNameControl) {
+    $nativeFileNameHandle = [IntPtr]$fileNameControl.Current.NativeWindowHandle
+  }
+  $nativeFileNameEditHandle = if ($nativeFileNameHandle -ne [IntPtr]::Zero) {
+    [ForgeWindowNative]::FindDescendantByClass($nativeFileNameHandle, 'Edit')
+  } else { [IntPtr]::Zero }
+  if ($nativeFileNameEditHandle -eq [IntPtr]::Zero) { $nativeFileNameEditHandle = $nativeFileNameHandle }
+  $fieldControls = @($dialogControls | Where-Object {
+    $_.Current.AutomationId -eq '1148' -or $_.Current.ControlType -in @(
+      [System.Windows.Automation.ControlType]::Edit,
+      [System.Windows.Automation.ControlType]::ComboBox
+    )
+  } | Select-Object -First 12 | ForEach-Object {
+    "type='$($_.Current.ControlType.ProgrammaticName)' id='$($_.Current.AutomationId)' hwnd=$($_.Current.NativeWindowHandle)"
+  })
+  Write-Output "Native picker handles: dialog=$($dialog.Current.NativeWindowHandle) id1148=$nativeFileNameHandle edit=$nativeFileNameEditHandle fields=[$($fieldControls -join '; ')] childClasses=[$([ForgeWindowNative]::DescribeChildClasses($dialog.Current.NativeWindowHandle))]"
+  $nativeFileNameAutomation = if ($nativeFileNameEditHandle -ne [IntPtr]::Zero) {
+    [System.Windows.Automation.AutomationElement]::FromHandle($nativeFileNameEditHandle)
+  } else { $null }
+  $nativeValuePattern = $null
+  if ($null -ne $nativeFileNameAutomation -and $nativeFileNameAutomation.TryGetCurrentPattern(
+      [System.Windows.Automation.ValuePattern]::Pattern,
+      [ref]$nativeValuePattern
+    )) {
+    $nativeValuePattern.SetValue($filePath)
+    if ($nativeValuePattern.Current.Value -cne $filePath) {
+      throw 'The native filename ValuePattern did not retain the synthetic screenshot path.'
+    }
+  } elseif ($null -ne $fileNameInput -and $fileNameInput.TryGetCurrentPattern(
       [System.Windows.Automation.ValuePattern]::Pattern,
       [ref]$valuePattern
     )) {
     $valuePattern.SetValue($filePath)
-    try { $fileNameControl.SetFocus() } catch { }
-    [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+    if ($valuePattern.Current.Value -cne $filePath) {
+      throw 'The UI Automation filename field did not retain the synthetic screenshot path.'
+    }
   } else {
-    # Some common-dialog providers expose no usable UIA value pattern or HWND.
-    # Paste through the native filename field so keyboard layout cannot alter
-    # the path; preserve and restore the operator's clipboard around the paste.
+    if ($nativeFileNameHandle -eq [IntPtr]::Zero) {
+      throw 'Windows did not expose an editable filename field for the screenshot picker.'
+    }
     $previousClipboard = [System.Windows.Forms.Clipboard]::GetDataObject()
     try {
-      [System.Windows.Forms.SendKeys]::SendWait('%n')
-      [System.Windows.Forms.SendKeys]::SendWait('^a')
       [System.Windows.Forms.Clipboard]::SetText($filePath)
+      [ForgeWindowNative]::ClickControlCenter($nativeFileNameEditHandle)
+      Start-Sleep -Milliseconds 100
+      [System.Windows.Forms.SendKeys]::SendWait('^a')
       [System.Windows.Forms.SendKeys]::SendWait('^v')
       Start-Sleep -Milliseconds 250
-      [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+      if ([ForgeWindowNative]::ReadWindowText($nativeFileNameEditHandle) -cne $filePath) {
+        throw 'The screenshot path was not entered into the focused native filename field.'
+      }
     } finally {
       if ($null -ne $previousClipboard) {
         [System.Windows.Forms.Clipboard]::SetDataObject($previousClipboard, $true)
@@ -347,6 +467,27 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
         [System.Windows.Forms.Clipboard]::Clear()
       }
     }
+  }
+  $openControl = $dialogControls | Where-Object {
+    $_.Current.ControlType -eq [System.Windows.Automation.ControlType]::Button -and
+    $_.Current.Name -match '(?i)^(open|abrir)$'
+  } | Select-Object -First 1
+  $nativeOpenButton = [ForgeWindowNative]::GetDlgItem($dialog.Current.NativeWindowHandle, 1)
+  if ($null -ne $openControl) {
+    Invoke-ForgeAutomationElement $openControl 'Open screenshot picker'
+  } elseif ($nativeOpenButton -ne [IntPtr]::Zero) {
+    [ForgeWindowNative]::ClickDialogButton($nativeOpenButton)
+  } else {
+    throw 'The verified native screenshot picker did not expose its Open action.'
+  }
+  if ([ForgeWindowNative]::IsWindowVisible($dialog.Current.NativeWindowHandle)) {
+    if ($nativeOpenButton -eq [IntPtr]::Zero) {
+      $nativeOpenButton = [IntPtr]$openControl.Current.NativeWindowHandle
+    }
+    if ($nativeOpenButton -eq [IntPtr]::Zero) {
+      throw 'The named Open action did not expose a native handle.'
+    }
+    [ForgeWindowNative]::ClickDialogButton($nativeOpenButton)
   }
   try {
     Wait-ForgeAutomationDialogClosed $desktop $root $dialog
@@ -360,12 +501,12 @@ function Choose-ForgeFile($root, [string]$buttonName, [string]$filePath) {
       $fieldValue = [System.IO.Path]::GetFileName([string]$fieldValuePattern.Current.Value)
     }
     $pickerControls = @($dialogControls | Select-Object -First 80 | ForEach-Object {
-      "type='$($_.Current.ControlType.ProgrammaticName)' name='$($_.Current.Name)' id='$($_.Current.AutomationId)'"
+      "type='$($_.Current.ControlType.ProgrammaticName)' id='$($_.Current.AutomationId)'"
     })
     $fieldDescription = if ($null -eq $fileNameControl) {
       'not found'
     } else {
-      "type='$($fileNameControl.Current.ControlType.ProgrammaticName)' name='$($fileNameControl.Current.Name)' id='$($fileNameControl.Current.AutomationId)' value-basename='$fieldValue'"
+      "type='$($fileNameControl.Current.ControlType.ProgrammaticName)' id='$($fileNameControl.Current.AutomationId)' value-basename='$fieldValue'"
     }
     throw "Native file picker did not close. File field: $fieldDescription. Picker UIA controls: $($pickerControls -join '; '). Original failure: $($_.Exception.Message)"
   }
@@ -418,7 +559,9 @@ try {
   $workspaceName = "Installed UI smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
   $workspaceInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($workspaceName)
   $createButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
+  $databasePath = Join-Path $isolatedLocalAppData 'ForgeOrgTool/data/forge.db'
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create your first project'
+  Assert-ForgeSqliteRecord $databasePath 'workspaces' $workspaceName
 
   $projectName = "Installed project smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New project'
@@ -426,7 +569,8 @@ try {
   $projectInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($projectName)
   $projectButton = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Project'
   $projectButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  Assert-ForgeSqliteRecord $databasePath 'projects' $projectName
 
   # Exercise a real Bug attachment through the installed React UI and local sidecar.
   $epicName = "Installed Epic smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
@@ -443,15 +587,15 @@ try {
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Epic'
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
 
-  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New work item'
-  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Feature title' $workItemName
-  Select-ForgeOption $root 'Epic for new feature' $epicName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New Work Item'
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Work Item title' $workItemName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Bug'
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::ComboBox) 'Bug severity'
   Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Steps to reproduce' 'Open the synthetic report.'
   Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Expected result' 'The report loads.'
   Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Actual result' 'A synthetic failure is shown.'
-  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Feature'
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Work Item'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
   Choose-ForgeFile $root 'Add Bug screenshot' $bugAttachmentPath
   try {
@@ -469,7 +613,6 @@ try {
     throw "Bug screenshot did not render after upload. UIA elements: $($summary -join '; '). Original failure: $($_.Exception.Message)"
   }
 
-  $databasePath = Join-Path $isolatedLocalAppData 'ForgeOrgTool/data/forge.db'
   if (-not (Test-Path -LiteralPath $databasePath -PathType Leaf)) {
     throw "The sidecar did not create the configured per-user SQLite database: $databasePath"
   }
@@ -488,8 +631,9 @@ try {
   $restartedSidecarPids = @(Get-Process -Name 'forge-sidecar' -ErrorAction SilentlyContinue | ForEach-Object Id)
   $ownedSidecarPids += @($restartedSidecarPids | Where-Object { $preexistingSidecarPids -notcontains $_ -and $ownedSidecarPids -notcontains $_ })
   $root = Get-ForgeAutomationRoot $window.Handle
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $workspaceName
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) $projectName
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  Assert-ForgeSqliteRecord $databasePath 'workspaces' $workspaceName
+  Assert-ForgeSqliteRecord $databasePath 'projects' $projectName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Board'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName

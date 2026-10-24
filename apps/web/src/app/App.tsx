@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { organizationApi, type Project, type Workspace } from '@forge-org/api-client';
 import { Button } from '@forge-org/ui';
@@ -39,6 +39,7 @@ function ApplicationShell() {
     () => localStorage.getItem('forge-active-workspace') ?? '',
   );
   const [navigationError, setNavigationError] = useState('');
+  const workspaceRevision = useRef(0);
   const routeWorkspaceId = getProjectContext(location.pathname)?.workspaceId;
   const navigationWorkspaceId = routeWorkspaceId ?? activeWorkspaceId;
   const activeWorkspace = workspaces.find((workspace) => workspace.id === navigationWorkspaceId);
@@ -46,10 +47,23 @@ function ApplicationShell() {
   const [projectRefresh, setProjectRefresh] = useState(0);
   useEffect(() => {
     let current = true;
+    const initialRevision = workspaceRevision.current;
     void organizationApi
       .listWorkspaces()
       .then((items) => {
         if (!current) return;
+        if (workspaceRevision.current !== initialRevision) {
+          setWorkspaces((existing) => {
+            const merged = [...items];
+            for (const workspace of existing) {
+              const index = merged.findIndex((item) => item.id === workspace.id);
+              if (index < 0) merged.push(workspace);
+              else merged[index] = workspace;
+            }
+            return merged;
+          });
+          return;
+        }
         setWorkspaces(items);
         const saved = localStorage.getItem('forge-active-workspace') ?? '';
         const selected = items.some((item) => item.id === saved) ? saved : (items[0]?.id ?? '');
@@ -71,20 +85,25 @@ function ApplicationShell() {
     function onActiveWorkspaceChange(event: Event) {
       const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
       if (!id) return;
+      workspaceRevision.current += 1;
       setActiveWorkspaceId(id);
       localStorage.setItem('forge-active-workspace', id);
     }
     function onWorkspaceCreated(event: Event) {
       const workspace = (event as CustomEvent<{ workspace?: Workspace }>).detail?.workspace;
-      if (workspace)
+      if (workspace) {
+        workspaceRevision.current += 1;
         setWorkspaces((items) => [...items.filter((item) => item.id !== workspace.id), workspace]);
+      }
     }
     function onWorkspaceUpdated(event: Event) {
       const workspace = (event as CustomEvent<{ workspace?: Workspace }>).detail?.workspace;
-      if (workspace)
+      if (workspace) {
+        workspaceRevision.current += 1;
         setWorkspaces((items) =>
           items.map((item) => (item.id === workspace.id ? workspace : item)),
         );
+      }
     }
     function onProjectsChanged() {
       setProjectRefresh((value) => value + 1);
@@ -254,11 +273,13 @@ function ApplicationShell() {
           {navigationWorkspaceId && (
             <nav aria-label="Project navigation" className={styles.projectNav}>
               <h2>Your projects</h2>
-              <NavigationItem
-                to={context ? `/projects/${context.workspaceId}/${context.projectId}` : '/'}
-                label="◦   Overview"
-                aria-label="Overview"
-              />
+              {context && (
+                <NavigationItem
+                  to={`/projects/${context.workspaceId}/${context.projectId}`}
+                  label="◦   Overview"
+                  aria-label="Overview"
+                />
+              )}
               <NavigationItem to="/" end label="◦   Projects" aria-label="Projects" />
               {projectWorkspaceId !== navigationWorkspaceId ? (
                 <span className={styles.emptyProjects}>Loading projects…</span>
@@ -368,11 +389,24 @@ function ApplicationShell() {
                 path="/planning/:workspaceId/:projectId/features/:featureId"
                 element={<FeatureDetailPage />}
               />
-              <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
+              <Route
+                path="/transfer/:workspaceId/:projectId"
+                element={
+                  <TransferPage
+                    projectName={activeProject?.name}
+                    workspaceName={activeWorkspace?.name}
+                  />
+                }
+              />
               <Route path="/transfer/workspaces/:workspaceId" element={<TransferPage />} />
               <Route
                 path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
-                element={<TransferPage />}
+                element={
+                  <TransferPage
+                    projectName={activeProject?.name}
+                    workspaceName={activeWorkspace?.name}
+                  />
+                }
               />
               {ComponentGallery && (
                 <Route

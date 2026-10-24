@@ -2,39 +2,32 @@
   display: grid;
   gap: var(--forge-space-4);
 }
-.contextOverlay {
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  display: flex;
-  justify-content: flex-end;
-  background: color-mix(in srgb, var(--forge-overlay, #101820) 56%, transparent);
+.stack > header h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
 }
-.contextDialog {
-  width: min(72rem, 100%);
-  height: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-  padding: clamp(var(--forge-space-4), 4vw, var(--forge-space-8));
-  border-left: 1px solid var(--forge-border);
-  background: var(--forge-surface);
-  box-shadow: var(--forge-shadow-popover);
-}
-.contextDialog:focus {
-  outline: none;
-}
-.dialogActions {
-  display: flex;
-  justify-content: flex-end;
+.stack > header p {
+  color: var(--forge-accent);
 }
 .destination {
-  margin: 0;
+  display: grid;
+  gap: var(--forge-space-2);
+  padding: 0;
+}
+.destination span {
+  color: var(--forge-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.destination strong {
+  display: block;
   padding: var(--forge-space-3);
   border: 1px solid var(--forge-border);
   border-radius: var(--forge-radius-md);
   background: var(--forge-surface-raised);
   color: var(--forge-text);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 .stack p {
   color: var(--forge-text-muted);
@@ -44,6 +37,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--forge-space-2);
+  scroll-margin-block: var(--forge-space-4) 96px;
 }
 .steps {
   display: grid;
@@ -77,7 +71,7 @@
   gap: var(--forge-space-4);
   align-items: start;
 }
-.contextDialog .workflowGrid {
+.contextWorkflowGrid {
   grid-template-columns: minmax(0, 1.34fr) minmax(0, 1fr);
   gap: var(--forge-space-4);
 }
@@ -147,16 +141,24 @@
 .panel p {
   margin: 0;
 }
-.fileInput {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: var(--forge-space-2);
-  border: 1px solid var(--forge-border);
-  border-radius: var(--forge-radius-sm);
-  background: var(--forge-surface);
+.returnLink {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--forge-space-2);
+  padding: var(--forge-space-3);
+  border-radius: var(--forge-radius-md);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-muted);
+  text-decoration: none;
+}
+.returnLink:hover {
+  background: var(--forge-surface-interactive);
   color: var(--forge-text);
+}
+.returnLink:focus-visible {
+  outline: 2px solid var(--forge-focus-ring);
+  outline-offset: 2px;
 }
 .fileName,
 .fingerprint {
@@ -200,15 +202,17 @@
   .workflowGrid {
     grid-template-columns: 1fr;
   }
-  .contextDialog {
-    width: 100%;
-    padding: var(--forge-space-4);
-    border-left: 0;
-  }
-  .contextDialog .workflowGrid {
+  .contextWorkflowGrid {
     grid-template-columns: minmax(0, 1fr);
   }
   .previewPanel {
     min-height: 0;
+  }
+  .actions {
+    position: sticky;
+    z-index: 7;
+    bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    padding-block: var(--forge-space-2);
+    background: var(--forge-surface);
   }
 }

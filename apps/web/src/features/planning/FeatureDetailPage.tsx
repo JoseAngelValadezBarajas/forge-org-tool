@@ -218,46 +218,44 @@ export function FeatureDetailPage() {
               ) : (
                 !archived && (
                   <div className={styles.inlineActions}>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => void updateCriterion(item.id, { satisfied: !item.satisfied })}
-                    >
-                      Mark {item.satisfied ? 'pending' : 'satisfied'}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => {
-                        setCriterionDraft(item.description);
-                        setEditingCriterionId(item.id);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      disabled={index === 0}
-                      onClick={() => void moveCriterion(index, -1)}
-                    >
-                      Move up
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      disabled={index === criteria.length - 1}
-                      onClick={() => void moveCriterion(index, 1)}
-                    >
-                      Move down
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => void removeCriterion(item.id)}
-                    >
-                      Delete
-                    </Button>
+                    <details className={styles.criterionMoreActions}>
+                      <summary>More criterion actions</summary>
+                      <div className={styles.criterionMoreActionsMenu}>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => {
+                            setCriterionDraft(item.description);
+                            setEditingCriterionId(item.id);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          disabled={index === 0}
+                          onClick={() => void moveCriterion(index, -1)}
+                        >
+                          Move up
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          disabled={index === criteria.length - 1}
+                          onClick={() => void moveCriterion(index, 1)}
+                        >
+                          Move down
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={() => void removeCriterion(item.id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </details>
                   </div>
                 )
               )}

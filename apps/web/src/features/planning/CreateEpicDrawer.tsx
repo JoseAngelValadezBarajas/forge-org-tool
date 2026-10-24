@@ -38,7 +38,7 @@ export function CreateEpicDrawer({
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    titleInputRef.current?.focus();
+    titleInputRef.current?.focus({ preventScroll: true });
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && drawerRef.current?.contains(document.activeElement)) {
         onCancel();
