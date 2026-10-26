@@ -44,6 +44,7 @@ export function EpicCard({
   if (compact) {
     return (
       <Card
+        as="article"
         className={`${styles.card} ${styles.compact}`}
         data-state={state}
         data-testid={`epic-card-${epic.id}`}
@@ -52,7 +53,19 @@ export function EpicCard({
       >
         <p className={styles.compactType}>{`EPIC · ${epic.priority ?? 'medium'}`}</p>
         <h4 className={styles.compactTitle}>
-          {href ? <Link to={href}>{epic.title}</Link> : epic.title}
+          {href ? (
+            <Link
+              draggable={draggable}
+              onDragStart={(event) =>
+                onDragStart?.(event as unknown as Parameters<DragEventHandler<HTMLDivElement>>[0])
+              }
+              to={href}
+            >
+              {epic.title}
+            </Link>
+          ) : (
+            epic.title
+          )}
         </h4>
         <p className={styles.compactMeta}>
           {total} items{epic.tags?.[0] ? `  ·  ${epic.tags[0].toLowerCase()}` : ''}

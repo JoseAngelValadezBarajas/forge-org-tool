@@ -173,7 +173,8 @@
   box-sizing: border-box;
   width: 100%;
   height: 615px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 0;
 }
 .board:focus-visible {
@@ -194,7 +195,7 @@
   width: 695px;
   height: 658px;
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   grid-template-columns: repeat(5, 222px);
 }
 .addEpic {

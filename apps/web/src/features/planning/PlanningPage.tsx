@@ -393,7 +393,9 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       emptyMessage="No Epics in this status."
                       onDrop={(event, destination) => {
                         event.preventDefault();
-                        const id = event.dataTransfer.getData('text/forge-epic-id');
+                        const id =
+                          event.dataTransfer.getData('text/forge-epic-id') ||
+                          event.dataTransfer.getData('text/plain');
                         const epic = workflowEpics.find((item) => item.id === id);
                         if (epic && epic.status !== destination) {
                           void updateEpic(epic, destination);
@@ -409,6 +411,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                           draggable
                           onDragStart={(event) => {
                             event.dataTransfer.setData('text/forge-epic-id', epic.id);
+                            event.dataTransfer.setData('text/plain', epic.id);
                             event.dataTransfer.effectAllowed = 'move';
                           }}
                         />

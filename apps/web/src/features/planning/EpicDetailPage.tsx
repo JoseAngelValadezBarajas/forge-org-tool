@@ -248,6 +248,7 @@ export function EpicDetailPage() {
       draggable={!readOnly}
       onDragStart={(event) => {
         event.dataTransfer.setData('text/forge-feature-id', feature.id);
+        event.dataTransfer.setData('text/plain', feature.id);
         event.dataTransfer.effectAllowed = 'move';
       }}
     >
@@ -256,6 +257,12 @@ export function EpicDetailPage() {
       </p>
       <Link
         className={styles.itemTitle}
+        draggable={!readOnly}
+        onDragStart={(event) => {
+          event.dataTransfer.setData('text/forge-feature-id', feature.id);
+          event.dataTransfer.setData('text/plain', feature.id);
+          event.dataTransfer.effectAllowed = 'move';
+        }}
         to={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
       >
         {feature.title}
@@ -565,7 +572,9 @@ export function EpicDetailPage() {
                         onDrop={(event, destination) => {
                           event.preventDefault();
                           if (readOnly) return;
-                          const id = event.dataTransfer.getData('text/forge-feature-id');
+                          const id =
+                            event.dataTransfer.getData('text/forge-feature-id') ||
+                            event.dataTransfer.getData('text/plain');
                           const item = features.find((feature) => feature.id === id);
                           if (item && item.status !== destination)
                             void moveFeature(item, { status: destination });

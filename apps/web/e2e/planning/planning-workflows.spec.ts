@@ -323,7 +323,7 @@ test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ pa
   const { workspace, project } = await createProject(page, suffix);
   await createWorkspaceTags(page, workspace.id, ['Research']);
   await page.goto(`/planning/${workspace.id}/${project.id}`);
-  await expect(page.getByTestId('project-epic-board')).toHaveCSS('overflow-y', 'auto');
+  await expect(page.getByTestId('project-epic-board')).toHaveCSS('overflow-y', 'hidden');
   await expect(page.getByTestId('kanban-column-backlog').locator('[data-state]')).toHaveCSS(
     'overflow-y',
     'auto',
@@ -339,11 +339,24 @@ test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ pa
     has: page.getByRole('link', { name: epicTitle, exact: true }),
   });
   await expect(epicCard).toBeVisible();
+  await expect(epicCard).toHaveAttribute('draggable', 'true');
+  const movedEpic = page.waitForResponse(
+    (response) => response.url().includes('/epics/') && response.request().method() === 'PATCH',
+  );
+  await epicCard.dragTo(page.getByTestId('kanban-column-ready').locator(':scope > div'), {
+    sourcePosition: { x: 8, y: 8 },
+  });
+  expect((await movedEpic).status()).toBe(200);
+  await expect(
+    page.getByTestId('kanban-column-ready').getByRole('link', { name: epicTitle, exact: true }),
+  ).toBeVisible();
   await page.getByRole('combobox', { name: 'Filter Epics by tag' }).selectOption('Research');
-  await expect(epicCard).toBeVisible();
+  await expect(
+    page.getByTestId('kanban-column-ready').getByRole('link', { name: epicTitle, exact: true }),
+  ).toBeVisible();
 
   await page.getByRole('combobox', { name: 'Filter Epics by tag' }).selectOption('');
-  await epicCard.getByRole('link', { name: epicTitle, exact: true }).click();
+  await page.getByRole('link', { name: epicTitle, exact: true }).click();
   await expect(page.getByRole('heading', { name: epicTitle, exact: true })).toBeVisible();
 });
 

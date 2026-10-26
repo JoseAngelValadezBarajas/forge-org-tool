@@ -33,16 +33,16 @@ export function KanbanColumn({
       aria-labelledby={`planning-column-${status}`}
       data-testid={`kanban-column-${status}`}
       className={[styles.column, compact && styles.compact].filter(Boolean).join(' ')}
-      onDragOver={(event) => {
-        if (onDrop) event.preventDefault();
-      }}
-      onDragEnter={(event) => {
-        if (onDrop) event.preventDefault();
-      }}
-      onDrop={(event) => onDrop?.(event, status)}
     >
       <Card
         className={[styles.surface, compact && styles.compactSurface].filter(Boolean).join(' ')}
+        onDragOver={(event) => {
+          if (onDrop) event.preventDefault();
+        }}
+        onDragEnter={(event) => {
+          if (onDrop) event.preventDefault();
+        }}
+        onDrop={(event) => onDrop?.(event, status)}
       >
         <h3
           id={`planning-column-${status}`}

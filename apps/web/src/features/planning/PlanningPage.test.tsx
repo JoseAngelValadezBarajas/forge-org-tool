@@ -123,10 +123,10 @@ describe('PlanningPage', () => {
       getData: vi.fn().mockReturnValue('e1'),
     };
     fireEvent.dragStart(card, { dataTransfer });
-    fireEvent.drop(
-      within(screen.getByLabelText('Epic workflow board')).getByTestId('kanban-column-ready'),
-      { dataTransfer },
+    const readyColumn = within(screen.getByLabelText('Epic workflow board')).getByTestId(
+      'kanban-column-ready',
     );
+    fireEvent.drop(readyColumn.firstElementChild as HTMLElement, { dataTransfer });
 
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(
