@@ -50,7 +50,8 @@ create table if not exists public.epics (
     tags text[] not null default '{}',
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
-    archived_at timestamptz
+    archived_at timestamptz,
+    unique (project_id, id)
 );
 
 create table if not exists public.features (
@@ -72,7 +73,9 @@ create table if not exists public.features (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     archived_at timestamptz,
-    check (kind = 'bug' or bug_severity is null)
+    check (kind = 'bug' or bug_severity is null),
+    constraint features_epic_same_project_fk
+        foreign key (project_id, epic_id) references public.epics (project_id, id)
 );
 
 create table if not exists public.workspace_tags (

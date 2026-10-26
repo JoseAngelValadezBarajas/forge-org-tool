@@ -1,4 +1,7 @@
+import sqlite3
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).parents[3]
 MIGRATION = ROOT / 'supabase' / 'migrations' / '20261026_byoc_0001.sql'
@@ -48,6 +51,37 @@ def test_rls_contract_has_no_client_bypass_for_membership_or_cross_workspace_wri
     assert sql.count('with check (') >= 4
     assert 'join public.projects p on p.workspace_id = wm.workspace_id' in sql
     assert 'wm.user_id = auth.uid()' in sql
+
+
+def test_features_reject_epics_from_a_different_project() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8').lower()
+
+    assert 'unique (project_id, id)' in sql
+    assert 'constraint features_epic_same_project_fk' in sql
+    assert 'foreign key (project_id, epic_id)' in sql
+    assert 'references public.epics (project_id, id)' in sql
+
+    connection = sqlite3.connect(':memory:')
+    connection.execute('PRAGMA foreign_keys = ON')
+    connection.executescript(
+        """
+        create table epics (
+            project_id text not null,
+            id text not null,
+            unique (project_id, id)
+        );
+        create table features (
+            project_id text not null,
+            epic_id text,
+            foreign key (project_id, epic_id) references epics (project_id, id)
+        );
+        insert into epics values ('project-a', 'epic-a');
+        insert into features values ('project-a', 'epic-a');
+        """
+    )
+
+    with pytest.raises(sqlite3.IntegrityError):
+        connection.execute("insert into features values ('project-b', 'epic-a')")
 
 
 def test_rollback_only_removes_byoc_owned_objects_in_dependency_order() -> None:

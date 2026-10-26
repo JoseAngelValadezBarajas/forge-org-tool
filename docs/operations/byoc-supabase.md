@@ -10,7 +10,7 @@ Use a separate Supabase project for evaluation. Do not point the commands below 
 2. Save [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql) locally.
 3. Run that SQL once in the project's SQL editor or through the owner's controlled Supabase CLI workflow.
 4. Confirm that the migration completed and that the project exposes the `forge_storage_preflight` and `forge_create_workspace` functions.
-5. Create the users who are allowed to use the project through Supabase Auth. Memberships are not client-insertable; the first authenticated user becomes the owner of a workspace created through FORGE. Additional membership administration is intentionally outside BYOC 0.1.
+5. Create the Supabase Auth identity used for the two-installation check. Memberships are not client-insertable; the first authenticated user becomes the owner of a workspace created through FORGE. Additional membership administration is intentionally outside BYOC 0.1.
 
 The migration is idempotent for the objects it owns, but it is not a general-purpose upgrade mechanism for an arbitrary existing schema. Do not combine it with unrelated SQL in the same change without reviewing the result.
 
@@ -38,13 +38,30 @@ After sign-in, use **Refresh connection**. FORGE displays `ready` only after Aut
 
 This is the one validation that requires the owner's disposable project and is not represented as a live CI result:
 
-1. Configure installation A and installation B with the same project URL and separate authorized Supabase users.
+1. Configure installation A and installation B with the same project URL and the same authorized Supabase identity. Sign in with that identity in both installations; this is the intended shared-data check, not two separate users.
 2. In A, create a Workspace, Project, Epic and Story/Feature.
 3. Change the Story/Feature status in A.
-4. Refresh B and confirm that the authorized user can see the same records and status.
+4. Refresh B and confirm that the same identity can see the same records and status.
 5. Restart B, sign in again if required, refresh, and confirm persistence.
-6. Attempt the same read/update from a user without membership. It must return no data or a permission denial.
+6. Sign in to a separate Supabase Auth identity C that has no `workspace_members` row. Its read must return no workspace data or a permission denial, and its update must not change A/B data.
 7. Delete the disposable project when the check is complete.
+
+## Controlled owner membership setup
+
+Testing a second authorized identity is a separate owner action. The client must not grant membership to itself or expose a membership-management capability in BYOC 0.1.
+
+After confirming the target workspace UUID and the second user's Supabase Auth UUID in the owner's dashboard, the owner may run this reviewed SQL in the disposable project's SQL editor:
+
+```sql
+begin;
+insert into public.workspace_members (workspace_id, user_id, role)
+values ('<workspace-uuid>', '<user-uuid>', 'viewer')
+on conflict (workspace_id, user_id)
+do update set role = excluded.role;
+commit;
+```
+
+The owner must verify both UUIDs before executing it, retain the result as validation evidence, and remove the membership afterward if it is no longer needed. This action is not part of application startup, is never performed by FORGE, and must not be run against production or operator data.
 
 Do not use real user data as a smoke fixture and do not claim this test passed without retaining the owner-controlled evidence.
 
