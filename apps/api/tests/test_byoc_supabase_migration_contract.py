@@ -110,8 +110,9 @@ def test_byoc_02_direct_dependency_writes_use_a_project_lock_and_cycle_trigger()
 def test_byoc_02_active_project_guard_is_safe_for_epic_rows() -> None:
     sql = MIGRATION.read_text(encoding='utf-8')
     project_guard = sql[
-        sql.index('create or replace function public.forge_assert_active_project()') :
-        sql.index('create or replace function public.forge_assert_active_feature_row()')
+        sql.index('create or replace function public.forge_assert_active_project()') : sql.index(
+            'create or replace function public.forge_assert_active_feature_row()'
+        )
     ]
 
     assert 'old.feature_id' not in project_guard
