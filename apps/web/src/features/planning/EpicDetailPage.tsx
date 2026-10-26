@@ -257,7 +257,7 @@ export function EpicDetailPage() {
       aria-label={feature.title}
       className={styles.itemCard}
       data-dragging={featurePointerDrag.draggingId === feature.id ? 'true' : undefined}
-      draggable={!readOnly}
+      draggable={false}
       onPointerDown={!readOnly ? (event) => featurePointerDrag.start(feature.id, event) : undefined}
       onDragStart={(event) => {
         event.dataTransfer.setData('text/forge-feature-id', feature.id);
@@ -270,7 +270,7 @@ export function EpicDetailPage() {
       </p>
       <Link
         className={styles.itemTitle}
-        draggable={!readOnly}
+        draggable={false}
         onDragStart={(event) => {
           event.dataTransfer.setData('text/forge-feature-id', feature.id);
           event.dataTransfer.setData('text/plain', feature.id);

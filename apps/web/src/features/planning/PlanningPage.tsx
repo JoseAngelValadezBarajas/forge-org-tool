@@ -416,6 +416,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                           compact
                           href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
                           draggable
+                          pointerDrag
                           dragging={epicPointerDrag.draggingId === epic.id}
                           onPointerDown={(event) => epicPointerDrag.start(epic.id, event)}
                           onDragStart={(event) => {

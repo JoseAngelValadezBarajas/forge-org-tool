@@ -10,6 +10,7 @@ type EpicCardProps = {
   href?: string;
   compact?: boolean;
   draggable?: boolean;
+  pointerDrag?: boolean;
   onDragStart?: DragEventHandler<HTMLDivElement>;
   onPointerDown?: PointerEventHandler<HTMLElement>;
   dragging?: boolean;
@@ -29,6 +30,7 @@ export function EpicCard({
   href,
   compact = false,
   draggable = false,
+  pointerDrag = false,
   onDragStart,
   onPointerDown,
   dragging = false,
@@ -53,7 +55,7 @@ export function EpicCard({
         data-state={state}
         data-testid={`epic-card-${epic.id}`}
         data-dragging={dragging ? 'true' : undefined}
-        draggable={draggable}
+        draggable={draggable && !pointerDrag}
         onDragStart={onDragStart}
         onPointerDown={onPointerDown}
       >
@@ -61,7 +63,7 @@ export function EpicCard({
         <h4 className={styles.compactTitle}>
           {href ? (
             <Link
-              draggable={draggable}
+              draggable={draggable && !pointerDrag}
               onDragStart={(event) =>
                 onDragStart?.(event as unknown as Parameters<DragEventHandler<HTMLDivElement>>[0])
               }

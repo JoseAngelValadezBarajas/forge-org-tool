@@ -162,7 +162,20 @@ test('UX-03 exact Epic board geometry, type filtering and durable status move', 
     await expect(page.getByRole('link', { name: 'Bounding box drift', exact: true })).toBeVisible();
     await page.getByRole('combobox', { name: 'Filter Work Items by type' }).selectOption('all');
     const card = page.getByRole('article', { name: story.title, exact: true });
-    await card.dragTo(page.getByTestId('kanban-column-ready'));
+    const target = page.getByTestId('kanban-column-ready').locator(':scope > div');
+    const sourceBox = await card.boundingBox();
+    const targetBox = await target.boundingBox();
+    if (!sourceBox || !targetBox) throw new Error('Work item drag geometry is unavailable');
+    await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(
+      sourceBox.x + sourceBox.width / 2 + 8,
+      sourceBox.y + sourceBox.height / 2 + 8,
+    );
+    await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, {
+      steps: 12,
+    });
+    await page.mouse.up();
   } else {
     await page.getByRole('tab', { name: /in progress/i }).click();
     await page

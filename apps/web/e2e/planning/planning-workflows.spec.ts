@@ -356,7 +356,7 @@ test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ pa
     has: page.getByRole('link', { name: epicTitle, exact: true }),
   });
   await expect(epicCard).toBeVisible();
-  await expect(epicCard).toHaveAttribute('draggable', 'true');
+  await expect(epicCard).not.toHaveAttribute('draggable', 'true');
   const movedEpic = page.waitForResponse(
     (response) => response.url().includes('/epics/') && response.request().method() === 'PATCH',
   );
