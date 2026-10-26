@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test:contract": "npm run build && node --test test/package-contract.test.mjs"
+    "test:contract": "npm run build && node --test test/package-contract.test.mjs test/storage.test.mjs test/supabase.test.mjs"
   },
   "types": "./dist/index.d.ts",
   "exports": {

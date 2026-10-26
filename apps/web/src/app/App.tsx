@@ -19,6 +19,7 @@ import {
 import {
   OrganizationPage,
   ProjectOverviewPage,
+  StorageSettingsPage,
   WorkspaceSettingsPage,
 } from '../features/organization';
 import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
@@ -533,6 +534,7 @@ function ApplicationShell() {
             />
             <Routes>
               <Route path="/" element={<OrganizationPage />} />
+              <Route path="/settings/storage" element={<StorageSettingsPage />} />
               <Route path="/workspaces/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
               <Route path="/projects/:workspaceId/:projectId" element={<ProjectOverviewPage />} />
               <Route
@@ -613,6 +615,11 @@ function ApplicationShell() {
         onClose={() => setPaletteOpen(false)}
         commands={[
           { id: 'organization', label: 'Organization', onSelect: () => go('/') },
+          {
+            id: 'storage-settings',
+            label: 'Storage settings',
+            onSelect: () => go('/settings/storage'),
+          },
           ...productDestinations
             .filter((destination): destination is typeof destination & { path: string } =>
               Boolean(destination.path),
