@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { usePointerKanbanDrag } from './usePointerKanbanDrag';
 
 function Harness({ onDrop }: { onDrop: (id: string, status: string) => void }) {
@@ -18,6 +18,8 @@ function Harness({ onDrop }: { onDrop: (id: string, status: string) => void }) {
 }
 
 describe('usePointerKanbanDrag', () => {
+  afterEach(() => cleanup());
+
   it('drops a card after the pointer crosses the drag threshold', () => {
     const onDrop = vi.fn();
     const target = document.createElement('div');
@@ -38,5 +40,17 @@ describe('usePointerKanbanDrag', () => {
 
     expect(onDrop).toHaveBeenCalledWith('epic-1', 'ready');
     vi.restoreAllMocks();
+  });
+
+  it('captures the pointer so a drag that starts on a link keeps its target', () => {
+    const onDrop = vi.fn();
+    render(<Harness onDrop={onDrop} />);
+    const source = screen.getByTestId('source');
+    const capture = vi.fn();
+    source.setPointerCapture = capture;
+
+    fireEvent.pointerDown(source, { button: 0, pointerId: 7, clientX: 10, clientY: 10 });
+
+    expect(capture).toHaveBeenCalledWith(7);
   });
 });

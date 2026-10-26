@@ -29,6 +29,7 @@ export function usePointerKanbanDrag<TStatus extends string>({
     ) {
       return;
     }
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     pending.current = { id, x: event.clientX, y: event.clientY };
     dragging.current = false;
   }, []);
