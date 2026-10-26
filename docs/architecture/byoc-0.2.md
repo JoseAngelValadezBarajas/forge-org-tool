@@ -74,6 +74,14 @@ The preflight response is `forge-byoc-v2`. An installation never reports
 Supabase `ready` before authentication, version preflight and permission
 checks succeed. A failed cloud operation never falls back to SQLite.
 
+Authentication is profile-bound. A Supabase session is kept in session storage
+by default and may be explicitly persisted with **Remember this session** for
+restart restoration. Sign-out, provider changes, project/key changes, and
+profile mismatches clear both storage layers. Passwords and privileged keys are
+never stored. Persistent WebView storage is not an OS keychain and must not be
+used as a trust boundary on shared devices; an OS-backed token store remains a
+separate Desktop hardening task.
+
 ## Real-project boundary
 
 CI uses synthetic HTTP and contract fixtures, and runs a disposable Postgres

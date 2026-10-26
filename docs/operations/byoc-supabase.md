@@ -29,7 +29,7 @@ Open Settings > Storage and select Supabase. Enter only:
 - the project URL, such as `https://your-project-ref.supabase.co`;
 - the project's `sb_publishable_*` key from the Supabase API settings.
 
-Never enter a secret key, service-role key, database password, connection string, or JWT in the settings form. FORGE stores the profile URL/key as configuration and keeps the authenticated session only for the current session. The password is sent to Supabase Auth and is not saved by FORGE.
+Never enter a secret key, service-role key, database password, connection string, or JWT in the settings form. FORGE stores the profile URL/key as configuration and keeps the authenticated session in session storage by default. The optional **Remember this session** setting persists the profile-bound session in the WebView so FORGE can restore it after restart; use it only on a private device and sign out on shared devices. The password is sent to Supabase Auth and is not saved by FORGE.
 
 After sign-in, use **Refresh connection**. FORGE displays `ready` only after Auth, the `forge-byoc-v2` preflight, and the Data API permission check succeed. A missing schema, denied permission, expired session, or outage remains an actionable error. FORGE does not fall back to local SQLite when Supabase is selected.
 

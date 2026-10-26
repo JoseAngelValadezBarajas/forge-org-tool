@@ -25,6 +25,7 @@ export function StorageSettings() {
   const [snapshot, setSnapshot] = useState<StorageSnapshot>(initial);
   const [projectUrl, setProjectUrl] = useState(initial.projectUrl ?? '');
   const [publishableKey, setPublishableKey] = useState('');
+  const [rememberSession, setRememberSession] = useState(initial.rememberSession ?? false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -44,8 +45,10 @@ export function StorageSettings() {
     setBusy(true);
     setError('');
     try {
-      configureStorage({ provider: 'supabase', projectUrl, publishableKey });
-      setSnapshot(await inspectStorage());
+      configureStorage({ provider: 'supabase', projectUrl, publishableKey, rememberSession });
+      const nextSnapshot = await inspectStorage();
+      setSnapshot(nextSnapshot);
+      setRememberSession(nextSnapshot.rememberSession ?? rememberSession);
       setPublishableKey('');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Supabase configuration is invalid.');
@@ -178,6 +181,20 @@ export function StorageSettings() {
               Only the public <code>sb_publishable_*</code> key is accepted. Never enter a secret,
               service-role key or PostgreSQL password.
             </p>
+            <label className={styles.providerOption}>
+              <input
+                aria-label="Remember this session"
+                type="checkbox"
+                checked={rememberSession}
+                onChange={(event) => setRememberSession(event.target.checked)}
+              />
+              <span>
+                <strong>Remember this session</strong>
+                <small>
+                  Keep the session after restarting FORGE. Use only on a private device.
+                </small>
+              </span>
+            </label>
             <Button type="submit" disabled={busy || !publishableKey}>
               Save Supabase settings
             </Button>

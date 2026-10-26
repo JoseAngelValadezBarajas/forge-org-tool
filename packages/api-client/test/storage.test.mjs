@@ -147,6 +147,65 @@ describe('BYOC storage contracts', () => {
     assert.equal(getStorageSnapshot().provider, 'local');
   });
 
+  it('restores a same-profile session from persistent storage when remember is enabled', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'remembered-access-token',
+            refresh_token: 'remembered-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: true });
+    await signInSupabase('a@example.test', 'temporary-password');
+    assert.ok(globalThis.localStorage.getItem('forge-supabase-session'));
+
+    resetStorageForTests({ preservePersisted: true });
+    globalThis.sessionStorage = memoryStorage();
+    initializeStoredStorage();
+
+    assert.equal(getStorageSnapshot().status, 'schema_missing');
+    assert.equal(getStorageSnapshot().userEmail, 'a@example.test');
+    assert.equal(getStorageSnapshot().rememberSession, true);
+  });
+
+  it('moves a remembered session to session storage when the preference is disabled', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'remembered-access-token',
+            refresh_token: 'remembered-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: true });
+    await signInSupabase('a@example.test', 'temporary-password');
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: false });
+
+    assert.equal(globalThis.localStorage.getItem('forge-supabase-session'), null);
+    assert.ok(globalThis.sessionStorage.getItem('forge-supabase-session'));
+    assert.equal(getStorageSnapshot().rememberSession, undefined);
+
+    resetStorageForTests({ preservePersisted: true });
+    globalThis.sessionStorage = memoryStorage();
+    initializeStoredStorage();
+    assert.equal(getStorageSnapshot().status, 'authentication_required');
+  });
+
   it('does not mark an unknown cloud schema version ready', async () => {
     globalThis.fetch = async (url) => {
       if (String(url).includes('/auth/v1/token')) {

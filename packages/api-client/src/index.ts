@@ -16,6 +16,7 @@ export {
 } from './storage.js';
 export type {
   StorageProvider,
+  StorageConfig,
   StorageSnapshot,
   StorageStatus,
   SupabaseProfile,

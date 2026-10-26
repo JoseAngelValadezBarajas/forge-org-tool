@@ -85,6 +85,7 @@ describe('StorageSettings', () => {
         provider: 'supabase',
         projectUrl: 'https://example123.supabase.co',
         publishableKey: 'sb_publishable_testkey123',
+        rememberSession: false,
       }),
     );
     expect(
@@ -118,5 +119,30 @@ describe('StorageSettings', () => {
       ),
     );
     expect(storageMock.inspectStorage).toHaveBeenCalled();
+  });
+
+  it('offers an accessible remember-session option and sends the selected value', async () => {
+    render(<StorageSettings />);
+    fireEvent.click(screen.getByRole('radio', { name: /Supabase/ }));
+    fireEvent.change(screen.getByLabelText('Supabase project URL'), {
+      target: { value: 'https://example123.supabase.co' },
+    });
+    fireEvent.change(screen.getByLabelText('Supabase publishable key'), {
+      target: { value: 'sb_publishable_testkey123' },
+    });
+
+    const remember = screen.getByRole('checkbox', { name: /Remember this session/i });
+    expect(remember).not.toBeChecked();
+    fireEvent.click(remember);
+    fireEvent.click(screen.getByRole('button', { name: 'Save Supabase settings' }));
+
+    await waitFor(() =>
+      expect(storageMock.configureStorage).toHaveBeenCalledWith({
+        provider: 'supabase',
+        projectUrl: 'https://example123.supabase.co',
+        publishableKey: 'sb_publishable_testkey123',
+        rememberSession: true,
+      }),
+    );
   });
 });

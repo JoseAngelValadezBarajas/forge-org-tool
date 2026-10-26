@@ -37,7 +37,7 @@ The API client exposes a stable `organizationApi` facade while its transport can
 
 1. Local startup initializes the existing same-origin transport and reports `ready`.
 2. Selecting Supabase validates and persists only the project URL and publishable key. No request is made until the user saves the configuration.
-3. Sign-in uses Supabase Auth password grant. The grant is sent as the `/auth/v1/token` query parameter and only credentials are sent in the JSON body. The password is not persisted; the access/refresh session is kept in profile-bound session storage for the current installation session and is restored after reload only for the same project/key profile. Expired sessions are refreshed once and failed refreshes require sign-in again.
+3. Sign-in uses Supabase Auth password grant. The grant is sent as the `/auth/v1/token` query parameter and only credentials are sent in the JSON body. The password is not persisted. By default the access/refresh session is kept in profile-bound session storage; **Remember this session** explicitly moves it to persistent WebView storage for restarts. Both modes restore only for the same project/key profile, and sign-out/provider changes clear both storage layers. Expired sessions are refreshed once and failed refreshes require sign-in again.
 4. `inspectStorage()` calls `forge_storage_preflight()` with the user's JWT. The 0.1 baseline reports `forge-byoc-v1`; the incremental 0.2 migration reports `forge-byoc-v2`.
 5. `401`, `403`, missing/unsupported schema, and network failures become distinct UI states. No state is reported as ready before authentication, schema, and permission preflight succeeds.
 
@@ -57,7 +57,7 @@ No live Supabase project or credential is included in this repository. Therefore
 
 ## Historical 0.1 follow-ups
 
-- Add a secure OS-backed token store where the target platform exposes one; session storage is the conservative 0.1 boundary.
+- Add a secure OS-backed token store where the target platform exposes one; persistent WebView storage is the current remember-session boundary and should be treated as unsafe on shared devices.
 - The former 0.1 follow-up is implemented by the incremental 0.2 migration and parity adapter.
 - Define explicit export/import or migration UX before offering any data movement between local and cloud stores.
 - Consider realtime/offline conflict handling only as a separate design; BYOC 0.1 is online and refresh-based.
