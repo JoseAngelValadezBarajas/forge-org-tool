@@ -7,7 +7,15 @@ import {
   type Workspace,
 } from '@forge-org/api-client';
 import { Button, SearchField } from '@corefoundry-labs/forge-ui';
-import { ChevronDown, ChevronRight, Search } from '@corefoundry-labs/forge-icons';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  Layers,
+  Search,
+} from '@corefoundry-labs/forge-icons';
 import {
   OrganizationPage,
   ProjectOverviewPage,
@@ -26,6 +34,7 @@ const ComponentGallery = import.meta.env.DEV
       })),
     )
   : null;
+const SIDEBAR_COLLAPSED_KEY = 'forge-sidebar-collapsed';
 export function App() {
   return (
     <ThemeProvider applyToDocument>
@@ -59,7 +68,13 @@ function ApplicationShell() {
   const [projectsExpanded, setProjectsExpanded] = useState(true);
   const [projectSearchOpen, setProjectSearchOpen] = useState(false);
   const [projectQuery, setProjectQuery] = useState('');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
+  );
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
+  useEffect(() => {
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
   useEffect(() => {
     let current = true;
     const initialRevision = workspaceRevision.current;
@@ -293,12 +308,39 @@ function ApplicationShell() {
           </select>
         </label>
       </header>
-      <div className={styles.shellGrid}>
-        <aside className={styles.sidebar} data-testid="app-sidebar" data-node-id="344:83">
-          <Link to="/" className={styles.brand} data-node-id="344:84">
-            <span className={styles.mark}>F</span>
-            <span className={styles.brandName}>FORGE</span>
-          </Link>
+      <div
+        className={styles.shellGrid}
+        data-testid="app-shell-grid"
+        data-sidebar-collapsed={String(sidebarCollapsed)}
+      >
+        <aside
+          id="app-sidebar"
+          className={styles.sidebar}
+          data-testid="app-sidebar"
+          data-node-id="344:83"
+        >
+          <div className={styles.sidebarHeader}>
+            <Link to="/" className={styles.brand} data-node-id="344:84">
+              <span className={styles.mark}>F</span>
+              <span className={styles.brandName}>FORGE</span>
+            </Link>
+            <button
+              type="button"
+              className={styles.sidebarToggle}
+              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-controls="app-sidebar"
+              aria-expanded={!sidebarCollapsed}
+              data-testid="sidebar-toggle"
+              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            >
+              {sidebarCollapsed ? (
+                <ArrowRight aria-hidden="true" size={16} />
+              ) : (
+                <ArrowLeft aria-hidden="true" size={16} />
+              )}
+            </button>
+          </div>
           <Link to="/" className={styles.mobileBrand} aria-label="F FORGE Workspace home">
             <span className={styles.mark}>F</span> FORGE
           </Link>
@@ -314,6 +356,7 @@ function ApplicationShell() {
               (navigationError ? 'Workspace unavailable' : 'Local Workspace')
             }
             dataNodeId="344:89"
+            compact={sidebarCollapsed}
           />
           {navigationError && (
             <p role="alert" className={styles.navigationError}>
@@ -327,6 +370,8 @@ function ApplicationShell() {
                 end
                 label="Workspace Overview"
                 aria-label="Workspace Overview"
+                icon={<Folder aria-hidden="true" size={16} />}
+                title="Workspace Overview"
               />
               <div className={styles.projectSectionControls}>
                 <h2>Project</h2>
@@ -374,11 +419,12 @@ function ApplicationShell() {
                         key={project.id}
                         to={`/projects/${navigationWorkspaceId}/${project.id}`}
                         aria-current={context?.projectId === project.id ? 'page' : undefined}
+                        title={project.name}
                       >
                         <span className={styles.projectIcon} aria-hidden="true">
-                          ◈
+                          <Layers aria-hidden="true" size={16} />
                         </span>
-                        {project.name}
+                        <span className={styles.projectLabel}>{project.name}</span>
                       </Link>
                     ))
                   )}

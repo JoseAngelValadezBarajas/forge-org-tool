@@ -9,6 +9,9 @@
   display: grid;
   grid-template-columns: 244px minmax(0, 1fr);
 }
+.shellGrid[data-sidebar-collapsed='true'] {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -20,6 +23,38 @@
   overflow: hidden;
   padding: 18px;
   background: var(--forge-surface-sidebar);
+}
+.sidebarHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 8px;
+  width: 208px;
+  min-height: 58px;
+}
+.sidebarHeader > .brand {
+  width: auto;
+  min-width: 0;
+}
+.sidebarToggle {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--forge-text-subtle);
+  cursor: pointer;
+}
+.sidebarToggle:hover {
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+}
+.sidebarToggle:focus-visible {
+  outline: 2px solid var(--forge-accent);
+  outline-offset: 1px;
 }
 .mark {
   display: inline-grid;
@@ -142,6 +177,11 @@
   flex: 0 0 10px;
   width: 10px;
   text-align: center;
+}
+.projectLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .projectNav a[aria-current='page'],
 .projectNav a:hover {
@@ -323,6 +363,60 @@
 }
 .main > .breadcrumb {
   display: none;
+}
+.shellGrid[data-sidebar-collapsed='true'] .sidebar {
+  width: 72px;
+  align-items: center;
+  padding-inline: 15px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .sidebarHeader {
+  grid-template-columns: 42px;
+  justify-items: center;
+  width: 42px;
+  gap: 8px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .sidebarHeader > .brand {
+  width: 42px;
+  flex: 0 0 42px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .brandName,
+.shellGrid[data-sidebar-collapsed='true'] .projectNav h2,
+.shellGrid[data-sidebar-collapsed='true'] .projectNav .label,
+.shellGrid[data-sidebar-collapsed='true'] .localMode {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.shellGrid[data-sidebar-collapsed='true'] .projectNav,
+.shellGrid[data-sidebar-collapsed='true'] .projectSectionControls,
+.shellGrid[data-sidebar-collapsed='true'] .projectList {
+  width: 42px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .projectSectionControls {
+  grid-template-columns: 28px;
+  justify-content: center;
+  gap: 4px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .projectNav a {
+  justify-content: center;
+  width: 42px;
+  gap: 0;
+  padding: 10px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .projectIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  flex-basis: 16px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .projectList {
+  overflow-x: hidden;
 }
 .breadcrumb {
   margin-bottom: var(--forge-space-5);
