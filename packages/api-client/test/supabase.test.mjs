@@ -172,7 +172,8 @@ describe('Supabase Data API adapter', () => {
       if (String(url).includes('/rpc/forge_storage_preflight')) {
         return jsonResponse({ schema_version: 'forge-byoc-v1' });
       }
-      if (String(url).includes('/rest/v1/projects')) return jsonResponse({ message: 'denied' }, 403);
+      if (String(url).includes('/rest/v1/projects'))
+        return jsonResponse({ message: 'denied' }, 403);
       throw new Error(`unexpected request ${String(url)}`);
     };
 
