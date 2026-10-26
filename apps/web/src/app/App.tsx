@@ -394,19 +394,19 @@ function ApplicationShell() {
                   {projectsExpanded ? <ChevronDown size={17} /> : <ChevronRight size={17} />}
                 </button>
               </div>
+              {projectSearchOpen && (
+                <SearchField
+                  aria-label="Search projects"
+                  className={styles.projectSearch}
+                  value={projectQuery}
+                  onChange={(event) => setProjectQuery(event.currentTarget.value)}
+                  placeholder="Search projects"
+                  clearLabel="Clear project search"
+                  onClear={() => setProjectQuery('')}
+                />
+              )}
               {projectsExpanded && (
                 <div className={styles.projectList}>
-                  {projectSearchOpen && (
-                    <SearchField
-                      aria-label="Search projects"
-                      className={styles.projectSearch}
-                      value={projectQuery}
-                      onChange={(event) => setProjectQuery(event.currentTarget.value)}
-                      placeholder="Search projects"
-                      clearLabel="Clear project search"
-                      onClear={() => setProjectQuery('')}
-                    />
-                  )}
                   {projectWorkspaceId !== navigationWorkspaceId ? (
                     <span className={styles.emptyProjects}>Loading projects…</span>
                   ) : projects.length === 0 ? (
@@ -424,7 +424,9 @@ function ApplicationShell() {
                         <span className={styles.projectIcon} aria-hidden="true">
                           <Layers aria-hidden="true" size={16} />
                         </span>
-                        <span className={styles.projectLabel}>{project.name}</span>
+                        <span className={styles.projectLabel} data-navigation-label="true">
+                          {project.name}
+                        </span>
                       </Link>
                     ))
                   )}

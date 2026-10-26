@@ -22,7 +22,9 @@ export function NavigationItem({
         aria-disabled="true"
       >
         {icon}
-        <span className={styles.label}>{label}</span>
+        <span className={styles.label} data-navigation-label="true">
+          {label}
+        </span>
       </span>
     );
   }
@@ -37,7 +39,9 @@ export function NavigationItem({
       }
     >
       {icon}
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label} data-navigation-label="true">
+        {label}
+      </span>
     </NavLink>
   );
 }

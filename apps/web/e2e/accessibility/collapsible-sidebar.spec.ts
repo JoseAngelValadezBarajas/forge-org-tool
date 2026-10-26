@@ -37,10 +37,40 @@ test('PA-SHELL-02 collapsible sidebar preserves navigation and viewport geometry
   await expect(grid).toHaveAttribute('data-sidebar-collapsed', 'true');
   await expect(projectLink).toHaveAttribute('aria-current', 'page');
   await expect(projectLink.locator('[data-icon="Layers"]')).toBeVisible();
+  const compactWorkspace = page.getByTestId('workspace-compact-control');
+  const workspaceBox = await compactWorkspace.boundingBox();
+  expect(workspaceBox).not.toBeNull();
+  expect(workspaceBox!.width).toBe(40);
+  const workspaceOverview = projectNavigation.getByRole('link', { name: 'Workspace Overview' });
+  await expect(workspaceOverview.locator('[data-navigation-label]')).toHaveCount(1);
+  await expect(workspaceOverview.locator('[data-navigation-label]')).toHaveCSS(
+    'position',
+    'absolute',
+  );
+  await expect(workspaceOverview.locator('[data-navigation-label]')).toHaveCSS('width', '1px');
+  await expect(workspaceOverview.locator('[data-navigation-label]')).toHaveCSS(
+    'clip',
+    'rect(0px, 0px, 0px, 0px)',
+  );
+  await expect(projectLink.locator('[data-navigation-label]')).toHaveCSS(
+    'clip',
+    'rect(0px, 0px, 0px, 0px)',
+  );
+  const searchButton = projectNavigation.getByRole('button', { name: 'Open project search' });
+  const expandProjectsButton = projectNavigation.getByRole('button', { name: 'Collapse projects' });
+  await expect(searchButton).toBeVisible();
+  await expect(expandProjectsButton).toBeVisible();
   const collapsedBox = await sidebar.boundingBox();
   expect(collapsedBox).not.toBeNull();
   expect(collapsedBox!.width).toBe(72);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+
+  await searchButton.click();
+  const projectSearch = page.getByRole('searchbox', { name: 'Search projects' });
+  await expect(projectSearch).toBeVisible();
+  const searchBox = await projectSearch.locator('..').boundingBox();
+  expect(searchBox).not.toBeNull();
+  expect(searchBox!.width).toBe(200);
 
   await page.reload();
   await expect(page.getByTestId('sidebar-toggle')).toHaveAccessibleName('Expand sidebar');

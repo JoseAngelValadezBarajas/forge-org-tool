@@ -97,6 +97,7 @@
   gap: 16px;
 }
 .projectNav {
+  position: relative;
   display: grid;
   gap: 16px;
   min-width: 0;
@@ -367,6 +368,7 @@
 .shellGrid[data-sidebar-collapsed='true'] .sidebar {
   width: 72px;
   align-items: center;
+  overflow: visible;
   padding-inline: 15px;
 }
 .shellGrid[data-sidebar-collapsed='true'] .sidebarHeader {
@@ -381,7 +383,8 @@
 }
 .shellGrid[data-sidebar-collapsed='true'] .brandName,
 .shellGrid[data-sidebar-collapsed='true'] .projectNav h2,
-.shellGrid[data-sidebar-collapsed='true'] .projectNav .label,
+.shellGrid[data-sidebar-collapsed='true'] .projectNav [data-navigation-label],
+.shellGrid[data-sidebar-collapsed='true'] .projectLabel,
 .shellGrid[data-sidebar-collapsed='true'] .localMode {
   position: absolute;
   width: 1px;
@@ -398,10 +401,21 @@
 .shellGrid[data-sidebar-collapsed='true'] .projectList {
   width: 42px;
 }
+.shellGrid[data-sidebar-collapsed='true'] [data-testid='workspace-compact-control'] {
+  width: 40px;
+}
 .shellGrid[data-sidebar-collapsed='true'] .projectSectionControls {
   grid-template-columns: 28px;
+  grid-auto-rows: 28px;
   justify-content: center;
   gap: 4px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .projectSearch {
+  position: absolute;
+  top: 64px;
+  left: 48px;
+  z-index: 3;
+  width: 200px;
 }
 .shellGrid[data-sidebar-collapsed='true'] .projectNav a {
   justify-content: center;
