@@ -53,7 +53,12 @@ describe('Supabase Data API adapter', () => {
     const state = await inspectStorage();
 
     assert.equal(state.status, 'ready');
-    assert.equal(calls.filter(({ url }) => url.includes('/auth/v1/token')).length, 1);
+    const authCall = calls.find(({ url }) => url.includes('/auth/v1/token'));
+    assert.equal(authCall.url, 'https://example123.supabase.co/auth/v1/token?grant_type=password');
+    assert.deepEqual(JSON.parse(authCall.init.body), {
+      email: 'a@example.test',
+      password: 'temporary-password',
+    });
     assert.equal(calls.filter(({ url }) => url.includes('/rpc/forge_storage_preflight')).length, 1);
   });
 
@@ -310,13 +315,13 @@ describe('Supabase Data API adapter', () => {
   });
 
   it('refreshes an expired session before the preflight or a data request', async () => {
-    const authBodies = [];
+    const authCalls = [];
     globalThis.fetch = async (url, init = {}) => {
       if (String(url).includes('/auth/v1/token')) {
         const body = JSON.parse(init.body);
-        authBodies.push(body);
+        authCalls.push({ url: String(url), body });
         return jsonResponse(
-          body.grant_type === 'password'
+          String(url).endsWith('?grant_type=password')
             ? { ...session, expires_in: 0 }
             : { ...session, access_token: 'refreshed-access-token', expires_in: 3600 },
         );
@@ -337,9 +342,15 @@ describe('Supabase Data API adapter', () => {
     await inspectStorage();
     await organizationApi.listWorkspaces();
 
-    assert.deepEqual(authBodies, [
-      { grant_type: 'password', email: 'a@example.test', password: 'temporary-password' },
-      { grant_type: 'refresh_token', refresh_token: 'user-refresh-token' },
+    assert.deepEqual(authCalls, [
+      {
+        url: 'https://example123.supabase.co/auth/v1/token?grant_type=password',
+        body: { email: 'a@example.test', password: 'temporary-password' },
+      },
+      {
+        url: 'https://example123.supabase.co/auth/v1/token?grant_type=refresh_token',
+        body: { refresh_token: 'user-refresh-token' },
+      },
     ]);
   });
 

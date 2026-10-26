@@ -36,6 +36,7 @@ export type StorageSnapshot = {
 };
 
 type StorageConfig = { provider: 'local' } | ({ provider: 'supabase' } & SupabaseProfile);
+type StoredSession = { profile: SupabaseProfile; session: SupabaseSession };
 type SupabaseHandlerFactory = (
   profile: SupabaseProfile,
   getSession: () => Promise<SupabaseSession | null>,
@@ -74,23 +75,42 @@ function readProfile(): SupabaseProfile | null {
   }
 }
 
-function readSession(): SupabaseSession | null {
+function profilesEqual(left: SupabaseProfile, right: SupabaseProfile): boolean {
+  return left.projectUrl === right.projectUrl && left.publishableKey === right.publishableKey;
+}
+
+function readStoredSession(): StoredSession | null {
   const raw = browserStorage('sessionStorage')?.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
-    const value = JSON.parse(raw) as Partial<SupabaseSession>;
+    const value = JSON.parse(raw) as {
+      profile?: SupabaseProfile;
+      session?: Partial<SupabaseSession>;
+    };
+    const storedProfile = value.profile;
+    const sessionValue = value.session;
     if (
-      typeof value.accessToken !== 'string' ||
-      typeof value.refreshToken !== 'string' ||
-      typeof value.expiresAt !== 'number' ||
-      typeof value.userId !== 'string'
+      !storedProfile ||
+      !sessionValue ||
+      typeof sessionValue.accessToken !== 'string' ||
+      typeof sessionValue.refreshToken !== 'string' ||
+      typeof sessionValue.expiresAt !== 'number' ||
+      typeof sessionValue.userId !== 'string'
     ) {
       return null;
     }
-    return value as SupabaseSession;
+    return {
+      profile: validateSupabaseProfile(storedProfile),
+      session: sessionValue as SupabaseSession,
+    };
   } catch {
     return null;
   }
+}
+
+function readSession(expectedProfile: SupabaseProfile): SupabaseSession | null {
+  const stored = readStoredSession();
+  return stored && profilesEqual(stored.profile, expectedProfile) ? stored.session : null;
 }
 
 function persistProfile(next: SupabaseProfile | null): void {
@@ -103,7 +123,7 @@ function persistProfile(next: SupabaseProfile | null): void {
 function persistSession(next: SupabaseSession | null): void {
   const storage = browserStorage('sessionStorage');
   if (!storage) return;
-  if (next) storage.setItem(SESSION_KEY, JSON.stringify(next));
+  if (next && profile) storage.setItem(SESSION_KEY, JSON.stringify({ profile, session: next }));
   else storage.removeItem(SESSION_KEY);
 }
 
@@ -170,13 +190,18 @@ export function configureStorage(config: StorageConfig): void {
     return;
   }
   const nextProfile = validateSupabaseProfile(config);
-  const profileChanged =
-    !profile ||
-    profile.projectUrl !== nextProfile.projectUrl ||
-    profile.publishableKey !== nextProfile.publishableKey;
+  const previousProfile = profile;
+  const storedSession = readStoredSession();
+  const profileChanged = Boolean(previousProfile && !profilesEqual(previousProfile, nextProfile));
   profile = nextProfile;
-  session = profileChanged ? null : readSession();
-  if (profileChanged) persistSession(null);
+  const sessionMatchesProfile =
+    storedSession !== null && profilesEqual(storedSession.profile, nextProfile);
+  if (profileChanged || (storedSession !== null && !sessionMatchesProfile)) {
+    session = null;
+    persistSession(null);
+  } else {
+    session = readSession(nextProfile);
+  }
   persistProfile(profile);
   snapshot = session
     ? {
@@ -254,14 +279,17 @@ function toSession(value: Record<string, unknown>): SupabaseSession {
 
 async function authRequest(
   nextProfile: SupabaseProfile,
-  body: Record<string, string>,
+  grantType: 'password' | 'refresh_token',
+  credentials: Record<string, string>,
 ): Promise<SupabaseSession> {
   let response: Response;
   try {
-    response = await fetch(`${nextProfile.projectUrl}/auth/v1/token`, {
+    const endpoint = new URL(`${nextProfile.projectUrl}/auth/v1/token`);
+    endpoint.searchParams.set('grant_type', grantType);
+    response = await fetch(endpoint.toString(), {
       method: 'POST',
       headers: authHeaders(nextProfile),
-      body: JSON.stringify(body),
+      body: JSON.stringify(credentials),
     });
   } catch {
     throw new ApiError(503, 'Supabase authentication is unavailable.');
@@ -275,10 +303,7 @@ async function refreshSupabaseSession(
   refreshToken: string,
 ): Promise<SupabaseSession | null> {
   try {
-    return await authRequest(nextProfile, {
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    });
+    return await authRequest(nextProfile, 'refresh_token', { refresh_token: refreshToken });
   } catch {
     return null;
   }
@@ -287,7 +312,7 @@ async function refreshSupabaseSession(
 export async function signInSupabase(email: string, password: string): Promise<StorageSnapshot> {
   if (!profile) throw new Error('Configure Supabase before signing in.');
   if (!email.trim() || !password) throw new Error('Email and password are required.');
-  session = await authRequest(profile, { grant_type: 'password', email, password });
+  session = await authRequest(profile, 'password', { email, password });
   persistSession(session);
   installSupabaseHandler();
   snapshot = {
@@ -367,13 +392,14 @@ export function initializeStoredStorage(): void {
   if (stored) configureStorage({ provider: 'supabase', ...stored });
 }
 
-export function resetStorageForTests(): void {
+export function resetStorageForTests(options: { preservePersisted?: boolean } = {}): void {
   profile = null;
   session = null;
-  handlerFactory = null;
   refreshInFlight = null;
-  persistProfile(null);
-  persistSession(null);
+  if (!options.preservePersisted) {
+    persistProfile(null);
+    persistSession(null);
+  }
   resetApiRequestHandler();
   snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };
 }
