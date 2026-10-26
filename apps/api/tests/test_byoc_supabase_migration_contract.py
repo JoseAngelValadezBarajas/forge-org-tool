@@ -105,3 +105,24 @@ def test_byoc_02_direct_dependency_writes_use_a_project_lock_and_cycle_trigger()
     assert 'feature_dependencies_acyclic_guard' in sql
     assert 'before insert or update on public.feature_dependencies' in sql
     assert 'dependency graph contains a cycle' in sql
+
+
+def test_byoc_02_active_project_guard_is_safe_for_epic_rows() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8')
+    project_guard = sql[
+        sql.index('create or replace function public.forge_assert_active_project()') :
+        sql.index('create or replace function public.forge_assert_active_feature_row()')
+    ]
+
+    assert 'old.feature_id' not in project_guard
+    assert 'new.feature_id' not in project_guard
+    assert (
+        'create trigger tasks_active_project_guard\n'
+        'before insert or update or delete on public.tasks\n'
+        'for each row execute function public.forge_assert_active_feature_row();'
+    ) in sql
+    assert (
+        'create trigger acceptance_criteria_active_project_guard\n'
+        'before insert or update or delete on public.acceptance_criteria\n'
+        'for each row execute function public.forge_assert_active_feature_row();'
+    ) in sql

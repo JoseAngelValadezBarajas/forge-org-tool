@@ -204,29 +204,43 @@ as $$
 declare
     target_project uuid;
 begin
-    if tg_table_name in ('tasks', 'acceptance_criteria') then
-        target_project := (
-            select project_id from public.features
-            where id = case when tg_op = 'DELETE' then old.feature_id else new.feature_id end
-        );
-    else
-        target_project := case when tg_op = 'DELETE' then old.project_id else new.project_id end;
-    end if;
+    target_project := case when tg_op = 'DELETE' then old.project_id else new.project_id end;
     if not public.forge_project_is_active(target_project) then
         raise exception 'archived projects are read-only' using errcode = '55000';
     end if;
     if tg_op = 'UPDATE' and tg_table_name in ('epics', 'features') and new.project_id <> old.project_id then
         raise exception 'records cannot move between projects' using errcode = '23514';
     end if;
-    if tg_op = 'UPDATE' and tg_table_name in ('tasks', 'acceptance_criteria') and exists (
+    if tg_op = 'UPDATE' and tg_table_name = 'feature_dependencies' and new.project_id <> old.project_id then
+        raise exception 'records cannot move between projects' using errcode = '23514';
+    end if;
+    return case when tg_op = 'DELETE' then old else new end;
+end;
+$$;
+
+create or replace function public.forge_assert_active_feature_row()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+    target_project uuid;
+begin
+    target_project := (
+        select project_id
+        from public.features
+        where id = case when tg_op = 'DELETE' then old.feature_id else new.feature_id end
+    );
+    if not public.forge_project_is_active(target_project) then
+        raise exception 'archived projects are read-only' using errcode = '55000';
+    end if;
+    if tg_op = 'UPDATE' and exists (
         select 1
         from public.features old_feature
         where old_feature.id = old.feature_id
           and old_feature.project_id <> target_project
     ) then
-        raise exception 'records cannot move between projects' using errcode = '23514';
-    end if;
-    if tg_op = 'UPDATE' and tg_table_name = 'feature_dependencies' and new.project_id <> old.project_id then
         raise exception 'records cannot move between projects' using errcode = '23514';
     end if;
     return case when tg_op = 'DELETE' then old else new end;
@@ -296,12 +310,12 @@ for each row execute function public.forge_assert_active_project();
 drop trigger if exists tasks_active_project_guard on public.tasks;
 create trigger tasks_active_project_guard
 before insert or update or delete on public.tasks
-for each row execute function public.forge_assert_active_project();
+for each row execute function public.forge_assert_active_feature_row();
 
 drop trigger if exists acceptance_criteria_active_project_guard on public.acceptance_criteria;
 create trigger acceptance_criteria_active_project_guard
 before insert or update or delete on public.acceptance_criteria
-for each row execute function public.forge_assert_active_project();
+for each row execute function public.forge_assert_active_feature_row();
 
 drop trigger if exists feature_dependencies_active_project_guard on public.feature_dependencies;
 create trigger feature_dependencies_active_project_guard

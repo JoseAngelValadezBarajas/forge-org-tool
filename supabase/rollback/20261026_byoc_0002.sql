@@ -150,6 +150,7 @@ drop function if exists public.forge_create_dependency(uuid, uuid, uuid);
 drop function if exists public.forge_reorder_criteria(uuid, uuid[]);
 drop function if exists public.forge_reorder_tasks(uuid, uuid[]);
 drop function if exists public.forge_assert_active_feature_project();
+drop function if exists public.forge_assert_active_feature_row();
 drop function if exists public.forge_assert_dependency_acyclic();
 drop function if exists public.forge_assert_active_project();
 drop function if exists public.forge_project_role(uuid);
