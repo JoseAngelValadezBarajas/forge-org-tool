@@ -339,7 +339,10 @@ test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ pa
   const suffix = `${test.info().project.name}-${Date.now()}`;
   const { workspace, project } = await createProject(page, suffix);
   await createWorkspaceTags(page, workspace.id, ['Research']);
+  await page.setViewportSize({ width: 1600, height: 900 });
   await page.goto(`/planning/${workspace.id}/${project.id}`);
+  const epicBoardBox = await page.getByTestId('project-epic-board').boundingBox();
+  expect(epicBoardBox?.width ?? 0).toBeGreaterThan(1148);
   await expect(page.getByTestId('project-epic-board')).toHaveCSS('overflow-y', 'hidden');
   await expect(page.getByTestId('kanban-column-backlog').locator('[data-state]')).toHaveCSS(
     'overflow-y',

@@ -2,7 +2,7 @@
   min-width: 0;
 }
 .compact {
-  width: 222px;
+  width: 100%;
   height: 615px;
 }
 .surface {
@@ -11,7 +11,7 @@
 .compactSurface {
   display: flex;
   box-sizing: border-box;
-  width: 222px;
+  width: 100%;
   height: 615px;
   flex-direction: column;
   gap: 12px;
@@ -30,7 +30,7 @@
   box-sizing: border-box;
   align-items: flex-start;
   justify-content: space-between;
-  width: 212px;
+  width: 100%;
   height: 43px;
   flex: 0 0 43px;
   margin: 0;
