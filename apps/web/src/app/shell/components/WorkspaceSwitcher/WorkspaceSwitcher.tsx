@@ -39,9 +39,7 @@ export function WorkspaceSwitcher({
           {compact && <Folder className={styles.compactIcon} aria-hidden="true" size={20} />}
           <Select
             id={id}
-            className={[styles.select, compact && styles.compactSelect]
-              .filter(Boolean)
-              .join(' ')}
+            className={[styles.select, compact && styles.compactSelect].filter(Boolean).join(' ')}
             aria-label="Workspace"
             value={value}
             onChange={(event) => onChange(event.target.value)}

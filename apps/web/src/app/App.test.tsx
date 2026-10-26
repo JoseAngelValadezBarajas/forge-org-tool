@@ -323,17 +323,15 @@ describe('M1 application shell', () => {
     fireEvent.click(toggle);
 
     expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument();
-    expect(screen.getByTestId('app-shell-grid')).toHaveAttribute(
-      'data-sidebar-collapsed',
-      'true',
-    );
+    expect(screen.getByTestId('app-shell-grid')).toHaveAttribute('data-sidebar-collapsed', 'true');
     expect(localStorage.getItem('forge-sidebar-collapsed')).toBe('true');
-    expect(within(projectNavigation).getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
     expect(
-      within(projectNavigation).getByRole('link', { name: 'FormiAI' }).querySelector('[data-icon="Layers"]'),
+      within(projectNavigation).getByRole('link', { name: 'Workspace Overview' }),
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(projectNavigation)
+        .getByRole('link', { name: 'FormiAI' })
+        .querySelector('[data-icon="Layers"]'),
     ).not.toBeNull();
 
     cleanup();
