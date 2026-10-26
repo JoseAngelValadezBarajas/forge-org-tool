@@ -586,6 +586,37 @@ export function createSupabaseHandler(
     return new Blob([archive], { type: 'application/zip' });
   }
 
+  async function finalizeImportedProject(
+    workspaceId: string,
+    imported: JsonRecord,
+  ): Promise<JsonRecord> {
+    const importId = String(imported.import_id ?? '');
+    const projectId = String(imported.project_id ?? '');
+    if (!importId || !projectId) {
+      throw new ApiError(502, 'Supabase did not return a protected import session.');
+    }
+    await rpc('forge_finalize_import', {
+      p_workspace_id: workspaceId,
+      p_import_id: importId,
+      p_project_id: projectId,
+    });
+    return imported;
+  }
+
+  async function compensateImportedProject(
+    workspaceId: string,
+    imported: JsonRecord,
+  ): Promise<void> {
+    const importId = String(imported.import_id ?? '');
+    const projectId = String(imported.project_id ?? '');
+    if (!importId || !projectId) return;
+    await rpc('forge_delete_imported_project', {
+      p_workspace_id: workspaceId,
+      p_import_id: importId,
+      p_project_id: projectId,
+    }).catch(() => undefined);
+  }
+
   async function packagePreview(workspaceId: string, archiveBase64: string): Promise<JsonRecord> {
     const parsed = await parsePackage(archiveBase64);
     const preview = await rpc<JsonRecord>('forge_transfer_preview', {
@@ -662,6 +693,7 @@ export function createSupabaseHandler(
           }),
         });
       }
+      await finalizeImportedProject(workspaceId, imported);
       return imported;
     } catch (cause) {
       await Promise.all(
@@ -671,10 +703,7 @@ export function createSupabaseHandler(
           }).catch(() => undefined),
         ),
       );
-      await rpc('forge_delete_imported_project', {
-        p_workspace_id: workspaceId,
-        p_project_id: imported.project_id,
-      }).catch(() => undefined);
+      await compensateImportedProject(workspaceId, imported);
       throw cause;
     }
   }
@@ -901,11 +930,17 @@ export function createSupabaseHandler(
       parts.length === 4 &&
       method === 'POST'
     ) {
-      return rpc<JsonRecord>('forge_transfer_commit', {
+      const imported = await rpc<JsonRecord>('forge_transfer_commit', {
         p_workspace_id: workspaceId,
         p_document: body.document,
         p_expected_fingerprint: body.expected_fingerprint,
-      }) as Promise<T>;
+      });
+      try {
+        return (await finalizeImportedProject(workspaceId, imported)) as T;
+      } catch (cause) {
+        await compensateImportedProject(workspaceId, imported);
+        throw cause;
+      }
     }
     if (
       parts[2] === 'projects' &&

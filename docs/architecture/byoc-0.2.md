@@ -43,6 +43,17 @@ cannot be replayed against another destination. ZIP parsing enforces the 5 MiB
 compressed, 25 MiB expanded and 100-entry limits while streaming entries before
 allocating declared payload sizes.
 
+Complete-project imports create a private, short-lived import session in the
+same transaction as the generated Project. JSON imports finalize it immediately
+after the client receives the commit response; ZIP imports finalize it only
+after attachment staging succeeds. Compensation requires the same user's
+provisional session, exact workspace and Project, and an unexpired session.
+Finalized or expired imports cannot be deleted through the compensation RPC.
+
+Dependency cycle protection is database-owned. A trigger protects direct table
+INSERT/UPDATE paths as well as the RPC, locks the Project row before checking
+reachability, and serializes concurrent dependency mutations for that Project.
+
 Screenshot writes use private Storage, read the stored object back, validate its
 image signature, byte size and SHA-256 against the metadata, and only then write
 the `bug_attachments` row. The migration trigger also checks that the Storage

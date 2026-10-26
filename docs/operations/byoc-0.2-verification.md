@@ -12,6 +12,13 @@ automatic migration execution was performed.
   rejected before allocation and observed output is capped at 25 MiB.
 - Contextual transfer fingerprints include scope, workspace, project,
   destination and document in the server RPC.
+- Complete-project imports use a same-user, exact-project, 15-minute
+  provisional import session. JSON and successful ZIP imports finalize the
+  session; compensation rejects existing projects, mismatched users/projects,
+  expired sessions and finalized imports.
+- Direct `feature_dependencies` INSERT/UPDATE paths use a PostgreSQL trigger
+  with a Project-row lock and recursive reachability check, including
+  concurrent writers; the RPC check remains as an early error path.
 - Screenshot upload and import read the private Storage object back before
   metadata insertion. Reads verify image signature, byte size and SHA-256;
   the migration trigger checks object existence and Storage size/MIME metadata.
@@ -36,9 +43,9 @@ automatic migration execution was performed.
 - `npm run test:e2e:smoke`: PASS — 2 isolated Chromium Component Host tests.
 - `npm run check:api-types`: PASS.
 
-The focused hardening tests include 18 api-client adapter tests and 4 migration
-contract tests, including negative ZIP decompression and Storage metadata
-mismatch cases.
+The focused hardening tests include 20 api-client adapter tests and 6 migration
+contract tests, including negative JSON/ZIP compensation, direct dependency
+cycle-guard, ZIP decompression, and Storage metadata mismatch cases.
 
 The focused migration contract tests are synthetic/static because no local
 Supabase CLI or running Docker engine was available on the verification host.

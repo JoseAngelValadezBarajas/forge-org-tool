@@ -534,10 +534,12 @@ describe('Supabase Data API adapter', () => {
         return jsonResponse({
           schema_version: 'forge-project-transfer-v2',
           project_id: 'project-imported',
+          import_id: 'import-a',
           fingerprint: 'transfer-fingerprint',
           references: [],
           counts: { epics: 1, features: 1, tasks: 0, acceptance_criteria: 0, dependencies: 0 },
         });
+      if (String(url).includes('/rpc/forge_finalize_import')) return jsonResponse({});
       if (String(url).includes('/rpc/forge_transfer_export'))
         return jsonResponse({
           schema_version: 'forge-project-transfer-v2',
@@ -562,8 +564,50 @@ describe('Supabase Data API adapter', () => {
     );
     assert.ok(calls.some(({ url }) => url.includes('/rpc/forge_transfer_preview')));
     assert.ok(calls.some(({ url }) => url.includes('/rpc/forge_transfer_commit')));
+    const finalizeCall = calls.find(({ url }) => url.includes('/rpc/forge_finalize_import'));
+    assert.deepEqual(JSON.parse(finalizeCall.init.body), {
+      p_workspace_id: 'workspace-a',
+      p_import_id: 'import-a',
+      p_project_id: 'project-imported',
+    });
     assert.ok(calls.some(({ url }) => url.includes('/rpc/forge_transfer_export')));
     assert.ok(calls.some(({ url }) => url.includes('/rpc/forge_transfer_export')));
+  });
+
+  it('compensates a provisional JSON import when finalization fails', async () => {
+    const calls = [];
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), init });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight'))
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      if (String(url).includes('/rpc/forge_transfer_commit'))
+        return jsonResponse({ project_id: 'project-imported', import_id: 'import-a' });
+      if (String(url).includes('/rpc/forge_finalize_import'))
+        return jsonResponse({ message: 'finalization unavailable' }, 503);
+      if (String(url).includes('/rpc/forge_delete_imported_project')) return jsonResponse({});
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+    await assert.rejects(
+      () =>
+        organizationApi.importProject(
+          'workspace-a',
+          { schema_version: 'forge-project-transfer-v2', project: { name: 'Imported' } },
+          'transfer-fingerprint',
+        ),
+      /finalization unavailable/i,
+    );
+
+    const deleteCall = calls.find(({ url }) => url.includes('/rpc/forge_delete_imported_project'));
+    assert.deepEqual(JSON.parse(deleteCall.init.body), {
+      p_workspace_id: 'workspace-a',
+      p_import_id: 'import-a',
+      p_project_id: 'project-imported',
+    });
   });
 
   it('routes contextual transfer preview, commit and export through Supabase RPCs', async () => {
@@ -691,10 +735,12 @@ describe('Supabase Data API adapter', () => {
         return jsonResponse({
           schema_version: 'forge-project-transfer-v2',
           project_id: 'project-imported',
+          import_id: 'import-a',
           fingerprint: 'zip-fingerprint',
           references: [{ ref: 'feature:001', generated_id: 'feature-imported' }],
           counts: { epics: 0, features: 1, tasks: 0, acceptance_criteria: 0, dependencies: 0 },
         });
+      if (String(url).includes('/rpc/forge_finalize_import')) return jsonResponse({});
       if (String(url).includes('/storage/v1/object/forge-bug-attachments/'))
         return jsonResponse({ Key: 'stored' });
       if (String(url).includes('/storage/v1/object/authenticated/'))
@@ -714,9 +760,108 @@ describe('Supabase Data API adapter', () => {
     await organizationApi.importProjectPackage('workspace-a', archiveBase64, preview.fingerprint);
 
     assert.ok(calls.some(({ url }) => url.includes('/rpc/forge_transfer_commit')));
+    assert.ok(calls.some(({ url }) => url.includes('/rpc/forge_finalize_import')));
     assert.ok(calls.some(({ url }) => url.includes('/storage/v1/object/forge-bug-attachments/')));
     assert.equal(
       calls.some(({ url }) => url.startsWith('/api/v1/')),
+      false,
+    );
+  });
+
+  it('uses the actor-bound import session when ZIP attachment staging fails', async () => {
+    const calls = [];
+    const png = Uint8Array.from([
+      0x89,
+      0x50,
+      0x4e,
+      0x47,
+      0x0d,
+      0x0a,
+      0x1a,
+      0x0a,
+      ...new Uint8Array(32),
+    ]);
+    const attachmentPath = 'attachments/feature-001/attachment-001.png';
+    const sha256 = createHash('sha256').update(png).digest('hex');
+    const manifest = {
+      schema_version: 'forge-project-transfer-v2',
+      project: { name: 'ZIP compensation' },
+      epics: [],
+      features: [
+        {
+          ref: 'feature:001',
+          title: 'Imported Bug',
+          kind: 'bug',
+          tasks: [],
+          acceptance_criteria: [],
+          attachments: [
+            {
+              path: attachmentPath,
+              file_name: 'screen.png',
+              content_type: 'image/png',
+              byte_size: png.byteLength,
+              sha256,
+            },
+          ],
+        },
+      ],
+      dependencies: [],
+    };
+    const archiveBase64 = globalThis.Buffer.from(
+      zipSync({
+        'manifest.json': strToU8(JSON.stringify(manifest)),
+        [attachmentPath]: png,
+      }),
+    ).toString('base64');
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), init });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight'))
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      if (String(url).includes('/rpc/forge_transfer_preview'))
+        return jsonResponse({
+          schema_version: 'forge-project-transfer-v2',
+          fingerprint: 'zip-fingerprint',
+          project: { name: 'ZIP compensation' },
+          counts: { epics: 0, features: 1, tasks: 0, acceptance_criteria: 0, dependencies: 0 },
+        });
+      if (String(url).includes('/rpc/forge_transfer_commit'))
+        return jsonResponse({
+          schema_version: 'forge-project-transfer-v2',
+          project_id: 'project-imported',
+          import_id: 'import-a',
+          fingerprint: 'zip-fingerprint',
+          references: [{ ref: 'feature:001', generated_id: 'feature-imported' }],
+          counts: { epics: 0, features: 1, tasks: 0, acceptance_criteria: 0, dependencies: 0 },
+        });
+      if (String(url).includes('/storage/v1/object/authenticated/'))
+        return new globalThis.Response(new Uint8Array([1, 2, 3]), {
+          status: 200,
+          headers: { 'Content-Type': 'image/png' },
+        });
+      if (String(url).includes('/storage/v1/object/forge-bug-attachments/'))
+        return jsonResponse({ Key: 'stored' });
+      if (String(url).includes('/rpc/forge_delete_imported_project')) return jsonResponse({});
+      throw new Error(`unexpected request ${String(url)} ${init.method ?? 'GET'}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+    const preview = await organizationApi.previewProjectPackageImport('workspace-a', archiveBase64);
+    await assert.rejects(
+      () => organizationApi.importProjectPackage('workspace-a', archiveBase64, preview.fingerprint),
+      /does not match attachment metadata/i,
+    );
+
+    const deleteCall = calls.find(({ url }) => url.includes('/rpc/forge_delete_imported_project'));
+    assert.deepEqual(JSON.parse(deleteCall.init.body), {
+      p_workspace_id: 'workspace-a',
+      p_import_id: 'import-a',
+      p_project_id: 'project-imported',
+    });
+    assert.equal(
+      calls.some(({ url }) => url.includes('/rpc/forge_finalize_import')),
       false,
     );
   });

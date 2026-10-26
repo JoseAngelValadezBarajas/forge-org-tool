@@ -23,6 +23,10 @@ API/private Storage. No PostgreSQL connection or privileged key is distributed.
 - Contextual fingerprints bound to scope, workspace, project and destination.
 - Storage read-back verification for image signature, size and SHA-256 before
   metadata insertion, plus a database trigger check for Storage metadata.
+- Import compensation is bound to a non-client-writable, same-user provisional
+  import session and exact Project. Finalized imports cannot be deleted.
+- `feature_dependencies` direct INSERT/UPDATE writes are protected by a
+  PostgreSQL cycle trigger and Project-row lock, including concurrent writers.
 
 ## Verification
 
