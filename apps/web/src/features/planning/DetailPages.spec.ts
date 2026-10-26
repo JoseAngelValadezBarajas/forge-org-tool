@@ -146,6 +146,11 @@ test('UX-03 exact Epic board geometry, type filtering and durable status move', 
       width: 1148,
       height: 563,
     });
+    await expect(page.getByTestId('epic-work-item-board')).toHaveCSS('overflow-y', 'auto');
+    await expect(page.getByTestId('kanban-column-backlog').locator('[data-state]')).toHaveCSS(
+      'overflow-y',
+      'auto',
+    );
     await geometry(page.getByTestId('kanban-column-backlog'), {
       x: 268,
       y: 368,

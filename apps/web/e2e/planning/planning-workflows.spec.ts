@@ -323,6 +323,11 @@ test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ pa
   const { workspace, project } = await createProject(page, suffix);
   await createWorkspaceTags(page, workspace.id, ['Research']);
   await page.goto(`/planning/${workspace.id}/${project.id}`);
+  await expect(page.getByTestId('project-epic-board')).toHaveCSS('overflow-y', 'auto');
+  await expect(page.getByTestId('kanban-column-backlog').locator('[data-state]')).toHaveCSS(
+    'overflow-y',
+    'auto',
+  );
 
   const epicTitle = `Epic ${suffix}`;
   const epicDialog = await openEpicDialog(page);
