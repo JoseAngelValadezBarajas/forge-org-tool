@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { NavLink, type NavLinkProps } from 'react-router-dom';
 import styles from './NavigationItem.module.css';
 export interface NavigationItemProps extends Omit<NavLinkProps, 'children'> {
   label: string;
   disabled?: boolean;
-  icon?: string;
+  icon?: ReactNode;
 }
 export function NavigationItem({
   label,

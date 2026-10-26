@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { Select } from '@corefoundry-labs/forge-ui';
+import { Folder } from '@corefoundry-labs/forge-icons';
 import styles from './WorkspaceSwitcher.module.css';
 export interface WorkspaceOption {
   id: string;
@@ -11,6 +12,7 @@ export interface WorkspaceSwitcherProps {
   onChange?: (id: string) => void;
   currentName?: string;
   dataNodeId?: string;
+  compact?: boolean;
 }
 export function WorkspaceSwitcher({
   value = '',
@@ -18,18 +20,28 @@ export function WorkspaceSwitcher({
   onChange,
   currentName = 'Local Workspace',
   dataNodeId,
+  compact = false,
 }: WorkspaceSwitcherProps) {
   const id = useId();
   if (workspaces.length > 0 && onChange) {
     const selectedName =
       workspaces.find((workspace) => workspace.id === value)?.name ?? currentName;
     return (
-      <div className={styles.field} data-node-id={dataNodeId}>
-        <label htmlFor={id}>Workspace</label>
+      <div
+        className={[styles.field, compact && styles.compactField].filter(Boolean).join(' ')}
+        data-node-id={dataNodeId}
+        data-testid={compact ? 'workspace-compact-control' : undefined}
+      >
+        <label className={compact ? styles.compactLabel : undefined} htmlFor={id}>
+          Workspace
+        </label>
         <span className={styles.selector}>
+          {compact && <Folder className={styles.compactIcon} aria-hidden="true" size={20} />}
           <Select
             id={id}
-            className={styles.select}
+            className={[styles.select, compact && styles.compactSelect]
+              .filter(Boolean)
+              .join(' ')}
             aria-label="Workspace"
             value={value}
             onChange={(event) => onChange(event.target.value)}
@@ -40,9 +52,11 @@ export function WorkspaceSwitcher({
               </option>
             ))}
           </Select>
-          <span className={styles.selectedName} aria-hidden="true">
-            {selectedName}&nbsp;&nbsp;▾
-          </span>
+          {!compact && (
+            <span className={styles.selectedName} aria-hidden="true">
+              {selectedName}&nbsp;&nbsp;▾
+            </span>
+          )}
         </span>
       </div>
     );
