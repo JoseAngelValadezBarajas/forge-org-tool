@@ -208,6 +208,11 @@
   padding: 14px 16px;
   border-radius: var(--forge-space-3);
   background: var(--forge-surface-raised);
+  cursor: grab;
+}
+.itemCard[data-dragging='true'] {
+  cursor: grabbing;
+  opacity: 0.72;
 }
 .itemKind,
 .itemTags {

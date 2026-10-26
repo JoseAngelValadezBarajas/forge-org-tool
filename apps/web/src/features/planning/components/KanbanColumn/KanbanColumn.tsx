@@ -36,6 +36,7 @@ export function KanbanColumn({
     >
       <Card
         className={[styles.surface, compact && styles.compactSurface].filter(Boolean).join(' ')}
+        data-kanban-status={status}
         onDragOver={(event) => {
           if (onDrop) event.preventDefault();
         }}

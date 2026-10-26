@@ -177,7 +177,24 @@ test.skip('PA-PLAN-001 legacy work-item board contract', async ({ page }) => {
   if (test.info().project.name === 'chromium-mobile') {
     await featureStatus.selectOption('ready');
   } else {
-    await page.locator('[data-testid^="work-item-card-"]').dragTo(readyColumn);
+    const featureCard = page.locator('[data-testid^="work-item-card-"]').first();
+    const readySurface = readyColumn.locator(':scope > div');
+    const featureBox = await featureCard.boundingBox();
+    const readyBox = await readySurface.boundingBox();
+    if (!featureBox || !readyBox) throw new Error('Work item drag geometry is unavailable');
+    await page.mouse.move(
+      featureBox.x + featureBox.width / 2,
+      featureBox.y + featureBox.height / 2,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      featureBox.x + featureBox.width / 2 + 8,
+      featureBox.y + featureBox.height / 2 + 8,
+    );
+    await page.mouse.move(readyBox.x + readyBox.width / 2, readyBox.y + readyBox.height / 2, {
+      steps: 12,
+    });
+    await page.mouse.up();
   }
   expect((await statusTransition).ok()).toBe(true);
   const movedOverview = await (
@@ -343,9 +360,17 @@ test('PA-PLAN-001 current Epic Board filters and opens Epic detail', async ({ pa
   const movedEpic = page.waitForResponse(
     (response) => response.url().includes('/epics/') && response.request().method() === 'PATCH',
   );
-  await epicCard.dragTo(page.getByTestId('kanban-column-ready').locator(':scope > div'), {
-    sourcePosition: { x: 8, y: 8 },
+  const epicBox = await epicCard.boundingBox();
+  const readySurface = page.getByTestId('kanban-column-ready').locator(':scope > div');
+  const readyBox = await readySurface.boundingBox();
+  if (!epicBox || !readyBox) throw new Error('Kanban drag geometry is unavailable');
+  await page.mouse.move(epicBox.x + epicBox.width / 2, epicBox.y + epicBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(epicBox.x + epicBox.width / 2 + 8, epicBox.y + epicBox.height / 2 + 8);
+  await page.mouse.move(readyBox.x + readyBox.width / 2, readyBox.y + readyBox.height / 2, {
+    steps: 12,
   });
+  await page.mouse.up();
   expect((await movedEpic).status()).toBe(200);
   await expect(
     page.getByTestId('kanban-column-ready').getByRole('link', { name: epicTitle, exact: true }),

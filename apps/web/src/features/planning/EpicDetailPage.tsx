@@ -21,6 +21,7 @@ import {
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
+import { usePointerKanbanDrag } from './usePointerKanbanDrag';
 import styles from './EpicDetailPage.module.css';
 
 const statuses: EpicStatus[] = ['backlog', 'ready', 'in_progress', 'verify', 'done'];
@@ -239,13 +240,25 @@ export function EpicDetailPage() {
   const legacyFeatures = filteredFeatures.filter(
     (feature) => !PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status),
   );
+  const featurePointerDrag = usePointerKanbanDrag<Feature['status']>({
+    onDrop: (id, destination) => {
+      if (readOnly || !PLANNING_COLUMN_STATUSES.some((column) => column.value === destination)) {
+        return;
+      }
+      const feature = features.find((item) => item.id === id);
+      if (feature && feature.status !== destination)
+        void moveFeature(feature, { status: destination });
+    },
+  });
   const itemCard = (feature: Feature) => (
     <Card
       as="article"
       key={feature.id}
       aria-label={feature.title}
       className={styles.itemCard}
+      data-dragging={featurePointerDrag.draggingId === feature.id ? 'true' : undefined}
       draggable={!readOnly}
+      onPointerDown={!readOnly ? (event) => featurePointerDrag.start(feature.id, event) : undefined}
       onDragStart={(event) => {
         event.dataTransfer.setData('text/forge-feature-id', feature.id);
         event.dataTransfer.setData('text/plain', feature.id);

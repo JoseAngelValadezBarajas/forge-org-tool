@@ -6,6 +6,7 @@ import styles from './PlanningPage.module.css';
 import { CreateEpicDrawer } from './CreateEpicDrawer';
 import { CreateEpicContextBoard } from './CreateEpicContextBoard';
 import { usePlanningController } from './usePlanningController';
+import { usePointerKanbanDrag } from './usePointerKanbanDrag';
 import {
   EpicCard,
   FeatureCard,
@@ -127,6 +128,12 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
       (epicPriorityFilter === 'all' || epic.priority === epicPriorityFilter) &&
       (!epicTagFilter || epic.tags?.includes(epicTagFilter))
     );
+  });
+  const epicPointerDrag = usePointerKanbanDrag<EpicStatus>({
+    onDrop: (id, destination) => {
+      const epic = workflowEpics.find((item) => item.id === id);
+      if (epic && epic.status !== destination) void updateEpic(epic, destination);
+    },
   });
   return (
     <ProjectPlanningHome>
@@ -409,6 +416,8 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                           compact
                           href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
                           draggable
+                          dragging={epicPointerDrag.draggingId === epic.id}
+                          onPointerDown={(event) => epicPointerDrag.start(epic.id, event)}
                           onDragStart={(event) => {
                             event.dataTransfer.setData('text/forge-epic-id', epic.id);
                             event.dataTransfer.setData('text/plain', epic.id);
