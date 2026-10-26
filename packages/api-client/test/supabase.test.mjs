@@ -450,6 +450,8 @@ describe('Supabase Data API adapter', () => {
     const calls = [];
     const png =
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+    const expectedBytes = globalThis.Buffer.from(png, 'base64');
+    const expectedHash = createHash('sha256').update(expectedBytes).digest('hex');
     globalThis.fetch = async (url, init = {}) => {
       calls.push({ url: String(url), init });
       if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
@@ -464,8 +466,8 @@ describe('Supabase Data API adapter', () => {
             feature_id: 'feature-a',
             file_name: 'screen.png',
             content_type: 'image/png',
-            byte_size: 68,
-            sha256: 'hash',
+            byte_size: expectedBytes.length,
+            sha256: expectedHash,
             storage_path: 'workspace-a/project-a/feature-a/attachment-a-screen.png',
           },
         ]);
@@ -476,13 +478,13 @@ describe('Supabase Data API adapter', () => {
             feature_id: 'feature-a',
             file_name: 'screen.png',
             content_type: 'image/png',
-            byte_size: 68,
-            sha256: 'hash',
+            byte_size: expectedBytes.length,
+            sha256: expectedHash,
             storage_path: 'workspace-a/project-a/feature-a/attachment-a-screen.png',
           },
         ]);
       if (String(url).includes('/storage/v1/object/authenticated/'))
-        return new globalThis.Response(new Uint8Array([1, 2, 3]), {
+        return new globalThis.Response(expectedBytes, {
           status: 200,
           headers: { 'Content-Type': 'image/png' },
         });
@@ -505,7 +507,7 @@ describe('Supabase Data API adapter', () => {
       'attachment-a',
     );
 
-    assert.equal(content.size, 3);
+    assert.equal(content.size, expectedBytes.length);
     assert.ok(calls.some(({ url }) => url.includes('/storage/v1/object/forge-bug-attachments/')));
     assert.ok(calls.some(({ url }) => url.includes('/storage/v1/object/authenticated/')));
     assert.equal(
@@ -695,6 +697,11 @@ describe('Supabase Data API adapter', () => {
         });
       if (String(url).includes('/storage/v1/object/forge-bug-attachments/'))
         return jsonResponse({ Key: 'stored' });
+      if (String(url).includes('/storage/v1/object/authenticated/'))
+        return new globalThis.Response(png, {
+          status: 200,
+          headers: { 'Content-Type': 'image/png' },
+        });
       if (String(url).includes('/rest/v1/bug_attachments')) return jsonResponse([{}]);
       throw new Error(`unexpected request ${String(url)}`);
     };
@@ -711,6 +718,117 @@ describe('Supabase Data API adapter', () => {
     assert.equal(
       calls.some(({ url }) => url.startsWith('/api/v1/')),
       false,
+    );
+  });
+
+  it('rejects a ZIP whose declared expansion exceeds the decompression budget before extraction', async () => {
+    const archive = zipSync({ 'bomb.bin': new Uint8Array(26 * 1024 * 1024) });
+    const archiveBase64 = globalThis.Buffer.from(archive).toString('base64');
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight'))
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+    await assert.rejects(
+      () => organizationApi.previewProjectPackageImport('workspace-a', archiveBase64),
+      /decompression budget/i,
+    );
+  });
+
+  it('rejects Storage content that disagrees with attachment metadata', async () => {
+    const png =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+    const expectedBytes = globalThis.Buffer.from(png, 'base64');
+    const expectedHash = createHash('sha256').update(expectedBytes).digest('hex');
+    globalThis.fetch = async (url, init = {}) => {
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight'))
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      if (String(url).includes('/rest/v1/bug_attachments'))
+        return jsonResponse([
+          {
+            id: 'attachment-a',
+            feature_id: 'feature-a',
+            file_name: 'screen.png',
+            content_type: 'image/png',
+            byte_size: expectedBytes.length,
+            sha256: expectedHash,
+            storage_path: 'workspace-a/project-a/feature-a/attachment-a-screen.png',
+          },
+        ]);
+      if (String(url).includes('/storage/v1/object/authenticated/'))
+        return new globalThis.Response(new Uint8Array([1, 2, 3]), {
+          status: 200,
+          headers: { 'Content-Type': 'image/png' },
+        });
+      throw new Error(`unexpected request ${String(url)} ${init.method ?? 'GET'}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+    await assert.rejects(
+      () =>
+        organizationApi.getBugAttachmentContent(
+          'workspace-a',
+          'project-a',
+          'feature-a',
+          'attachment-a',
+        ),
+      /does not match attachment metadata/i,
+    );
+  });
+
+  it('does not create attachment metadata when uploaded Storage bytes fail verification', async () => {
+    const calls = [];
+    const png =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), init });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight'))
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      if (String(url).includes('/rest/v1/bug_attachments') && init.method === 'POST')
+        throw new Error('attachment metadata must not be written');
+      if (String(url).includes('/rest/v1/bug_attachments')) return jsonResponse([]);
+      if (String(url).includes('/storage/v1/object/authenticated/'))
+        return new globalThis.Response(new Uint8Array([1, 2, 3]), {
+          status: 200,
+          headers: { 'Content-Type': 'image/png' },
+        });
+      if (String(url).includes('/storage/v1/object/forge-bug-attachments/'))
+        return jsonResponse({ Key: 'stored' });
+      throw new Error(`unexpected request ${String(url)} ${init.method ?? 'GET'}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+    await assert.rejects(
+      () =>
+        organizationApi.uploadBugAttachment('workspace-a', 'project-a', 'feature-a', {
+          file_name: 'screen.png',
+          content_type: 'image/png',
+          data_base64: png,
+        }),
+      /does not match attachment metadata/i,
+    );
+    assert.equal(
+      calls.some(
+        ({ url, init }) => url.includes('/rest/v1/bug_attachments') && init.method === 'POST',
+      ),
+      false,
+    );
+    assert.ok(
+      calls.some(
+        ({ url, init }) =>
+          url.includes('/storage/v1/object/forge-bug-attachments/') && init.method === 'DELETE',
+      ),
     );
   });
 

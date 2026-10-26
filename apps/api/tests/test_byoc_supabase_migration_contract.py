@@ -50,3 +50,15 @@ def test_byoc_02_rollback_restores_the_01_preflight_and_policies() -> None:
     assert 'forge-byoc-v1' in sql
     assert 'restore the 0.1 write policies' in sql.lower()
     assert 'drop function if exists public.forge_project_is_active(uuid)' in sql
+
+
+def test_byoc_02_binds_contextual_fingerprints_and_storage_metadata() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8')
+
+    assert "'scope', p_scope" in sql
+    assert "'workspace_id', p_workspace_id" in sql
+    assert "'project_id', p_project_id" in sql
+    assert "'destination_id', p_destination_id" in sql
+    assert 'storage.objects' in sql
+    assert "metadata->>'size'" in sql
+    assert "metadata->>'mimetype'" in sql

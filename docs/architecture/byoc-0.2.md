@@ -1,6 +1,6 @@
 # FORGE BYOC 0.2 functional parity
 
-**Status:** implementation candidate on `feature/forge-byoc-supabase-parity`.
+**Status:** hardening candidate on `feature/forge-byoc-0.2-hardening`.
 
 ## Runtime contract
 
@@ -37,6 +37,17 @@ project ownership foreign keys, archived-project write guards, unique names,
 dependency graph validation and transaction boundaries. Client validation is
 only an early error message and never an authorization boundary.
 
+Transfer fingerprints for contextual imports are bound to the scope, workspace,
+project, destination and document by the contextual RPC. A reviewed fingerprint
+cannot be replayed against another destination. ZIP parsing enforces the 5 MiB
+compressed, 25 MiB expanded and 100-entry limits while streaming entries before
+allocating declared payload sizes.
+
+Screenshot writes use private Storage, read the stored object back, validate its
+image signature, byte size and SHA-256 against the metadata, and only then write
+the `bug_attachments` row. The migration trigger also checks that the Storage
+object exists and that its declared size and MIME metadata agree with the row.
+
 ## Migration boundary
 
 `supabase/migrations/20261026_byoc_0001.sql` is the already-applied BYOC 0.1
@@ -44,6 +55,9 @@ baseline and is immutable. Owners apply
 `20261026_byoc_0002.sql` explicitly, after backup/review, to add the parity
 tables, private bucket, RLS, grants and RPCs. FORGE does not run either file,
 does not provision a project, and does not receive an owner/service-role key.
+The hardening changes are included in 0002; no adjustment to 0001 is required.
+The owner should still validate the final SQL in a disposable project before
+applying it to any retained project.
 
 The preflight response is `forge-byoc-v2`. An installation never reports
 Supabase `ready` before authentication, version preflight and permission

@@ -253,6 +253,7 @@ declare
     target_project uuid;
     target_feature uuid;
     target_workspace uuid;
+    stored_metadata jsonb;
 begin
     target_project := case when tg_op = 'DELETE' then old.project_id else new.project_id end;
     target_feature := case when tg_op = 'DELETE' then old.feature_id else new.feature_id end;
@@ -268,6 +269,26 @@ begin
     end if;
     if tg_op <> 'DELETE' and new.storage_path not like target_workspace::text || '/' || target_project::text || '/' || target_feature::text || '/%' then
         raise exception 'attachment storage path does not match its Bug' using errcode = '23514';
+    end if;
+    if tg_op <> 'DELETE' then
+        select o.metadata
+        into stored_metadata
+        from storage.objects o
+        where o.bucket_id = 'forge-bug-attachments'
+          and o.name = new.storage_path;
+        if not found then
+            raise exception 'attachment Storage object is missing' using errcode = '23514';
+        end if;
+        if stored_metadata is null or coalesce(stored_metadata->>'size', '') !~ '^[0-9]+$' then
+            raise exception 'attachment Storage size does not match metadata' using errcode = '23514';
+        end if;
+        if (stored_metadata->>'size')::bigint <> new.byte_size then
+            raise exception 'attachment Storage size does not match metadata' using errcode = '23514';
+        end if;
+        if nullif(stored_metadata->>'mimetype', '') is null
+           or stored_metadata->>'mimetype' <> new.content_type then
+            raise exception 'attachment Storage content type does not match metadata' using errcode = '23514';
+        end if;
     end if;
     if not public.forge_project_is_active(target_project) then
         raise exception 'archived projects are read-only' using errcode = '55000';
@@ -1017,6 +1038,7 @@ set search_path = public
 as $$
 declare
     preview jsonb;
+    contextual_fingerprint text;
 begin
     if public.forge_project_role(p_project_id) is null then
         raise exception 'project membership required' using errcode = '42501';
@@ -1052,7 +1074,26 @@ begin
     ) then
         raise exception 'Task transfer must contain Tasks for exactly one Work Item' using errcode = '22023';
     end if;
-    return preview || jsonb_build_object('destination', jsonb_build_object('scope', p_scope, 'id', p_destination_id));
+    contextual_fingerprint := encode(
+        digest(
+            convert_to(
+                jsonb_build_object(
+                    'scope', p_scope,
+                    'workspace_id', p_workspace_id,
+                    'project_id', p_project_id,
+                    'destination_id', p_destination_id,
+                    'document', p_document
+                )::text,
+                'utf8'
+            ),
+            'sha256'
+        ),
+        'hex'
+    );
+    return preview || jsonb_build_object(
+        'fingerprint', contextual_fingerprint,
+        'destination', jsonb_build_object('scope', p_scope, 'id', p_destination_id)
+    );
 end;
 $$;
 

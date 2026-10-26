@@ -1,4 +1,4 @@
-# Draft PR — FORGE BYOC 0.2 Supabase parity
+# Draft PR — FORGE BYOC 0.2 hardening
 
 ## Summary
 
@@ -18,6 +18,11 @@ API/private Storage. No PostgreSQL connection or privileged key is distributed.
   bounded parsing, staging and compensation.
 - Supabase adapter tests, migration contract checks, private content handling,
   reload/session coverage, and documentation/parity register.
+- Bounded streaming ZIP extraction that rejects oversized declared expansion
+  before allocation.
+- Contextual fingerprints bound to scope, workspace, project and destination.
+- Storage read-back verification for image signature, size and SHA-256 before
+  metadata insertion, plus a database trigger check for Storage metadata.
 
 ## Verification
 
@@ -28,6 +33,9 @@ the documented disposable A/B/C test.
 ## Review notes
 
 - `20261026_byoc_0001.sql` is intentionally unchanged.
+- `20261026_byoc_0002.sql` is the owner-reviewed incremental migration and was
+  not executed by FORGE; it needs no adjustment before disposable-project
+  validation.
 - The untracked operator `build/` directory was preserved.
 - Do not merge or apply either migration to a real project without owner
   backup/review.

@@ -1,5 +1,5 @@
 import { ApiError } from './errors.js';
-import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
+import { strFromU8, strToU8, Unzip, UnzipInflate, zipSync } from 'fflate';
 import type {
   BugAttachment,
   Criterion,
@@ -212,6 +212,31 @@ export function createSupabaseHandler(
     return sha256(new TextEncoder().encode(stableStringify(value)));
   }
 
+  async function verifyAttachmentBlob(
+    blob: Blob,
+    contentType: string,
+    expectedByteSize: number,
+    expectedSha256: string,
+  ): Promise<Blob> {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    if (
+      (blob.type && blob.type.toLowerCase() !== contentType.toLowerCase()) ||
+      bytes.byteLength !== expectedByteSize ||
+      bytes.byteLength > MAX_ATTACHMENT_BYTES
+    ) {
+      throw new ApiError(422, 'Stored screenshot does not match attachment metadata.');
+    }
+    try {
+      validateImage(bytes, contentType);
+    } catch {
+      throw new ApiError(422, 'Stored screenshot does not match attachment metadata.');
+    }
+    if ((await sha256(bytes)) !== expectedSha256) {
+      throw new ApiError(422, 'Stored screenshot checksum does not match attachment metadata.');
+    }
+    return new Blob([bytes], { type: contentType });
+  }
+
   async function uploadAttachment(
     workspaceId: string,
     projectId: string,
@@ -234,6 +259,7 @@ export function createSupabaseHandler(
     }
     const attachmentId = globalThis.crypto.randomUUID();
     const storagePath = `${workspaceId}/${projectId}/${featureId}/${attachmentId}-${fileName}`;
+    const contentHash = await sha256(bytes);
     const encodedBytes = new ArrayBuffer(bytes.byteLength);
     new Uint8Array(encodedBytes).set(bytes);
     try {
@@ -242,6 +268,12 @@ export function createSupabaseHandler(
         headers: { 'Content-Type': String(contentType), 'x-upsert': 'false' },
         body: encodedBytes,
       });
+      await verifyAttachmentBlob(
+        await blobRequest(`/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${storagePath}`),
+        String(contentType),
+        bytes.byteLength,
+        contentHash,
+      );
       const created = one(
         await table<AttachmentRecord[]>('bug_attachments', '', {
           method: 'POST',
@@ -254,7 +286,7 @@ export function createSupabaseHandler(
             file_name: fileName,
             content_type: contentType,
             byte_size: bytes.byteLength,
-            sha256: await sha256(bytes),
+            sha256: contentHash,
           }),
         }),
       );
@@ -284,9 +316,108 @@ export function createSupabaseHandler(
       }),
     );
     const record = one(records);
-    return blobRequest(
-      `/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${record.storage_path}`,
+    return verifyAttachmentBlob(
+      await blobRequest(
+        `/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${record.storage_path}`,
+      ),
+      record.content_type,
+      record.byte_size,
+      record.sha256,
     );
+  }
+
+  function concatChunks(chunks: Uint8Array[], byteLength: number): Uint8Array {
+    const bytes = new Uint8Array(byteLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return bytes;
+  }
+
+  function unzipEntriesBounded(archiveBytes: Uint8Array): Record<string, Uint8Array> {
+    const entries: Record<string, Uint8Array> = {};
+    const seen = new Set<string>();
+    let entryCount = 0;
+    let declaredExpandedBytes = 0;
+    let expandedBytes = 0;
+    let failure: ApiError | null = null;
+    const fail = (message: string): void => {
+      failure ??= new ApiError(422, message);
+    };
+    const unzip = new Unzip((file) => {
+      if (failure) return;
+      entryCount += 1;
+      const normalizedName = file.name.normalize('NFC').toLowerCase();
+      if (entryCount > MAX_PACKAGE_ENTRIES || seen.has(normalizedName)) {
+        fail('Project package exceeds decompression budget.');
+        return;
+      }
+      seen.add(normalizedName);
+      if (
+        file.originalSize !== undefined &&
+        (!Number.isSafeInteger(file.originalSize) || file.originalSize > MAX_EXPANDED_BYTES)
+      ) {
+        fail('Project package exceeds decompression budget.');
+        return;
+      }
+      if (file.compression !== 0 && file.compression !== 8) {
+        fail('Project package contains an unsupported compression method.');
+        return;
+      }
+      const declaredSize = file.originalSize ?? 0;
+      if (declaredSize > MAX_EXPANDED_BYTES - declaredExpandedBytes) {
+        fail('Project package exceeds decompression budget.');
+        return;
+      }
+      declaredExpandedBytes += declaredSize;
+      const fixed = file.originalSize === undefined ? null : new Uint8Array(declaredSize);
+      const chunks: Uint8Array[] = [];
+      let fileSize = 0;
+      let offset = 0;
+      file.ondata = (error, chunk, final) => {
+        if (error) {
+          fail('Project package is not a valid ZIP archive.');
+          return;
+        }
+        if (failure) return;
+        fileSize += chunk.byteLength;
+        expandedBytes += chunk.byteLength;
+        if (
+          fileSize > MAX_EXPANDED_BYTES ||
+          expandedBytes > MAX_EXPANDED_BYTES ||
+          (fixed !== null && offset + chunk.byteLength > fixed.byteLength)
+        ) {
+          fail('Project package exceeds decompression budget.');
+          file.terminate();
+          return;
+        }
+        if (fixed !== null) {
+          fixed.set(chunk, offset);
+          offset += chunk.byteLength;
+        } else {
+          chunks.push(chunk);
+        }
+        if (final) {
+          if (fixed !== null && offset !== fixed.byteLength) {
+            fail('Project package decompression size mismatch.');
+            return;
+          }
+          entries[file.name] = fixed ?? concatChunks(chunks, fileSize);
+        }
+      };
+      file.start();
+    });
+    unzip.register(UnzipInflate);
+    try {
+      unzip.push(archiveBytes, true);
+    } catch (cause) {
+      if (cause instanceof ApiError) throw cause;
+      throw new ApiError(422, 'Project package is not a valid ZIP archive.');
+    }
+    if (failure) throw failure;
+    return entries;
   }
 
   type PackageAsset = {
@@ -306,18 +437,11 @@ export function createSupabaseHandler(
       MAX_PACKAGE_BYTES,
       'Project package is not valid base64.',
     );
-    let entries: Record<string, Uint8Array>;
-    try {
-      entries = unzipSync(archiveBytes);
-    } catch {
-      throw new ApiError(422, 'Project package is not a valid ZIP archive.');
-    }
+    const entries = unzipEntriesBounded(archiveBytes);
     const paths = Object.keys(entries);
     if (!paths.includes('manifest.json') || paths.length > MAX_PACKAGE_ENTRIES) {
       throw new ApiError(422, 'Project package manifest is invalid.');
     }
-    const expanded = paths.reduce((total, path) => total + entries[path].byteLength, 0);
-    if (expanded > MAX_EXPANDED_BYTES) throw new ApiError(422, 'Project package is too large.');
     let manifest: JsonRecord;
     try {
       const parsedManifest: unknown = JSON.parse(strFromU8(entries['manifest.json']));
@@ -517,6 +641,12 @@ export function createSupabaseHandler(
           body: asset.bytes.buffer as ArrayBuffer,
         });
         uploaded.push(storagePath);
+        await verifyAttachmentBlob(
+          await blobRequest(`/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${storagePath}`),
+          asset.contentType,
+          asset.bytes.byteLength,
+          asset.sha256,
+        );
         await table('bug_attachments', '', {
           method: 'POST',
           body: JSON.stringify({
