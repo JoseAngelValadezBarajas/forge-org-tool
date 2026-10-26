@@ -42,7 +42,7 @@ describe('usePointerKanbanDrag', () => {
     vi.restoreAllMocks();
   });
 
-  it('captures the pointer so a drag that starts on a link keeps its target', () => {
+  it('captures the pointer only after movement crosses the drag threshold', () => {
     const onDrop = vi.fn();
     render(<Harness onDrop={onDrop} />);
     const source = screen.getByTestId('source');
@@ -50,7 +50,9 @@ describe('usePointerKanbanDrag', () => {
     source.setPointerCapture = capture;
 
     fireEvent.pointerDown(source, { button: 0, pointerId: 7, clientX: 10, clientY: 10 });
+    expect(capture).not.toHaveBeenCalled();
 
+    fireEvent.pointerMove(document, { pointerId: 7, clientX: 20, clientY: 20 });
     expect(capture).toHaveBeenCalledWith(7);
   });
 });

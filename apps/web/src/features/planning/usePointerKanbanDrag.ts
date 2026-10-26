@@ -4,6 +4,7 @@ type PointerDrag = {
   id: string;
   x: number;
   y: number;
+  target: HTMLElement;
 };
 
 type PointerKanbanDragOptions<TStatus extends string> = {
@@ -29,8 +30,7 @@ export function usePointerKanbanDrag<TStatus extends string>({
     ) {
       return;
     }
-    event.currentTarget.setPointerCapture?.(event.pointerId);
-    pending.current = { id, x: event.clientX, y: event.clientY };
+    pending.current = { id, x: event.clientX, y: event.clientY, target: event.currentTarget };
     dragging.current = false;
   }, []);
 
@@ -41,6 +41,7 @@ export function usePointerKanbanDrag<TStatus extends string>({
       const distance = Math.hypot(event.clientX - source.x, event.clientY - source.y);
       if (!dragging.current && distance < threshold) return;
       if (!dragging.current) {
+        source.target.setPointerCapture?.(event.pointerId);
         dragging.current = true;
         suppressClick.current = true;
         setDraggingId(source.id);
