@@ -291,6 +291,15 @@
   font-weight: 500;
   text-align: left;
 }
+@media (min-width: 1400px) {
+  .topbarContext {
+    flex: 0 0 760px;
+    max-width: none;
+  }
+  .topbarActions {
+    margin-right: 125px;
+  }
+}
 .themeControl {
   position: relative;
   display: inline-flex;

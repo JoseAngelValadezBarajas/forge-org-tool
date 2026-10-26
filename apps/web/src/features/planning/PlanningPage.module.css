@@ -81,6 +81,12 @@
   background: var(--forge-accent);
   filter: brightness(1.06);
 }
+@media (min-width: 1400px) {
+  .pageHeading > div {
+    width: 930px;
+    flex: 0 0 930px;
+  }
+}
 .epicBoardSection {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -177,7 +183,7 @@
 }
 .board.epicBoard {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(222px, 1fr));
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
@@ -201,6 +207,9 @@
 }
 .board.epicBoard > section > div.compactSurface {
   height: 100%;
+}
+.board.epicBoard > section > [data-kanban-status] > [data-state] {
+  width: calc(100% + 2px);
 }
 .board:focus-visible {
   outline: 2px solid var(--forge-accent);

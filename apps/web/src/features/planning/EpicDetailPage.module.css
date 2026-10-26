@@ -185,6 +185,11 @@
     grid-template-columns: repeat(5, minmax(222px, 1fr));
   }
 }
+@media (min-width: 1400px) {
+  .board {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
 .board > section,
 .board > section > div {
   box-sizing: border-box;
