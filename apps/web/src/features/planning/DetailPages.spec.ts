@@ -157,6 +157,10 @@ test('UX-03 exact Epic board geometry, type filtering and durable status move', 
       width: 222,
       height: 563,
     });
+    const columnWidths = await page
+      .getByTestId(/^kanban-column-/)
+      .evaluateAll((columns) => columns.map((column) => column.getBoundingClientRect().width));
+    expect(Math.max(...columnWidths) - Math.min(...columnWidths)).toBeLessThan(2);
     await page.getByRole('combobox', { name: 'Filter Work Items by type' }).selectOption('bug');
     await expect(page.getByRole('link', { name: story.title, exact: true })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Bounding box drift', exact: true })).toBeVisible();

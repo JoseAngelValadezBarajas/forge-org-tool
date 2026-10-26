@@ -191,6 +191,9 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+.board > section > div.compactSurface {
+  height: 100%;
+}
 .board > section > div > h3 {
   width: 100%;
 }
@@ -341,20 +344,11 @@
   font-size: 13px;
 }
 @media (min-width: 721px) and (max-width: 1200px) {
-  .board {
-    grid-template-columns: repeat(5, 222px);
-    overflow-x: auto;
-  }
   .filters {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .progress {
     flex-basis: 100%;
-  }
-}
-@media (min-width: 1400px) {
-  .board {
-    grid-template-columns: repeat(4, 222px) minmax(0, 1fr);
   }
 }
 @media (max-width: 720px) {
