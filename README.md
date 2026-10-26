@@ -8,7 +8,8 @@ A new, public, local-first organizational tool for software work, with a self-co
 
 **License:** New FORGE Org Tool code and documentation are offered under
 [Apache-2.0](LICENSE). The original FORGE repository is a separate preserved
-source reference under its own license; see [reconstruction provenance](docs/reconstruction/functional-parity.md).
+source reference under its own license; the active product scope is documented
+in [`docs/product/mvp-1.0.md`](docs/product/mvp-1.0.md).
 
 ## Scope and architecture
 
@@ -20,9 +21,9 @@ source reference under its own license; see [reconstruction provenance](docs/rec
 - `apps/api`: Python FastAPI modular monolith with bounded capability routers, application services, migration runner, and persistence boundary; it owns durable state, rules, provenance and contracts.
 - `apps/desktop`: Tauri 2 runtime boundary with Rust-owned capabilities and a separately certified sidecar/packaging workflow.
 
-See [architecture](docs/architecture/README.md), [client component contracts](docs/architecture/client-components.md), [migration checkpoints](docs/migration/plan.md), and [safety policy](SECURITY.md).
+See [architecture](docs/architecture/README.md), [client component contracts](docs/architecture/client-components.md), and [safety policy](SECURITY.md).
 
-The 1.0 implementation keeps Organization, Planning, Project Transfer and shared UI in scope. Advanced capabilities from the original reconstruction inventory are not part of the active 1.0 product; see the compatibility matrix in [`docs/migration/plan.md`](docs/migration/plan.md). The original FORGE repository and PRs are not modified or archived by this work.
+The 1.0 implementation keeps Organization, Planning, Project Transfer and shared UI in scope. Advanced capabilities from the original product inventory are not part of the active 1.0 product; see [`docs/product/mvp-1.0.md`](docs/product/mvp-1.0.md). The original FORGE repository and PRs are not modified or archived by this work.
 
 Project Transfer supports legacy v1 JSON import, v2 JSON planning export/import, and v2 ZIP packages that include validated Bug screenshots. Package transfer is limited to 5 MiB compressed to remain within the Desktop sidecar request boundary; see [`docs/import-export/README.md`](docs/import-export/README.md) for the package manifest, checksums and rejected archive conditions.
 

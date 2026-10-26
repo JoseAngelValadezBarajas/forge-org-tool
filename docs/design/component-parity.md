@@ -268,7 +268,7 @@ UX-01 worktree; they do not certify visual parity.
   decomposed preview implementation.
 
 Automated host evidence is retained in
-[docs/evidence/ux01/](../evidence/ux01/): Dark/Light Component Host
+[docs/evidence/ux-1.1/](../evidence/ux-1.1/): Dark/Light Component Host
 desktop/mobile overview and category captures, plus representative
 Organization, Planning, Feature Detail, Readiness, Context, Workbench,
 Delivery and Transfer journeys. The host responsive check covers 1440, 1280,
