@@ -168,7 +168,7 @@
 }
 .board.epicBoard {
   display: grid;
-  grid-template-columns: repeat(5, 222px);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
