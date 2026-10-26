@@ -180,6 +180,11 @@
   overflow-x: auto;
   overflow-y: hidden;
 }
+@media (min-width: 721px) and (max-width: 1200px) {
+  .board {
+    grid-template-columns: repeat(5, minmax(222px, 1fr));
+  }
+}
 .board > section,
 .board > section > div {
   box-sizing: border-box;

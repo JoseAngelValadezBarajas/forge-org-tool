@@ -217,7 +217,8 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
-  flex: 0 0 760px;
+  flex: 1 1 auto;
+  max-width: 100%;
   overflow: hidden;
   height: 20px;
   color: var(--forge-text-muted);
@@ -231,7 +232,9 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-right: 125px;
+  flex: 0 0 auto;
+  min-width: 0;
+  margin-right: 0;
 }
 .topbarActions > button {
   box-sizing: border-box;
