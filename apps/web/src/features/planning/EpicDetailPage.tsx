@@ -571,6 +571,8 @@ export function EpicDetailPage() {
                     className={styles.board}
                     data-testid="epic-work-item-board"
                     data-scroll-axis="both"
+                    role="region"
+                    tabIndex={0}
                   >
                     {PLANNING_COLUMN_STATUSES.map(({ value: boardStatus }) => (
                       <KanbanColumn

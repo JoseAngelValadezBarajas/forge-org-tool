@@ -23,9 +23,9 @@
   display: grid;
   align-content: start;
   gap: 7px;
-  width: 930px;
+  width: auto;
   min-width: 0;
-  flex: 0 0 930px;
+  flex: 1 1 auto;
   height: 105px;
 }
 .pageHeading p,
@@ -81,8 +81,15 @@
   background: var(--forge-accent);
   filter: brightness(1.06);
 }
+@media (min-width: 1400px) {
+  .pageHeading > div {
+    width: 930px;
+    flex: 0 0 930px;
+  }
+}
 .epicBoardSection {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   min-width: 0;
   margin-bottom: 45px;
@@ -94,6 +101,11 @@
   height: 51px;
   min-width: 0;
   overflow: visible;
+}
+.epicToolbar > * {
+  min-width: 0;
+  width: auto;
+  flex: 1 1 auto;
 }
 .epicFilter,
 .boardViewMenu > summary {
@@ -115,6 +127,9 @@
 .boardViewMenu {
   position: relative;
   z-index: 2;
+  flex: 0 0 118px;
+}
+.epicToolbar > .boardViewMenu {
   flex: 0 0 118px;
 }
 .boardViewMenu > summary {
@@ -168,14 +183,33 @@
 }
 .board.epicBoard {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(222px, 1fr));
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: 615px;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0;
+}
+.board.epicBoard > section,
+.board.epicBoard > section > div {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.board.epicBoard > section > div {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.board.epicBoard > section > div.compactSurface {
+  height: 100%;
+}
+.board.epicBoard > section > [data-kanban-status] > [data-state] {
+  width: calc(100% + 2px);
 }
 .board:focus-visible {
   outline: 2px solid var(--forge-accent);
@@ -391,5 +425,10 @@ dialog.createEpicDrawer {
   }
   .boardAndDrawer .board.epicBoard {
     display: none;
+  }
+}
+@media (min-width: 721px) and (max-width: 1200px) {
+  .board.epicBoard {
+    grid-template-columns: repeat(5, minmax(222px, 1fr));
   }
 }

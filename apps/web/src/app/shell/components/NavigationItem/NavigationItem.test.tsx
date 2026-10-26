@@ -12,6 +12,21 @@ it('uses route-aware current-page semantics', () => {
   expect(screen.getByRole('link', { name: /Projects/ })).toHaveAttribute('aria-current', 'page');
 });
 
+it('renders a React icon node while preserving the accessible navigation label', () => {
+  render(
+    <MemoryRouter initialEntries={['/projects']}>
+      <NavigationItem
+        to="/projects"
+        label="Projects"
+        icon={<span data-testid="navigation-icon" aria-hidden="true" />}
+      />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getByTestId('navigation-icon')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute('aria-current', 'page');
+});
+
 it('renders disabled navigation as an inaccessible-to-activation item', () => {
   function CurrentLocation() {
     return <output>{useLocation().pathname}</output>;

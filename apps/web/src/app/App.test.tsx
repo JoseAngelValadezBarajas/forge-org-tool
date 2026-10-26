@@ -283,6 +283,63 @@ describe('M1 application shell', () => {
     expect(within(projectNavigation).getByRole('link', { name: 'FormiAI' })).toBeVisible();
   });
 
+  it('collapses the desktop sidebar into an accessible icon rail and restores the preference', async () => {
+    const workspace = {
+      id: 'w1',
+      name: 'Personal',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    const project = {
+      id: 'p1',
+      workspace_id: 'w1',
+      name: 'FormiAI',
+      description: null,
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload = path === '/api/v1/workspaces' ? [workspace] : [project];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+
+    const sidebar = screen.getByRole('complementary');
+    const projectNavigation = await within(sidebar).findByRole('navigation', {
+      name: 'Project navigation',
+    });
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' });
+    expect(screen.getByTestId('app-shell-grid')).toHaveAttribute('data-sidebar-collapsed', 'false');
+    expect(await within(projectNavigation).findByRole('link', { name: 'FormiAI' })).toBeVisible();
+
+    fireEvent.click(toggle);
+
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument();
+    expect(screen.getByTestId('app-shell-grid')).toHaveAttribute('data-sidebar-collapsed', 'true');
+    expect(localStorage.getItem('forge-sidebar-collapsed')).toBe('true');
+    expect(
+      within(projectNavigation).getByRole('link', { name: 'Workspace Overview' }),
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(projectNavigation)
+        .getByRole('link', { name: 'FormiAI' })
+        .querySelector('[data-icon="Layers"]'),
+    ).not.toBeNull();
+
+    cleanup();
+    renderRoute('/');
+    expect(await screen.findByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument();
+    expect(screen.getByTestId('app-shell-grid')).toHaveAttribute('data-sidebar-collapsed', 'true');
+  });
+
   it('provides compact mobile navigation for Projects, the current Board, Search and Settings', () => {
     renderRoute('/planning/w1/p1');
 

@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { NavLink, type NavLinkProps } from 'react-router-dom';
 import styles from './NavigationItem.module.css';
 export interface NavigationItemProps extends Omit<NavLinkProps, 'children'> {
   label: string;
   disabled?: boolean;
-  icon?: string;
+  icon?: ReactNode;
 }
 export function NavigationItem({
   label,
@@ -21,7 +22,9 @@ export function NavigationItem({
         aria-disabled="true"
       >
         {icon}
-        <span className={styles.label}>{label}</span>
+        <span className={styles.label} data-navigation-label="true">
+          {label}
+        </span>
       </span>
     );
   }
@@ -36,7 +39,9 @@ export function NavigationItem({
       }
     >
       {icon}
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label} data-navigation-label="true">
+        {label}
+      </span>
     </NavLink>
   );
 }

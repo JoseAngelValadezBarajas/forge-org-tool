@@ -384,8 +384,10 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               <div
                 className={`${styles.board} ${styles.epicBoard}`}
                 aria-label="Epic workflow board"
+                role="region"
                 data-testid="project-epic-board"
                 data-node-id="344:131"
+                tabIndex={0}
               >
                 {PLANNING_COLUMN_STATUSES.map(({ value: status }) => {
                   const columnEpics = filteredWorkflowEpics.filter(
