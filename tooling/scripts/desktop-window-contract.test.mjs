@@ -16,6 +16,7 @@ test('Tauri declares a visible, usable main FORGE window explicitly', () => {
   assert.ok(main?.minHeight >= 600);
   assert.equal(main?.center, true);
   assert.equal(main?.visible, true);
+  assert.match(config.app.security?.csp ?? '', /connect-src[^;]*https:\/\/\*\.supabase\.co/);
 });
 
 test('Windows desktop host uses the single-instance activation plugin', async () => {

@@ -39,7 +39,7 @@ def _schema_is_current(path: Path, current_version: int) -> bool:
         migration_version = probe.execute('SELECT max(version) FROM schema_migrations').fetchone()[
             0
         ]
-        return schema_version == current_version and migration_version == current_version
+        return bool(schema_version == current_version and migration_version == current_version)
 
 
 def connect() -> sqlite3.Connection:

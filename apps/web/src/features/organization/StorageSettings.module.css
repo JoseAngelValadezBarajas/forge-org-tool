@@ -1,0 +1,132 @@
+.card {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  padding: 20px;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.heading h2,
+.heading p {
+  margin: 0;
+}
+
+.heading h2 {
+  color: var(--forge-text-primary);
+  font-size: 19px;
+}
+
+.heading p,
+.help,
+.status,
+.warning {
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--forge-accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.providers {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.providers legend {
+  margin-bottom: 2px;
+  color: var(--forge-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.providerOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 9px;
+  background: var(--forge-surface-raised);
+  color: var(--forge-text-primary);
+}
+
+.providerOption > span {
+  display: grid;
+  gap: 3px;
+}
+
+.providers small {
+  color: var(--forge-text-muted);
+  font-size: 11px;
+}
+
+.future {
+  margin: 0;
+  color: var(--forge-text-subtle);
+  font-size: 12px;
+}
+
+.status,
+.warning,
+.error {
+  margin: 0;
+}
+
+.status span {
+  overflow-wrap: anywhere;
+}
+
+.error {
+  color: var(--forge-danger);
+  font-size: 12px;
+}
+
+.cloudPanel {
+  display: grid;
+  gap: 18px;
+  max-width: 640px;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.form h3 {
+  margin: 0;
+  color: var(--forge-text-primary);
+  font-size: 15px;
+}
+
+.help code {
+  color: var(--forge-accent);
+  font-family: var(--forge-font-mono);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 760px) {
+  .heading {
+    display: grid;
+  }
+}
