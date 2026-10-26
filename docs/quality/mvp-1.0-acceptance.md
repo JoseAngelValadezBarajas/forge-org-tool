@@ -20,13 +20,6 @@ The isolated Chromium acceptance run passed 24/24 journeys, 0 failed and 0 flaky
 
 Quality CI [39968176409](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409) passed `web`, `api`, and `desktop` on final implementation commit `534686ae38f9730aacff12c2dc0ea69e0fcef634`. The Windows job's installed NSIS test reported `PASS installed UI -> authenticated API -> SQLite -> restart`, including Bug screenshot `forge-desktop-bug.png`, visible `FORGE Org Tool` window at 1044×788, isolated `%LOCALAPPDATA%\ForgeOrgTool\data\forge.db`, and restart verification.
 
-Retained browser captures in `docs/evidence/mvp-1.0/`:
-
-- `component-host-desktop-dark.png`, `component-host-desktop-light.png`
-- `component-host-mobile-dark.png`, `component-host-mobile-light.png`
-- `project-overview-desktop.png`, `project-overview-mobile.png`
-- `epic-detail-desktop.png`, `epic-detail-mobile.png`
-
-The CI artifact [product acceptance evidence](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12507523428) includes the latest Playwright reports, traces and screenshots. The [Windows installer evidence artifact](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12508766702) includes the NSIS installer and native startup smoke screenshot. See [`verification.md`](../evidence/mvp-1.0/verification.md) for local commands and detailed results.
+The CI artifact [product acceptance evidence](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12507523428) includes the latest Playwright reports, traces and screenshots. The [Windows installer evidence artifact](https://github.com/JoseAngelValadezBarajas/forge-org-tool/actions/runs/39968176409/artifacts/12508766702) includes the NSIS installer and native startup smoke screenshot. Detailed run output remains available from the linked CI artifacts.
 
 Overall delivery status: `MVP_READY_FOR_REVIEW`. This means automated acceptance is complete and human product/design review can proceed. Figma visual review remains open; PR #3 is open and unmerged. No merge or release is implied.
