@@ -187,7 +187,8 @@
 }
 @media (min-width: 1400px) {
   .board {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(5, 222px);
+    column-gap: 9.5px;
   }
 }
 .board > section,
