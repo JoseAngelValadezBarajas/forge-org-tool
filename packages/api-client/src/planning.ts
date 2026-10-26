@@ -1,4 +1,4 @@
-import { getApiJson, sendJson } from './transport.js';
+import { getApiBlob, getApiJson, sendJson } from './transport.js';
 import type {
   Criterion,
   BugAttachment,
@@ -65,6 +65,15 @@ export const planningCapability = {
       `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachmentId}`,
       { method: 'DELETE', body: '{}' },
     ),
+  getBugAttachmentContent: (
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    attachmentId: string,
+  ) =>
+    getApiBlob({
+      path: `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachmentId}/content`,
+    }),
   createEpic: (
     workspaceId: string,
     projectId: string,

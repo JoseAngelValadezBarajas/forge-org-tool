@@ -356,7 +356,7 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
     const result = activeHandler?.preflight
       ? await activeHandler.preflight()
       : { schemaVersion: '' };
-    if (result.schemaVersion !== 'forge-byoc-v1') {
+    if (!['forge-byoc-v1', 'forge-byoc-v2'].includes(result.schemaVersion)) {
       throw new ApiError(409, 'The Supabase BYOC schema is missing or unsupported.');
     }
     snapshot = {

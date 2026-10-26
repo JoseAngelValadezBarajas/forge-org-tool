@@ -146,4 +146,30 @@ describe('BYOC storage contracts', () => {
     initializeStoredStorage();
     assert.equal(getStorageSnapshot().provider, 'local');
   });
+
+  it('does not mark an unknown cloud schema version ready', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'user-access-token',
+            refresh_token: 'user-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      return new globalThis.Response(JSON.stringify({ schema_version: 'forge-byoc-v99' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile });
+    await signInSupabase('a@example.test', 'temporary-password');
+    const { inspectStorage } = await import('../dist/index.js');
+    const state = await inspectStorage();
+    assert.equal(state.status, 'schema_missing');
+  });
 });

@@ -47,6 +47,7 @@ export function FeatureDetailPage() {
     notes,
     setNotes,
     attachments,
+    attachmentUrls,
     workspaceTags,
     uploadAttachment,
     removeAttachment,
@@ -617,7 +618,9 @@ export function FeatureDetailPage() {
                     ) : (
                       <ul className={styles.attachmentGrid}>
                         {attachments.map((attachment) => {
-                          const contentUrl = `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachment.id}/content`;
+                          const contentUrl =
+                            attachmentUrls[attachment.id] ??
+                            `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/attachments/${attachment.id}/content`;
                           return (
                             <li key={attachment.id} className={styles.attachment}>
                               <a href={contentUrl} target="_blank" rel="noreferrer">

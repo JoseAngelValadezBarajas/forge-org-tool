@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   organizationApi,
+  getStorageSnapshot,
   type BugAttachment,
   type Criterion,
   type Dependency,
@@ -29,6 +30,7 @@ export function useFeatureDetailController(
   const [featureTags, setFeatureTags] = useState('');
   const [notes, setNotes] = useState('');
   const [attachments, setAttachments] = useState<BugAttachment[]>([]);
+  const [attachmentUrls, setAttachmentUrls] = useState<Record<string, string>>({});
   const [workspaceTags, setWorkspaceTags] = useState<WorkspaceTag[]>([]);
   const [taskTitle, setTaskTitle] = useState('');
   const [criterion, setCriterion] = useState('');
@@ -63,6 +65,28 @@ export function useFeatureDetailController(
             ? await organizationApi.listBugAttachments(workspaceId, projectId, featureId)
             : [];
         if (!isCurrent() || generation !== loadGeneration.current) return;
+        const nextAttachmentUrls: Record<string, string> = {};
+        if (getStorageSnapshot().provider === 'supabase') {
+          await Promise.all(
+            nextAttachments.map(async (attachment) => {
+              const blob = await organizationApi.getBugAttachmentContent(
+                workspaceId,
+                projectId,
+                featureId,
+                attachment.id,
+              );
+              nextAttachmentUrls[attachment.id] = URL.createObjectURL(blob);
+            }),
+          );
+        }
+        if (!isCurrent() || generation !== loadGeneration.current) {
+          Object.values(nextAttachmentUrls).forEach((url) => URL.revokeObjectURL(url));
+          return;
+        }
+        setAttachmentUrls((previous) => {
+          Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+          return nextAttachmentUrls;
+        });
         setFeature(nextFeature);
         setFeatureTitle(nextFeature?.title ?? '');
         setFeatureDescription(nextFeature?.description ?? '');
@@ -91,6 +115,10 @@ export function useFeatureDetailController(
     queueMicrotask(() => void load(() => current));
     return () => {
       current = false;
+      setAttachmentUrls((previous) => {
+        Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+        return {};
+      });
     };
   }, [load]);
 
@@ -222,6 +250,13 @@ export function useFeatureDetailController(
     try {
       await organizationApi.deleteBugAttachment(workspaceId, projectId, featureId, attachmentId);
       setAttachments((items) => items.filter((item) => item.id !== attachmentId));
+      setAttachmentUrls((previous) => {
+        const url = previous[attachmentId];
+        if (url) URL.revokeObjectURL(url);
+        const next = { ...previous };
+        delete next[attachmentId];
+        return next;
+      });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to remove screenshot.');
     }
@@ -266,6 +301,7 @@ export function useFeatureDetailController(
     moveTask,
     feature,
     attachments,
+    attachmentUrls,
     workspaceTags,
     reload: load,
     uploadAttachment,

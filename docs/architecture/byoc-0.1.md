@@ -1,6 +1,6 @@
 # FORGE BYOC 0.1
 
-**Status:** implementation candidate on `feature/forge-byoc-0.1`. Local SQLite remains the default. Supabase is an explicit, user-owned storage provider for the first shared-data vertical slice. Firebase is displayed as future work only.
+**Status:** superseded by [BYOC 0.2](byoc-0.2.md). This document records the 0.1 trust-boundary decisions that remain in force.
 
 ## Product contract
 
@@ -11,7 +11,7 @@ Settings > Storage lets a user choose:
 
 Changing provider never copies, merges, migrates, deletes, or silently falls back between stores. Existing local data is left in place. A cloud operation that fails is reported as a cloud error; it is never retried against local SQLite.
 
-The supported cloud slice is Workspace, Project, Epic, Feature/Story, status updates, planning overview, and workspace tags. Attachments, tasks, acceptance criteria, dependencies, imports/exports, offline sync, realtime, Firebase, and the remaining SQLite-only capabilities are deliberately outside BYOC 0.1.
+The 0.1 cloud slice was intentionally limited. BYOC 0.2 extends it to tasks, acceptance criteria, dependencies, private attachments and versioned transfer; offline sync, realtime and Firebase remain out of scope.
 
 ## Runtime layers and trust boundaries
 
@@ -38,7 +38,7 @@ The API client exposes a stable `organizationApi` facade while its transport can
 1. Local startup initializes the existing same-origin transport and reports `ready`.
 2. Selecting Supabase validates and persists only the project URL and publishable key. No request is made until the user saves the configuration.
 3. Sign-in uses Supabase Auth password grant. The grant is sent as the `/auth/v1/token` query parameter and only credentials are sent in the JSON body. The password is not persisted; the access/refresh session is kept in profile-bound session storage for the current installation session and is restored after reload only for the same project/key profile. Expired sessions are refreshed once and failed refreshes require sign-in again.
-4. `inspectStorage()` calls `forge_storage_preflight()` with the user's JWT. Only the expected `forge-byoc-v1` schema response becomes `ready`.
+4. `inspectStorage()` calls `forge_storage_preflight()` with the user's JWT. The 0.1 baseline reports `forge-byoc-v1`; the incremental 0.2 migration reports `forge-byoc-v2`.
 5. `401`, `403`, missing/unsupported schema, and network failures become distinct UI states. No state is reported as ready before authentication, schema, and permission preflight succeeds.
 
 The desktop CSP allows HTTPS connections to `*.supabase.co` in addition to the existing local sidecar origin. Tauri window, sidecar, and filesystem policies are otherwise unchanged.
@@ -55,9 +55,9 @@ Automated coverage includes strict profile validation, exact Auth grant/body rou
 
 No live Supabase project or credential is included in this repository. Therefore this change must not claim a real two-installation sync certification. The remaining manual validation is one owner-controlled run: provision a disposable Supabase project with the migration, configure installations A and B with the same authorized identity, create the vertical slice in A, refresh B, and verify status-change and restart persistence; then verify user C has no membership access. Any additional authorized user must be prepared separately through the documented owner-controlled membership action. The owner must then delete that disposable project if it is no longer needed.
 
-## Deliberate follow-ups
+## Historical 0.1 follow-ups
 
 - Add a secure OS-backed token store where the target platform exposes one; session storage is the conservative 0.1 boundary.
-- Extend the cloud adapter for tasks, acceptance criteria, dependencies, attachments and transfer only after their remote contracts and RLS rules are specified.
+- The former 0.1 follow-up is implemented by the incremental 0.2 migration and parity adapter.
 - Define explicit export/import or migration UX before offering any data movement between local and cloud stores.
 - Consider realtime/offline conflict handling only as a separate design; BYOC 0.1 is online and refresh-based.
