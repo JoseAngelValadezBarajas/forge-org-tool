@@ -83,6 +83,7 @@
 }
 .epicBoardSection {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   min-width: 0;
   margin-bottom: 45px;
@@ -180,6 +181,8 @@
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: 615px;
   overflow-x: auto;
   overflow-y: hidden;

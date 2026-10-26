@@ -116,7 +116,16 @@ async function geometry(
 }
 
 async function noOverflow(page: Page) {
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const metrics = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth,
+    scrollLeft: document.documentElement.scrollLeft,
+    board: document
+      .querySelector('[data-testid="project-epic-board"], [data-testid="epic-work-item-board"]')
+      ?.getBoundingClientRect()
+      .toJSON(),
+  }));
+  expect(metrics.scrollWidth, JSON.stringify(metrics)).toBeLessThanOrEqual(metrics.innerWidth);
 }
 
 test.beforeEach(async ({ page }, info) => {
@@ -210,7 +219,7 @@ test('UX-03 board shells keep the header inside the viewport and share column ge
   page,
 }) => {
   const { path, epic } = await seed(page);
-  await page.setViewportSize({ width: 1216, height: 900 });
+  await page.setViewportSize({ width: 1196, height: 900 });
 
   for (const boardPath of [path, `${path}/epics/${epic.id}`]) {
     await page.goto(boardPath);
@@ -219,7 +228,7 @@ test('UX-03 board shells keep the header inside the viewport and share column ge
 
     const topbar = await page.getByTestId('app-topbar').boundingBox();
     expect(topbar).not.toBeNull();
-    expect(topbar!.x + topbar!.width).toBeLessThanOrEqual(1216);
+    expect(topbar!.x + topbar!.width).toBeLessThanOrEqual(1196);
 
     const board = page.getByTestId(
       boardPath.endsWith(epic.id) ? 'epic-work-item-board' : 'project-epic-board',
