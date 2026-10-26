@@ -39,6 +39,17 @@ def test_membership_is_not_client_insertable_and_policies_are_membership_bound()
     assert 'wm.workspace_id = ' in sql
 
 
+def test_rls_contract_has_no_client_bypass_for_membership_or_cross_workspace_writes() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8').lower()
+
+    assert 'alter table public.workspace_members enable row level security' in sql
+    assert 'create policy workspace_members_insert' not in sql
+    assert 'grant insert on public.workspace_members' not in sql
+    assert sql.count('with check (') >= 4
+    assert 'join public.projects p on p.workspace_id = wm.workspace_id' in sql
+    assert 'wm.user_id = auth.uid()' in sql
+
+
 def test_rollback_only_removes_byoc_owned_objects_in_dependency_order() -> None:
     sql = ROLLBACK.read_text(encoding='utf-8').lower()
 

@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
-import { configureStorage, getStorageSnapshot, validateSupabaseProfile } from '../dist/index.js';
+import {
+  configureStorage,
+  getStorageSnapshot,
+  signInSupabase,
+  validateSupabaseProfile,
+} from '../dist/index.js';
 
 const validProfile = {
   projectUrl: 'https://example123.supabase.co',
@@ -48,5 +53,20 @@ describe('BYOC storage contracts', () => {
       message: 'Sign in to the configured Supabase project.',
       projectUrl: validProfile.projectUrl,
     });
+  });
+
+  it('does not accept an invalid Supabase token response as a usable session', async () => {
+    globalThis.fetch = async () =>
+      new globalThis.Response(JSON.stringify({ access_token: 'not-a-session' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+    configureStorage({ provider: 'supabase', ...validProfile });
+    await assert.rejects(
+      () => signInSupabase('a@example.test', 'temporary-password'),
+      /invalid authentication session/i,
+    );
+    assert.equal(getStorageSnapshot().status, 'authentication_required');
   });
 });

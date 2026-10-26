@@ -135,6 +135,66 @@ describe('Supabase Data API adapter', () => {
     assert.equal(calls.filter(({ url }) => url.startsWith('/api/v1/')).length, 0);
   });
 
+  it('keeps a user without workspace membership isolated from another user', async () => {
+    const calls = [];
+    const userBSession = {
+      ...session,
+      access_token: 'user-b-access-token',
+      refresh_token: 'user-b-refresh-token',
+      user: { id: 'user-b', email: 'b@example.test' },
+    };
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), init });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(userBSession);
+      if (String(url).includes('/rpc/forge_storage_preflight')) {
+        return jsonResponse({ schema_version: 'forge-byoc-v1' });
+      }
+      if (String(url).includes('/rest/v1/workspaces')) return jsonResponse([]);
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('b@example.test', 'temporary-password');
+    await inspectStorage();
+    const workspaces = await organizationApi.listWorkspaces();
+
+    assert.deepEqual(workspaces, []);
+    const workspaceRead = calls.find(({ url }) => url.includes('/rest/v1/workspaces'));
+    assert.equal(workspaceRead.init.headers.Authorization, 'Bearer user-b-access-token');
+    assert.equal(calls.filter(({ url }) => url.startsWith('/api/v1/')).length, 0);
+  });
+
+  it('preserves cross-workspace denial instead of falling back or broadening the update', async () => {
+    const calls = [];
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), init });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight')) {
+        return jsonResponse({ schema_version: 'forge-byoc-v1' });
+      }
+      if (String(url).includes('/rest/v1/projects')) return jsonResponse({ message: 'denied' }, 403);
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+
+    await assert.rejects(
+      () => organizationApi.updateProject('workspace-b', 'project-a', { name: 'Cross-workspace' }),
+      (error) => {
+        assert.equal(error.status, 403);
+        return true;
+      },
+    );
+    const updateCall = calls.find(
+      ({ url, init }) => url.includes('/rest/v1/projects') && init.method === 'PATCH',
+    );
+    assert.ok(updateCall);
+    assert.match(updateCall.url, /workspace_id=eq\.workspace-b/);
+    assert.equal(calls.filter(({ url }) => url.startsWith('/api/v1/')).length, 0);
+  });
+
   it('routes Project updates to the project row and preserves the vertical-slice contract', async () => {
     const calls = [];
     globalThis.fetch = async (url, init = {}) => {
