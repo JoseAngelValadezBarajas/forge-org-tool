@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 from typing import Any
 
 from forge_org.domain.organization import ACTIVE, ARCHIVED, normalized_name, validate_project_status
@@ -19,8 +20,9 @@ class InvalidInput(Exception):
 
 
 class OrganizationService:
-    def __init__(self, connection: sqlite3.Connection) -> None:
+    def __init__(self, connection: sqlite3.Connection, attachment_root: Path | None = None) -> None:
         self.repository = OrganizationRepository(connection)
+        self.attachment_root = attachment_root
 
     def list_workspaces(self) -> list[dict[str, Any]]:
         return self.repository.list_workspaces()
@@ -58,6 +60,11 @@ class OrganizationService:
         return self.repository.set_workspace_archive(
             workspace_id, utc_now() if archived else None
         ) or self.workspace(workspace_id)
+
+    def delete_workspace(self, workspace_id: str) -> None:
+        self.workspace(workspace_id)
+        if not self.repository.delete_workspace(workspace_id, self.attachment_root):
+            raise NotFound('Workspace not found')
 
     def projects(self, workspace_id: str, search: str | None, status: str) -> list[dict[str, Any]]:
         self.workspace(workspace_id)

@@ -1,6 +1,6 @@
 # FORGE BYOC 0.2 functional parity
 
-**Status:** implementation candidate on `feature/forge-byoc-supabase-parity`.
+**Status:** hardening candidate on `feature/forge-byoc-0.2-hardening`.
 
 ## Runtime contract
 
@@ -37,6 +37,28 @@ project ownership foreign keys, archived-project write guards, unique names,
 dependency graph validation and transaction boundaries. Client validation is
 only an early error message and never an authorization boundary.
 
+Transfer fingerprints for contextual imports are bound to the scope, workspace,
+project, destination and document by the contextual RPC. A reviewed fingerprint
+cannot be replayed against another destination. ZIP parsing enforces the 5 MiB
+compressed, 25 MiB expanded and 100-entry limits while streaming entries before
+allocating declared payload sizes.
+
+Complete-project imports create a private, short-lived import session in the
+same transaction as the generated Project. JSON imports finalize it immediately
+after the client receives the commit response; ZIP imports finalize it only
+after attachment staging succeeds. Compensation requires the same user's
+provisional session, exact workspace and Project, and an unexpired session.
+Finalized or expired imports cannot be deleted through the compensation RPC.
+
+Dependency cycle protection is database-owned. A trigger protects direct table
+INSERT/UPDATE paths as well as the RPC, locks the Project row before checking
+reachability, and serializes concurrent dependency mutations for that Project.
+
+Screenshot writes use private Storage, read the stored object back, validate its
+image signature, byte size and SHA-256 against the metadata, and only then write
+the `bug_attachments` row. The migration trigger also checks that the Storage
+object exists and that its declared size and MIME metadata agree with the row.
+
 ## Migration boundary
 
 `supabase/migrations/20261026_byoc_0001.sql` is the already-applied BYOC 0.1
@@ -44,10 +66,21 @@ baseline and is immutable. Owners apply
 `20261026_byoc_0002.sql` explicitly, after backup/review, to add the parity
 tables, private bucket, RLS, grants and RPCs. FORGE does not run either file,
 does not provision a project, and does not receive an owner/service-role key.
+The hardening changes are included in 0002; no adjustment to 0001 is required.
+The owner should still validate the final SQL in a disposable project before
+applying it to any retained project.
 
 The preflight response is `forge-byoc-v2`. An installation never reports
 Supabase `ready` before authentication, version preflight and permission
 checks succeed. A failed cloud operation never falls back to SQLite.
+
+Authentication is profile-bound. A Supabase session is kept in session storage
+by default and may be explicitly persisted with **Remember this session** for
+restart restoration. Sign-out, provider changes, project/key changes, and
+profile mismatches clear both storage layers. Passwords and privileged keys are
+never stored. Persistent WebView storage is not an OS keychain and must not be
+used as a trust boundary on shared devices; an OS-backed token store remains a
+separate Desktop hardening task.
 
 ## Real-project boundary
 

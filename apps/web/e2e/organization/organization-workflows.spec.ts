@@ -1,6 +1,21 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 type Workspace = { id: string; name: string };
+
+async function selectWorkspace(page: Page, name: string) {
+  await page
+    .getByRole('button', { name: /^Workspace:/ })
+    .first()
+    .click();
+  await page
+    .getByRole('menu', { name: 'Workspaces' })
+    .getByRole('menuitemradio', { name, exact: true })
+    .click();
+}
+
+async function expectSelectedWorkspace(page: Page, name: string) {
+  await expect(page.getByRole('button', { name: `Workspace: ${name}`, exact: true })).toBeVisible();
+}
 
 async function revealProjectActions(card: Locator) {
   const actions = card.locator('details');
@@ -27,7 +42,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
     }),
   ).toBeVisible();
   if (workspaces[0]) {
-    await expect(page.getByRole('combobox', { name: 'Workspace' })).toHaveValue(workspaces[0].id);
+    await expectSelectedWorkspace(page, workspaces[0].name);
   }
 
   let workspace: Workspace;
@@ -36,11 +51,11 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
     const workspaceForm = page.getByRole('form', { name: 'Create first workspace' });
     await workspaceForm.getByLabel('Workspace name').fill(`Acceptance ${suffix}`);
     await workspaceForm.getByRole('button', { name: 'Create Workspace', exact: true }).click();
-    await expect(page.getByRole('combobox', { name: 'Workspace' })).toBeVisible();
     const createdResponse = await page.request.get('/api/v1/workspaces');
     workspaces = (await createdResponse.json()) as Workspace[];
     workspace = workspaces.find((item) => item.name === `Acceptance ${suffix}`)!;
     expect(workspace).toBeTruthy();
+    await expectSelectedWorkspace(page, workspace.name);
   } else {
     // UI exposes workspace creation only in first-use; isolate the rest of this journey
     // with a synthetic workspace created through the same production API/SQLite.
@@ -50,7 +65,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
     expect(created.status()).toBe(201);
     workspace = (await created.json()) as Workspace;
     await page.reload();
-    await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+    await selectWorkspace(page, workspace.name);
   }
 
   const projectName = `Lifecycle ${suffix}`;
@@ -132,7 +147,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   );
   expect((await persisted.json())[0]).toMatchObject({ status: 'active' });
   await page.reload();
-  await expect(page.getByRole('combobox', { name: 'Workspace' })).toHaveValue(workspace.id);
+  await expectSelectedWorkspace(page, workspace.name);
   await projectFilters.click();
   await search.fill(projectName);
   await projectFilters.click();
@@ -148,8 +163,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   expect(secondWorkspaceResponse.status()).toBe(201);
   const secondWorkspace = await secondWorkspaceResponse.json();
   await page.reload();
-  const workspaceSelector = page.getByRole('combobox', { name: 'Workspace' });
-  await workspaceSelector.selectOption(secondWorkspace.id);
+  await selectWorkspace(page, secondWorkspace.name);
   await expect(projectHeading).toHaveCount(0);
   const secondProjectName = `Second workspace project ${suffix}`;
   await page.getByRole('button', { name: 'New project', exact: true }).click();
@@ -163,7 +177,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
       exact: true,
     }),
   ).toBeVisible();
-  await workspaceSelector.selectOption(workspace.id);
+  await selectWorkspace(page, workspace.name);
   await expect(projectHeading).toBeVisible();
   for (const siblingName of siblingProjectNames) {
     await expect(
@@ -230,7 +244,7 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
   const project = await projectResponse.json();
 
   await page.goto('/');
-  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+  await selectWorkspace(page, workspace.name);
   const projectLink = page
     .getByRole('region', { name: 'Projects', exact: true })
     .getByRole('link', { name: project.name, exact: true });

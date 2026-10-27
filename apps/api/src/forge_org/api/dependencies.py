@@ -34,7 +34,7 @@ def database() -> Iterator[sqlite3.Connection]:
 
 
 def service(connection: sqlite3.Connection = Depends(database)) -> OrganizationService:
-    return OrganizationService(connection)
+    return OrganizationService(connection, database_path().parent / 'bug-attachments')
 
 
 def service_error(exc: Exception) -> HTTPException:

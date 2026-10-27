@@ -1,5 +1,5 @@
 import { ApiError } from './errors.js';
-import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
+import { strFromU8, strToU8, Unzip, UnzipInflate, zipSync } from 'fflate';
 import type {
   BugAttachment,
   Criterion,
@@ -29,6 +29,9 @@ const MAX_PACKAGE_BYTES = 5 * 1024 * 1024;
 const MAX_PACKAGE_ENTRIES = 100;
 const MAX_EXPANDED_BYTES = 25 * 1024 * 1024;
 const MAX_DOCUMENT_BYTES = 7 * 1024 * 1024;
+const MAX_STORAGE_LIST_PAGE = 1000;
+const MAX_STORAGE_DELETE_BATCH = 1000;
+const MAX_STORAGE_CLEANUP_ATTEMPTS = 3;
 
 function bodyOf(init: RequestInit): JsonRecord {
   if (typeof init.body !== 'string' || init.body.length === 0) return {};
@@ -115,6 +118,142 @@ export function createSupabaseHandler(
   async function blobRequest(endpoint: string, init: RequestInit = {}): Promise<Blob> {
     const response = await responseFor(endpoint, init);
     return response.blob();
+  }
+
+  type StorageListEntry = {
+    name?: unknown;
+    id?: unknown;
+  };
+
+  function storageCleanupScope(workspaceId: string): string {
+    if (
+      workspaceId.length === 0 ||
+      workspaceId === '.' ||
+      workspaceId === '..' ||
+      workspaceId.includes('/') ||
+      workspaceId.includes('\\')
+    ) {
+      throw new ApiError(422, 'Workspace storage scope is invalid.');
+    }
+    return `${workspaceId}/`;
+  }
+
+  function storagePathForEntry(
+    prefix: string,
+    entry: StorageListEntry,
+    workspacePrefix: string,
+  ): string {
+    if (typeof entry.name !== 'string' || entry.name.length === 0) {
+      throw new ApiError(502, 'Supabase returned an invalid Storage entry.');
+    }
+    if (
+      entry.name === '.' ||
+      entry.name === '..' ||
+      entry.name.includes('/') ||
+      entry.name.includes('\\')
+    ) {
+      throw new ApiError(502, 'Supabase returned a Storage entry outside the workspace scope.');
+    }
+    const path = `${prefix}${entry.name}`;
+    if (
+      !path.startsWith(workspacePrefix) ||
+      path.split('/').some((part) => part === '.' || part === '..')
+    ) {
+      throw new ApiError(502, 'Supabase returned a Storage entry outside the workspace scope.');
+    }
+    return path;
+  }
+
+  async function listWorkspaceStoragePaths(workspaceId: string): Promise<string[]> {
+    const workspacePrefix = storageCleanupScope(workspaceId);
+    const pendingPrefixes = [workspacePrefix];
+    const files: string[] = [];
+    const visitedPrefixes = new Set<string>();
+
+    while (pendingPrefixes.length > 0) {
+      const prefix = pendingPrefixes.shift();
+      if (!prefix || visitedPrefixes.has(prefix)) continue;
+      visitedPrefixes.add(prefix);
+
+      for (let offset = 0; ; offset += MAX_STORAGE_LIST_PAGE) {
+        const entries = await request<StorageListEntry[]>(
+          `/storage/v1/object/list/${ATTACHMENT_BUCKET}`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              prefix,
+              limit: MAX_STORAGE_LIST_PAGE,
+              offset,
+              sortBy: { column: 'name', order: 'asc' },
+            }),
+          },
+        );
+        if (!Array.isArray(entries)) {
+          throw new ApiError(502, 'Supabase returned an invalid Storage listing.');
+        }
+
+        for (const entry of entries) {
+          const path = storagePathForEntry(prefix, entry, workspacePrefix);
+          if (entry.id !== null && typeof entry.id !== 'string') {
+            throw new ApiError(502, 'Supabase returned an invalid Storage entry.');
+          }
+          if (entry.id === null) {
+            pendingPrefixes.push(`${path}/`);
+          } else {
+            files.push(path);
+          }
+        }
+
+        if (entries.length < MAX_STORAGE_LIST_PAGE) break;
+      }
+    }
+
+    return files;
+  }
+
+  function storageDeleteBatches(paths: string[]): string[][] {
+    const batches: string[][] = [];
+    for (let index = 0; index < paths.length; index += MAX_STORAGE_DELETE_BATCH) {
+      batches.push(paths.slice(index, index + MAX_STORAGE_DELETE_BATCH));
+    }
+    return batches;
+  }
+
+  function shouldRetryStorageCleanup(cause: unknown): boolean {
+    return (
+      cause instanceof ApiError &&
+      (cause.status === 408 || cause.status === 429 || cause.status >= 500)
+    );
+  }
+
+  async function cleanupWorkspaceStorage(workspaceId: string): Promise<void> {
+    let lastFailure: unknown;
+
+    for (let attempt = 0; attempt < MAX_STORAGE_CLEANUP_ATTEMPTS; attempt += 1) {
+      try {
+        const paths = await listWorkspaceStoragePaths(workspaceId);
+        if (paths.length === 0) return;
+
+        for (const batch of storageDeleteBatches(paths)) {
+          await responseFor(`/storage/v1/object/${ATTACHMENT_BUCKET}`, {
+            method: 'DELETE',
+            body: JSON.stringify({ prefixes: batch }),
+          });
+        }
+        const remaining = await listWorkspaceStoragePaths(workspaceId);
+        if (remaining.length === 0) return;
+        lastFailure = new ApiError(409, 'Workspace Storage cleanup did not complete.');
+      } catch (cause) {
+        lastFailure = cause;
+        if (!shouldRetryStorageCleanup(cause) || attempt === MAX_STORAGE_CLEANUP_ATTEMPTS - 1) {
+          throw cause;
+        }
+      }
+    }
+
+    throw lastFailure instanceof Error
+      ? lastFailure
+      : new ApiError(409, 'Workspace Storage cleanup did not complete.');
   }
 
   async function table<T>(tableName: string, suffix = '', init: RequestInit = {}): Promise<T> {
@@ -212,6 +351,31 @@ export function createSupabaseHandler(
     return sha256(new TextEncoder().encode(stableStringify(value)));
   }
 
+  async function verifyAttachmentBlob(
+    blob: Blob,
+    contentType: string,
+    expectedByteSize: number,
+    expectedSha256: string,
+  ): Promise<Blob> {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    if (
+      (blob.type && blob.type.toLowerCase() !== contentType.toLowerCase()) ||
+      bytes.byteLength !== expectedByteSize ||
+      bytes.byteLength > MAX_ATTACHMENT_BYTES
+    ) {
+      throw new ApiError(422, 'Stored screenshot does not match attachment metadata.');
+    }
+    try {
+      validateImage(bytes, contentType);
+    } catch {
+      throw new ApiError(422, 'Stored screenshot does not match attachment metadata.');
+    }
+    if ((await sha256(bytes)) !== expectedSha256) {
+      throw new ApiError(422, 'Stored screenshot checksum does not match attachment metadata.');
+    }
+    return new Blob([bytes], { type: contentType });
+  }
+
   async function uploadAttachment(
     workspaceId: string,
     projectId: string,
@@ -234,6 +398,7 @@ export function createSupabaseHandler(
     }
     const attachmentId = globalThis.crypto.randomUUID();
     const storagePath = `${workspaceId}/${projectId}/${featureId}/${attachmentId}-${fileName}`;
+    const contentHash = await sha256(bytes);
     const encodedBytes = new ArrayBuffer(bytes.byteLength);
     new Uint8Array(encodedBytes).set(bytes);
     try {
@@ -242,6 +407,12 @@ export function createSupabaseHandler(
         headers: { 'Content-Type': String(contentType), 'x-upsert': 'false' },
         body: encodedBytes,
       });
+      await verifyAttachmentBlob(
+        await blobRequest(`/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${storagePath}`),
+        String(contentType),
+        bytes.byteLength,
+        contentHash,
+      );
       const created = one(
         await table<AttachmentRecord[]>('bug_attachments', '', {
           method: 'POST',
@@ -254,7 +425,7 @@ export function createSupabaseHandler(
             file_name: fileName,
             content_type: contentType,
             byte_size: bytes.byteLength,
-            sha256: await sha256(bytes),
+            sha256: contentHash,
           }),
         }),
       );
@@ -284,9 +455,108 @@ export function createSupabaseHandler(
       }),
     );
     const record = one(records);
-    return blobRequest(
-      `/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${record.storage_path}`,
+    return verifyAttachmentBlob(
+      await blobRequest(
+        `/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${record.storage_path}`,
+      ),
+      record.content_type,
+      record.byte_size,
+      record.sha256,
     );
+  }
+
+  function concatChunks(chunks: Uint8Array[], byteLength: number): Uint8Array {
+    const bytes = new Uint8Array(byteLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return bytes;
+  }
+
+  function unzipEntriesBounded(archiveBytes: Uint8Array): Record<string, Uint8Array> {
+    const entries: Record<string, Uint8Array> = {};
+    const seen = new Set<string>();
+    let entryCount = 0;
+    let declaredExpandedBytes = 0;
+    let expandedBytes = 0;
+    let failure: ApiError | null = null;
+    const fail = (message: string): void => {
+      failure ??= new ApiError(422, message);
+    };
+    const unzip = new Unzip((file) => {
+      if (failure) return;
+      entryCount += 1;
+      const normalizedName = file.name.normalize('NFC').toLowerCase();
+      if (entryCount > MAX_PACKAGE_ENTRIES || seen.has(normalizedName)) {
+        fail('Project package exceeds decompression budget.');
+        return;
+      }
+      seen.add(normalizedName);
+      if (
+        file.originalSize !== undefined &&
+        (!Number.isSafeInteger(file.originalSize) || file.originalSize > MAX_EXPANDED_BYTES)
+      ) {
+        fail('Project package exceeds decompression budget.');
+        return;
+      }
+      if (file.compression !== 0 && file.compression !== 8) {
+        fail('Project package contains an unsupported compression method.');
+        return;
+      }
+      const declaredSize = file.originalSize ?? 0;
+      if (declaredSize > MAX_EXPANDED_BYTES - declaredExpandedBytes) {
+        fail('Project package exceeds decompression budget.');
+        return;
+      }
+      declaredExpandedBytes += declaredSize;
+      const fixed = file.originalSize === undefined ? null : new Uint8Array(declaredSize);
+      const chunks: Uint8Array[] = [];
+      let fileSize = 0;
+      let offset = 0;
+      file.ondata = (error, chunk, final) => {
+        if (error) {
+          fail('Project package is not a valid ZIP archive.');
+          return;
+        }
+        if (failure) return;
+        fileSize += chunk.byteLength;
+        expandedBytes += chunk.byteLength;
+        if (
+          fileSize > MAX_EXPANDED_BYTES ||
+          expandedBytes > MAX_EXPANDED_BYTES ||
+          (fixed !== null && offset + chunk.byteLength > fixed.byteLength)
+        ) {
+          fail('Project package exceeds decompression budget.');
+          file.terminate();
+          return;
+        }
+        if (fixed !== null) {
+          fixed.set(chunk, offset);
+          offset += chunk.byteLength;
+        } else {
+          chunks.push(chunk);
+        }
+        if (final) {
+          if (fixed !== null && offset !== fixed.byteLength) {
+            fail('Project package decompression size mismatch.');
+            return;
+          }
+          entries[file.name] = fixed ?? concatChunks(chunks, fileSize);
+        }
+      };
+      file.start();
+    });
+    unzip.register(UnzipInflate);
+    try {
+      unzip.push(archiveBytes, true);
+    } catch (cause) {
+      if (cause instanceof ApiError) throw cause;
+      throw new ApiError(422, 'Project package is not a valid ZIP archive.');
+    }
+    if (failure) throw failure;
+    return entries;
   }
 
   type PackageAsset = {
@@ -306,18 +576,11 @@ export function createSupabaseHandler(
       MAX_PACKAGE_BYTES,
       'Project package is not valid base64.',
     );
-    let entries: Record<string, Uint8Array>;
-    try {
-      entries = unzipSync(archiveBytes);
-    } catch {
-      throw new ApiError(422, 'Project package is not a valid ZIP archive.');
-    }
+    const entries = unzipEntriesBounded(archiveBytes);
     const paths = Object.keys(entries);
     if (!paths.includes('manifest.json') || paths.length > MAX_PACKAGE_ENTRIES) {
       throw new ApiError(422, 'Project package manifest is invalid.');
     }
-    const expanded = paths.reduce((total, path) => total + entries[path].byteLength, 0);
-    if (expanded > MAX_EXPANDED_BYTES) throw new ApiError(422, 'Project package is too large.');
     let manifest: JsonRecord;
     try {
       const parsedManifest: unknown = JSON.parse(strFromU8(entries['manifest.json']));
@@ -462,6 +725,37 @@ export function createSupabaseHandler(
     return new Blob([archive], { type: 'application/zip' });
   }
 
+  async function finalizeImportedProject(
+    workspaceId: string,
+    imported: JsonRecord,
+  ): Promise<JsonRecord> {
+    const importId = String(imported.import_id ?? '');
+    const projectId = String(imported.project_id ?? '');
+    if (!importId || !projectId) {
+      throw new ApiError(502, 'Supabase did not return a protected import session.');
+    }
+    await rpc('forge_finalize_import', {
+      p_workspace_id: workspaceId,
+      p_import_id: importId,
+      p_project_id: projectId,
+    });
+    return imported;
+  }
+
+  async function compensateImportedProject(
+    workspaceId: string,
+    imported: JsonRecord,
+  ): Promise<void> {
+    const importId = String(imported.import_id ?? '');
+    const projectId = String(imported.project_id ?? '');
+    if (!importId || !projectId) return;
+    await rpc('forge_delete_imported_project', {
+      p_workspace_id: workspaceId,
+      p_import_id: importId,
+      p_project_id: projectId,
+    }).catch(() => undefined);
+  }
+
   async function packagePreview(workspaceId: string, archiveBase64: string): Promise<JsonRecord> {
     const parsed = await parsePackage(archiveBase64);
     const preview = await rpc<JsonRecord>('forge_transfer_preview', {
@@ -517,6 +811,12 @@ export function createSupabaseHandler(
           body: asset.bytes.buffer as ArrayBuffer,
         });
         uploaded.push(storagePath);
+        await verifyAttachmentBlob(
+          await blobRequest(`/storage/v1/object/authenticated/${ATTACHMENT_BUCKET}/${storagePath}`),
+          asset.contentType,
+          asset.bytes.byteLength,
+          asset.sha256,
+        );
         await table('bug_attachments', '', {
           method: 'POST',
           body: JSON.stringify({
@@ -532,6 +832,7 @@ export function createSupabaseHandler(
           }),
         });
       }
+      await finalizeImportedProject(workspaceId, imported);
       return imported;
     } catch (cause) {
       await Promise.all(
@@ -541,10 +842,7 @@ export function createSupabaseHandler(
           }).catch(() => undefined),
         ),
       );
-      await rpc('forge_delete_imported_project', {
-        p_workspace_id: workspaceId,
-        p_project_id: imported.project_id,
-      }).catch(() => undefined);
+      await compensateImportedProject(workspaceId, imported);
       throw cause;
     }
   }
@@ -560,6 +858,11 @@ export function createSupabaseHandler(
         p_description: body.description ?? null,
       }),
     );
+  }
+
+  async function deleteWorkspace(workspaceId: string): Promise<void> {
+    await cleanupWorkspaceStorage(workspaceId);
+    await rpc<void>('forge_delete_workspace', { p_workspace_id: workspaceId });
   }
 
   async function listProjects(workspaceId: string, path: string): Promise<Project[]> {
@@ -771,11 +1074,17 @@ export function createSupabaseHandler(
       parts.length === 4 &&
       method === 'POST'
     ) {
-      return rpc<JsonRecord>('forge_transfer_commit', {
+      const imported = await rpc<JsonRecord>('forge_transfer_commit', {
         p_workspace_id: workspaceId,
         p_document: body.document,
         p_expected_fingerprint: body.expected_fingerprint,
-      }) as Promise<T>;
+      });
+      try {
+        return (await finalizeImportedProject(workspaceId, imported)) as T;
+      } catch (cause) {
+        await compensateImportedProject(workspaceId, imported);
+        throw cause;
+      }
     }
     if (
       parts[2] === 'projects' &&
@@ -830,6 +1139,9 @@ export function createSupabaseHandler(
       }) as Promise<T>;
     }
     if (parts.length === 1 && method === 'POST') return createWorkspace(body) as Promise<T>;
+    if (parts.length === 2 && method === 'DELETE') {
+      return deleteWorkspace(workspaceId) as Promise<T>;
+    }
     if (parts.length === 2 && method === 'PATCH') {
       return one(
         await table<Workspace[]>('workspaces', query({ id: `eq.${workspaceId}` }), {

@@ -16,6 +16,16 @@ async function patchJson(page: Page, path: string, body: unknown) {
   return response.json();
 }
 
+async function selectWorkspace(page: Page, name: string) {
+  const workspaceTrigger = page.getByRole('button', { name: /^Workspace:/ }).first();
+  await expect(workspaceTrigger).toBeVisible();
+  await workspaceTrigger.click();
+  await page
+    .getByRole('menu', { name: 'Workspaces' })
+    .getByRole('menuitemradio', { name, exact: true })
+    .click();
+}
+
 async function seedSyntheticProject(page: Page) {
   const workspace = await postJson<{ id: string }>(page, '/api/v1/workspaces', {
     name: 'Personal',
@@ -292,8 +302,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   if (info.project.name === 'chromium-mobile') {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
-    await expect(page.getByRole('combobox', { name: 'Workspace' })).toBeVisible();
-    await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+    await selectWorkspace(page, 'Personal');
     await page
       .getByRole('banner', { name: 'Workspace controls' })
       .getByRole('combobox', { name: 'Appearance' })
@@ -402,8 +411,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
 
   await page.setViewportSize({ width: 1440, height: 960 });
   await page.goto('/');
-  await expect(page.getByRole('combobox', { name: 'Workspace' })).toBeVisible();
-  await page.getByRole('combobox', { name: 'Workspace' }).selectOption(workspace.id);
+  await selectWorkspace(page, 'Personal');
   await page.getByRole('combobox', { name: 'Appearance' }).selectOption('dark');
   await expect(
     page.locator('#main').getByRole('link', { name: 'FormiAI', exact: true }),
@@ -452,7 +460,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   const primaryAction = page.getByRole('button', { name: 'New Epic' });
   const toolbar = page.getByLabel('Epic board filters');
   const firstCard = projectBoard.locator('[data-testid^="epic-card-"]').first();
-  expect(await rect(page.locator('[data-node-id="344:89"] select'))).toEqual({
+  expect(await rect(page.locator('[data-node-id="344:89"] button'))).toEqual({
     x: 18,
     y: 128,
     width: 208,
@@ -473,7 +481,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     viewport: { width: 1440, height: 960, deviceScaleFactor: 1, zoomPercent: 100 },
     actual: {
       sidebar: await rect(page.getByTestId('app-sidebar')),
-      workspaceSelector: await rect(page.locator('[data-node-id="344:89"] select')),
+      workspaceSelector: await rect(page.locator('[data-node-id="344:89"] button')),
       topbar: await rect(page.getByTestId('app-topbar')),
       breadcrumb: await rect(page.locator('[data-node-id="344:106"]')),
       search: await rect(page.locator('[data-node-id="344:107"]')),

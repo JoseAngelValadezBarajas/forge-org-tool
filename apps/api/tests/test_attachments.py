@@ -113,3 +113,38 @@ def test_bug_attachments_are_validated_scoped_persistent_and_removable(tmp_path:
             reopened.close()
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_workspace_delete_removes_local_attachment_files(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'workspace-delete.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Delete files'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'Client'}
+            ).json()
+            bug = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}/features',
+                json={'title': 'Crash', 'kind': 'bug'},
+            ).json()
+            attachment_url = (
+                f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+                f'/features/{bug["id"]}/attachments'
+            )
+            uploaded = client.post(
+                attachment_url,
+                json={
+                    'file_name': 'screen.png',
+                    'content_type': 'image/png',
+                    'data_base64': base64.b64encode(_png()).decode('ascii'),
+                },
+            )
+            assert uploaded.status_code == 201
+            storage_root = tmp_path / 'bug-attachments'
+            assert list(storage_root.iterdir())
+
+            deleted = client.delete(f'/api/v1/workspaces/{workspace["id"]}')
+            assert deleted.status_code == 204
+            assert not list(storage_root.iterdir())
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)

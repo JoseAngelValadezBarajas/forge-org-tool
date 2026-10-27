@@ -1,0 +1,114 @@
+.stack {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  min-width: 0;
+}
+.heading > div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+.eyebrow,
+.status {
+  color: var(--forge-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+.heading h1 {
+  margin: 0;
+  color: var(--forge-text-primary);
+  font-size: 30px;
+  line-height: 39px;
+}
+.heading p,
+.workspaceCopy p,
+.empty p {
+  margin: 0;
+  color: var(--forge-text-muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+.list {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.workspace {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-width: 0;
+  padding: 18px;
+}
+.workspaceCopy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.workspaceCopy h2,
+.empty h2 {
+  margin: 0;
+  color: var(--forge-text-primary);
+  font-size: 19px;
+}
+.workspaceCopy p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.actions a {
+  color: var(--forge-text-muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+.actions a:hover {
+  color: var(--forge-accent);
+}
+.empty {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  padding: 24px;
+}
+.form {
+  display: grid;
+  gap: 16px;
+}
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.error {
+  margin: 0;
+  color: var(--forge-danger);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 720px) {
+  .heading,
+  .workspace {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .actions {
+    justify-content: flex-start;
+  }
+}

@@ -51,6 +51,16 @@ def get_workspace(
         raise service_error(exc) from exc
 
 
+@organization_router.delete('/workspaces/{workspace_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_workspace(
+    workspace_id: str, organization: OrganizationService = Depends(service)
+) -> None:
+    try:
+        organization.delete_workspace(workspace_id)
+    except NotFound as exc:
+        raise service_error(exc) from exc
+
+
 @organization_router.patch('/workspaces/{workspace_id}', response_model=WorkspaceResponse)
 def update_workspace(
     workspace_id: str,

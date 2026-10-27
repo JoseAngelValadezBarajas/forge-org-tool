@@ -33,9 +33,12 @@ export type StorageSnapshot = {
   message: string;
   projectUrl?: string;
   userEmail?: string;
+  rememberSession?: boolean;
 };
 
-type StorageConfig = { provider: 'local' } | ({ provider: 'supabase' } & SupabaseProfile);
+export type StorageConfig =
+  | { provider: 'local' }
+  | ({ provider: 'supabase' } & SupabaseProfile & { rememberSession?: boolean });
 type StoredSession = { profile: SupabaseProfile; session: SupabaseSession };
 type SupabaseHandlerFactory = (
   profile: SupabaseProfile,
@@ -43,7 +46,9 @@ type SupabaseHandlerFactory = (
 ) => ApiRequestHandler;
 
 const PROFILE_KEY = 'forge-storage-profile';
+const ACTIVE_PROVIDER_KEY = 'forge-storage-provider';
 const SESSION_KEY = 'forge-supabase-session';
+const REMEMBER_SESSION_KEY = 'forge-supabase-remember-session';
 const SUPABASE_HOST = /^[a-z0-9][a-z0-9-]*\.supabase\.co$/;
 const PUBLISHABLE_KEY = /^sb_publishable_[A-Za-z0-9_-]+$/;
 
@@ -79,8 +84,35 @@ function profilesEqual(left: SupabaseProfile, right: SupabaseProfile): boolean {
   return left.projectUrl === right.projectUrl && left.publishableKey === right.publishableKey;
 }
 
+function readRememberSession(): boolean {
+  return browserStorage('localStorage')?.getItem(REMEMBER_SESSION_KEY) === 'true';
+}
+
+function readActiveProvider(): StorageProvider | null {
+  const value = browserStorage('localStorage')?.getItem(ACTIVE_PROVIDER_KEY);
+  return value === 'local' || value === 'supabase' ? value : null;
+}
+
+function persistActiveProvider(provider: StorageProvider): void {
+  browserStorage('localStorage')?.setItem(ACTIVE_PROVIDER_KEY, provider);
+}
+
+function notifyStorageChanged(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('forge:storage-changed'));
+  }
+}
+
+function persistRememberSession(next: boolean): void {
+  const storage = browserStorage('localStorage');
+  if (!storage) return;
+  if (next) storage.setItem(REMEMBER_SESSION_KEY, 'true');
+  else storage.removeItem(REMEMBER_SESSION_KEY);
+}
+
 function readStoredSession(): StoredSession | null {
-  const raw = browserStorage('sessionStorage')?.getItem(SESSION_KEY);
+  const storage = browserStorage(readRememberSession() ? 'localStorage' : 'sessionStorage');
+  const raw = storage?.getItem(SESSION_KEY);
   if (!raw) return null;
   try {
     const value = JSON.parse(raw) as {
@@ -108,11 +140,6 @@ function readStoredSession(): StoredSession | null {
   }
 }
 
-function readSession(expectedProfile: SupabaseProfile): SupabaseSession | null {
-  const stored = readStoredSession();
-  return stored && profilesEqual(stored.profile, expectedProfile) ? stored.session : null;
-}
-
 function persistProfile(next: SupabaseProfile | null): void {
   const storage = browserStorage('localStorage');
   if (!storage) return;
@@ -121,10 +148,16 @@ function persistProfile(next: SupabaseProfile | null): void {
 }
 
 function persistSession(next: SupabaseSession | null): void {
-  const storage = browserStorage('sessionStorage');
-  if (!storage) return;
-  if (next && profile) storage.setItem(SESSION_KEY, JSON.stringify({ profile, session: next }));
-  else storage.removeItem(SESSION_KEY);
+  browserStorage('localStorage')?.removeItem(SESSION_KEY);
+  browserStorage('sessionStorage')?.removeItem(SESSION_KEY);
+  if (next && profile) {
+    const storage = browserStorage(readRememberSession() ? 'localStorage' : 'sessionStorage');
+    storage?.setItem(SESSION_KEY, JSON.stringify({ profile, session: next }));
+  }
+}
+
+function rememberedSessionFields(): Pick<StorageSnapshot, 'rememberSession'> {
+  return readRememberSession() ? { rememberSession: true } : {};
 }
 
 export function validateSupabaseProfile(input: SupabaseProfile): SupabaseProfile {
@@ -178,30 +211,45 @@ function installSupabaseHandler(): void {
   setApiRequestHandler(handlerFactory(profile, getValidSupabaseSession));
 }
 
-export function configureStorage(config: StorageConfig): void {
-  if (config.provider === 'local') {
-    profile = null;
-    session = null;
-    refreshInFlight = null;
+function activateLocalStorage(preserveCloudConfiguration: boolean): void {
+  if (!preserveCloudConfiguration) {
     persistProfile(null);
     persistSession(null);
-    resetApiRequestHandler();
-    snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };
+  }
+  persistActiveProvider('local');
+  profile = null;
+  session = null;
+  refreshInFlight = null;
+  resetApiRequestHandler();
+  snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };
+  notifyStorageChanged();
+}
+
+export function configureStorage(config: StorageConfig): void {
+  if (config.provider === 'local') {
+    activateLocalStorage(false);
     return;
   }
   const nextProfile = validateSupabaseProfile(config);
+  persistActiveProvider('supabase');
   const previousProfile = profile;
   const storedSession = readStoredSession();
+  const rememberSession =
+    'rememberSession' in config ? Boolean(config.rememberSession) : readRememberSession();
   const profileChanged = Boolean(previousProfile && !profilesEqual(previousProfile, nextProfile));
   profile = nextProfile;
-  const sessionMatchesProfile =
-    storedSession !== null && profilesEqual(storedSession.profile, nextProfile);
-  if (profileChanged || (storedSession !== null && !sessionMatchesProfile)) {
+  if ('rememberSession' in config) persistRememberSession(rememberSession);
+  if (profileChanged) {
     session = null;
-    persistSession(null);
+  } else if (session && previousProfile && profilesEqual(previousProfile, nextProfile)) {
+    // Keep an active same-profile session while moving it between storage modes.
   } else {
-    session = readSession(nextProfile);
+    session =
+      storedSession && profilesEqual(storedSession.profile, nextProfile)
+        ? storedSession.session
+        : null;
   }
+  persistSession(session);
   persistProfile(profile);
   snapshot = session
     ? {
@@ -209,6 +257,7 @@ export function configureStorage(config: StorageConfig): void {
         status: 'schema_missing',
         message: 'Verify the Supabase schema and permissions before using cloud storage.',
         projectUrl: profile.projectUrl,
+        ...rememberedSessionFields(),
         ...(session.email ? { userEmail: session.email } : {}),
       }
     : {
@@ -216,12 +265,29 @@ export function configureStorage(config: StorageConfig): void {
         status: 'authentication_required',
         message: 'Sign in to the configured Supabase project.',
         projectUrl: profile.projectUrl,
+        ...rememberedSessionFields(),
       };
   installSupabaseHandler();
+  notifyStorageChanged();
 }
 
 export function getStorageSnapshot(): StorageSnapshot {
   return { ...snapshot };
+}
+
+export function getConfiguredStorageProviders(): StorageProvider[] {
+  return readProfile() ? ['local', 'supabase'] : ['local'];
+}
+
+export function switchStorageProvider(provider: StorageProvider): StorageSnapshot {
+  if (provider === 'local') {
+    activateLocalStorage(true);
+    return getStorageSnapshot();
+  }
+  const storedProfile = readProfile();
+  if (!storedProfile) throw new Error('Supabase storage is not configured.');
+  configureStorage({ provider: 'supabase', ...storedProfile });
+  return getStorageSnapshot();
 }
 
 export function getActiveSupabaseProfile(): SupabaseProfile | null {
@@ -245,6 +311,7 @@ export async function getValidSupabaseSession(): Promise<SupabaseSession | null>
       status: 'authentication_required',
       message: 'Supabase session expired. Sign in again.',
       projectUrl: profile.projectUrl,
+      ...rememberedSessionFields(),
     };
   }
   return session;
@@ -309,10 +376,15 @@ async function refreshSupabaseSession(
   }
 }
 
-export async function signInSupabase(email: string, password: string): Promise<StorageSnapshot> {
+export async function signInSupabase(
+  email: string,
+  password: string,
+  rememberSession?: boolean,
+): Promise<StorageSnapshot> {
   if (!profile) throw new Error('Configure Supabase before signing in.');
   if (!email.trim() || !password) throw new Error('Email and password are required.');
   session = await authRequest(profile, 'password', { email, password });
+  if (rememberSession !== undefined) persistRememberSession(rememberSession);
   persistSession(session);
   installSupabaseHandler();
   snapshot = {
@@ -320,8 +392,10 @@ export async function signInSupabase(email: string, password: string): Promise<S
     status: 'schema_missing',
     message: 'Signed in. Verify the Supabase schema and permissions.',
     projectUrl: profile.projectUrl,
+    ...rememberedSessionFields(),
     ...(session.email ? { userEmail: session.email } : {}),
   };
+  notifyStorageChanged();
   return getStorageSnapshot();
 }
 
@@ -335,9 +409,11 @@ export function signOutSupabase(): void {
       status: 'authentication_required',
       message: 'Sign in to the configured Supabase project.',
       projectUrl: profile.projectUrl,
+      ...rememberedSessionFields(),
     };
     installSupabaseHandler();
   }
+  notifyStorageChanged();
 }
 
 export async function inspectStorage(): Promise<StorageSnapshot> {
@@ -349,6 +425,7 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
       message: 'Sign in to the configured Supabase project.',
       projectUrl: profile.projectUrl,
     };
+    notifyStorageChanged();
     return getStorageSnapshot();
   }
   const activeHandler = handlerFactory ? handlerFactory(profile, getValidSupabaseSession) : null;
@@ -364,6 +441,7 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
       status: 'ready',
       message: 'Supabase storage is ready.',
       projectUrl: profile.projectUrl,
+      ...rememberedSessionFields(),
       ...(session?.email ? { userEmail: session.email } : {}),
     };
   } catch (cause) {
@@ -381,15 +459,21 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
       status,
       message: error.detail ?? 'Supabase storage is unavailable.',
       projectUrl: profile.projectUrl,
+      ...rememberedSessionFields(),
       ...(session?.email ? { userEmail: session.email } : {}),
     };
   }
+  notifyStorageChanged();
   return getStorageSnapshot();
 }
 
 export function initializeStoredStorage(): void {
   const stored = readProfile();
-  if (stored) configureStorage({ provider: 'supabase', ...stored });
+  if (readActiveProvider() === 'local') {
+    activateLocalStorage(true);
+  } else if (stored) {
+    configureStorage({ provider: 'supabase', ...stored });
+  }
 }
 
 export function resetStorageForTests(options: { preservePersisted?: boolean } = {}): void {
@@ -399,6 +483,8 @@ export function resetStorageForTests(options: { preservePersisted?: boolean } = 
   if (!options.preservePersisted) {
     persistProfile(null);
     persistSession(null);
+    persistRememberSession(false);
+    browserStorage('localStorage')?.removeItem(ACTIVE_PROVIDER_KEY);
   }
   resetApiRequestHandler();
   snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };

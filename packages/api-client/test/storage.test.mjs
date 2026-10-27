@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import {
   configureStorage,
+  getConfiguredStorageProviders,
   getStorageSnapshot,
   signInSupabase,
+  switchStorageProvider,
   validateSupabaseProfile,
 } from '../dist/index.js';
 import { initializeStoredStorage, resetStorageForTests } from '../dist/storage.js';
@@ -145,6 +147,136 @@ describe('BYOC storage contracts', () => {
     resetStorageForTests({ preservePersisted: true });
     initializeStoredStorage();
     assert.equal(getStorageSnapshot().provider, 'local');
+  });
+
+  it('restores a same-profile session from persistent storage when remember is enabled', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'remembered-access-token',
+            refresh_token: 'remembered-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: true });
+    await signInSupabase('a@example.test', 'temporary-password');
+    assert.ok(globalThis.localStorage.getItem('forge-supabase-session'));
+
+    resetStorageForTests({ preservePersisted: true });
+    globalThis.sessionStorage = memoryStorage();
+    initializeStoredStorage();
+
+    assert.equal(getStorageSnapshot().status, 'schema_missing');
+    assert.equal(getStorageSnapshot().userEmail, 'a@example.test');
+    assert.equal(getStorageSnapshot().rememberSession, true);
+  });
+
+  it('moves a remembered session to session storage when the preference is disabled', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'remembered-access-token',
+            refresh_token: 'remembered-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: true });
+    await signInSupabase('a@example.test', 'temporary-password');
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: false });
+
+    assert.equal(globalThis.localStorage.getItem('forge-supabase-session'), null);
+    assert.ok(globalThis.sessionStorage.getItem('forge-supabase-session'));
+    assert.equal(getStorageSnapshot().rememberSession, undefined);
+
+    resetStorageForTests({ preservePersisted: true });
+    globalThis.sessionStorage = memoryStorage();
+    initializeStoredStorage();
+    assert.equal(getStorageSnapshot().status, 'authentication_required');
+  });
+
+  it('allows the sign-in choice to enable persistent session storage', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'remembered-access-token',
+            refresh_token: 'remembered-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: false });
+    await signInSupabase('a@example.test', 'temporary-password', true);
+
+    assert.ok(globalThis.localStorage.getItem('forge-supabase-session'));
+    assert.equal(globalThis.sessionStorage.getItem('forge-supabase-session'), null);
+    assert.equal(getStorageSnapshot().rememberSession, true);
+  });
+
+  it('preserves configured providers while switching between local and Supabase', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'switch-access-token',
+            refresh_token: 'switch-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: true });
+    await signInSupabase('a@example.test', 'temporary-password');
+    assert.deepEqual(getConfiguredStorageProviders(), ['local', 'supabase']);
+
+    switchStorageProvider('local');
+    assert.equal(getStorageSnapshot().provider, 'local');
+    assert.deepEqual(getConfiguredStorageProviders(), ['local', 'supabase']);
+
+    resetStorageForTests({ preservePersisted: true });
+    initializeStoredStorage();
+    assert.equal(getStorageSnapshot().provider, 'local');
+
+    switchStorageProvider('supabase');
+    assert.equal(getStorageSnapshot().provider, 'supabase');
+    assert.equal(getStorageSnapshot().userEmail, 'a@example.test');
+  });
+
+  it('does not switch to an unconfigured Supabase provider', () => {
+    configureStorage({ provider: 'local' });
+
+    assert.throws(() => switchStorageProvider('supabase'), /not configured/i);
+    assert.equal(getStorageSnapshot().provider, 'local');
+  });
+
+  it('keeps direct local configuration as an explicit cloud reset', () => {
+    configureStorage({ provider: 'supabase', ...validProfile });
+    configureStorage({ provider: 'local' });
+
+    assert.deepEqual(getConfiguredStorageProviders(), ['local']);
   });
 
   it('does not mark an unknown cloud schema version ready', async () => {

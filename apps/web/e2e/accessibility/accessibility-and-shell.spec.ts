@@ -42,7 +42,7 @@ test('PA-A11Y-01 shell themes, keyboard command navigation, focus restoration an
       })
     : page.getByTestId('app-topbar').getByRole('button', { name: 'Search' });
   if (mobile) {
-    const workspaceBox = await page.getByRole('combobox', { name: 'Workspace' }).boundingBox();
+    const workspaceBox = await page.getByRole('button', { name: /^Workspace:/ }).boundingBox();
     const paletteBox = await openPalette.boundingBox();
     expect(workspaceBox).not.toBeNull();
     expect(paletteBox).not.toBeNull();

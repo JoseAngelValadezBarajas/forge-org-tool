@@ -3,6 +3,13 @@ import '@testing-library/jest-dom/vitest';
 import { act } from '@testing-library/react';
 import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import {
+  configureStorage,
+  getStorageSnapshot,
+  inspectStorage,
+  signInSupabase,
+  switchStorageProvider,
+} from '@forge-org/api-client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import parity from '../../../../docs/design/design-system-parity.json';
 import { productPatternCatalogIds } from './component-gallery/catalog/product-patterns';
@@ -23,6 +30,7 @@ function renderRoute(path: string) {
 describe('M1 application shell', () => {
   afterEach(() => {
     cleanup();
+    configureStorage({ provider: 'local' });
     localStorage.clear();
     delete document.documentElement.dataset.theme;
     vi.unstubAllGlobals();
@@ -76,13 +84,57 @@ describe('M1 application shell', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByRole('combobox', { name: 'Workspace' })).toHaveLength(2);
-      for (const selector of screen.getAllByRole('combobox', { name: 'Workspace' })) {
-        expect(selector).toHaveValue(workspace.id);
-      }
+      expect(
+        screen.getAllByRole('button', { name: 'Workspace: Created during startup' }),
+      ).toHaveLength(2);
       expect(screen.getByRole('heading', { name: 'Your workspace, in focus' })).toBeInTheDocument();
     });
     expect(localStorage.getItem('forge-active-workspace')).toBe(workspace.id);
+  });
+
+  it('does not repopulate Local workspaces after switching to Supabase', async () => {
+    let resolveLocalWorkspaces: ((response: Response) => void) | undefined;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input) === '/api/v1/workspaces') {
+          return new Promise<Response>((resolve) => {
+            resolveLocalWorkspaces = resolve;
+          });
+        }
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    await waitFor(() => expect(resolveLocalWorkspaces).toBeTypeOf('function'));
+
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    await act(async () => {
+      resolveLocalWorkspaces?.(
+        new Response(
+          JSON.stringify([
+            {
+              id: 'local-workspace',
+              name: 'Local workspace',
+              status: 'active',
+              created_at: '',
+              updated_at: '',
+              archived_at: null,
+            },
+          ]),
+          { status: 200 },
+        ),
+      );
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('Provider Supabase - Sign in required')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Local workspace')).toBeNull();
   });
 
   it('opens an Epic detail route with project context', async () => {
@@ -198,7 +250,7 @@ describe('M1 application shell', () => {
     expect(
       await within(sidebar).findByRole('navigation', { name: 'Project navigation' }),
     ).toBeInTheDocument();
-    expect(within(sidebar).getByRole('combobox', { name: 'Workspace' })).toBeInTheDocument();
+    expect(within(sidebar).getByRole('button', { name: /^Workspace:/ })).toBeInTheDocument();
     expect(await within(sidebar).findByRole('heading', { name: 'Project' })).toBeInTheDocument();
     const projectNavigation = await within(sidebar).findByRole('navigation', {
       name: 'Project navigation',
@@ -210,7 +262,176 @@ describe('M1 application shell', () => {
     expect(
       await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
     ).not.toHaveAttribute('aria-current', 'page');
-    expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
+    expect(within(sidebar).getByText('Local DB')).toBeInTheDocument();
+  });
+
+  it('opens the storage menu with configured providers and switches the active provider', async () => {
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    renderRoute('/');
+
+    const sidebar = screen.getByTestId('app-sidebar');
+    const storageButton = within(sidebar).getByRole('button', {
+      name: /Storage providers.*Provider Supabase/i,
+    });
+    fireEvent.click(storageButton);
+
+    const menu = screen.getByRole('menu', { name: 'Storage providers' });
+    expect(within(menu).getByRole('menuitem', { name: 'Configure storage' })).toBeInTheDocument();
+    expect(within(menu).getByRole('separator')).toBeInTheDocument();
+    expect(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    expect(within(menu).getByRole('menuitemradio', { name: 'Supabase' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+
+    fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' }));
+    expect(getStorageSnapshot().provider).toBe('local');
+
+    fireEvent.click(within(sidebar).getByRole('button', { name: /Storage providers.*Local DB/i }));
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitemradio', {
+        name: 'Supabase',
+      }),
+    );
+    expect(getStorageSnapshot().provider).toBe('supabase');
+  });
+
+  it('shows Supabase online state and reloads the workspace from the active provider', async () => {
+    const workspace = {
+      id: 'cloud-workspace',
+      name: 'Cloud workspace',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const url = String(input);
+        if (url.includes('/auth/v1/token')) {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                access_token: 'access-token',
+                refresh_token: 'refresh-token',
+                expires_in: 3600,
+                user: { id: 'user-a', email: 'a@example.test' },
+              }),
+              { status: 200 },
+            ),
+          );
+        }
+        if (url.includes('/rpc/forge_storage_preflight')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ schema_version: 'forge-byoc-v2' }), { status: 200 }),
+          );
+        }
+        if (url.includes('/rest/v1/workspaces')) {
+          return Promise.resolve(new Response(JSON.stringify([workspace]), { status: 200 }));
+        }
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    renderRoute('/');
+
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Provider Supabase - Online')).toBeInTheDocument();
+      expect(screen.getAllByText('Cloud workspace').length).toBeGreaterThan(0);
+    });
+  });
+
+  it('navigates from the storage menu to Storage Settings', async () => {
+    renderRoute('/');
+
+    const sidebar = screen.getByTestId('app-sidebar');
+    fireEvent.click(within(sidebar).getByRole('button', { name: /Storage providers.*Local DB/i }));
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitem', {
+        name: 'Configure storage',
+      }),
+    );
+
+    expect(
+      await screen.findByRole('heading', { name: 'Where FORGE stores your work' }),
+    ).toBeVisible();
+  });
+
+  it('keeps the storage menu accessible when the sidebar is collapsed', () => {
+    renderRoute('/');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    const storageButton = screen.getByRole('button', {
+      name: /Storage providers.*Local DB/i,
+    });
+    expect(storageButton).toBeVisible();
+    fireEvent.click(storageButton);
+    expect(screen.getByRole('menu', { name: 'Storage providers' })).toBeVisible();
+  });
+
+  it('supports keyboard focus management for the storage menu', () => {
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    switchStorageProvider('local');
+    renderRoute('/');
+
+    const storageButton = screen.getByRole('button', {
+      name: /Storage providers.*Local DB/i,
+    });
+    fireEvent.click(storageButton);
+    const menu = screen.getByRole('menu', { name: 'Storage providers' });
+    const configureItem = within(menu).getByRole('menuitem', { name: 'Configure storage' });
+    const localItem = within(menu).getByRole('menuitemradio', { name: 'Local SQLite' });
+    const supabaseItem = within(menu).getByRole('menuitemradio', { name: 'Supabase' });
+
+    expect(configureItem).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(localItem).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(supabaseItem).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'Escape' });
+    expect(storageButton).toHaveFocus();
+    expect(screen.queryByRole('menu', { name: 'Storage providers' })).toBeNull();
+  });
+
+  it('reloads shell data after a storage change notification', async () => {
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    switchStorageProvider('local');
+    let workspaceRequests = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input) === '/api/v1/workspaces') workspaceRequests += 1;
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    await waitFor(() => expect(workspaceRequests).toBe(1));
+
+    switchStorageProvider('local');
+    await waitFor(() => expect(workspaceRequests).toBe(2));
   });
 
   it('filters projects and collapses the project list from the sidebar controls', async () => {
@@ -413,9 +634,12 @@ describe('M1 application shell', () => {
       'href',
       '/projects/w1/p1',
     );
-    fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
-      target: { value: 'w2' },
-    });
+    fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: Research' }));
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitemradio', {
+        name: 'Studio',
+      }),
+    );
 
     expect(await within(projectNavigation).findByRole('link', { name: 'Signal' })).toHaveAttribute(
       'href',
@@ -432,7 +656,9 @@ describe('M1 application shell', () => {
       'href',
       '/projects/w2/p2',
     );
-    expect(within(restoredSidebar).getByRole('combobox', { name: 'Workspace' })).toHaveValue('w2');
+    expect(
+      within(restoredSidebar).getByRole('button', { name: 'Workspace: Studio' }),
+    ).toBeInTheDocument();
   });
 
   it('discards an old Workspace project response after changing the global selector', async () => {
@@ -471,11 +697,15 @@ describe('M1 application shell', () => {
     );
     renderRoute('/');
     const sidebar = screen.getByRole('complementary');
-    await within(sidebar).findByRole('option', { name: 'One' });
+    await within(sidebar).findByRole('button', { name: 'Workspace: One' });
+    fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: One' }));
+    await screen.findByRole('menuitemradio', { name: 'One' });
     await waitFor(() => expect(pending.get('w1')).toHaveLength(2));
-    fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
-      target: { value: 'w2' },
-    });
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitemradio', {
+        name: 'Two',
+      }),
+    );
     await waitFor(() => expect(pending.get('w2')).toHaveLength(2));
     pending
       .get('w2')
@@ -495,6 +725,35 @@ describe('M1 application shell', () => {
     await waitFor(() =>
       expect(screen.queryByRole('heading', { name: 'Stale project' })).not.toBeInTheDocument(),
     );
+  });
+
+  it('opens workspace management from the workspace dropdown', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
+            : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    const sidebar = screen.getByRole('complementary');
+    const workspaceButton = await within(sidebar).findByRole('button', {
+      name: 'Workspace: Research',
+    });
+    fireEvent.click(workspaceButton);
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitem', {
+        name: 'Manage workspaces',
+      }),
+    );
+    expect(await screen.findByRole('heading', { name: 'Manage workspaces' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByText('Manage workspaces'),
+    ).toHaveAttribute('aria-current', 'page');
   });
 
   it('keeps Workspace tag administration on its own settings route', async () => {

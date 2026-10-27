@@ -103,6 +103,21 @@ begin
 end;
 $$;
 
+create table if not exists public.forge_import_sessions (
+    id uuid primary key default gen_random_uuid(),
+    workspace_id uuid not null,
+    project_id uuid not null unique,
+    created_by uuid not null default auth.uid(),
+    state text not null default 'provisional' check (state in ('provisional', 'finalized')),
+    created_at timestamptz not null default now(),
+    expires_at timestamptz not null default (now() + interval '15 minutes'),
+    finalized_at timestamptz,
+    foreign key (workspace_id, project_id)
+        references public.projects (workspace_id, id) on delete cascade
+);
+
+alter table public.forge_import_sessions enable row level security;
+
 create index if not exists tasks_feature_position_idx
     on public.tasks (feature_id, position, id);
 create index if not exists acceptance_criteria_feature_position_idx
@@ -189,26 +204,11 @@ as $$
 declare
     target_project uuid;
 begin
-    if tg_table_name in ('tasks', 'acceptance_criteria') then
-        target_project := (
-            select project_id from public.features
-            where id = case when tg_op = 'DELETE' then old.feature_id else new.feature_id end
-        );
-    else
-        target_project := case when tg_op = 'DELETE' then old.project_id else new.project_id end;
-    end if;
+    target_project := case when tg_op = 'DELETE' then old.project_id else new.project_id end;
     if not public.forge_project_is_active(target_project) then
         raise exception 'archived projects are read-only' using errcode = '55000';
     end if;
     if tg_op = 'UPDATE' and tg_table_name in ('epics', 'features') and new.project_id <> old.project_id then
-        raise exception 'records cannot move between projects' using errcode = '23514';
-    end if;
-    if tg_op = 'UPDATE' and tg_table_name in ('tasks', 'acceptance_criteria') and exists (
-        select 1
-        from public.features old_feature
-        where old_feature.id = old.feature_id
-          and old_feature.project_id <> target_project
-    ) then
         raise exception 'records cannot move between projects' using errcode = '23514';
     end if;
     if tg_op = 'UPDATE' and tg_table_name = 'feature_dependencies' and new.project_id <> old.project_id then
@@ -217,6 +217,85 @@ begin
     return case when tg_op = 'DELETE' then old else new end;
 end;
 $$;
+
+create or replace function public.forge_assert_active_feature_row()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+    target_project uuid;
+begin
+    target_project := (
+        select project_id
+        from public.features
+        where id = case when tg_op = 'DELETE' then old.feature_id else new.feature_id end
+    );
+    if not public.forge_project_is_active(target_project) then
+        raise exception 'archived projects are read-only' using errcode = '55000';
+    end if;
+    if tg_op = 'UPDATE' and exists (
+        select 1
+        from public.features old_feature
+        where old_feature.id = old.feature_id
+          and old_feature.project_id <> target_project
+    ) then
+        raise exception 'records cannot move between projects' using errcode = '23514';
+    end if;
+    return case when tg_op = 'DELETE' then old else new end;
+end;
+$$;
+
+create or replace function public.forge_assert_dependency_acyclic()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public
+as $$
+declare
+    locked_project uuid;
+    excluded_dependency uuid;
+begin
+    if tg_op not in ('INSERT', 'UPDATE') then
+        return old;
+    end if;
+    excluded_dependency := case when tg_op = 'UPDATE' then old.id else null end;
+
+    -- Serialize every dependency mutation for a project. The subsequent
+    -- recursive query runs after the lock is acquired, so concurrent writers
+    -- cannot both validate against the same pre-write graph.
+    select p.id
+    into locked_project
+    from public.projects p
+    where p.id = new.project_id
+    for update;
+    if locked_project is null then
+        raise exception 'dependency project does not exist' using errcode = '23503';
+    end if;
+
+    if exists (
+        with recursive reachable(id) as (
+            select new.blocked_feature_id
+            union
+            select dependency.blocked_feature_id
+            from public.feature_dependencies dependency
+            join reachable on reachable.id = dependency.blocking_feature_id
+            where dependency.project_id = new.project_id
+              and (excluded_dependency is null or dependency.id <> excluded_dependency)
+        )
+        select 1 from reachable where id = new.blocking_feature_id
+    ) then
+        raise exception 'dependency graph contains a cycle' using errcode = '23514';
+    end if;
+    return new;
+end;
+$$;
+
+drop trigger if exists feature_dependencies_acyclic_guard on public.feature_dependencies;
+create trigger feature_dependencies_acyclic_guard
+before insert or update on public.feature_dependencies
+for each row execute function public.forge_assert_dependency_acyclic();
 
 drop trigger if exists epics_active_project_guard on public.epics;
 create trigger epics_active_project_guard
@@ -231,12 +310,12 @@ for each row execute function public.forge_assert_active_project();
 drop trigger if exists tasks_active_project_guard on public.tasks;
 create trigger tasks_active_project_guard
 before insert or update or delete on public.tasks
-for each row execute function public.forge_assert_active_project();
+for each row execute function public.forge_assert_active_feature_row();
 
 drop trigger if exists acceptance_criteria_active_project_guard on public.acceptance_criteria;
 create trigger acceptance_criteria_active_project_guard
 before insert or update or delete on public.acceptance_criteria
-for each row execute function public.forge_assert_active_project();
+for each row execute function public.forge_assert_active_feature_row();
 
 drop trigger if exists feature_dependencies_active_project_guard on public.feature_dependencies;
 create trigger feature_dependencies_active_project_guard
@@ -253,6 +332,7 @@ declare
     target_project uuid;
     target_feature uuid;
     target_workspace uuid;
+    stored_metadata jsonb;
 begin
     target_project := case when tg_op = 'DELETE' then old.project_id else new.project_id end;
     target_feature := case when tg_op = 'DELETE' then old.feature_id else new.feature_id end;
@@ -268,6 +348,26 @@ begin
     end if;
     if tg_op <> 'DELETE' and new.storage_path not like target_workspace::text || '/' || target_project::text || '/' || target_feature::text || '/%' then
         raise exception 'attachment storage path does not match its Bug' using errcode = '23514';
+    end if;
+    if tg_op <> 'DELETE' then
+        select o.metadata
+        into stored_metadata
+        from storage.objects o
+        where o.bucket_id = 'forge-bug-attachments'
+          and o.name = new.storage_path;
+        if not found then
+            raise exception 'attachment Storage object is missing' using errcode = '23514';
+        end if;
+        if stored_metadata is null or coalesce(stored_metadata->>'size', '') !~ '^[0-9]+$' then
+            raise exception 'attachment Storage size does not match metadata' using errcode = '23514';
+        end if;
+        if (stored_metadata->>'size')::bigint <> new.byte_size then
+            raise exception 'attachment Storage size does not match metadata' using errcode = '23514';
+        end if;
+        if nullif(stored_metadata->>'mimetype', '') is null
+           or stored_metadata->>'mimetype' <> new.content_type then
+            raise exception 'attachment Storage content type does not match metadata' using errcode = '23514';
+        end if;
     end if;
     if not public.forge_project_is_active(target_project) then
         raise exception 'archived projects are read-only' using errcode = '55000';
@@ -837,12 +937,13 @@ create or replace function public.forge_transfer_commit(
 )
 returns jsonb
 language plpgsql
-security invoker
+security definer
 set search_path = public
 as $$
 declare
     preview jsonb;
     project_id uuid := gen_random_uuid();
+    import_session_id uuid;
     epic_id uuid;
     feature_id uuid;
     task jsonb;
@@ -855,7 +956,7 @@ declare
     now_value timestamptz := now();
     reference_rows jsonb := '[]'::jsonb;
 begin
-    if public.forge_workspace_role(p_workspace_id) not in ('owner', 'editor') then
+    if auth.uid() is null or public.forge_workspace_role(p_workspace_id) not in ('owner', 'editor') then
         raise exception 'editor membership required' using errcode = '42501';
     end if;
     preview := public.forge_transfer_preview(p_workspace_id, p_document);
@@ -864,6 +965,9 @@ begin
     end if;
     insert into public.projects(id, workspace_id, name, description)
     values (project_id, p_workspace_id, trim(p_document->'project'->>'name'), p_document->'project'->>'description');
+    insert into public.forge_import_sessions(workspace_id, project_id, created_by)
+    values (p_workspace_id, project_id, auth.uid())
+    returning id into import_session_id;
     for epic in select value from jsonb_array_elements(coalesce(p_document->'epics', '[]'::jsonb)) loop
         epic_id := gen_random_uuid();
         epic_map := epic_map || jsonb_build_object(epic->>'ref', epic_id::text);
@@ -906,14 +1010,15 @@ begin
     end loop;
     return jsonb_build_object(
         'schema_version', preview->>'schema_version', 'workspace_id', p_workspace_id,
-        'project_id', project_id, 'fingerprint', preview->>'fingerprint',
+        'project_id', project_id, 'import_id', import_session_id,
+        'fingerprint', preview->>'fingerprint',
         'references', reference_rows, 'counts', preview->'counts'
     );
 end;
 $$;
 
-create or replace function public.forge_delete_imported_project(
-    p_workspace_id uuid, p_project_id uuid
+create or replace function public.forge_finalize_import(
+    p_workspace_id uuid, p_import_id uuid, p_project_id uuid
 )
 returns void
 language plpgsql
@@ -924,7 +1029,55 @@ begin
     if public.forge_workspace_role(p_workspace_id) not in ('owner', 'editor') then
         raise exception 'editor membership required' using errcode = '42501';
     end if;
-    delete from public.projects where id = p_project_id and workspace_id = p_workspace_id;
+    update public.forge_import_sessions
+    set state = 'finalized', finalized_at = now()
+    where id = p_import_id
+      and workspace_id = p_workspace_id
+      and project_id = p_project_id
+      and created_by = auth.uid()
+      and state = 'provisional'
+      and expires_at > now();
+    if not found then
+        raise exception 'import session is invalid, expired or already finalized' using errcode = '42501';
+    end if;
+end;
+$$;
+
+drop function if exists public.forge_delete_imported_project(uuid, uuid);
+create or replace function public.forge_delete_imported_project(
+    p_workspace_id uuid, p_import_id uuid, p_project_id uuid
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    session_state text;
+    session_expires_at timestamptz;
+begin
+    if public.forge_workspace_role(p_workspace_id) not in ('owner', 'editor') then
+        raise exception 'editor membership required' using errcode = '42501';
+    end if;
+    select state, expires_at
+    into session_state, session_expires_at
+    from public.forge_import_sessions
+    where id = p_import_id
+      and workspace_id = p_workspace_id
+      and project_id = p_project_id
+      and created_by = auth.uid()
+    for update;
+    if not found then
+        raise exception 'import session is invalid, expired or finalized' using errcode = '42501';
+    end if;
+    if session_state <> 'provisional' or session_expires_at <= now() then
+        raise exception 'import session is invalid, expired or finalized' using errcode = '42501';
+    end if;
+    delete from public.projects
+    where id = p_project_id and workspace_id = p_workspace_id;
+    if not found then
+        raise exception 'import project does not exist' using errcode = '23503';
+    end if;
 end;
 $$;
 
@@ -1017,6 +1170,7 @@ set search_path = public
 as $$
 declare
     preview jsonb;
+    contextual_fingerprint text;
 begin
     if public.forge_project_role(p_project_id) is null then
         raise exception 'project membership required' using errcode = '42501';
@@ -1052,7 +1206,26 @@ begin
     ) then
         raise exception 'Task transfer must contain Tasks for exactly one Work Item' using errcode = '22023';
     end if;
-    return preview || jsonb_build_object('destination', jsonb_build_object('scope', p_scope, 'id', p_destination_id));
+    contextual_fingerprint := encode(
+        digest(
+            convert_to(
+                jsonb_build_object(
+                    'scope', p_scope,
+                    'workspace_id', p_workspace_id,
+                    'project_id', p_project_id,
+                    'destination_id', p_destination_id,
+                    'document', p_document
+                )::text,
+                'utf8'
+            ),
+            'sha256'
+        ),
+        'hex'
+    );
+    return preview || jsonb_build_object(
+        'fingerprint', contextual_fingerprint,
+        'destination', jsonb_build_object('scope', p_scope, 'id', p_destination_id)
+    );
 end;
 $$;
 
@@ -1216,7 +1389,7 @@ $$;
 insert into public.forge_schema_meta(schema_version)
 values ('forge-byoc-v2') on conflict (schema_version) do nothing;
 
-revoke all on public.tasks, public.acceptance_criteria, public.feature_dependencies, public.bug_attachments from anon, authenticated;
+revoke all on table public.tasks, public.acceptance_criteria, public.feature_dependencies, public.bug_attachments, public.forge_import_sessions from anon, authenticated;
 grant select, insert, update, delete on public.tasks, public.acceptance_criteria, public.feature_dependencies, public.bug_attachments to authenticated;
 grant execute on function public.forge_workspace_role(uuid), public.forge_project_role(uuid) to authenticated;
 grant execute on function public.forge_bug_attachment_scope(uuid, uuid, uuid, boolean) to authenticated;
@@ -1225,7 +1398,7 @@ grant execute on function public.forge_reorder_tasks(uuid, uuid[]), public.forge
 grant execute on function public.forge_create_dependency(uuid, uuid, uuid) to authenticated;
 grant execute on function public.forge_owner_add_member(uuid, uuid, text) to authenticated;
 grant execute on function public.forge_transfer_preview(uuid, jsonb), public.forge_transfer_commit(uuid, jsonb, text) to authenticated;
-grant execute on function public.forge_delete_imported_project(uuid, uuid) to authenticated;
+grant execute on function public.forge_finalize_import(uuid, uuid, uuid), public.forge_delete_imported_project(uuid, uuid, uuid) to authenticated;
 grant execute on function public.forge_transfer_export(uuid, uuid, text) to authenticated;
 grant execute on function public.forge_transfer_contextual_preview(uuid, uuid, text, uuid, jsonb) to authenticated;
 grant execute on function public.forge_transfer_contextual_commit(uuid, uuid, text, uuid, jsonb, text) to authenticated;

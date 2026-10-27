@@ -33,6 +33,7 @@ test('compiled facade and capability subpath expose callable operations', async 
 test('compatibility facade exposes only active 1.0 capabilities', async () => {
   const { organizationApi } = await import(pathToFileURL(resolve(packageRoot, 'dist/index.js')));
   assert.equal(typeof organizationApi.listWorkspaces, 'function');
+  assert.equal(typeof organizationApi.deleteWorkspace, 'function');
   assert.equal(typeof organizationApi.planningOverview, 'function');
   assert.equal(typeof organizationApi.previewProjectImport, 'function');
   assert.equal(typeof organizationApi.previewProjectPackageImport, 'function');

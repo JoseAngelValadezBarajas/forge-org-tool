@@ -6,6 +6,7 @@ _HANDLERS = (
     'list_workspaces',
     'create_workspace',
     'get_workspace',
+    'delete_workspace',
     'update_workspace',
     'list_projects',
     'create_project',

@@ -1,9 +1,22 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
+  getConfiguredStorageProviders,
+  getStorageSnapshot,
+  inspectStorage,
   organizationApi,
+  switchStorageProvider,
   type PlanningOverview,
   type Project,
+  type StorageProvider,
+  type StorageSnapshot,
   type Workspace,
 } from '@forge-org/api-client';
 import { Button, SearchField } from '@corefoundry-labs/forge-ui';
@@ -15,11 +28,13 @@ import {
   Folder,
   Layers,
   Search,
+  Settings,
 } from '@corefoundry-labs/forge-icons';
 import {
   OrganizationPage,
   ProjectOverviewPage,
   StorageSettingsPage,
+  WorkspaceManagementPage,
   WorkspaceSettingsPage,
 } from '../features/organization';
 import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
@@ -36,6 +51,17 @@ const ComponentGallery = import.meta.env.DEV
     )
   : null;
 const SIDEBAR_COLLAPSED_KEY = 'forge-sidebar-collapsed';
+
+function storageProviderLabel(snapshot: StorageSnapshot): string {
+  if (snapshot.provider === 'local') return 'Local DB';
+  if (snapshot.status === 'ready') return 'Provider Supabase - Online';
+  if (snapshot.status === 'authentication_required') return 'Provider Supabase - Sign in required';
+  if (snapshot.status === 'schema_missing') return 'Provider Supabase - Schema required';
+  if (snapshot.status === 'permissions_denied') return 'Provider Supabase - Access denied';
+  if (snapshot.status === 'network_unavailable') return 'Provider Supabase - Offline';
+  return 'Provider Supabase - Configured';
+}
+
 export function App() {
   return (
     <ThemeProvider applyToDocument>
@@ -54,6 +80,7 @@ function ApplicationShell() {
   const [activeWorkspaceId, setActiveWorkspaceId] = useState(
     () => localStorage.getItem('forge-active-workspace') ?? '',
   );
+  const activeWorkspaceIdRef = useRef(activeWorkspaceId);
   const [navigationError, setNavigationError] = useState('');
   const workspaceRevision = useRef(0);
   const context = getProjectContext(location.pathname);
@@ -72,27 +99,86 @@ function ApplicationShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
   );
+  const [storageMenuOpen, setStorageMenuOpen] = useState(false);
+  const [storageSnapshot, setStorageSnapshot] = useState<StorageSnapshot>(() =>
+    getStorageSnapshot(),
+  );
+  const [configuredStorageProviders, setConfiguredStorageProviders] = useState<StorageProvider[]>(
+    () => getConfiguredStorageProviders(),
+  );
+  const [storageRevision, setStorageRevision] = useState(0);
+  const storageProviderRef = useRef(storageSnapshot.provider);
+  const storageDataRevision = useRef(0);
+  const storageMenuTriggerRef = useRef<HTMLButtonElement>(null);
+  const storageMenuItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const previousStorageMenuOpen = useRef(false);
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
+  const workspaceFallbackName = navigationError
+    ? 'Workspace unavailable'
+    : storageSnapshot.provider === 'supabase'
+      ? 'No Supabase workspace'
+      : 'Local Workspace';
+  useEffect(() => {
+    activeWorkspaceIdRef.current = activeWorkspaceId;
+  }, [activeWorkspaceId]);
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
   useEffect(() => {
+    function onStorageChanged() {
+      const nextSnapshot = getStorageSnapshot();
+      const providerChanged = storageProviderRef.current !== nextSnapshot.provider;
+      storageProviderRef.current = nextSnapshot.provider;
+      storageDataRevision.current += 1;
+      setStorageSnapshot(nextSnapshot);
+      setConfiguredStorageProviders(getConfiguredStorageProviders());
+      setStorageRevision((value) => value + 1);
+      setProjectRefresh((value) => value + 1);
+      setWorkspaces([]);
+      setProjects([]);
+      setProjectWorkspaceId('');
+      setContextOverview(null);
+      setNavigationError('');
+      if (providerChanged) {
+        workspaceRevision.current += 1;
+        setActiveWorkspaceId('');
+        activeWorkspaceIdRef.current = '';
+        localStorage.removeItem('forge-active-workspace');
+      }
+    }
+    window.addEventListener('forge:storage-changed', onStorageChanged);
+    return () => window.removeEventListener('forge:storage-changed', onStorageChanged);
+  }, []);
+  useEffect(() => {
+    if (storageMenuOpen) {
+      storageMenuItemRefs.current[0]?.focus();
+    } else if (previousStorageMenuOpen.current) {
+      storageMenuTriggerRef.current?.focus();
+    }
+    previousStorageMenuOpen.current = storageMenuOpen;
+  }, [storageMenuOpen]);
+  useEffect(() => {
+    if (storageSnapshot.provider !== 'supabase') return;
+    let current = true;
+    void inspectStorage().catch((cause: unknown) => {
+      if (current) {
+        setNavigationError(cause instanceof Error ? cause.message : 'Supabase unavailable.');
+      }
+    });
+    return () => {
+      current = false;
+    };
+  }, [storageSnapshot.provider]);
+  useEffect(() => {
     let current = true;
     const initialRevision = workspaceRevision.current;
+    const initialStorageDataRevision = storageDataRevision.current;
     void organizationApi
       .listWorkspaces()
       .then((items) => {
         if (!current) return;
+        if (storageDataRevision.current !== initialStorageDataRevision) return;
         if (workspaceRevision.current !== initialRevision) {
-          setWorkspaces((existing) => {
-            const merged = [...items];
-            for (const workspace of existing) {
-              const index = merged.findIndex((item) => item.id === workspace.id);
-              if (index < 0) merged.push(workspace);
-              else merged[index] = workspace;
-            }
-            return merged;
-          });
           return;
         }
         setWorkspaces(items);
@@ -103,7 +189,7 @@ function ApplicationShell() {
         else localStorage.removeItem('forge-active-workspace');
       })
       .catch((cause: unknown) => {
-        if (current)
+        if (current && storageDataRevision.current === initialStorageDataRevision)
           setNavigationError(
             cause instanceof Error ? cause.message : 'Workspace navigation unavailable.',
           );
@@ -111,13 +197,14 @@ function ApplicationShell() {
     return () => {
       current = false;
     };
-  }, []);
+  }, [storageRevision]);
   useEffect(() => {
     function onActiveWorkspaceChange(event: Event) {
       const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
       if (!id) return;
       workspaceRevision.current += 1;
       setActiveWorkspaceId(id);
+      activeWorkspaceIdRef.current = id;
       localStorage.setItem('forge-active-workspace', id);
     }
     function onWorkspaceCreated(event: Event) {
@@ -136,17 +223,31 @@ function ApplicationShell() {
         );
       }
     }
+    function onWorkspaceDeleted(event: Event) {
+      const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
+      if (!id) return;
+      workspaceRevision.current += 1;
+      setWorkspaces((items) => items.filter((item) => item.id !== id));
+      setProjects((items) => items.filter((item) => item.workspace_id !== id));
+      if (activeWorkspaceIdRef.current === id) {
+        setActiveWorkspaceId('');
+        localStorage.removeItem('forge-active-workspace');
+        setProjectWorkspaceId('');
+      }
+    }
     function onProjectsChanged() {
       setProjectRefresh((value) => value + 1);
     }
     window.addEventListener('forge:active-workspace-change', onActiveWorkspaceChange);
     window.addEventListener('forge:workspace-created', onWorkspaceCreated);
     window.addEventListener('forge:workspace-updated', onWorkspaceUpdated);
+    window.addEventListener('forge:workspace-deleted', onWorkspaceDeleted);
     window.addEventListener('forge:projects-changed', onProjectsChanged);
     return () => {
       window.removeEventListener('forge:active-workspace-change', onActiveWorkspaceChange);
       window.removeEventListener('forge:workspace-created', onWorkspaceCreated);
       window.removeEventListener('forge:workspace-updated', onWorkspaceUpdated);
+      window.removeEventListener('forge:workspace-deleted', onWorkspaceDeleted);
       window.removeEventListener('forge:projects-changed', onProjectsChanged);
     };
   }, []);
@@ -200,17 +301,56 @@ function ApplicationShell() {
         event.preventDefault();
         setPaletteOpen(true);
       }
-      if (event.key === 'Escape') setPaletteOpen(false);
+      if (event.key === 'Escape') {
+        setPaletteOpen(false);
+        setStorageMenuOpen(false);
+      }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
   function go(path: string) {
     setPaletteOpen(false);
+    setStorageMenuOpen(false);
     navigate(path);
+  }
+
+  function selectStorageProvider(provider: StorageProvider) {
+    try {
+      const nextSnapshot = switchStorageProvider(provider);
+      setStorageSnapshot(nextSnapshot);
+      setConfiguredStorageProviders(getConfiguredStorageProviders());
+      setStorageMenuOpen(false);
+      if (nextSnapshot.status === 'authentication_required') navigate('/settings/storage');
+    } catch {
+      setStorageMenuOpen(false);
+      navigate('/settings/storage');
+    }
+  }
+
+  function handleStorageMenuKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    const items = storageMenuItemRefs.current.filter(
+      (item): item is HTMLButtonElement => item !== null,
+    );
+    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setStorageMenuOpen(false);
+      return;
+    }
+    if (!items.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const nextIndex =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? items.length - 1
+          : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    items[nextIndex]?.focus();
   }
   function selectWorkspace(id: string) {
     setActiveWorkspaceId(id);
+    activeWorkspaceIdRef.current = id;
     localStorage.setItem('forge-active-workspace', id);
     window.dispatchEvent(
       new CustomEvent('forge:active-workspace-change', { detail: { workspaceId: id } }),
@@ -291,10 +431,8 @@ function ApplicationShell() {
               name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
             }))}
             onChange={selectWorkspace}
-            currentName={
-              activeWorkspace?.name ??
-              (navigationError ? 'Workspace unavailable' : 'Local Workspace')
-            }
+            onManage={() => go('/workspaces/manage')}
+            currentName={activeWorkspace?.name ?? workspaceFallbackName}
           />
         </div>
         <Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
@@ -352,10 +490,8 @@ function ApplicationShell() {
               name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
             }))}
             onChange={selectWorkspace}
-            currentName={
-              activeWorkspace?.name ??
-              (navigationError ? 'Workspace unavailable' : 'Local Workspace')
-            }
+            onManage={() => go('/workspaces/manage')}
+            currentName={activeWorkspace?.name ?? workspaceFallbackName}
             dataNodeId="344:89"
             compact={sidebarCollapsed}
           />
@@ -436,7 +572,62 @@ function ApplicationShell() {
             </nav>
           )}
           <div className={styles.localMode}>
-            <strong>LOCAL FIRST&nbsp;&nbsp; • &nbsp;&nbsp;PRIVATE</strong>
+            <button
+              type="button"
+              className={styles.storageMenuTrigger}
+              ref={storageMenuTriggerRef}
+              aria-label={`Storage providers: ${storageProviderLabel(storageSnapshot)}`}
+              aria-haspopup="menu"
+              aria-expanded={storageMenuOpen}
+              onClick={() => setStorageMenuOpen((open) => !open)}
+            >
+              <Settings aria-hidden="true" size={15} />
+              <span className={styles.storageMenuLabel}>
+                {storageProviderLabel(storageSnapshot)}
+              </span>
+              <ChevronDown aria-hidden="true" size={14} className={styles.storageMenuChevron} />
+            </button>
+            {storageMenuOpen && (
+              <div
+                className={styles.storageMenu}
+                role="menu"
+                aria-label="Storage providers"
+                tabIndex={-1}
+                onKeyDown={handleStorageMenuKeyDown}
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  className={styles.storageMenuItem}
+                  ref={(node) => {
+                    storageMenuItemRefs.current[0] = node;
+                  }}
+                  onClick={() => go('/settings/storage')}
+                >
+                  <Settings aria-hidden="true" size={15} />
+                  <span>Configure storage</span>
+                </button>
+                <div className={styles.storageMenuSeparator} role="separator" />
+                {configuredStorageProviders.map((provider, index) => (
+                  <button
+                    key={provider}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={storageSnapshot.provider === provider}
+                    className={styles.storageMenuItem}
+                    ref={(node) => {
+                      storageMenuItemRefs.current[index + 1] = node;
+                    }}
+                    onClick={() => selectStorageProvider(provider)}
+                  >
+                    <span className={styles.storageMenuIndicator} aria-hidden="true">
+                      {storageSnapshot.provider === provider ? '•' : ''}
+                    </span>
+                    <span>{provider === 'local' ? 'Local SQLite' : 'Supabase'}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </aside>
         <div
@@ -532,9 +723,10 @@ function ApplicationShell() {
               workspaceName={activeWorkspace?.name}
               projectName={activeProject?.name}
             />
-            <Routes>
+            <Routes key={storageRevision}>
               <Route path="/" element={<OrganizationPage />} />
               <Route path="/settings/storage" element={<StorageSettingsPage />} />
+              <Route path="/workspaces/manage" element={<WorkspaceManagementPage />} />
               <Route path="/workspaces/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
               <Route path="/projects/:workspaceId/:projectId" element={<ProjectOverviewPage />} />
               <Route
@@ -649,6 +841,20 @@ function Breadcrumbs({
   workspaceName?: string;
   projectName?: string;
 }) {
+  if (pathname === '/workspaces/manage') {
+    return (
+      <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+        <ol>
+          <li>
+            <Link to="/">Workspace</Link>
+          </li>
+          <li>
+            <span aria-current="page">Manage workspaces</span>
+          </li>
+        </ol>
+      </nav>
+    );
+  }
   if (pathname.startsWith('/workspaces/')) {
     return (
       <nav aria-label="Breadcrumb" className={styles.breadcrumb}>

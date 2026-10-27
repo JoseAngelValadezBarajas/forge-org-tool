@@ -85,6 +85,7 @@ describe('StorageSettings', () => {
         provider: 'supabase',
         projectUrl: 'https://example123.supabase.co',
         publishableKey: 'sb_publishable_testkey123',
+        rememberSession: false,
       }),
     );
     expect(
@@ -115,8 +116,40 @@ describe('StorageSettings', () => {
       expect(storageMock.signInSupabase).toHaveBeenCalledWith(
         'a@example.test',
         'temporary-password',
+        false,
       ),
     );
     expect(storageMock.inspectStorage).toHaveBeenCalled();
+  });
+
+  it('lets the user choose persistence directly in the Supabase sign-in form', async () => {
+    render(<StorageSettings />);
+    fireEvent.click(screen.getByRole('radio', { name: /Supabase/ }));
+    fireEvent.change(screen.getByLabelText('Supabase project URL'), {
+      target: { value: 'https://example123.supabase.co' },
+    });
+    fireEvent.change(screen.getByLabelText('Supabase publishable key'), {
+      target: { value: 'sb_publishable_testkey123' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save Supabase settings' }));
+
+    await screen.findByRole('heading', { name: 'Sign in to your Supabase project' });
+    const remember = screen.getByRole('checkbox', { name: /Remember this session/i });
+    fireEvent.click(remember);
+    fireEvent.change(screen.getByLabelText('Supabase email'), {
+      target: { value: 'a@example.test' },
+    });
+    fireEvent.change(screen.getByLabelText('Supabase password'), {
+      target: { value: 'temporary-password' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign in to Supabase' }));
+
+    await waitFor(() =>
+      expect(storageMock.signInSupabase).toHaveBeenCalledWith(
+        'a@example.test',
+        'temporary-password',
+        true,
+      ),
+    );
   });
 });

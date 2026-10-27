@@ -50,3 +50,80 @@ def test_byoc_02_rollback_restores_the_01_preflight_and_policies() -> None:
     assert 'forge-byoc-v1' in sql
     assert 'restore the 0.1 write policies' in sql.lower()
     assert 'drop function if exists public.forge_project_is_active(uuid)' in sql
+    assert 'drop function if exists public.forge_finalize_import(uuid, uuid, uuid)' in sql
+    assert 'drop function if exists public.forge_delete_imported_project(uuid, uuid, uuid)' in sql
+    assert 'drop function if exists public.forge_assert_dependency_acyclic()' in sql
+    assert 'drop table if exists public.forge_import_sessions' in sql
+
+
+def test_byoc_02_binds_contextual_fingerprints_and_storage_metadata() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8')
+
+    assert "'scope', p_scope" in sql
+    assert "'workspace_id', p_workspace_id" in sql
+    assert "'project_id', p_project_id" in sql
+    assert "'destination_id', p_destination_id" in sql
+    assert 'storage.objects' in sql
+    assert "metadata->>'size'" in sql
+    assert "metadata->>'mimetype'" in sql
+
+
+def test_byoc_02_import_compensation_is_actor_bound_and_not_finalized() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8')
+
+    assert 'create table if not exists public.forge_import_sessions' in sql
+    assert 'created_by uuid not null default auth.uid()' in sql
+    assert "state text not null default 'provisional'" in sql
+    assert "'finalized'" in sql
+    assert 'expires_at timestamptz not null' in sql
+    assert 'finalized_at timestamptz' in sql
+    assert 'forge_finalize_import' in sql
+    assert 'forge_delete_imported_project(uuid, uuid, uuid)' in sql
+    assert 'created_by = auth.uid()' in sql
+    assert "state = 'provisional'" in sql
+    assert 'expires_at > now()' in sql
+    assert 'revoke all on table public.tasks' in sql
+    assert 'public.forge_import_sessions from anon, authenticated' in sql
+    assert "'import_id', import_session_id" in sql
+    delete_sql = sql[sql.index('create or replace function public.forge_delete_imported_project') :]
+    assert 'where id = p_import_id' in delete_sql
+    assert 'project_id = p_project_id' in delete_sql
+    assert 'created_by = auth.uid()' in delete_sql
+    assert 'delete from public.projects' in delete_sql
+    assert 'where id = p_project_id and workspace_id = p_workspace_id' in delete_sql
+    commit_sql = sql[sql.index('create or replace function public.forge_transfer_commit') :]
+    assert 'security definer' in commit_sql.split('as $$', 1)[0]
+
+
+def test_byoc_02_direct_dependency_writes_use_a_project_lock_and_cycle_trigger() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8')
+
+    assert 'create or replace function public.forge_assert_dependency_acyclic()' in sql
+    assert 'for update' in sql
+    assert 'with recursive reachable(id)' in sql
+    assert 'dependency.id <> excluded_dependency' in sql
+    assert 'feature_dependencies_acyclic_guard' in sql
+    assert 'before insert or update on public.feature_dependencies' in sql
+    assert 'dependency graph contains a cycle' in sql
+
+
+def test_byoc_02_active_project_guard_is_safe_for_epic_rows() -> None:
+    sql = MIGRATION.read_text(encoding='utf-8')
+    project_guard = sql[
+        sql.index('create or replace function public.forge_assert_active_project()') : sql.index(
+            'create or replace function public.forge_assert_active_feature_row()'
+        )
+    ]
+
+    assert 'old.feature_id' not in project_guard
+    assert 'new.feature_id' not in project_guard
+    assert (
+        'create trigger tasks_active_project_guard\n'
+        'before insert or update or delete on public.tasks\n'
+        'for each row execute function public.forge_assert_active_feature_row();'
+    ) in sql
+    assert (
+        'create trigger acceptance_criteria_active_project_guard\n'
+        'before insert or update or delete on public.acceptance_criteria\n'
+        'for each row execute function public.forge_assert_active_feature_row();'
+    ) in sql
