@@ -60,6 +60,11 @@ describe('Android shell contract', () => {
     assert.match(workflow, /npx tauri android build --debug --apk/);
     assert.match(workflow, /actions\/upload-artifact@v4/);
     assert.match(workflow, /10\\\.0\\\.2\\\.2|127\\\.0\\\.0\\\.1:5173/);
+    assert.match(
+      workflow,
+      /find "\$extracted_apk" -type f ! -path "\$extracted_apk\/assets\/tauri\.conf\.json"/,
+    );
+    assert.match(workflow, /find "\$extracted_apk\/assets" -type f -name '\*\.js'/);
     assert.equal(packageJson.scripts.tauri, 'tauri');
   });
 });

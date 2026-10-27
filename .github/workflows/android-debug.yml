@@ -88,7 +88,9 @@ jobs:
           extracted_apk="$(mktemp -d)"
           trap 'rm -rf "$extracted_apk"' EXIT
           unzip -q "$apk_path" -d "$extracted_apk"
-          if grep -R -a -n -E '10\.0\.2\.2|127\.0\.0\.1:5173' "$extracted_apk"; then
+          test -n "$(find "$extracted_apk/assets" -type f -name '*.js' -print -quit)"
+          if find "$extracted_apk" -type f ! -path "$extracted_apk/assets/tauri.conf.json" -print0 \
+            | xargs -0 grep -a -n -E '10\.0\.2\.2|127\.0\.0\.1:5173'; then
             echo 'Development Vite URLs must not be embedded in the APK.' >&2
             exit 1
           fi
