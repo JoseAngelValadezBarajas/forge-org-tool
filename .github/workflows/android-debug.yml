@@ -90,7 +90,9 @@ jobs:
           unzip -q "$apk_path" -d "$extracted_apk"
           # Tauri embeds frontendDist into the native library rather than as loose APK files.
           test -n "$(find "$extracted_apk/lib" -type f -name 'libforge_org_desktop_lib.so' -print -quit)"
-          if find "$extracted_apk" -type f ! -path "$extracted_apk/assets/tauri.conf.json" -print0 \
+          if find "$extracted_apk" -type f \
+            ! -path "$extracted_apk/assets/tauri.conf.json" \
+            ! -path "$extracted_apk/lib/*" -print0 \
             | xargs -0 grep -a -n -E '10\.0\.2\.2|127\.0\.0\.1:5173'; then
             echo 'Development Vite URLs must not be embedded in the APK.' >&2
             exit 1

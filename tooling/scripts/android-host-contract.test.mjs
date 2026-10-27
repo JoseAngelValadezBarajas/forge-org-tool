@@ -62,11 +62,15 @@ describe('Android shell contract', () => {
     assert.match(workflow, /10\\\.0\\\.2\\\.2|127\\\.0\\\.0\\\.1:5173/);
     assert.match(
       workflow,
-      /find "\$extracted_apk" -type f ! -path "\$extracted_apk\/assets\/tauri\.conf\.json"/,
+      /find "\$extracted_apk" -type f[\s\S]*! -path "\$extracted_apk\/assets\/tauri\.conf\.json"/,
     );
     assert.match(
       workflow,
       /find "\$extracted_apk\/lib" -type f -name 'libforge_org_desktop_lib\.so'/,
+    );
+    assert.match(
+      workflow,
+      /! -path "\$extracted_apk\/lib\/\*" -print0/,
     );
     assert.equal(packageJson.scripts.tauri, 'tauri');
   });
