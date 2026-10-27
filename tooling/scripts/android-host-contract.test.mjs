@@ -68,10 +68,7 @@ describe('Android shell contract', () => {
       workflow,
       /find "\$extracted_apk\/lib" -type f -name 'libforge_org_desktop_lib\.so'/,
     );
-    assert.match(
-      workflow,
-      /! -path "\$extracted_apk\/lib\/\*" -print0/,
-    );
+    assert.match(workflow, /! -path "\$extracted_apk\/lib\/\*" -print0/);
     assert.equal(packageJson.scripts.tauri, 'tauri');
   });
 });
