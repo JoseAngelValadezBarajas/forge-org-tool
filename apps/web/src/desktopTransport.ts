@@ -1,3 +1,5 @@
+import { getForgeRuntimePlatform, type ForgeRuntimePlatform } from './runtimePlatform';
+
 type DesktopInvoke = (command: string, args?: Record<string, unknown>) => Promise<unknown>;
 
 interface DesktopInternals {
@@ -38,12 +40,19 @@ function parseDesktopResponse(raw: unknown): Response {
   });
 }
 
-export function installDesktopTransport(): void {
+export function installDesktopTransport(
+  runtimePlatform: ForgeRuntimePlatform = getForgeRuntimePlatform(),
+): void {
   const nativeFetch = window.fetch.bind(window);
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const details = requestDetails(input, init);
+    if (runtimePlatform === 'android' && details.path.startsWith('/api/v1/')) {
+      throw new Error(
+        'Local SQLite transport is unavailable on Android; configure Supabase storage.',
+      );
+    }
     const invoke = desktopInvoke();
-    if (!invoke || !details.path.startsWith('/api/v1/')) {
+    if (runtimePlatform !== 'desktop' || !invoke || !details.path.startsWith('/api/v1/')) {
       return nativeFetch(input, init);
     }
     if (!['GET', 'POST', 'PATCH', 'DELETE'].includes(details.method)) {

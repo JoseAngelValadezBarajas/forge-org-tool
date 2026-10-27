@@ -56,6 +56,7 @@ let profile: SupabaseProfile | null = null;
 let session: SupabaseSession | null = null;
 let handlerFactory: SupabaseHandlerFactory | null = null;
 let refreshInFlight: Promise<SupabaseSession | null> | null = null;
+let localStorageAvailable = true;
 let snapshot: StorageSnapshot = {
   provider: 'local',
   status: 'ready',
@@ -212,6 +213,9 @@ function installSupabaseHandler(): void {
 }
 
 function activateLocalStorage(preserveCloudConfiguration: boolean): void {
+  if (!localStorageAvailable) {
+    throw new Error('Local SQLite is unavailable on this runtime; configure Supabase storage.');
+  }
   if (!preserveCloudConfiguration) {
     persistProfile(null);
     persistSession(null);
@@ -271,11 +275,49 @@ export function configureStorage(config: StorageConfig): void {
   notifyStorageChanged();
 }
 
+/**
+ * Restrict the client to a cloud provider on runtimes that cannot host the
+ * local SQLite sidecar, such as the Android shell.
+ */
+export function setLocalStorageAvailable(available: boolean): void {
+  localStorageAvailable = available;
+  if (available || snapshot.provider !== 'local') return;
+
+  const storedProfile = readProfile();
+  persistActiveProvider('supabase');
+  profile = storedProfile;
+  session = storedProfile ? (readStoredSession()?.session ?? null) : null;
+  if (storedProfile && session) {
+    persistSession(session);
+  } else {
+    session = null;
+  }
+  snapshot = storedProfile
+    ? {
+        provider: 'supabase',
+        status: session ? 'schema_missing' : 'authentication_required',
+        message: session
+          ? 'Verify the Supabase schema and permissions before using cloud storage.'
+          : 'Sign in to the configured Supabase project.',
+        projectUrl: storedProfile.projectUrl,
+        ...rememberedSessionFields(),
+        ...(session?.email ? { userEmail: session.email } : {}),
+      }
+    : {
+        provider: 'supabase',
+        status: 'authentication_required',
+        message: 'Android requires Supabase storage. Configure a Supabase project to continue.',
+      };
+  installSupabaseHandler();
+  notifyStorageChanged();
+}
+
 export function getStorageSnapshot(): StorageSnapshot {
   return { ...snapshot };
 }
 
 export function getConfiguredStorageProviders(): StorageProvider[] {
+  if (!localStorageAvailable) return ['supabase'];
   return readProfile() ? ['local', 'supabase'] : ['local'];
 }
 
@@ -477,6 +519,7 @@ export function initializeStoredStorage(): void {
 }
 
 export function resetStorageForTests(options: { preservePersisted?: boolean } = {}): void {
+  localStorageAvailable = true;
   profile = null;
   session = null;
   refreshInFlight = null;

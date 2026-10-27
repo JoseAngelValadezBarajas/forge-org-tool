@@ -9,7 +9,10 @@ if (!Number.isInteger(apiPort) || apiPort < 1024 || apiPort > 65535) {
 export default defineConfig({
   plugins: [react()],
   resolve: { dedupe: ['react', 'react-dom'] },
-  server: { host: '127.0.0.1', proxy: { '/api': `http://127.0.0.1:${apiPort}` } },
+  server: {
+    host: process.env.FORGE_ANDROID_DEV === '1' ? '0.0.0.0' : '127.0.0.1',
+    proxy: { '/api': `http://127.0.0.1:${apiPort}` },
+  },
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],

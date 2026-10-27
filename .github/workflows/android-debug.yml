@@ -1,0 +1,106 @@
+name: Android Debug APK
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/android-debug.yml'
+      - 'apps/desktop/src-tauri/**'
+      - 'apps/web/src/**'
+      - 'apps/web/index.html'
+      - 'packages/api-client/**'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android-debug:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - name: Install Android SDK and NDK packages
+        shell: bash
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Build production frontend
+        run: npm run build
+
+      - name: Reject development URLs and credentials from the frontend bundle
+        shell: bash
+        run: |
+          if grep -R -n -E '10\.0\.2\.2|127\.0\.0\.1:5173' apps/web/dist; then
+            echo 'Development Vite URLs must not be embedded in the production frontend.' >&2
+            exit 1
+          fi
+          if grep -R -n -E 'SUPABASE_(SERVICE_ROLE|SECRET)|sb_secret_|service_role' apps/web/dist; then
+            echo 'Privileged Supabase credentials must not be embedded in the APK frontend.' >&2
+            exit 1
+          fi
+
+      - name: Initialize Tauri Android project
+        working-directory: apps/desktop/src-tauri
+        run: npx tauri android init --ci --skip-targets-install
+
+      - name: Build debug APK
+        working-directory: apps/desktop/src-tauri
+        run: npx tauri android build --debug --apk --target aarch64 --ci
+
+      - name: Verify APK output and embedded production assets
+        id: apk
+        shell: bash
+        run: |
+          apk_path="$(find apps/desktop/src-tauri/gen/android/app/build/outputs/apk -type f -name '*.apk' -print -quit)"
+          test -n "$apk_path"
+          test -s "$apk_path"
+          echo "path=$apk_path" >> "$GITHUB_OUTPUT"
+          unzip -l "$apk_path"
+          extracted_apk="$(mktemp -d)"
+          trap 'rm -rf "$extracted_apk"' EXIT
+          unzip -q "$apk_path" -d "$extracted_apk"
+          # Tauri embeds frontendDist into the native library rather than as loose APK files.
+          test -n "$(find "$extracted_apk/lib" -type f -name 'libforge_org_desktop_lib.so' -print -quit)"
+          if find "$extracted_apk" -type f \
+            ! -path "$extracted_apk/assets/tauri.conf.json" \
+            ! -path "$extracted_apk/lib/*" -print0 \
+            | xargs -0 grep -a -n -E '10\.0\.2\.2|127\.0\.0\.1:5173'; then
+            echo 'Development Vite URLs must not be embedded in the APK.' >&2
+            exit 1
+          fi
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-android-debug-${{ github.sha }}
+          path: ${{ steps.apk.outputs.path }}
+          if-no-files-found: error

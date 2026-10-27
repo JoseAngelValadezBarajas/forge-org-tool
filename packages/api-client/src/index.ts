@@ -11,6 +11,7 @@ export {
   getConfiguredStorageProviders,
   getStorageSnapshot,
   inspectStorage,
+  setLocalStorageAvailable,
   signInSupabase,
   signOutSupabase,
   switchStorageProvider,

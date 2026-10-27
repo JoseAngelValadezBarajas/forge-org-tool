@@ -7,16 +7,23 @@ license = "Apache-2.0"
 edition = "2021"
 rust-version = "1.77"
 
+[lib]
+name = "forge_org_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [build-dependencies]
 tauri-build = { version = "2.0.0", features = [] }
 
 [dependencies]
-forge-org-desktop-policy = { path = ".." }
-tauri = { version = "2.0.0", features = ["tray-icon"] }
+tauri = { version = "2.0.0", features = [] }
 tauri-plugin-dialog = "2.0.0"
 tauri-plugin-fs = "2.0.0"
-tauri-plugin-single-instance = "2.0.0"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+forge-org-desktop-policy = { path = ".." }
+tauri = { version = "2.0.0", features = ["tray-icon"] }
 tauri-plugin-shell = "2.0.0"
+tauri-plugin-single-instance = "2.0.0"
 rand = "0.9"
 
 [features]
