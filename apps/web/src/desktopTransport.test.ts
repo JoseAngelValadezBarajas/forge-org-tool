@@ -44,6 +44,24 @@ describe('Desktop transport bridge', () => {
     expect(browserFetch).toHaveBeenCalledWith('/api/v1/health', undefined);
   });
 
+  it('rejects the local API transport in the Android shell without invoking Desktop IPC', async () => {
+    const invoke = vi.fn();
+    const browserFetch = vi.fn();
+    window.fetch = browserFetch;
+    Object.defineProperty(window, '__TAURI_INTERNALS__', {
+      configurable: true,
+      value: { invoke },
+    });
+
+    installDesktopTransport('android');
+
+    await expect(fetch('/api/v1/workspaces')).rejects.toThrow(
+      'Local SQLite transport is unavailable on Android; configure Supabase storage.',
+    );
+    expect(invoke).not.toHaveBeenCalled();
+    expect(browserFetch).not.toHaveBeenCalled();
+  });
+
   it('preserves query strings and rejects methods outside the Rust policy', async () => {
     const invoke = vi.fn().mockResolvedValue('200\n[]');
     Object.defineProperty(window, '__TAURI_INTERNALS__', {

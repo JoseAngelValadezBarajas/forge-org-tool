@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "build": {
+    "devUrl": "http://10.0.2.2:5173"
+  },
+  "app": {
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' https://*.supabase.co"
+    }
+  },
+  "bundle": {
+    "icon": ["icons/512x512.png"],
+    "externalBin": [],
+    "android": {
+      "minSdkVersion": 24
+    }
+  }
+}

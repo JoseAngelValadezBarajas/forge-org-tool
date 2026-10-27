@@ -56,6 +56,7 @@ vi.mock('@forge-org/api-client', () => ({
 afterEach(() => {
   cleanup();
   storageMock.reset();
+  delete (window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__;
   vi.clearAllMocks();
 });
 
@@ -66,6 +67,24 @@ describe('StorageSettings', () => {
     expect(screen.getByText('Local SQLite is active.')).toBeInTheDocument();
     expect(screen.getByText(/Firebase/)).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /Local SQLite/ })).toBeChecked();
+  });
+
+  it('makes local SQLite unavailable in the Android shell', () => {
+    Object.defineProperty(window, '__TAURI_INTERNALS__', {
+      configurable: true,
+      value: { invoke: vi.fn() },
+    });
+    Object.defineProperty(window.navigator, 'userAgent', {
+      configurable: true,
+      value: 'Mozilla/5.0 (Linux; Android 14; Pixel 8)',
+    });
+
+    render(<StorageSettings />);
+
+    expect(screen.getByRole('radio', { name: /Local SQLite/ })).toBeDisabled();
+    expect(
+      screen.getByText(/Unavailable in Android. Configure Supabase cloud storage/),
+    ).toBeInTheDocument();
   });
 
   it('configures Supabase without presenting ready before authentication', async () => {

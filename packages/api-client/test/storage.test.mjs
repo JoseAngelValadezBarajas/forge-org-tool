@@ -4,6 +4,7 @@ import {
   configureStorage,
   getConfiguredStorageProviders,
   getStorageSnapshot,
+  setLocalStorageAvailable,
   signInSupabase,
   switchStorageProvider,
   validateSupabaseProfile,
@@ -36,12 +37,25 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  setLocalStorageAvailable(true);
   configureStorage({ provider: 'local' });
   delete globalThis.localStorage;
   delete globalThis.sessionStorage;
 });
 
 describe('BYOC storage contracts', () => {
+  it('rejects local SQLite explicitly when the runtime is cloud-only', () => {
+    setLocalStorageAvailable(false);
+
+    assert.deepEqual(getConfiguredStorageProviders(), ['supabase']);
+    assert.throws(
+      () => configureStorage({ provider: 'local' }),
+      /Local SQLite is unavailable on this runtime/i,
+    );
+    assert.equal(getStorageSnapshot().provider, 'supabase');
+    assert.equal(getStorageSnapshot().status, 'authentication_required');
+  });
+
   it('keeps local SQLite ready by default and does not require a cloud config', () => {
     configureStorage({ provider: 'local' });
 

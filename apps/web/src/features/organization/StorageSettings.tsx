@@ -10,6 +10,7 @@ import {
   type StorageSnapshot,
 } from '@forge-org/api-client';
 import styles from './StorageSettings.module.css';
+import { getForgeRuntimePlatform } from '../../runtimePlatform';
 
 function toneFor(snapshot: StorageSnapshot): 'success' | 'warning' | 'danger' {
   if (snapshot.status === 'ready') return 'success';
@@ -20,6 +21,7 @@ function toneFor(snapshot: StorageSnapshot): 'success' | 'warning' | 'danger' {
 }
 
 export function StorageSettings() {
+  const android = getForgeRuntimePlatform() === 'android';
   const initial = getStorageSnapshot();
   const [provider, setProvider] = useState<StorageProvider>(initial.provider);
   const [snapshot, setSnapshot] = useState<StorageSnapshot>(initial);
@@ -118,11 +120,16 @@ export function StorageSettings() {
             name="storage-provider"
             value="local"
             checked={provider === 'local'}
+            disabled={android}
             onChange={() => void selectProvider('local')}
           />
           <span>
             <strong>Local SQLite</strong>
-            <small>Default. Existing data stays on this installation.</small>
+            <small>
+              {android
+                ? 'Unavailable in Android. Configure Supabase cloud storage to continue.'
+                : 'Default. Existing data stays on this installation.'}
+            </small>
           </span>
         </div>
         <div className={styles.providerOption}>
