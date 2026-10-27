@@ -49,6 +49,7 @@ describe('Android shell contract', () => {
 
   it('defines a CI lane that builds and uploads a real debug APK', async () => {
     const workflow = await read('.github/workflows/android-debug.yml');
+    const packageJson = JSON.parse(await read('package.json'));
     assert.match(workflow, /runs-on: ubuntu-24\.04/);
     assert.match(workflow, /actions\/setup-java@v4/);
     assert.match(workflow, /node-version: ['"]24['"]/);
@@ -59,5 +60,6 @@ describe('Android shell contract', () => {
     assert.match(workflow, /npx tauri android build --debug --apk/);
     assert.match(workflow, /actions\/upload-artifact@v4/);
     assert.match(workflow, /10\\\.0\\\.2\\\.2|127\\\.0\\\.0\\\.1:5173/);
+    assert.equal(packageJson.scripts.tauri, 'tauri');
   });
 });

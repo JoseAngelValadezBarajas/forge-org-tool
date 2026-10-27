@@ -16,6 +16,7 @@
   "scripts": {
     "postinstall": "npm run build:packages",
     "dev": "npm run dev --workspace=@forge-org/web",
+    "tauri": "tauri",
     "build:packages": "npm run build --workspace=@forge-org/api-client",
     "build": "npm run build:packages && npm run build --workspace=@forge-org/web && npm run check:production-host",
     "desktop:build:nsis": "tauri build --config apps/desktop/src-tauri/tauri.conf.json",
