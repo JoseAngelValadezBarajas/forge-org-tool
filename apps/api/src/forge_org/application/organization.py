@@ -20,9 +20,7 @@ class InvalidInput(Exception):
 
 
 class OrganizationService:
-    def __init__(
-        self, connection: sqlite3.Connection, attachment_root: Path | None = None
-    ) -> None:
+    def __init__(self, connection: sqlite3.Connection, attachment_root: Path | None = None) -> None:
         self.repository = OrganizationRepository(connection)
         self.attachment_root = attachment_root
 

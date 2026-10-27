@@ -164,7 +164,10 @@ class OrganizationPlanningPersistence:
             for row in rows:
                 relative_path = row['relative_path']
                 candidate = (attachment_root / relative_path).resolve()
-                if Path(relative_path).name == relative_path and candidate.parent == attachment_root:
+                if (
+                    Path(relative_path).name == relative_path
+                    and candidate.parent == attachment_root
+                ):
                     attachment_paths.append(candidate)
         cursor = self.connection.execute('DELETE FROM workspaces WHERE id = ?', (workspace_id,))
         if cursor.rowcount:
