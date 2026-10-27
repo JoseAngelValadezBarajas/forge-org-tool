@@ -65,7 +65,7 @@ export function WorkspaceSwitcher({
         data-testid={compact ? 'workspace-compact-control' : undefined}
       >
         <span className={compact ? styles.compactLabel : undefined}>Workspace</span>
-        <div className={styles.selector} onKeyDown={handleKeyDown}>
+        <div className={styles.selector}>
           <button
             type="button"
             className={[styles.trigger, compact && styles.compactTrigger].filter(Boolean).join(' ')}
@@ -80,7 +80,13 @@ export function WorkspaceSwitcher({
             <ChevronDown aria-hidden="true" size={14} className={styles.chevron} />
           </button>
           {open && (
-            <div className={styles.menu} role="menu" aria-label="Workspaces">
+            <div
+              className={styles.menu}
+              role="menu"
+              aria-label="Workspaces"
+              tabIndex={-1}
+              onKeyDown={handleKeyDown}
+            >
               {onManage && (
                 <button
                   type="button"

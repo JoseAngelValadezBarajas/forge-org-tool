@@ -132,7 +132,7 @@ describe('Supabase Data API adapter', () => {
         return jsonResponse({ schema_version: 'forge-byoc-v2' });
       }
       if (String(url).includes('/rpc/forge_delete_workspace')) {
-        return new Response(null, { status: 204 });
+        return new globalThis.Response(null, { status: 204 });
       }
       throw new Error(`unexpected request ${String(url)}`);
     };
