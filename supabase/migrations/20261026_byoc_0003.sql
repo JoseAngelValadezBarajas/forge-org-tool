@@ -18,6 +18,16 @@ begin
         raise exception 'authentication required' using errcode = '42501';
     end if;
 
+    -- A retry after the database delete is a safe no-op. Storage cleanup is
+    -- performed by the authenticated client before this function is called.
+    if not exists (
+        select 1
+        from public.workspaces w
+        where w.id = p_workspace_id
+    ) then
+        return;
+    end if;
+
     if not exists (
         select 1
         from public.workspace_members wm
@@ -28,18 +38,23 @@ begin
         raise exception 'workspace owner access required' using errcode = '42501';
     end if;
 
-    -- Remove private attachment objects before the metadata cascades from the
-    -- workspace delete. The bucket remains owned by the BYOC project.
-    delete from storage.objects
-    where bucket_id = 'forge-bug-attachments'
-      and name like p_workspace_id::text || '/%';
+    -- The client must remove physical objects through the Storage API. Keep
+    -- this database-side guard so a stale or partial cleanup can never allow
+    -- the workspace metadata to be deleted while Storage objects remain.
+    if exists (
+        select 1
+        from storage.objects
+        where bucket_id = 'forge-bug-attachments'
+          and (
+              name = p_workspace_id::text
+              or name like p_workspace_id::text || '/%'
+          )
+    ) then
+        raise exception 'workspace storage cleanup incomplete' using errcode = '55000';
+    end if;
 
     delete from public.workspaces
     where id = p_workspace_id;
-
-    if not found then
-        raise exception 'workspace not found' using errcode = 'P0002';
-    end if;
 end;
 $$;
 

@@ -29,6 +29,9 @@ const MAX_PACKAGE_BYTES = 5 * 1024 * 1024;
 const MAX_PACKAGE_ENTRIES = 100;
 const MAX_EXPANDED_BYTES = 25 * 1024 * 1024;
 const MAX_DOCUMENT_BYTES = 7 * 1024 * 1024;
+const MAX_STORAGE_LIST_PAGE = 1000;
+const MAX_STORAGE_DELETE_BATCH = 1000;
+const MAX_STORAGE_CLEANUP_ATTEMPTS = 3;
 
 function bodyOf(init: RequestInit): JsonRecord {
   if (typeof init.body !== 'string' || init.body.length === 0) return {};
@@ -115,6 +118,142 @@ export function createSupabaseHandler(
   async function blobRequest(endpoint: string, init: RequestInit = {}): Promise<Blob> {
     const response = await responseFor(endpoint, init);
     return response.blob();
+  }
+
+  type StorageListEntry = {
+    name?: unknown;
+    id?: unknown;
+  };
+
+  function storageCleanupScope(workspaceId: string): string {
+    if (
+      workspaceId.length === 0 ||
+      workspaceId === '.' ||
+      workspaceId === '..' ||
+      workspaceId.includes('/') ||
+      workspaceId.includes('\\')
+    ) {
+      throw new ApiError(422, 'Workspace storage scope is invalid.');
+    }
+    return `${workspaceId}/`;
+  }
+
+  function storagePathForEntry(
+    prefix: string,
+    entry: StorageListEntry,
+    workspacePrefix: string,
+  ): string {
+    if (typeof entry.name !== 'string' || entry.name.length === 0) {
+      throw new ApiError(502, 'Supabase returned an invalid Storage entry.');
+    }
+    if (
+      entry.name === '.' ||
+      entry.name === '..' ||
+      entry.name.includes('/') ||
+      entry.name.includes('\\')
+    ) {
+      throw new ApiError(502, 'Supabase returned a Storage entry outside the workspace scope.');
+    }
+    const path = `${prefix}${entry.name}`;
+    if (
+      !path.startsWith(workspacePrefix) ||
+      path.split('/').some((part) => part === '.' || part === '..')
+    ) {
+      throw new ApiError(502, 'Supabase returned a Storage entry outside the workspace scope.');
+    }
+    return path;
+  }
+
+  async function listWorkspaceStoragePaths(workspaceId: string): Promise<string[]> {
+    const workspacePrefix = storageCleanupScope(workspaceId);
+    const pendingPrefixes = [workspacePrefix];
+    const files: string[] = [];
+    const visitedPrefixes = new Set<string>();
+
+    while (pendingPrefixes.length > 0) {
+      const prefix = pendingPrefixes.shift();
+      if (!prefix || visitedPrefixes.has(prefix)) continue;
+      visitedPrefixes.add(prefix);
+
+      for (let offset = 0; ; offset += MAX_STORAGE_LIST_PAGE) {
+        const entries = await request<StorageListEntry[]>(
+          `/storage/v1/object/list/${ATTACHMENT_BUCKET}`,
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              prefix,
+              limit: MAX_STORAGE_LIST_PAGE,
+              offset,
+              sortBy: { column: 'name', order: 'asc' },
+            }),
+          },
+        );
+        if (!Array.isArray(entries)) {
+          throw new ApiError(502, 'Supabase returned an invalid Storage listing.');
+        }
+
+        for (const entry of entries) {
+          const path = storagePathForEntry(prefix, entry, workspacePrefix);
+          if (entry.id !== null && typeof entry.id !== 'string') {
+            throw new ApiError(502, 'Supabase returned an invalid Storage entry.');
+          }
+          if (entry.id === null) {
+            pendingPrefixes.push(`${path}/`);
+          } else {
+            files.push(path);
+          }
+        }
+
+        if (entries.length < MAX_STORAGE_LIST_PAGE) break;
+      }
+    }
+
+    return files;
+  }
+
+  function storageDeleteBatches(paths: string[]): string[][] {
+    const batches: string[][] = [];
+    for (let index = 0; index < paths.length; index += MAX_STORAGE_DELETE_BATCH) {
+      batches.push(paths.slice(index, index + MAX_STORAGE_DELETE_BATCH));
+    }
+    return batches;
+  }
+
+  function shouldRetryStorageCleanup(cause: unknown): boolean {
+    return (
+      cause instanceof ApiError &&
+      (cause.status === 408 || cause.status === 429 || cause.status >= 500)
+    );
+  }
+
+  async function cleanupWorkspaceStorage(workspaceId: string): Promise<void> {
+    let lastFailure: unknown;
+
+    for (let attempt = 0; attempt < MAX_STORAGE_CLEANUP_ATTEMPTS; attempt += 1) {
+      try {
+        const paths = await listWorkspaceStoragePaths(workspaceId);
+        if (paths.length === 0) return;
+
+        for (const batch of storageDeleteBatches(paths)) {
+          await responseFor(`/storage/v1/object/${ATTACHMENT_BUCKET}`, {
+            method: 'DELETE',
+            body: JSON.stringify({ prefixes: batch }),
+          });
+        }
+        const remaining = await listWorkspaceStoragePaths(workspaceId);
+        if (remaining.length === 0) return;
+        lastFailure = new ApiError(409, 'Workspace Storage cleanup did not complete.');
+      } catch (cause) {
+        lastFailure = cause;
+        if (!shouldRetryStorageCleanup(cause) || attempt === MAX_STORAGE_CLEANUP_ATTEMPTS - 1) {
+          throw cause;
+        }
+      }
+    }
+
+    throw lastFailure instanceof Error
+      ? lastFailure
+      : new ApiError(409, 'Workspace Storage cleanup did not complete.');
   }
 
   async function table<T>(tableName: string, suffix = '', init: RequestInit = {}): Promise<T> {
@@ -722,6 +861,7 @@ export function createSupabaseHandler(
   }
 
   async function deleteWorkspace(workspaceId: string): Promise<void> {
+    await cleanupWorkspaceStorage(workspaceId);
     await rpc<void>('forge_delete_workspace', { p_workspace_id: workspaceId });
   }
 
