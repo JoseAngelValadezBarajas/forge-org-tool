@@ -15,6 +15,10 @@ test('defines a human-gated Windows and Android Preview distribution workflow', 
   assert.match(workflow, /push:\s*\n\s*tags:\s*\n\s*- ['"]v0\.1\.3-preview\.\*['"]/);
   assert.match(workflow, /workflow_dispatch:/);
   assert.doesNotMatch(workflow, /pull_request:/);
+  assert.match(
+    workflow,
+    /github\.event_name == 'workflow_dispatch' && github\.ref != 'refs\/heads\/main'/,
+  );
   assert.match(workflow, /permissions:\s*\n\s*contents:\s*read/);
   assert.equal((workflow.match(/environment:\s*release/g) ?? []).length, 2);
   assert.match(workflow, /runs-on:\s+ubuntu-24\.04/);

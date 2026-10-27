@@ -20,7 +20,17 @@ env:
   RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
 
 jobs:
+  release-ref:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Reject manual runs from non-main refs
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo 'Release signing is allowed only from main or a release tag.' >&2
+          exit 1
+
   android-release:
+    needs: release-ref
     runs-on: ubuntu-24.04
     environment: release
     steps:
@@ -138,6 +148,7 @@ jobs:
           if-no-files-found: error
 
   windows-release:
+    needs: release-ref
     runs-on: windows-latest
     environment: release
     steps:
