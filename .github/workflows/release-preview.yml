@@ -211,7 +211,7 @@ jobs:
       - name: Build NSIS installer
         shell: pwsh
         run: |
-          if (Test-Path -LiteralPath $env:TAURI_WINDOWS_RELEASE_CONFIG) {
+          if ($env:TAURI_WINDOWS_RELEASE_CONFIG -and (Test-Path -LiteralPath $env:TAURI_WINDOWS_RELEASE_CONFIG)) {
             npx tauri build --config $env:TAURI_WINDOWS_RELEASE_CONFIG
           } else {
             npm run desktop:build:nsis

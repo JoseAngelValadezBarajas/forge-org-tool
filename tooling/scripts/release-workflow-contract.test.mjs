@@ -28,6 +28,7 @@ test('defines a human-gated Windows and Android Preview distribution workflow', 
   assert.match(workflow, /sha256sum/);
 
   assert.match(workflow, /npm run desktop:build:nsis/);
+  assert.match(workflow, /\$env:TAURI_WINDOWS_RELEASE_CONFIG -and \(Test-Path/);
   assert.match(workflow, /signtool/);
   assert.match(workflow, /signtool verify \/pa/);
   assert.match(workflow, /WINDOWS_SIGNING_PENDING/);
