@@ -272,6 +272,13 @@ describe('BYOC storage contracts', () => {
     assert.equal(getStorageSnapshot().provider, 'local');
   });
 
+  it('keeps direct local configuration as an explicit cloud reset', () => {
+    configureStorage({ provider: 'supabase', ...validProfile });
+    configureStorage({ provider: 'local' });
+
+    assert.deepEqual(getConfiguredStorageProviders(), ['local']);
+  });
+
   it('does not mark an unknown cloud schema version ready', async () => {
     globalThis.fetch = async (url) => {
       if (String(url).includes('/auth/v1/token')) {

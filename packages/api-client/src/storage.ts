@@ -211,15 +211,23 @@ function installSupabaseHandler(): void {
   setApiRequestHandler(handlerFactory(profile, getValidSupabaseSession));
 }
 
+function activateLocalStorage(preserveCloudConfiguration: boolean): void {
+  if (!preserveCloudConfiguration) {
+    persistProfile(null);
+    persistSession(null);
+  }
+  persistActiveProvider('local');
+  profile = null;
+  session = null;
+  refreshInFlight = null;
+  resetApiRequestHandler();
+  snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };
+  notifyStorageChanged();
+}
+
 export function configureStorage(config: StorageConfig): void {
   if (config.provider === 'local') {
-    persistActiveProvider('local');
-    profile = null;
-    session = null;
-    refreshInFlight = null;
-    resetApiRequestHandler();
-    snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };
-    notifyStorageChanged();
+    activateLocalStorage(false);
     return;
   }
   const nextProfile = validateSupabaseProfile(config);
@@ -273,7 +281,7 @@ export function getConfiguredStorageProviders(): StorageProvider[] {
 
 export function switchStorageProvider(provider: StorageProvider): StorageSnapshot {
   if (provider === 'local') {
-    configureStorage({ provider: 'local' });
+    activateLocalStorage(true);
     return getStorageSnapshot();
   }
   const storedProfile = readProfile();
@@ -460,7 +468,7 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
 export function initializeStoredStorage(): void {
   const stored = readProfile();
   if (readActiveProvider() === 'local') {
-    configureStorage({ provider: 'local' });
+    activateLocalStorage(true);
   } else if (stored) {
     configureStorage({ provider: 'supabase', ...stored });
   }

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act } from '@testing-library/react';
 import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { configureStorage, getStorageSnapshot } from '@forge-org/api-client';
+import { configureStorage, getStorageSnapshot, switchStorageProvider } from '@forge-org/api-client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import parity from '../../../../docs/design/design-system-parity.json';
 import { productPatternCatalogIds } from './component-gallery/catalog/product-patterns';
@@ -224,7 +224,9 @@ describe('M1 application shell', () => {
     renderRoute('/');
 
     const sidebar = screen.getByTestId('app-sidebar');
-    const storageButton = within(sidebar).getByRole('button', { name: 'Storage providers' });
+    const storageButton = within(sidebar).getByRole('button', {
+      name: /Storage providers.*LOCAL FIRST/i,
+    });
     fireEvent.click(storageButton);
 
     const menu = screen.getByRole('menu', { name: 'Storage providers' });
@@ -242,7 +244,9 @@ describe('M1 application shell', () => {
     fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' }));
     expect(getStorageSnapshot().provider).toBe('local');
 
-    fireEvent.click(within(sidebar).getByRole('button', { name: 'Storage providers' }));
+    fireEvent.click(
+      within(sidebar).getByRole('button', { name: /Storage providers.*LOCAL FIRST/i }),
+    );
     fireEvent.click(
       within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitemradio', {
         name: 'Supabase',
@@ -255,7 +259,9 @@ describe('M1 application shell', () => {
     renderRoute('/');
 
     const sidebar = screen.getByTestId('app-sidebar');
-    fireEvent.click(within(sidebar).getByRole('button', { name: 'Storage providers' }));
+    fireEvent.click(
+      within(sidebar).getByRole('button', { name: /Storage providers.*LOCAL FIRST/i }),
+    );
     fireEvent.click(
       within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitem', {
         name: 'Configure storage',
@@ -271,10 +277,62 @@ describe('M1 application shell', () => {
     renderRoute('/');
 
     fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
-    const storageButton = screen.getByRole('button', { name: 'Storage providers' });
+    const storageButton = screen.getByRole('button', {
+      name: /Storage providers.*LOCAL FIRST/i,
+    });
     expect(storageButton).toBeVisible();
     fireEvent.click(storageButton);
     expect(screen.getByRole('menu', { name: 'Storage providers' })).toBeVisible();
+  });
+
+  it('supports keyboard focus management for the storage menu', () => {
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    switchStorageProvider('local');
+    renderRoute('/');
+
+    const storageButton = screen.getByRole('button', {
+      name: /Storage providers.*LOCAL FIRST/i,
+    });
+    fireEvent.click(storageButton);
+    const menu = screen.getByRole('menu', { name: 'Storage providers' });
+    const configureItem = within(menu).getByRole('menuitem', { name: 'Configure storage' });
+    const localItem = within(menu).getByRole('menuitemradio', { name: 'Local SQLite' });
+    const supabaseItem = within(menu).getByRole('menuitemradio', { name: 'Supabase' });
+
+    expect(configureItem).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(localItem).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(supabaseItem).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'Escape' });
+    expect(storageButton).toHaveFocus();
+    expect(screen.queryByRole('menu', { name: 'Storage providers' })).toBeNull();
+  });
+
+  it('reloads shell data after a storage change notification', async () => {
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    switchStorageProvider('local');
+    let workspaceRequests = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input) === '/api/v1/workspaces') workspaceRequests += 1;
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    await waitFor(() => expect(workspaceRequests).toBe(1));
+
+    switchStorageProvider('local');
+    await waitFor(() => expect(workspaceRequests).toBe(2));
   });
 
   it('filters projects and collapses the project list from the sidebar controls', async () => {

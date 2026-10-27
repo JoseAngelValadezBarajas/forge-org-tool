@@ -1,4 +1,11 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
   getConfiguredStorageProviders,
@@ -85,18 +92,46 @@ function ApplicationShell() {
   const [configuredStorageProviders, setConfiguredStorageProviders] = useState<StorageProvider[]>(
     () => getConfiguredStorageProviders(),
   );
+  const [storageRevision, setStorageRevision] = useState(0);
+  const storageProviderRef = useRef(storageSnapshot.provider);
+  const storageMenuTriggerRef = useRef<HTMLButtonElement>(null);
+  const storageMenuItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const previousStorageMenuOpen = useRef(false);
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
   useEffect(() => {
     function onStorageChanged() {
-      setStorageSnapshot(getStorageSnapshot());
+      const nextSnapshot = getStorageSnapshot();
+      const providerChanged = storageProviderRef.current !== nextSnapshot.provider;
+      storageProviderRef.current = nextSnapshot.provider;
+      setStorageSnapshot(nextSnapshot);
       setConfiguredStorageProviders(getConfiguredStorageProviders());
+      setStorageRevision((value) => value + 1);
+      setProjectRefresh((value) => value + 1);
+      if (providerChanged) {
+        workspaceRevision.current += 1;
+        setWorkspaces([]);
+        setProjects([]);
+        setProjectWorkspaceId('');
+        setContextOverview(null);
+        setNavigationError('');
+        setActiveWorkspaceId('');
+        localStorage.removeItem('forge-active-workspace');
+      }
     }
     window.addEventListener('forge:storage-changed', onStorageChanged);
     return () => window.removeEventListener('forge:storage-changed', onStorageChanged);
   }, []);
+  useEffect(() => {
+    if (storageMenuOpen) {
+      storageMenuItemRefs.current[0]?.focus();
+    } else if (previousStorageMenuOpen.current) {
+      storageMenuTriggerRef.current?.focus();
+    }
+    previousStorageMenuOpen.current = storageMenuOpen;
+  }, [storageMenuOpen]);
   useEffect(() => {
     let current = true;
     const initialRevision = workspaceRevision.current;
@@ -132,7 +167,7 @@ function ApplicationShell() {
     return () => {
       current = false;
     };
-  }, []);
+  }, [storageRevision]);
   useEffect(() => {
     function onActiveWorkspaceChange(event: Event) {
       const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
@@ -221,8 +256,10 @@ function ApplicationShell() {
         event.preventDefault();
         setPaletteOpen(true);
       }
-      if (event.key === 'Escape') setPaletteOpen(false);
-      if (event.key === 'Escape') setStorageMenuOpen(false);
+      if (event.key === 'Escape') {
+        setPaletteOpen(false);
+        setStorageMenuOpen(false);
+      }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -244,6 +281,27 @@ function ApplicationShell() {
       setStorageMenuOpen(false);
       navigate('/settings/storage');
     }
+  }
+
+  function handleStorageMenuKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    const items = storageMenuItemRefs.current.filter(
+      (item): item is HTMLButtonElement => item !== null,
+    );
+    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setStorageMenuOpen(false);
+      return;
+    }
+    if (!items.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const nextIndex =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? items.length - 1
+          : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    items[nextIndex]?.focus();
   }
   function selectWorkspace(id: string) {
     setActiveWorkspaceId(id);
@@ -475,7 +533,8 @@ function ApplicationShell() {
             <button
               type="button"
               className={styles.storageMenuTrigger}
-              aria-label="Storage providers"
+              ref={storageMenuTriggerRef}
+              aria-label="Storage providers: Local First, Private"
               aria-haspopup="menu"
               aria-expanded={storageMenuOpen}
               onClick={() => setStorageMenuOpen((open) => !open)}
@@ -487,24 +546,36 @@ function ApplicationShell() {
               <ChevronDown aria-hidden="true" size={14} className={styles.storageMenuChevron} />
             </button>
             {storageMenuOpen && (
-              <div className={styles.storageMenu} role="menu" aria-label="Storage providers">
+              <div
+                className={styles.storageMenu}
+                role="menu"
+                aria-label="Storage providers"
+                tabIndex={-1}
+                onKeyDown={handleStorageMenuKeyDown}
+              >
                 <button
                   type="button"
                   role="menuitem"
                   className={styles.storageMenuItem}
+                  ref={(node) => {
+                    storageMenuItemRefs.current[0] = node;
+                  }}
                   onClick={() => go('/settings/storage')}
                 >
                   <Settings aria-hidden="true" size={15} />
                   <span>Configure storage</span>
                 </button>
                 <div className={styles.storageMenuSeparator} role="separator" />
-                {configuredStorageProviders.map((provider) => (
+                {configuredStorageProviders.map((provider, index) => (
                   <button
                     key={provider}
                     type="button"
                     role="menuitemradio"
                     aria-checked={storageSnapshot.provider === provider}
                     className={styles.storageMenuItem}
+                    ref={(node) => {
+                      storageMenuItemRefs.current[index + 1] = node;
+                    }}
                     onClick={() => selectStorageProvider(provider)}
                   >
                     <span className={styles.storageMenuIndicator} aria-hidden="true">

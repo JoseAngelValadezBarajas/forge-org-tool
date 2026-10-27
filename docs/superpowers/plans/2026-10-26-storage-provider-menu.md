@@ -128,8 +128,12 @@ Only commit documentation updates that record actual executed verification; do n
 
 ## Executed verification
 
-- `npm test`: PASS — architecture, design-system, token, OpenAPI, tooling, frontend, and package suites; 174 frontend tests passed with 8 skipped and 34 api-client contract tests passed.
-- `npm run lint:frontend`: PASS.
+- `npm test`: PASS — architecture, design-system, token, OpenAPI, tooling, frontend, and package suites; 176 frontend tests passed with 8 skipped and 35 api-client contract tests passed.
+- Focused API-client storage contracts: PASS (35/35).
+- Focused shell tests: PASS (37/37).
+- `npm run format:check:web`: PASS.
+- `npm run lint:frontend`: PASS with zero warnings.
 - `npm run build`: PASS, including production Component Host exclusion.
 - Focused RED runs were observed before implementation for both the API capability and sidebar menu.
+- Reviewer follow-up RED/GREEN coverage added for accessible naming, keyboard focus and arrow navigation, storage-change data invalidation, and explicit local configuration reset semantics.
 - No real Supabase project or user data was accessed.
