@@ -46,11 +46,13 @@ Two options were considered:
 
 Option 1 is selected. `tauri.conf.json` remains the Desktop source of truth,
 while `tauri.android.conf.json` removes the Desktop sidecar and adjusts the
-development URL for the Android emulator. `main.rs` keeps the existing
-sidecar/tray/IPC implementation behind a non-mobile target gate and uses a
-minimal mobile builder. React routes, storage state, Supabase capabilities,
-and business components remain shared. This minimizes Desktop risk and avoids
-two application shells drifting apart.
+development URL for the Android emulator. `lib.rs` contains the shared
+`#[cfg_attr(mobile, tauri::mobile_entry_point)] pub fn run()` entry point;
+`main.rs` is only the Desktop executable shim. The existing sidecar/tray/IPC
+implementation is behind a non-mobile target gate, while mobile runs only the
+minimal Tauri builder. React routes, storage state, Supabase capabilities, and
+business components remain shared. This minimizes Desktop risk and avoids two
+application shells drifting apart.
 
 The Android development URL is `http://10.0.2.2:5173`, the Android emulator's
 gateway to the host machine. Vite binds to `0.0.0.0` only when
@@ -103,6 +105,24 @@ adb install -r .\gen\android\app\build\outputs\apk\universal\debug\app-universal
 adb shell monkey -p com.forge.orgtool 1
 adb logcat | Select-String 'FORGE|AndroidRuntime|WebView'
 ```
+
+## GitHub Actions APK lane
+
+`.github/workflows/android-debug.yml` runs on `ubuntu-24.04` for Android,
+Tauri, frontend, API-client, and workflow changes. It installs Java 17, Node
+24, the Android platform/build tools and NDK, builds the production frontend,
+initializes Tauri with `npx tauri android init --ci`, and builds one
+`aarch64` debug APK with `npx tauri android build --debug --apk`. The job
+fails when no non-empty APK is produced, when the APK contains the emulator
+development gateway or local Vite URL, or when privileged Supabase credential
+markers appear in the frontend bundle. The APK is uploaded as the
+`forge-android-debug-<sha>` artifact. The workflow contains no Supabase
+secrets and does not run against a Supabase project.
+
+The workflow currently validates compilation and package contents only. It has
+no emulator job, so Android installation, launch, navigation, and runtime
+error evidence remain a separate `ANDROID_RUNTIME` result until a device or
+emulator is available.
 
 The exact APK filename can vary with the Android Gradle plugin; inspect
 `gen/android/app/build/outputs/apk/` if the universal artifact is not present.

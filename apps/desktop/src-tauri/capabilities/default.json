@@ -3,5 +3,6 @@
   "identifier": "default",
   "description": "Desktop capability grants only selected-image reads and file-dialog access, alongside the shell sidecar.",
   "windows": ["main"],
+  "platforms": ["windows", "macOS", "linux"],
   "permissions": ["core:default", "shell:allow-execute", "dialog:allow-open", "fs:allow-read-file"]
 }

@@ -21,7 +21,7 @@ test('Tauri declares a visible, usable main FORGE window explicitly', () => {
 
 test('Windows desktop host uses the single-instance activation plugin', async () => {
   const manifest = await readFile('apps/desktop/src-tauri/Cargo.toml', 'utf8');
-  const host = await readFile('apps/desktop/src-tauri/src/main.rs', 'utf8');
+  const host = await readFile('apps/desktop/src-tauri/src/lib.rs', 'utf8');
 
   assert.match(manifest, /tauri-plugin-single-instance\s*=/);
   assert.match(host, /tauri_plugin_single_instance::init/);
@@ -32,7 +32,7 @@ test('Windows desktop host uses the single-instance activation plugin', async ()
 
 test('Desktop screenshot picker uses the native dialog and grants only selected-file reads', async () => {
   const manifest = await readFile('apps/desktop/src-tauri/Cargo.toml', 'utf8');
-  const host = await readFile('apps/desktop/src-tauri/src/main.rs', 'utf8');
+  const host = await readFile('apps/desktop/src-tauri/src/lib.rs', 'utf8');
   const capability = JSON.parse(
     await readFile('apps/desktop/src-tauri/capabilities/default.json', 'utf8'),
   );
@@ -47,7 +47,7 @@ test('Desktop screenshot picker uses the native dialog and grants only selected-
 });
 
 test('the packaged PyInstaller sidecar is launched as a killable process group', async () => {
-  const host = await readFile('apps/desktop/src-tauri/src/main.rs', 'utf8');
+  const host = await readFile('apps/desktop/src-tauri/src/lib.rs', 'utf8');
   const launch = host.slice(host.indexOf('.sidecar("forge-sidecar")'), host.indexOf('.spawn()'));
 
   assert.match(launch, /\.set_process_group\(true\)/);
