@@ -232,13 +232,98 @@
   font-size: 0.82rem;
 }
 .localMode {
+  position: relative;
   box-sizing: border-box;
-  height: 22px;
+  width: 208px;
+  height: 32px;
   margin-top: 140px;
   color: var(--forge-text-subtle);
   font-size: 10px;
   font-weight: 600;
   white-space: nowrap;
+}
+.storageMenuTrigger {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  box-sizing: border-box;
+  width: 208px;
+  height: 32px;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--forge-text-subtle);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.storageMenuTrigger:hover,
+.storageMenuTrigger[aria-expanded='true'] {
+  border-color: var(--forge-border-subtle);
+  background: var(--forge-surface-raised);
+  color: var(--forge-text);
+}
+.storageMenuTrigger:focus-visible,
+.storageMenuItem:focus-visible {
+  outline: 2px solid var(--forge-accent);
+  outline-offset: 1px;
+}
+.storageMenuLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.storageMenuChevron {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+.storageMenu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 10;
+  display: grid;
+  width: 220px;
+  padding: 6px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 10px;
+  background: var(--forge-surface-raised);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 28%);
+}
+.storageMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--forge-text-muted);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.storageMenuItem:hover,
+.storageMenuItem[aria-checked='true'] {
+  background: var(--forge-accent-soft);
+  color: var(--forge-text);
+}
+.storageMenuIndicator {
+  display: inline-grid;
+  place-items: center;
+  width: 12px;
+  color: var(--forge-accent);
+  font-size: 16px;
+  line-height: 12px;
+}
+.storageMenuSeparator {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--forge-border-subtle);
 }
 .contentColumn {
   min-width: 0;
@@ -394,7 +479,8 @@
 .shellGrid[data-sidebar-collapsed='true'] .projectNav h2,
 .shellGrid[data-sidebar-collapsed='true'] .projectNav [data-navigation-label],
 .shellGrid[data-sidebar-collapsed='true'] .projectLabel,
-.shellGrid[data-sidebar-collapsed='true'] .localMode {
+.shellGrid[data-sidebar-collapsed='true'] .storageMenuLabel,
+.shellGrid[data-sidebar-collapsed='true'] .storageMenuChevron {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -440,6 +526,22 @@
 }
 .shellGrid[data-sidebar-collapsed='true'] .projectList {
   overflow-x: hidden;
+}
+.shellGrid[data-sidebar-collapsed='true'] .localMode {
+  width: 42px;
+  height: 42px;
+  margin-top: 140px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .storageMenuTrigger {
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+}
+.shellGrid[data-sidebar-collapsed='true'] .storageMenu {
+  right: auto;
+  bottom: 0;
+  left: 48px;
 }
 .breadcrumb {
   margin-bottom: var(--forge-space-5);

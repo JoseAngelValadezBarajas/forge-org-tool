@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { act } from '@testing-library/react';
 import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { configureStorage, getStorageSnapshot } from '@forge-org/api-client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import parity from '../../../../docs/design/design-system-parity.json';
 import { productPatternCatalogIds } from './component-gallery/catalog/product-patterns';
@@ -23,6 +24,7 @@ function renderRoute(path: string) {
 describe('M1 application shell', () => {
   afterEach(() => {
     cleanup();
+    configureStorage({ provider: 'local' });
     localStorage.clear();
     delete document.documentElement.dataset.theme;
     vi.unstubAllGlobals();
@@ -211,6 +213,68 @@ describe('M1 application shell', () => {
       await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
     ).not.toHaveAttribute('aria-current', 'page');
     expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
+  });
+
+  it('opens the storage menu with configured providers and switches the active provider', async () => {
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    renderRoute('/');
+
+    const sidebar = screen.getByTestId('app-sidebar');
+    const storageButton = within(sidebar).getByRole('button', { name: 'Storage providers' });
+    fireEvent.click(storageButton);
+
+    const menu = screen.getByRole('menu', { name: 'Storage providers' });
+    expect(within(menu).getByRole('menuitem', { name: 'Configure storage' })).toBeInTheDocument();
+    expect(within(menu).getByRole('separator')).toBeInTheDocument();
+    expect(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    expect(within(menu).getByRole('menuitemradio', { name: 'Supabase' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+
+    fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' }));
+    expect(getStorageSnapshot().provider).toBe('local');
+
+    fireEvent.click(within(sidebar).getByRole('button', { name: 'Storage providers' }));
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitemradio', {
+        name: 'Supabase',
+      }),
+    );
+    expect(getStorageSnapshot().provider).toBe('supabase');
+  });
+
+  it('navigates from the storage menu to Storage Settings', async () => {
+    renderRoute('/');
+
+    const sidebar = screen.getByTestId('app-sidebar');
+    fireEvent.click(within(sidebar).getByRole('button', { name: 'Storage providers' }));
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitem', {
+        name: 'Configure storage',
+      }),
+    );
+
+    expect(
+      await screen.findByRole('heading', { name: 'Where FORGE stores your work' }),
+    ).toBeVisible();
+  });
+
+  it('keeps the storage menu accessible when the sidebar is collapsed', () => {
+    renderRoute('/');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
+    const storageButton = screen.getByRole('button', { name: 'Storage providers' });
+    expect(storageButton).toBeVisible();
+    fireEvent.click(storageButton);
+    expect(screen.getByRole('menu', { name: 'Storage providers' })).toBeVisible();
   });
 
   it('filters projects and collapses the project list from the sidebar controls', async () => {

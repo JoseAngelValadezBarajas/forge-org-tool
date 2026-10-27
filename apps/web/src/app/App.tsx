@@ -1,9 +1,14 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import {
+  getConfiguredStorageProviders,
+  getStorageSnapshot,
   organizationApi,
+  switchStorageProvider,
   type PlanningOverview,
   type Project,
+  type StorageProvider,
+  type StorageSnapshot,
   type Workspace,
 } from '@forge-org/api-client';
 import { Button, SearchField } from '@corefoundry-labs/forge-ui';
@@ -15,6 +20,7 @@ import {
   Folder,
   Layers,
   Search,
+  Settings,
 } from '@corefoundry-labs/forge-icons';
 import {
   OrganizationPage,
@@ -72,10 +78,25 @@ function ApplicationShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
   );
+  const [storageMenuOpen, setStorageMenuOpen] = useState(false);
+  const [storageSnapshot, setStorageSnapshot] = useState<StorageSnapshot>(() =>
+    getStorageSnapshot(),
+  );
+  const [configuredStorageProviders, setConfiguredStorageProviders] = useState<StorageProvider[]>(
+    () => getConfiguredStorageProviders(),
+  );
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
+  useEffect(() => {
+    function onStorageChanged() {
+      setStorageSnapshot(getStorageSnapshot());
+      setConfiguredStorageProviders(getConfiguredStorageProviders());
+    }
+    window.addEventListener('forge:storage-changed', onStorageChanged);
+    return () => window.removeEventListener('forge:storage-changed', onStorageChanged);
+  }, []);
   useEffect(() => {
     let current = true;
     const initialRevision = workspaceRevision.current;
@@ -201,13 +222,28 @@ function ApplicationShell() {
         setPaletteOpen(true);
       }
       if (event.key === 'Escape') setPaletteOpen(false);
+      if (event.key === 'Escape') setStorageMenuOpen(false);
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
   function go(path: string) {
     setPaletteOpen(false);
+    setStorageMenuOpen(false);
     navigate(path);
+  }
+
+  function selectStorageProvider(provider: StorageProvider) {
+    try {
+      const nextSnapshot = switchStorageProvider(provider);
+      setStorageSnapshot(nextSnapshot);
+      setConfiguredStorageProviders(getConfiguredStorageProviders());
+      setStorageMenuOpen(false);
+      if (nextSnapshot.status === 'authentication_required') navigate('/settings/storage');
+    } catch {
+      setStorageMenuOpen(false);
+      navigate('/settings/storage');
+    }
   }
   function selectWorkspace(id: string) {
     setActiveWorkspaceId(id);
@@ -436,7 +472,49 @@ function ApplicationShell() {
             </nav>
           )}
           <div className={styles.localMode}>
-            <strong>LOCAL FIRST&nbsp;&nbsp; • &nbsp;&nbsp;PRIVATE</strong>
+            <button
+              type="button"
+              className={styles.storageMenuTrigger}
+              aria-label="Storage providers"
+              aria-haspopup="menu"
+              aria-expanded={storageMenuOpen}
+              onClick={() => setStorageMenuOpen((open) => !open)}
+            >
+              <Settings aria-hidden="true" size={15} />
+              <span className={styles.storageMenuLabel}>
+                LOCAL FIRST&nbsp;&nbsp; • &nbsp;&nbsp;PRIVATE
+              </span>
+              <ChevronDown aria-hidden="true" size={14} className={styles.storageMenuChevron} />
+            </button>
+            {storageMenuOpen && (
+              <div className={styles.storageMenu} role="menu" aria-label="Storage providers">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className={styles.storageMenuItem}
+                  onClick={() => go('/settings/storage')}
+                >
+                  <Settings aria-hidden="true" size={15} />
+                  <span>Configure storage</span>
+                </button>
+                <div className={styles.storageMenuSeparator} role="separator" />
+                {configuredStorageProviders.map((provider) => (
+                  <button
+                    key={provider}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={storageSnapshot.provider === provider}
+                    className={styles.storageMenuItem}
+                    onClick={() => selectStorageProvider(provider)}
+                  >
+                    <span className={styles.storageMenuIndicator} aria-hidden="true">
+                      {storageSnapshot.provider === provider ? '•' : ''}
+                    </span>
+                    <span>{provider === 'local' ? 'Local SQLite' : 'Supabase'}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </aside>
         <div
