@@ -54,7 +54,7 @@ git tag -a v0.1.3-preview.1 -m "FORGE Org Tool 0.1.3 Preview 1"
 git push origin v0.1.3-preview.1
 ```
 
-The distribution workflow is intentionally not triggered by pull requests. It runs on the exact Preview tag or through `workflow_dispatch` with `release_tag=v0.1.3-preview.1`, and it uses the protected `release` Environment before accessing signing secrets.
+The distribution workflow is intentionally not triggered by pull requests. It runs on the exact Preview tag or through `workflow_dispatch` from `main` with `release_tag=v0.1.3-preview.1`, and it uses the protected `release` Environment before accessing signing secrets.
 
 The workflow produces:
 
