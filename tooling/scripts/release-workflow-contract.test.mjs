@@ -12,7 +12,7 @@ test('defines a human-gated Windows and Android Preview distribution workflow', 
   assert.equal(fs.existsSync(workflowPath), true);
   const workflow = fs.readFileSync(workflowPath, 'utf8');
 
-  assert.match(workflow, /push:\s*\n\s*tags:\s*\n\s*- ['"]v0\.1\.3-preview\.\*['"]/);
+  assert.match(workflow, /push:\s*\n\s*tags:\s*\n\s*- ['"]v0\.1\.3-preview\.1['"]/);
   assert.match(workflow, /workflow_dispatch:/);
   assert.doesNotMatch(workflow, /pull_request:/);
   assert.match(
