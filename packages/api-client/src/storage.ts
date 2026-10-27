@@ -425,6 +425,7 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
       message: 'Sign in to the configured Supabase project.',
       projectUrl: profile.projectUrl,
     };
+    notifyStorageChanged();
     return getStorageSnapshot();
   }
   const activeHandler = handlerFactory ? handlerFactory(profile, getValidSupabaseSession) : null;
@@ -462,6 +463,7 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
       ...(session?.email ? { userEmail: session.email } : {}),
     };
   }
+  notifyStorageChanged();
   return getStorageSnapshot();
 }
 

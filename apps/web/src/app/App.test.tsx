@@ -3,7 +3,13 @@ import '@testing-library/jest-dom/vitest';
 import { act } from '@testing-library/react';
 import { waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { configureStorage, getStorageSnapshot, switchStorageProvider } from '@forge-org/api-client';
+import {
+  configureStorage,
+  getStorageSnapshot,
+  inspectStorage,
+  signInSupabase,
+  switchStorageProvider,
+} from '@forge-org/api-client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import parity from '../../../../docs/design/design-system-parity.json';
 import { productPatternCatalogIds } from './component-gallery/catalog/product-patterns';
@@ -85,6 +91,51 @@ describe('M1 application shell', () => {
       expect(screen.getByRole('heading', { name: 'Your workspace, in focus' })).toBeInTheDocument();
     });
     expect(localStorage.getItem('forge-active-workspace')).toBe(workspace.id);
+  });
+
+  it('does not repopulate Local workspaces after switching to Supabase', async () => {
+    let resolveLocalWorkspaces: ((response: Response) => void) | undefined;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (String(input) === '/api/v1/workspaces') {
+          return new Promise<Response>((resolve) => {
+            resolveLocalWorkspaces = resolve;
+          });
+        }
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    await waitFor(() => expect(resolveLocalWorkspaces).toBeTypeOf('function'));
+
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    await act(async () => {
+      resolveLocalWorkspaces?.(
+        new Response(
+          JSON.stringify([
+            {
+              id: 'local-workspace',
+              name: 'Local workspace',
+              status: 'active',
+              created_at: '',
+              updated_at: '',
+              archived_at: null,
+            },
+          ]),
+          { status: 200 },
+        ),
+      );
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('Provider Supabase - Sign in required')).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Local workspace')).toBeNull();
   });
 
   it('opens an Epic detail route with project context', async () => {
@@ -212,7 +263,7 @@ describe('M1 application shell', () => {
     expect(
       await within(projectNavigation).findByRole('link', { name: 'FormiAI' }),
     ).not.toHaveAttribute('aria-current', 'page');
-    expect(within(sidebar).getByText(/LOCAL FIRST.*PRIVATE/u)).toBeInTheDocument();
+    expect(within(sidebar).getByText('Local DB')).toBeInTheDocument();
   });
 
   it('opens the storage menu with configured providers and switches the active provider', async () => {
@@ -225,7 +276,7 @@ describe('M1 application shell', () => {
 
     const sidebar = screen.getByTestId('app-sidebar');
     const storageButton = within(sidebar).getByRole('button', {
-      name: /Storage providers.*LOCAL FIRST/i,
+      name: /Storage providers.*Provider Supabase/i,
     });
     fireEvent.click(storageButton);
 
@@ -244,9 +295,7 @@ describe('M1 application shell', () => {
     fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' }));
     expect(getStorageSnapshot().provider).toBe('local');
 
-    fireEvent.click(
-      within(sidebar).getByRole('button', { name: /Storage providers.*LOCAL FIRST/i }),
-    );
+    fireEvent.click(within(sidebar).getByRole('button', { name: /Storage providers.*Local DB/i }));
     fireEvent.click(
       within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitemradio', {
         name: 'Supabase',
@@ -255,13 +304,64 @@ describe('M1 application shell', () => {
     expect(getStorageSnapshot().provider).toBe('supabase');
   });
 
+  it('shows Supabase online state and reloads the workspace from the active provider', async () => {
+    const workspace = {
+      id: 'cloud-workspace',
+      name: 'Cloud workspace',
+      status: 'active',
+      created_at: '',
+      updated_at: '',
+      archived_at: null,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const url = String(input);
+        if (url.includes('/auth/v1/token')) {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                access_token: 'access-token',
+                refresh_token: 'refresh-token',
+                expires_in: 3600,
+                user: { id: 'user-a', email: 'a@example.test' },
+              }),
+              { status: 200 },
+            ),
+          );
+        }
+        if (url.includes('/rpc/forge_storage_preflight')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ schema_version: 'forge-byoc-v2' }), { status: 200 }),
+          );
+        }
+        if (url.includes('/rest/v1/workspaces')) {
+          return Promise.resolve(new Response(JSON.stringify([workspace]), { status: 200 }));
+        }
+        return Promise.resolve(new Response('[]', { status: 200 }));
+      }),
+    );
+    configureStorage({
+      provider: 'supabase',
+      projectUrl: 'https://example123.supabase.co',
+      publishableKey: 'sb_publishable_testkey123',
+    });
+    renderRoute('/');
+
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Provider Supabase - Online')).toBeInTheDocument();
+      expect(screen.getAllByText('Cloud workspace').length).toBeGreaterThan(0);
+    });
+  });
+
   it('navigates from the storage menu to Storage Settings', async () => {
     renderRoute('/');
 
     const sidebar = screen.getByTestId('app-sidebar');
-    fireEvent.click(
-      within(sidebar).getByRole('button', { name: /Storage providers.*LOCAL FIRST/i }),
-    );
+    fireEvent.click(within(sidebar).getByRole('button', { name: /Storage providers.*Local DB/i }));
     fireEvent.click(
       within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitem', {
         name: 'Configure storage',
@@ -278,7 +378,7 @@ describe('M1 application shell', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
     const storageButton = screen.getByRole('button', {
-      name: /Storage providers.*LOCAL FIRST/i,
+      name: /Storage providers.*Local DB/i,
     });
     expect(storageButton).toBeVisible();
     fireEvent.click(storageButton);
@@ -295,7 +395,7 @@ describe('M1 application shell', () => {
     renderRoute('/');
 
     const storageButton = screen.getByRole('button', {
-      name: /Storage providers.*LOCAL FIRST/i,
+      name: /Storage providers.*Local DB/i,
     });
     fireEvent.click(storageButton);
     const menu = screen.getByRole('menu', { name: 'Storage providers' });

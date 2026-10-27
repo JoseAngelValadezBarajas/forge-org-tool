@@ -34,11 +34,18 @@ function jsonResponse(value, status = 200) {
 afterEach(() => {
   configureStorage({ provider: 'local' });
   delete globalThis.fetch;
+  delete globalThis.window;
 });
 
 describe('Supabase Data API adapter', () => {
   it('preflights Auth, schema and permissions before exposing ready', async () => {
     const calls = [];
+    const storageEvents = [];
+    globalThis.window = {
+      dispatchEvent(event) {
+        storageEvents.push(event.type);
+      },
+    };
     globalThis.fetch = async (url, init = {}) => {
       calls.push({ url: String(url), init });
       if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
@@ -62,6 +69,7 @@ describe('Supabase Data API adapter', () => {
       password: 'temporary-password',
     });
     assert.equal(calls.filter(({ url }) => url.includes('/rpc/forge_storage_preflight')).length, 1);
+    assert.equal(storageEvents.at(-1), 'forge:storage-changed');
   });
 
   it('uses the authenticated Supabase Data API for the Workspace vertical slice', async () => {

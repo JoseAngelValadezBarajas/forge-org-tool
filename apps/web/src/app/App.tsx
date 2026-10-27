@@ -10,6 +10,7 @@ import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import {
   getConfiguredStorageProviders,
   getStorageSnapshot,
+  inspectStorage,
   organizationApi,
   switchStorageProvider,
   type PlanningOverview,
@@ -49,6 +50,17 @@ const ComponentGallery = import.meta.env.DEV
     )
   : null;
 const SIDEBAR_COLLAPSED_KEY = 'forge-sidebar-collapsed';
+
+function storageProviderLabel(snapshot: StorageSnapshot): string {
+  if (snapshot.provider === 'local') return 'Local DB';
+  if (snapshot.status === 'ready') return 'Provider Supabase - Online';
+  if (snapshot.status === 'authentication_required') return 'Provider Supabase - Sign in required';
+  if (snapshot.status === 'schema_missing') return 'Provider Supabase - Schema required';
+  if (snapshot.status === 'permissions_denied') return 'Provider Supabase - Access denied';
+  if (snapshot.status === 'network_unavailable') return 'Provider Supabase - Offline';
+  return 'Provider Supabase - Configured';
+}
+
 export function App() {
   return (
     <ThemeProvider applyToDocument>
@@ -94,10 +106,16 @@ function ApplicationShell() {
   );
   const [storageRevision, setStorageRevision] = useState(0);
   const storageProviderRef = useRef(storageSnapshot.provider);
+  const storageDataRevision = useRef(0);
   const storageMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const storageMenuItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const previousStorageMenuOpen = useRef(false);
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
+  const workspaceFallbackName = navigationError
+    ? 'Workspace unavailable'
+    : storageSnapshot.provider === 'supabase'
+      ? 'No Supabase workspace'
+      : 'Local Workspace';
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
@@ -106,17 +124,18 @@ function ApplicationShell() {
       const nextSnapshot = getStorageSnapshot();
       const providerChanged = storageProviderRef.current !== nextSnapshot.provider;
       storageProviderRef.current = nextSnapshot.provider;
+      storageDataRevision.current += 1;
       setStorageSnapshot(nextSnapshot);
       setConfiguredStorageProviders(getConfiguredStorageProviders());
       setStorageRevision((value) => value + 1);
       setProjectRefresh((value) => value + 1);
+      setWorkspaces([]);
+      setProjects([]);
+      setProjectWorkspaceId('');
+      setContextOverview(null);
+      setNavigationError('');
       if (providerChanged) {
         workspaceRevision.current += 1;
-        setWorkspaces([]);
-        setProjects([]);
-        setProjectWorkspaceId('');
-        setContextOverview(null);
-        setNavigationError('');
         setActiveWorkspaceId('');
         localStorage.removeItem('forge-active-workspace');
       }
@@ -133,22 +152,27 @@ function ApplicationShell() {
     previousStorageMenuOpen.current = storageMenuOpen;
   }, [storageMenuOpen]);
   useEffect(() => {
+    if (storageSnapshot.provider !== 'supabase') return;
+    let current = true;
+    void inspectStorage().catch((cause: unknown) => {
+      if (current) {
+        setNavigationError(cause instanceof Error ? cause.message : 'Supabase unavailable.');
+      }
+    });
+    return () => {
+      current = false;
+    };
+  }, [storageSnapshot.provider]);
+  useEffect(() => {
     let current = true;
     const initialRevision = workspaceRevision.current;
+    const initialStorageDataRevision = storageDataRevision.current;
     void organizationApi
       .listWorkspaces()
       .then((items) => {
         if (!current) return;
+        if (storageDataRevision.current !== initialStorageDataRevision) return;
         if (workspaceRevision.current !== initialRevision) {
-          setWorkspaces((existing) => {
-            const merged = [...items];
-            for (const workspace of existing) {
-              const index = merged.findIndex((item) => item.id === workspace.id);
-              if (index < 0) merged.push(workspace);
-              else merged[index] = workspace;
-            }
-            return merged;
-          });
           return;
         }
         setWorkspaces(items);
@@ -159,7 +183,7 @@ function ApplicationShell() {
         else localStorage.removeItem('forge-active-workspace');
       })
       .catch((cause: unknown) => {
-        if (current)
+        if (current && storageDataRevision.current === initialStorageDataRevision)
           setNavigationError(
             cause instanceof Error ? cause.message : 'Workspace navigation unavailable.',
           );
@@ -385,10 +409,7 @@ function ApplicationShell() {
               name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
             }))}
             onChange={selectWorkspace}
-            currentName={
-              activeWorkspace?.name ??
-              (navigationError ? 'Workspace unavailable' : 'Local Workspace')
-            }
+            currentName={activeWorkspace?.name ?? workspaceFallbackName}
           />
         </div>
         <Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
@@ -446,10 +467,7 @@ function ApplicationShell() {
               name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
             }))}
             onChange={selectWorkspace}
-            currentName={
-              activeWorkspace?.name ??
-              (navigationError ? 'Workspace unavailable' : 'Local Workspace')
-            }
+            currentName={activeWorkspace?.name ?? workspaceFallbackName}
             dataNodeId="344:89"
             compact={sidebarCollapsed}
           />
@@ -534,14 +552,14 @@ function ApplicationShell() {
               type="button"
               className={styles.storageMenuTrigger}
               ref={storageMenuTriggerRef}
-              aria-label="Storage providers: Local First, Private"
+              aria-label={`Storage providers: ${storageProviderLabel(storageSnapshot)}`}
               aria-haspopup="menu"
               aria-expanded={storageMenuOpen}
               onClick={() => setStorageMenuOpen((open) => !open)}
             >
               <Settings aria-hidden="true" size={15} />
               <span className={styles.storageMenuLabel}>
-                LOCAL FIRST&nbsp;&nbsp; • &nbsp;&nbsp;PRIVATE
+                {storageProviderLabel(storageSnapshot)}
               </span>
               <ChevronDown aria-hidden="true" size={14} className={styles.storageMenuChevron} />
             </button>
@@ -681,7 +699,7 @@ function ApplicationShell() {
               workspaceName={activeWorkspace?.name}
               projectName={activeProject?.name}
             />
-            <Routes>
+            <Routes key={storageRevision}>
               <Route path="/" element={<OrganizationPage />} />
               <Route path="/settings/storage" element={<StorageSettingsPage />} />
               <Route path="/workspaces/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
