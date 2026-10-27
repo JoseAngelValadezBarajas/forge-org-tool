@@ -46,6 +46,7 @@ type SupabaseHandlerFactory = (
 ) => ApiRequestHandler;
 
 const PROFILE_KEY = 'forge-storage-profile';
+const ACTIVE_PROVIDER_KEY = 'forge-storage-provider';
 const SESSION_KEY = 'forge-supabase-session';
 const REMEMBER_SESSION_KEY = 'forge-supabase-remember-session';
 const SUPABASE_HOST = /^[a-z0-9][a-z0-9-]*\.supabase\.co$/;
@@ -85,6 +86,21 @@ function profilesEqual(left: SupabaseProfile, right: SupabaseProfile): boolean {
 
 function readRememberSession(): boolean {
   return browserStorage('localStorage')?.getItem(REMEMBER_SESSION_KEY) === 'true';
+}
+
+function readActiveProvider(): StorageProvider | null {
+  const value = browserStorage('localStorage')?.getItem(ACTIVE_PROVIDER_KEY);
+  return value === 'local' || value === 'supabase' ? value : null;
+}
+
+function persistActiveProvider(provider: StorageProvider): void {
+  browserStorage('localStorage')?.setItem(ACTIVE_PROVIDER_KEY, provider);
+}
+
+function notifyStorageChanged(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('forge:storage-changed'));
+  }
 }
 
 function persistRememberSession(next: boolean): void {
@@ -197,16 +213,17 @@ function installSupabaseHandler(): void {
 
 export function configureStorage(config: StorageConfig): void {
   if (config.provider === 'local') {
+    persistActiveProvider('local');
     profile = null;
     session = null;
     refreshInFlight = null;
-    persistProfile(null);
-    persistSession(null);
     resetApiRequestHandler();
     snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };
+    notifyStorageChanged();
     return;
   }
   const nextProfile = validateSupabaseProfile(config);
+  persistActiveProvider('supabase');
   const previousProfile = profile;
   const storedSession = readStoredSession();
   const rememberSession =
@@ -243,10 +260,26 @@ export function configureStorage(config: StorageConfig): void {
         ...rememberedSessionFields(),
       };
   installSupabaseHandler();
+  notifyStorageChanged();
 }
 
 export function getStorageSnapshot(): StorageSnapshot {
   return { ...snapshot };
+}
+
+export function getConfiguredStorageProviders(): StorageProvider[] {
+  return readProfile() ? ['local', 'supabase'] : ['local'];
+}
+
+export function switchStorageProvider(provider: StorageProvider): StorageSnapshot {
+  if (provider === 'local') {
+    configureStorage({ provider: 'local' });
+    return getStorageSnapshot();
+  }
+  const storedProfile = readProfile();
+  if (!storedProfile) throw new Error('Supabase storage is not configured.');
+  configureStorage({ provider: 'supabase', ...storedProfile });
+  return getStorageSnapshot();
 }
 
 export function getActiveSupabaseProfile(): SupabaseProfile | null {
@@ -354,6 +387,7 @@ export async function signInSupabase(
     ...rememberedSessionFields(),
     ...(session.email ? { userEmail: session.email } : {}),
   };
+  notifyStorageChanged();
   return getStorageSnapshot();
 }
 
@@ -371,6 +405,7 @@ export function signOutSupabase(): void {
     };
     installSupabaseHandler();
   }
+  notifyStorageChanged();
 }
 
 export async function inspectStorage(): Promise<StorageSnapshot> {
@@ -424,7 +459,11 @@ export async function inspectStorage(): Promise<StorageSnapshot> {
 
 export function initializeStoredStorage(): void {
   const stored = readProfile();
-  if (stored) configureStorage({ provider: 'supabase', ...stored });
+  if (readActiveProvider() === 'local') {
+    configureStorage({ provider: 'local' });
+  } else if (stored) {
+    configureStorage({ provider: 'supabase', ...stored });
+  }
 }
 
 export function resetStorageForTests(options: { preservePersisted?: boolean } = {}): void {
@@ -435,6 +474,7 @@ export function resetStorageForTests(options: { preservePersisted?: boolean } = 
     persistProfile(null);
     persistSession(null);
     persistRememberSession(false);
+    browserStorage('localStorage')?.removeItem(ACTIVE_PROVIDER_KEY);
   }
   resetApiRequestHandler();
   snapshot = { provider: 'local', status: 'ready', message: 'Local SQLite is active.' };

@@ -8,10 +8,12 @@ export { getApiBlob, getApiJson, sendJson } from './transport.js';
 export type { ApiRequest } from './transport.js';
 export {
   configureStorage,
+  getConfiguredStorageProviders,
   getStorageSnapshot,
   inspectStorage,
   signInSupabase,
   signOutSupabase,
+  switchStorageProvider,
   validateSupabaseProfile,
 } from './storage.js';
 export type {

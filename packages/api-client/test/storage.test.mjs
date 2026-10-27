@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 import {
   configureStorage,
+  getConfiguredStorageProviders,
   getStorageSnapshot,
   signInSupabase,
+  switchStorageProvider,
   validateSupabaseProfile,
 } from '../dist/index.js';
 import { initializeStoredStorage, resetStorageForTests } from '../dist/storage.js';
@@ -228,6 +230,46 @@ describe('BYOC storage contracts', () => {
     assert.ok(globalThis.localStorage.getItem('forge-supabase-session'));
     assert.equal(globalThis.sessionStorage.getItem('forge-supabase-session'), null);
     assert.equal(getStorageSnapshot().rememberSession, true);
+  });
+
+  it('preserves configured providers while switching between local and Supabase', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'switch-access-token',
+            refresh_token: 'switch-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: true });
+    await signInSupabase('a@example.test', 'temporary-password');
+    assert.deepEqual(getConfiguredStorageProviders(), ['local', 'supabase']);
+
+    switchStorageProvider('local');
+    assert.equal(getStorageSnapshot().provider, 'local');
+    assert.deepEqual(getConfiguredStorageProviders(), ['local', 'supabase']);
+
+    resetStorageForTests({ preservePersisted: true });
+    initializeStoredStorage();
+    assert.equal(getStorageSnapshot().provider, 'local');
+
+    switchStorageProvider('supabase');
+    assert.equal(getStorageSnapshot().provider, 'supabase');
+    assert.equal(getStorageSnapshot().userEmail, 'a@example.test');
+  });
+
+  it('does not switch to an unconfigured Supabase provider', () => {
+    configureStorage({ provider: 'local' });
+
+    assert.throws(() => switchStorageProvider('supabase'), /not configured/i);
+    assert.equal(getStorageSnapshot().provider, 'local');
   });
 
   it('does not mark an unknown cloud schema version ready', async () => {
