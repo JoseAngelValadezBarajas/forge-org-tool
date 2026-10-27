@@ -84,10 +84,9 @@ describe('M1 application shell', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getAllByRole('combobox', { name: 'Workspace' })).toHaveLength(2);
-      for (const selector of screen.getAllByRole('combobox', { name: 'Workspace' })) {
-        expect(selector).toHaveValue(workspace.id);
-      }
+      expect(
+        screen.getAllByRole('button', { name: 'Workspace: Created during startup' }),
+      ).toHaveLength(2);
       expect(screen.getByRole('heading', { name: 'Your workspace, in focus' })).toBeInTheDocument();
     });
     expect(localStorage.getItem('forge-active-workspace')).toBe(workspace.id);
@@ -251,7 +250,7 @@ describe('M1 application shell', () => {
     expect(
       await within(sidebar).findByRole('navigation', { name: 'Project navigation' }),
     ).toBeInTheDocument();
-    expect(within(sidebar).getByRole('combobox', { name: 'Workspace' })).toBeInTheDocument();
+    expect(within(sidebar).getByRole('button', { name: /^Workspace:/ })).toBeInTheDocument();
     expect(await within(sidebar).findByRole('heading', { name: 'Project' })).toBeInTheDocument();
     const projectNavigation = await within(sidebar).findByRole('navigation', {
       name: 'Project navigation',
@@ -635,9 +634,12 @@ describe('M1 application shell', () => {
       'href',
       '/projects/w1/p1',
     );
-    fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
-      target: { value: 'w2' },
-    });
+    fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: Research' }));
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitemradio', {
+        name: 'Studio',
+      }),
+    );
 
     expect(await within(projectNavigation).findByRole('link', { name: 'Signal' })).toHaveAttribute(
       'href',
@@ -654,7 +656,9 @@ describe('M1 application shell', () => {
       'href',
       '/projects/w2/p2',
     );
-    expect(within(restoredSidebar).getByRole('combobox', { name: 'Workspace' })).toHaveValue('w2');
+    expect(
+      within(restoredSidebar).getByRole('button', { name: 'Workspace: Studio' }),
+    ).toBeInTheDocument();
   });
 
   it('discards an old Workspace project response after changing the global selector', async () => {
@@ -693,11 +697,15 @@ describe('M1 application shell', () => {
     );
     renderRoute('/');
     const sidebar = screen.getByRole('complementary');
-    await within(sidebar).findByRole('option', { name: 'One' });
+    await within(sidebar).findByRole('button', { name: 'Workspace: One' });
+    fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: One' }));
+    await screen.findByRole('menuitemradio', { name: 'One' });
     await waitFor(() => expect(pending.get('w1')).toHaveLength(2));
-    fireEvent.change(within(sidebar).getByRole('combobox', { name: 'Workspace' }), {
-      target: { value: 'w2' },
-    });
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitemradio', {
+        name: 'Two',
+      }),
+    );
     await waitFor(() => expect(pending.get('w2')).toHaveLength(2));
     pending
       .get('w2')
@@ -717,6 +725,32 @@ describe('M1 application shell', () => {
     await waitFor(() =>
       expect(screen.queryByRole('heading', { name: 'Stale project' })).not.toBeInTheDocument(),
     );
+  });
+
+  it('opens workspace management from the workspace dropdown', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        const path = String(input);
+        const payload =
+          path === '/api/v1/workspaces'
+            ? [{ id: 'w1', name: 'Research', status: 'active', created_at: '', updated_at: '' }]
+            : [];
+        return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
+      }),
+    );
+    renderRoute('/');
+    const sidebar = screen.getByRole('complementary');
+    const workspaceButton = await within(sidebar).findByRole('button', {
+      name: 'Workspace: Research',
+    });
+    fireEvent.click(workspaceButton);
+    fireEvent.click(
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitem', {
+        name: 'Manage workspaces',
+      }),
+    );
+    expect(await screen.findByRole('heading', { name: 'Manage workspaces' })).toBeInTheDocument();
   });
 
   it('keeps Workspace tag administration on its own settings route', async () => {

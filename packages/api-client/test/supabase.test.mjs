@@ -123,6 +123,31 @@ describe('Supabase Data API adapter', () => {
     );
   });
 
+  it('routes workspace deletion through the owner-only RPC', async () => {
+    const calls = [];
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), init });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight')) {
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      }
+      if (String(url).includes('/rpc/forge_delete_workspace')) {
+        return new Response(null, { status: 204 });
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+    await organizationApi.deleteWorkspace('workspace-a');
+
+    const deletion = calls.find(({ url }) => url.includes('/rpc/forge_delete_workspace'));
+    assert.ok(deletion);
+    assert.deepEqual(JSON.parse(deletion.init.body), { p_workspace_id: 'workspace-a' });
+    assert.equal(deletion.init.headers.Authorization, 'Bearer user-access-token');
+  });
+
   it('surfaces RLS denial and never retries the operation against local SQLite', async () => {
     const calls = [];
     globalThis.fetch = async (url, init = {}) => {

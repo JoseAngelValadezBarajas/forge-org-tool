@@ -34,6 +34,7 @@ import {
   OrganizationPage,
   ProjectOverviewPage,
   StorageSettingsPage,
+  WorkspaceManagementPage,
   WorkspaceSettingsPage,
 } from '../features/organization';
 import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
@@ -79,6 +80,7 @@ function ApplicationShell() {
   const [activeWorkspaceId, setActiveWorkspaceId] = useState(
     () => localStorage.getItem('forge-active-workspace') ?? '',
   );
+  const activeWorkspaceIdRef = useRef(activeWorkspaceId);
   const [navigationError, setNavigationError] = useState('');
   const workspaceRevision = useRef(0);
   const context = getProjectContext(location.pathname);
@@ -117,6 +119,9 @@ function ApplicationShell() {
       ? 'No Supabase workspace'
       : 'Local Workspace';
   useEffect(() => {
+    activeWorkspaceIdRef.current = activeWorkspaceId;
+  }, [activeWorkspaceId]);
+  useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
   useEffect(() => {
@@ -137,6 +142,7 @@ function ApplicationShell() {
       if (providerChanged) {
         workspaceRevision.current += 1;
         setActiveWorkspaceId('');
+        activeWorkspaceIdRef.current = '';
         localStorage.removeItem('forge-active-workspace');
       }
     }
@@ -198,6 +204,7 @@ function ApplicationShell() {
       if (!id) return;
       workspaceRevision.current += 1;
       setActiveWorkspaceId(id);
+      activeWorkspaceIdRef.current = id;
       localStorage.setItem('forge-active-workspace', id);
     }
     function onWorkspaceCreated(event: Event) {
@@ -216,17 +223,31 @@ function ApplicationShell() {
         );
       }
     }
+    function onWorkspaceDeleted(event: Event) {
+      const id = (event as CustomEvent<{ workspaceId?: string }>).detail?.workspaceId;
+      if (!id) return;
+      workspaceRevision.current += 1;
+      setWorkspaces((items) => items.filter((item) => item.id !== id));
+      setProjects((items) => items.filter((item) => item.workspace_id !== id));
+      if (activeWorkspaceIdRef.current === id) {
+        setActiveWorkspaceId('');
+        localStorage.removeItem('forge-active-workspace');
+        setProjectWorkspaceId('');
+      }
+    }
     function onProjectsChanged() {
       setProjectRefresh((value) => value + 1);
     }
     window.addEventListener('forge:active-workspace-change', onActiveWorkspaceChange);
     window.addEventListener('forge:workspace-created', onWorkspaceCreated);
     window.addEventListener('forge:workspace-updated', onWorkspaceUpdated);
+    window.addEventListener('forge:workspace-deleted', onWorkspaceDeleted);
     window.addEventListener('forge:projects-changed', onProjectsChanged);
     return () => {
       window.removeEventListener('forge:active-workspace-change', onActiveWorkspaceChange);
       window.removeEventListener('forge:workspace-created', onWorkspaceCreated);
       window.removeEventListener('forge:workspace-updated', onWorkspaceUpdated);
+      window.removeEventListener('forge:workspace-deleted', onWorkspaceDeleted);
       window.removeEventListener('forge:projects-changed', onProjectsChanged);
     };
   }, []);
@@ -329,6 +350,7 @@ function ApplicationShell() {
   }
   function selectWorkspace(id: string) {
     setActiveWorkspaceId(id);
+    activeWorkspaceIdRef.current = id;
     localStorage.setItem('forge-active-workspace', id);
     window.dispatchEvent(
       new CustomEvent('forge:active-workspace-change', { detail: { workspaceId: id } }),
@@ -409,6 +431,7 @@ function ApplicationShell() {
               name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
             }))}
             onChange={selectWorkspace}
+            onManage={() => go('/workspaces/manage')}
             currentName={activeWorkspace?.name ?? workspaceFallbackName}
           />
         </div>
@@ -467,6 +490,7 @@ function ApplicationShell() {
               name: workspace.archived_at ? `${workspace.name} (archived)` : workspace.name,
             }))}
             onChange={selectWorkspace}
+            onManage={() => go('/workspaces/manage')}
             currentName={activeWorkspace?.name ?? workspaceFallbackName}
             dataNodeId="344:89"
             compact={sidebarCollapsed}
@@ -702,6 +726,7 @@ function ApplicationShell() {
             <Routes key={storageRevision}>
               <Route path="/" element={<OrganizationPage />} />
               <Route path="/settings/storage" element={<StorageSettingsPage />} />
+              <Route path="/workspaces/manage" element={<WorkspaceManagementPage />} />
               <Route path="/workspaces/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
               <Route path="/projects/:workspaceId/:projectId" element={<ProjectOverviewPage />} />
               <Route

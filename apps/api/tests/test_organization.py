@@ -106,3 +106,23 @@ def test_workspace_archive_and_restore_preserve_projects_and_gate_writes(
             ).status_code
             == 201
         )
+
+
+def test_workspace_delete_removes_its_projects_and_is_explicit(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv('FORGE_DATABASE_PATH', str(tmp_path / 'forge.db'))
+
+    with TestClient(app) as client:
+        workspace = client.post('/api/v1/workspaces', json={'name': 'Delete me'}).json()
+        workspace_id = workspace['id']
+        project = client.post(
+            f'/api/v1/workspaces/{workspace_id}/projects', json={'name': 'Child project'}
+        ).json()
+
+        deleted = client.delete(f'/api/v1/workspaces/{workspace_id}')
+        assert deleted.status_code == 204
+        assert client.get(f'/api/v1/workspaces/{workspace_id}').status_code == 404
+        assert (
+            client.get(f'/api/v1/workspaces/{workspace_id}/projects/{project["id"]}').status_code
+            == 404
+        )
+        assert client.delete(f'/api/v1/workspaces/{workspace_id}').status_code == 404

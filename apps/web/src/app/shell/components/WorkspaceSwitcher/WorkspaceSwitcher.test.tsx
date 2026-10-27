@@ -2,8 +2,9 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { expect, it, vi } from 'vitest';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
-it('shows the current workspace and reports a real selection change', () => {
+it('shows an accessible menu and reports a real selection change', () => {
   const onChange = vi.fn();
+  const onManage = vi.fn();
   render(
     <WorkspaceSwitcher
       value="w1"
@@ -12,28 +13,39 @@ it('shows the current workspace and reports a real selection change', () => {
         { id: 'w2', name: 'Research' },
       ]}
       onChange={onChange}
+      onManage={onManage}
     />,
   );
-  fireEvent.change(screen.getByRole('combobox', { name: 'Workspace' }), {
-    target: { value: 'w2' },
-  });
+  fireEvent.click(screen.getByRole('button', { name: 'Workspace: Local' }));
+  const menu = screen.getByRole('menu', { name: 'Workspaces' });
+  fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Research' }));
   expect(onChange).toHaveBeenCalledWith('w2');
+  expect(screen.queryByRole('menu', { name: 'Workspaces' })).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Workspace: Local' }));
+  fireEvent.click(
+    within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitem', {
+      name: 'Manage workspaces',
+    }),
+  );
+  expect(onManage).toHaveBeenCalledOnce();
 });
 
-it('keeps the native workspace select accessible in compact mode', () => {
+it('keeps the compact workspace menu accessible', () => {
   render(
     <WorkspaceSwitcher
       compact
       value="w1"
       workspaces={[{ id: 'w1', name: 'Local' }]}
       onChange={vi.fn()}
+      onManage={vi.fn()}
     />,
   );
 
   expect(screen.getByTestId('workspace-compact-control')).toBeInTheDocument();
   expect(
-    within(screen.getByTestId('workspace-compact-control')).getByRole('combobox', {
-      name: 'Workspace',
+    within(screen.getByTestId('workspace-compact-control')).getByRole('button', {
+      name: 'Workspace: Local',
     }),
   ).toBeInTheDocument();
 });

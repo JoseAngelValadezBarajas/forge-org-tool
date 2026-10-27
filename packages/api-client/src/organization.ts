@@ -8,6 +8,10 @@ export const organizationCapability = {
       method: 'POST',
       body: JSON.stringify({ name, description: description || null }),
     }),
+  deleteWorkspace: (workspaceId: string) =>
+    sendJson<void>(`/api/v1/workspaces/${workspaceId}`, {
+      method: 'DELETE',
+    }),
   updateWorkspace: (workspaceId: string, values: WorkspaceUpdate) =>
     sendJson<Workspace>(`/api/v1/workspaces/${workspaceId}`, {
       method: 'PATCH',

@@ -7,9 +7,9 @@ This guide is for the owner of a Supabase project. FORGE does not create a proje
 Use a separate Supabase project for evaluation. Do not point the commands below at a production project unless you have reviewed the migration and made a backup.
 
 1. Create or select the project in Supabase.
-2. Take an owner-controlled backup/export, review both files, then apply [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql) once, followed by [20261026_byoc_0002.sql](../../supabase/migrations/20261026_byoc_0002.sql) through the owner's reviewed SQL editor or controlled Supabase CLI workflow. FORGE never applies either file.
+2. Take an owner-controlled backup/export, review the files, then apply [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql), [20261026_byoc_0002.sql](../../supabase/migrations/20261026_byoc_0002.sql), and, if workspace deletion is required, [20261026_byoc_0003.sql](../../supabase/migrations/20261026_byoc_0003.sql) through the owner's reviewed SQL editor or controlled Supabase CLI workflow. FORGE never applies these files.
 3. Confirm that `forge_storage_preflight()` returns `forge-byoc-v2`, the private `forge-bug-attachments` bucket exists, and the transfer/planning RPCs exist.
-4. Create the Supabase Auth identity used for the two-installation check. The first authenticated user becomes the owner of a workspace created through FORGE.
+4. Create the Supabase Auth identity used for the two-installation check. The first authenticated user becomes the owner of a workspace created through FORGE. Migration 0003 is optional for existing projects until an owner needs permanent workspace deletion; without it, the UI reports the provider's unavailable RPC instead of falling back to SQLite.
 
 The migration is idempotent for the objects it owns, but it is not a general-purpose upgrade mechanism for an arbitrary existing schema. Do not combine it with unrelated SQL in the same change without reviewing the result.
 
@@ -66,6 +66,13 @@ Do not use real user data as a smoke fixture and do not claim this test passed w
 `supabase/rollback/20261026_byoc_0002.sql` is the owner-only rollback for the incremental 0.2 objects and policies; it is destructive for 0.2 planning/attachment data. The 0.1 rollback remains separate. Before running either script, confirm that the project contains no data that must remain and export any required data through an owner-controlled process. FORGE never invokes a rollback script.
 
 The local SQLite store is not modified by provisioning or switching to Supabase. There is no automatic data transfer between providers in BYOC 0.2; transfer is an explicit reviewed import/export action.
+
+Workspace management lists only the active provider. Permanent deletion requires
+explicit confirmation. Local deletion uses the local API and SQLite foreign-key
+cascades. Supabase deletion is an owner-only `forge_delete_workspace` RPC from
+0003; it removes the workspace's private attachment objects before the related
+metadata and project records cascade. It is never available to anonymous users,
+editors, viewers, or the installed application before the owner applies 0003.
 
 Migration 0002 creates the private `forge_import_sessions` table and the
 database-owned `feature_dependencies_acyclic_guard`. Do not insert or update

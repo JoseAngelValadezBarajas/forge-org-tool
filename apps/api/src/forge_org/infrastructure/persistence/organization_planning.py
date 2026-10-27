@@ -148,6 +148,13 @@ class OrganizationPlanningPersistence:
         self.connection.commit()
         return self.get_workspace(workspace_id) or {}
 
+    def delete_workspace(self, workspace_id: str) -> bool:
+        cursor = self.connection.execute('DELETE FROM workspaces WHERE id = ?', (workspace_id,))
+        if cursor.rowcount:
+            self.connection.commit()
+            return True
+        return False
+
     def update_workspace(self, workspace_id: str, values: dict[str, Any]) -> dict[str, Any] | None:
         if not values:
             return self.get_workspace(workspace_id)

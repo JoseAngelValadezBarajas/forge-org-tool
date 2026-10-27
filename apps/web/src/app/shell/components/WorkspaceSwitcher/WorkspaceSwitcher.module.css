@@ -1,24 +1,10 @@
-.select {
-  box-sizing: border-box;
-  width: 208px;
-  min-width: 0;
-  height: 48px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 9px;
-  background: var(--forge-surface-interactive);
-  color: var(--forge-text-primary);
-  font-size: 14px;
-  font-weight: 600;
-  appearance: none;
-  color: transparent;
-}
 .field {
+  position: relative;
   display: grid;
   gap: 5px;
   width: 208px;
 }
-.field label {
+.field > span:first-child {
   width: 190px;
   height: 20px;
   margin: 0 0 11px;
@@ -34,23 +20,99 @@
   width: 208px;
   height: 48px;
 }
-.selectedName {
-  position: absolute;
-  top: 0;
-  left: 12px;
+.trigger {
   display: flex;
+  box-sizing: border-box;
   align-items: center;
+  gap: 8px;
+  width: 208px;
   height: 48px;
-  overflow: hidden;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: var(--forge-surface-interactive);
   color: var(--forge-text-primary);
+  font: inherit;
   font-size: 14px;
   font-weight: 600;
-  pointer-events: none;
+  text-align: left;
+  cursor: pointer;
+}
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  border-color: var(--forge-accent);
+  background: var(--forge-surface-raised);
+}
+.trigger:focus-visible,
+.menuItem:focus-visible {
+  outline: 2px solid var(--forge-accent);
+  outline-offset: 2px;
+}
+.selectedName {
+  min-width: 0;
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.select option {
-  color: var(--forge-text-primary);
+.chevron {
+  flex: 0 0 auto;
+  color: var(--forge-text-secondary);
+}
+.menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 7px);
+  left: 0;
+  display: grid;
+  gap: 3px;
+  box-sizing: border-box;
+  width: 208px;
+  max-height: min(320px, 60vh);
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--forge-border-subtle);
+  border-radius: 9px;
+  background: var(--forge-surface-raised);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 28%);
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--forge-text-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.menuItem:hover,
+.menuItem[aria-checked='true'] {
+  background: var(--forge-accent-soft);
+  color: var(--forge-accent);
+}
+.menuItem > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.menuIndicator {
+  flex: 0 0 9px;
+  width: 9px;
+  color: var(--forge-accent);
+  text-align: center;
+}
+.menuSeparator {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--forge-border-subtle);
 }
 .current {
   display: grid;
@@ -71,8 +133,8 @@
 }
 .compactLabel {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 1px !important;
+  height: 1px !important;
   padding: 0;
   margin: -1px;
   overflow: hidden;
@@ -80,34 +142,32 @@
   white-space: nowrap;
   border: 0;
 }
-.compactField .selector {
+.compactField .selector,
+.compactTrigger {
   width: 40px;
   height: 40px;
+}
+.compactTrigger {
+  position: relative;
+  justify-content: center;
+  padding: 0;
+  border-color: var(--forge-border-subtle);
 }
 .compactIcon {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1;
   color: var(--forge-text-secondary);
-  pointer-events: none;
 }
-.compactSelect {
-  position: relative;
-  z-index: 2;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--forge-border-subtle);
-  border-radius: 9px;
-  background: var(--forge-surface-interactive);
-  color: transparent;
-  cursor: pointer;
-  appearance: none;
+.compactTrigger .selectedName,
+.compactTrigger .chevron {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
-.compactSelect:focus-visible {
-  outline: 2px solid var(--forge-accent);
-  outline-offset: 2px;
+.compactField .menu {
+  left: 0;
+  width: 208px;
 }
 @media (max-width: 720px) {
   .field {
@@ -115,11 +175,13 @@
     min-width: 0;
   }
   .selector,
-  .select {
+  .trigger {
     width: 100%;
     min-width: 0;
   }
-  .selectedName {
-    right: 12px;
+  .compactField,
+  .compactField .selector,
+  .compactField .trigger {
+    width: 40px;
   }
 }

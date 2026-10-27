@@ -721,6 +721,10 @@ export function createSupabaseHandler(
     );
   }
 
+  async function deleteWorkspace(workspaceId: string): Promise<void> {
+    await rpc<void>('forge_delete_workspace', { p_workspace_id: workspaceId });
+  }
+
   async function listProjects(workspaceId: string, path: string): Promise<Project[]> {
     const url = new URL(`https://forge.invalid${path}`);
     const status = url.searchParams.get('status') ?? 'active';
@@ -995,6 +999,9 @@ export function createSupabaseHandler(
       }) as Promise<T>;
     }
     if (parts.length === 1 && method === 'POST') return createWorkspace(body) as Promise<T>;
+    if (parts.length === 2 && method === 'DELETE') {
+      return deleteWorkspace(workspaceId) as Promise<T>;
+    }
     if (parts.length === 2 && method === 'PATCH') {
       return one(
         await table<Workspace[]>('workspaces', query({ id: `eq.${workspaceId}` }), {
