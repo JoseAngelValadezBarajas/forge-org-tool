@@ -206,6 +206,30 @@ describe('BYOC storage contracts', () => {
     assert.equal(getStorageSnapshot().status, 'authentication_required');
   });
 
+  it('allows the sign-in choice to enable persistent session storage', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) {
+        return new globalThis.Response(
+          JSON.stringify({
+            access_token: 'remembered-access-token',
+            refresh_token: 'remembered-refresh-token',
+            expires_in: 3600,
+            user: { id: 'user-a', email: 'a@example.test' },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+
+    configureStorage({ provider: 'supabase', ...validProfile, rememberSession: false });
+    await signInSupabase('a@example.test', 'temporary-password', true);
+
+    assert.ok(globalThis.localStorage.getItem('forge-supabase-session'));
+    assert.equal(globalThis.sessionStorage.getItem('forge-supabase-session'), null);
+    assert.equal(getStorageSnapshot().rememberSession, true);
+  });
+
   it('does not mark an unknown cloud schema version ready', async () => {
     globalThis.fetch = async (url) => {
       if (String(url).includes('/auth/v1/token')) {

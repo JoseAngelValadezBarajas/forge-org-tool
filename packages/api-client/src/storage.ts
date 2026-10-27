@@ -335,10 +335,15 @@ async function refreshSupabaseSession(
   }
 }
 
-export async function signInSupabase(email: string, password: string): Promise<StorageSnapshot> {
+export async function signInSupabase(
+  email: string,
+  password: string,
+  rememberSession?: boolean,
+): Promise<StorageSnapshot> {
   if (!profile) throw new Error('Configure Supabase before signing in.');
   if (!email.trim() || !password) throw new Error('Email and password are required.');
   session = await authRequest(profile, 'password', { email, password });
+  if (rememberSession !== undefined) persistRememberSession(rememberSession);
   persistSession(session);
   installSupabaseHandler();
   snapshot = {
