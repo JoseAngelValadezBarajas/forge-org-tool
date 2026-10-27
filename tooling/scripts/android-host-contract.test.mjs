@@ -64,7 +64,10 @@ describe('Android shell contract', () => {
       workflow,
       /find "\$extracted_apk" -type f ! -path "\$extracted_apk\/assets\/tauri\.conf\.json"/,
     );
-    assert.match(workflow, /find "\$extracted_apk\/assets" -type f -name '\*\.js'/);
+    assert.match(
+      workflow,
+      /find "\$extracted_apk\/lib" -type f -name 'libforge_org_desktop_lib\.so'/,
+    );
     assert.equal(packageJson.scripts.tauri, 'tauri');
   });
 });
