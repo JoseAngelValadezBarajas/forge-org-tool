@@ -2,6 +2,7 @@
 
 import sqlite3
 import unicodedata
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -148,10 +149,28 @@ class OrganizationPlanningPersistence:
         self.connection.commit()
         return self.get_workspace(workspace_id) or {}
 
-    def delete_workspace(self, workspace_id: str) -> bool:
+    def delete_workspace(self, workspace_id: str, attachment_root: Path | None = None) -> bool:
+        attachment_paths: list[Path] = []
+        if attachment_root is not None:
+            attachment_root = attachment_root.resolve()
+            rows = self.connection.execute(
+                'SELECT ba.relative_path '
+                'FROM bug_attachments ba '
+                'JOIN features f ON f.id = ba.feature_id '
+                'JOIN projects p ON p.id = f.project_id '
+                'WHERE p.workspace_id = ?',
+                (workspace_id,),
+            ).fetchall()
+            for row in rows:
+                relative_path = row['relative_path']
+                candidate = (attachment_root / relative_path).resolve()
+                if Path(relative_path).name == relative_path and candidate.parent == attachment_root:
+                    attachment_paths.append(candidate)
         cursor = self.connection.execute('DELETE FROM workspaces WHERE id = ?', (workspace_id,))
         if cursor.rowcount:
             self.connection.commit()
+            for path in attachment_paths:
+                path.unlink(missing_ok=True)
             return True
         return False
 

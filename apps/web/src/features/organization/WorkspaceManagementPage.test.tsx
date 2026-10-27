@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
+import { act } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { WorkspaceManagementPage } from './WorkspaceManagementPage';
@@ -109,5 +110,48 @@ describe('WorkspaceManagementPage', () => {
       '/api/v1/workspaces/w1',
       expect.objectContaining({ method: 'DELETE' }),
     );
+  });
+
+  it('keeps a workspace created while the initial list request is still pending', async () => {
+    let resolveList: ((response: Response) => void) | undefined;
+    const createdWorkspace = {
+      id: 'w3',
+      name: 'Created while loading',
+      description: null,
+      archived_at: null,
+      created_at: '',
+      updated_at: '',
+    };
+    const fetchMock = vi.fn((input: string, init?: RequestInit) => {
+      if (input === '/api/v1/workspaces' && !resolveList) {
+        return new Promise<Response>((resolve) => {
+          resolveList = resolve;
+        });
+      }
+      if (input === '/api/v1/workspaces' && init?.method === 'POST') {
+        return Promise.resolve(new Response(JSON.stringify(createdWorkspace), { status: 201 }));
+      }
+      return Promise.resolve(new Response(null, { status: 204 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <MemoryRouter>
+        <WorkspaceManagementPage />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(resolveList).toBeTypeOf('function'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'New workspace' }));
+    fireEvent.change(screen.getByLabelText('Workspace name'), {
+      target: { value: createdWorkspace.name },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Create workspace' }));
+    expect(await screen.findByRole('article', { name: createdWorkspace.name })).toBeInTheDocument();
+
+    await act(async () => {
+      resolveList?.(new Response('[]', { status: 200 }));
+    });
+    expect(screen.getByRole('article', { name: createdWorkspace.name })).toBeInTheDocument();
   });
 });

@@ -751,6 +751,9 @@ describe('M1 application shell', () => {
       }),
     );
     expect(await screen.findByRole('heading', { name: 'Manage workspaces' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByText('Manage workspaces'),
+    ).toHaveAttribute('aria-current', 'page');
   });
 
   it('keeps Workspace tag administration on its own settings route', async () => {

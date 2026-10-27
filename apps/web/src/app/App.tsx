@@ -841,6 +841,20 @@ function Breadcrumbs({
   workspaceName?: string;
   projectName?: string;
 }) {
+  if (pathname === '/workspaces/manage') {
+    return (
+      <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
+        <ol>
+          <li>
+            <Link to="/">Workspace</Link>
+          </li>
+          <li>
+            <span aria-current="page">Manage workspaces</span>
+          </li>
+        </ol>
+      </nav>
+    );
+  }
   if (pathname.startsWith('/workspaces/')) {
     return (
       <nav aria-label="Breadcrumb" className={styles.breadcrumb}>

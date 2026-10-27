@@ -682,7 +682,7 @@
   .mobileWorkspace > div {
     gap: 0;
   }
-  .mobileWorkspace > div > label {
+  .mobileWorkspace > div > span:first-child {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -690,7 +690,7 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
   }
-  .mobileWorkspace select {
+  .mobileWorkspace .trigger {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
@@ -700,7 +700,7 @@
     appearance: auto;
   }
   .mobileWorkspace .selectedName {
-    display: none;
+    display: inline;
   }
   .mobileTheme {
     gap: 0;
