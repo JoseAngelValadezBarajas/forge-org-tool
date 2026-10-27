@@ -53,6 +53,7 @@ describe('Android shell contract', () => {
     assert.match(workflow, /actions\/setup-java@v4/);
     assert.match(workflow, /node-version: ['"]24['"]/);
     assert.match(workflow, /android-actions\/setup-android@v3/);
+    assert.match(workflow, /packages: platform-tools/);
     assert.match(workflow, /npx tauri android init --ci/);
     assert.match(workflow, /npx tauri android build --debug --apk/);
     assert.match(workflow, /actions\/upload-artifact@v4/);
