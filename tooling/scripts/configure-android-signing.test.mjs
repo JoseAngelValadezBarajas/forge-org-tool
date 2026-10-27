@@ -34,7 +34,10 @@ test('configures and repeats Android release signing without duplicating Gradle 
   const escapedKeystorePath = keystorePath.replaceAll('\\', '\\\\').replaceAll(':', '\\:');
   assert.ok(firstProperties.includes(`storeFile=${escapedKeystorePath}\n`));
   assert.equal((firstGradle.match(/create\("release"\)/g) ?? []).length, 1);
-  assert.equal((firstGradle.match(/signingConfig = signingConfigs\.getByName\("release"\)/g) ?? []).length, 1);
+  assert.equal(
+    (firstGradle.match(/signingConfig = signingConfigs\.getByName\("release"\)/g) ?? []).length,
+    1,
+  );
   assert.match(firstGradle, /import java\.io\.FileInputStream/);
   assert.match(firstGradle, /import java\.util\.Properties/);
 

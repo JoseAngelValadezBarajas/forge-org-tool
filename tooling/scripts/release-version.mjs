@@ -30,9 +30,7 @@ function readCargoManifestVersion(filePath, packageName) {
 export function readReleaseMetadata(rootDir) {
   const packageJson = readJson(path.join(rootDir, 'package.json'));
   const packageLock = readJson(path.join(rootDir, 'package-lock.json'));
-  const tauriConfig = readJson(
-    path.join(rootDir, 'apps/desktop/src-tauri/tauri.conf.json'),
-  );
+  const tauriConfig = readJson(path.join(rootDir, 'apps/desktop/src-tauri/tauri.conf.json'));
   const cargoManifestPath = path.join(rootDir, 'apps/desktop/src-tauri/Cargo.toml');
 
   return {
