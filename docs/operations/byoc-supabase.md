@@ -7,9 +7,9 @@ This guide is for the owner of a Supabase project. FORGE does not create a proje
 Use a separate Supabase project for evaluation. Do not point the commands below at a production project unless you have reviewed the migration and made a backup.
 
 1. Create or select the project in Supabase.
-2. Take an owner-controlled backup/export, review the files, then apply [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql), [20261026_byoc_0002.sql](../../supabase/migrations/20261026_byoc_0002.sql), and, if workspace deletion is required, [20261026_byoc_0003.sql](../../supabase/migrations/20261026_byoc_0003.sql) through the owner's reviewed SQL editor or controlled Supabase CLI workflow. FORGE never applies these files.
+2. Take an owner-controlled backup/export, review the files, then apply [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql), [20261026_byoc_0002.sql](../../supabase/migrations/20261026_byoc_0002.sql), [20261026_byoc_0003.sql](../../supabase/migrations/20261026_byoc_0003.sql) if workspace deletion is required, and [20261028_byoc_0004.sql](../../supabase/migrations/20261028_byoc_0004.sql) through the owner's reviewed SQL editor or controlled Supabase CLI workflow. FORGE never applies these files.
 3. Confirm that `forge_storage_preflight()` returns `forge-byoc-v2`, the private `forge-bug-attachments` bucket exists, and the transfer/planning RPCs exist.
-4. Create the Supabase Auth identity used for the two-installation check. The first authenticated user becomes the owner of a workspace created through FORGE. Migration 0003 is optional for existing projects until an owner needs permanent workspace deletion; without it, the UI reports the provider's unavailable RPC instead of falling back to SQLite.
+4. Create the Supabase Auth identity used for the two-installation check. The first authenticated user becomes the owner of a workspace created through FORGE. Migration 0003 is optional for existing projects until an owner needs permanent workspace deletion; without it, the UI reports the provider's unavailable RPC instead of falling back to SQLite. Migration 0004 is required for existing projects before using JSON or contextual imports when `digest(bytea, unknown) does not exist` is reported.
 
 The migration is idempotent for the objects it owns, but it is not a general-purpose upgrade mechanism for an arbitrary existing schema. Do not combine it with unrelated SQL in the same change without reviewing the result.
 
@@ -88,6 +88,15 @@ backup, run the complete 0002 file without editing or splitting it, and confirm
 the `forge-byoc-v2` preflight. If rollback is required, stop the client, export
 any data that must be retained, and use the reviewed rollback script; FORGE does
 not invoke rollback or migration SQL.
+
+Migration 0004 is a non-destructive repair for projects that already applied
+0001/0002. It enables `pgcrypto` if needed and exposes the Supabase `extensions`
+schema to the four transfer RPCs so their SHA-256 fingerprint and UUID calls
+resolve on projects where Supabase installed `pgcrypto` outside `public`. Apply
+it once, then reload FORGE and retry the import. It does not rewrite or delete
+any Workspace, Project, Epic, Work Item or attachment data. Its rollback only
+restores the previous function search path and should not be used while imports
+are in progress.
 
 ## Operational boundaries
 
