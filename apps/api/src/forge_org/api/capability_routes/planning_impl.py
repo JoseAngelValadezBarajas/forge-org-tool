@@ -26,7 +26,7 @@ from forge_org.api.schemas import (
     WorkspaceTagResponse,
     WorkspaceTagUpdate,
 )
-from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
+from forge_org.application.errors import DuplicateName
 from forge_org.application.knowledge import KnowledgeService
 from forge_org.application.planning import PlanningService
 from forge_org.domain.errors import DuplicateRecord
@@ -38,10 +38,7 @@ capability_router = APIRouter(prefix='/api/v1', tags=['organization'])
 def planning_overview(
     workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)
 ) -> dict[str, Any]:
-    try:
-        return planning.overview(workspace_id, project_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return planning.overview(workspace_id, project_id)
 
 
 @capability_router.get(
@@ -50,10 +47,7 @@ def planning_overview(
 def list_epics(
     workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.list_epics(workspace_id, project_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return planning.list_epics(workspace_id, project_id)
 
 
 @capability_router.post(
@@ -67,29 +61,21 @@ def create_epic(
     payload: EpicCreate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.create_epic(
-            workspace_id,
-            project_id,
-            payload.title,
-            payload.description,
-            payload.priority,
-            payload.tags,
-        )
-    except (LookupError, ValueError) as exc:
-        raise service_error(
-            NotFound(str(exc)) if isinstance(exc, LookupError) else InvalidInput(str(exc))
-        ) from exc
+    return planning.create_epic(
+        workspace_id,
+        project_id,
+        payload.title,
+        payload.description,
+        payload.priority,
+        payload.tags,
+    )
 
 
 @capability_router.get('/workspaces/{workspace_id}/tags', response_model=list[WorkspaceTagResponse])
 def list_workspace_tags(
     workspace_id: str, planning: PlanningService = Depends(planning_service)
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.workspace_tags(workspace_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return planning.workspace_tags(workspace_id)
 
 
 @capability_router.post(
@@ -102,10 +88,6 @@ def create_workspace_tag(
 ) -> dict[str, Any]:
     try:
         return planning.create_workspace_tag(workspace_id, payload.name, payload.color)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
     except DuplicateRecord as exc:
         raise service_error(DuplicateName('Tag name already exists in this workspace')) from exc
 
@@ -123,10 +105,6 @@ def update_workspace_tag(
         return planning.update_workspace_tag(
             workspace_id, tag_id, payload.model_dump(exclude_unset=True)
         )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
     except DuplicateRecord as exc:
         raise service_error(DuplicateName('Tag name already exists in this workspace')) from exc
 
@@ -137,10 +115,7 @@ def delete_workspace_tag(
     tag_id: str,
     planning: PlanningService = Depends(planning_service),
 ) -> None:
-    try:
-        planning.delete_workspace_tag(workspace_id, tag_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    planning.delete_workspace_tag(workspace_id, tag_id)
 
 
 @capability_router.patch(
@@ -153,14 +128,9 @@ def update_epic(
     payload: EpicUpdate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.update_epic(
-            workspace_id, project_id, epic_id, payload.model_dump(exclude_unset=True)
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.update_epic(
+        workspace_id, project_id, epic_id, payload.model_dump(exclude_unset=True)
+    )
 
 
 @capability_router.get(
@@ -176,12 +146,9 @@ def list_features(
     epic_id: str | None = None,
     planning: PlanningService = Depends(planning_service),
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.list_features(
-            workspace_id, project_id, search, status_filter, priority, epic_id
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return planning.list_features(
+        workspace_id, project_id, search, status_filter, priority, epic_id
+    )
 
 
 @capability_router.post(
@@ -195,12 +162,7 @@ def create_feature(
     payload: FeatureCreate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.create_feature(workspace_id, project_id, payload.model_dump())
-    except (LookupError, ValueError) as exc:
-        raise service_error(
-            NotFound(str(exc)) if isinstance(exc, LookupError) else InvalidInput(str(exc))
-        ) from exc
+    return planning.create_feature(workspace_id, project_id, payload.model_dump())
 
 
 @capability_router.patch(
@@ -214,14 +176,9 @@ def update_feature(
     payload: FeatureUpdate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.update_feature(
-            workspace_id, project_id, feature_id, payload.model_dump(exclude_unset=True)
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.update_feature(
+        workspace_id, project_id, feature_id, payload.model_dump(exclude_unset=True)
+    )
 
 
 @capability_router.patch(
@@ -236,18 +193,13 @@ def update_criterion(
     payload: CriterionUpdate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.update_criterion(
-            workspace_id,
-            project_id,
-            feature_id,
-            criterion_id,
-            payload.model_dump(exclude_unset=True),
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.update_criterion(
+        workspace_id,
+        project_id,
+        feature_id,
+        criterion_id,
+        payload.model_dump(exclude_unset=True),
+    )
 
 
 @capability_router.delete(
@@ -261,12 +213,7 @@ def delete_criterion(
     criterion_id: str,
     planning: PlanningService = Depends(planning_service),
 ) -> None:
-    try:
-        planning.delete_criterion(workspace_id, project_id, feature_id, criterion_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    planning.delete_criterion(workspace_id, project_id, feature_id, criterion_id)
 
 
 @capability_router.post(
@@ -280,12 +227,7 @@ def reorder_criteria(
     payload: CriterionReorderRequest,
     planning: PlanningService = Depends(planning_service),
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.reorder_criteria(workspace_id, project_id, feature_id, payload.ids)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.reorder_criteria(workspace_id, project_id, feature_id, payload.ids)
 
 
 @capability_router.get(
@@ -298,10 +240,7 @@ def list_tasks(
     feature_id: str,
     planning: PlanningService = Depends(planning_service),
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.tasks(workspace_id, project_id, feature_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return planning.tasks(workspace_id, project_id, feature_id)
 
 
 @capability_router.post(
@@ -316,12 +255,7 @@ def create_task(
     payload: TaskCreate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.create_task(workspace_id, project_id, feature_id, payload.model_dump())
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.create_task(workspace_id, project_id, feature_id, payload.model_dump())
 
 
 @capability_router.patch(
@@ -336,14 +270,9 @@ def update_task(
     payload: TaskUpdate,
     planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    try:
-        return planning.update_task(
-            workspace_id, project_id, feature_id, task_id, payload.model_dump(exclude_unset=True)
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.update_task(
+        workspace_id, project_id, feature_id, task_id, payload.model_dump(exclude_unset=True)
+    )
 
 
 @capability_router.post(
@@ -357,12 +286,7 @@ def reorder_tasks(
     payload: dict[str, list[str]],
     planning: PlanningService = Depends(planning_service),
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.reorder_tasks(workspace_id, project_id, feature_id, payload.get('ids', []))
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return planning.reorder_tasks(workspace_id, project_id, feature_id, payload.get('ids', []))
 
 
 @capability_router.get(
@@ -372,10 +296,7 @@ def reorder_tasks(
 def list_dependencies(
     workspace_id: str, project_id: str, planning: PlanningService = Depends(planning_service)
 ) -> list[dict[str, Any]]:
-    try:
-        return planning.dependencies(workspace_id, project_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return planning.dependencies(workspace_id, project_id)
 
 
 @capability_router.post(
@@ -391,10 +312,6 @@ def create_dependency(
 ) -> dict[str, Any]:
     try:
         return planning.create_dependency(workspace_id, project_id, payload.model_dump())
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
     except DuplicateRecord as exc:
         raise service_error(DuplicateName('Dependency already exists')) from exc
 
@@ -408,10 +325,7 @@ def delete_dependency(
     dependency_id: str,
     planning: PlanningService = Depends(planning_service),
 ) -> None:
-    try:
-        planning.delete_dependency(workspace_id, project_id, dependency_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    planning.delete_dependency(workspace_id, project_id, dependency_id)
 
 
 @capability_router.get(
@@ -424,10 +338,7 @@ def list_criteria(
     feature_id: str,
     knowledge: KnowledgeService = Depends(knowledge_service),
 ) -> list[dict[str, Any]]:
-    try:
-        return knowledge.criteria(workspace_id, project_id, feature_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
+    return knowledge.criteria(workspace_id, project_id, feature_id)
 
 
 @capability_router.post(
@@ -442,9 +353,4 @@ def create_criterion(
     payload: CriterionCreate,
     knowledge: KnowledgeService = Depends(knowledge_service),
 ) -> dict[str, Any]:
-    try:
-        return knowledge.create_criterion(workspace_id, project_id, feature_id, payload.description)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return knowledge.create_criterion(workspace_id, project_id, feature_id, payload.description)

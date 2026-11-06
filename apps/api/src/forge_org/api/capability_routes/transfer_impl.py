@@ -16,7 +16,7 @@ from forge_org.api.schemas import (
     ProjectPackageImportRequest,
     ProjectPackagePreviewRequest,
 )
-from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
+from forge_org.application.errors import DuplicateName, InvalidInput
 from forge_org.application.project_package import MAX_PACKAGE_BYTES, ProjectPackageService
 from forge_org.application.transfer import ProjectTransferService
 from forge_org.domain.errors import DuplicateRecord
@@ -32,12 +32,7 @@ def preview_import(
     payload: dict[str, Any],
     transfer: ProjectTransferService = Depends(transfer_service),
 ) -> dict[str, Any]:
-    try:
-        return transfer.preview(workspace_id, payload)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except (ValueError, TypeError) as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return transfer.preview(workspace_id, payload)
 
 
 @capability_router.post(
@@ -53,12 +48,6 @@ def import_project(
             workspace_id, payload.document, payload.expected_fingerprint
         )
         return {'workspace_id': workspace_id, **result}
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except (ValueError, TypeError) as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
-    except RuntimeError as exc:
-        raise service_error(exc) from exc
     except DuplicateRecord as exc:
         raise service_error(DuplicateName('Project name already exists in this workspace')) from exc
 
@@ -70,12 +59,7 @@ def export_project(
     schema_version: str = Query(default='forge-project-import-v1'),
     transfer: ProjectTransferService = Depends(transfer_service),
 ) -> dict[str, Any]:
-    try:
-        return transfer.export_project(workspace_id, project_id, schema_version)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return transfer.export_project(workspace_id, project_id, schema_version)
 
 
 @capability_router.post(
@@ -90,14 +74,9 @@ def preview_contextual_import(
     payload: dict[str, Any],
     transfer: ProjectTransferService = Depends(transfer_service),
 ) -> dict[str, Any]:
-    try:
-        return transfer.preview_contextual_import(
-            workspace_id, project_id, scope, destination_id, payload
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except (ValueError, TypeError) as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return transfer.preview_contextual_import(
+        workspace_id, project_id, scope, destination_id, payload
+    )
 
 
 @capability_router.post(
@@ -122,12 +101,6 @@ def import_contextual(
             payload.document,
             payload.expected_fingerprint,
         )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except (ValueError, TypeError) as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
-    except RuntimeError as exc:
-        raise service_error(exc) from exc
     except DuplicateRecord as exc:
         raise service_error(
             DuplicateName('Contextual import conflicts with existing records')
@@ -144,12 +117,7 @@ def export_contextual(
     destination_id: str,
     transfer: ProjectTransferService = Depends(transfer_service),
 ) -> dict[str, Any]:
-    try:
-        return transfer.export_contextual(workspace_id, project_id, scope, destination_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return transfer.export_contextual(workspace_id, project_id, scope, destination_id)
 
 
 def _decode_package(encoded: str) -> bytes:
@@ -168,17 +136,12 @@ def export_project_package(
     project_id: str,
     package: ProjectPackageService = Depends(project_package_service),
 ) -> Response:
-    try:
-        content = package.export(workspace_id, project_id)
-        return Response(
-            content,
-            media_type='application/zip',
-            headers={'Content-Disposition': 'attachment; filename="forge-project-transfer-v2.zip"'},
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    content = package.export(workspace_id, project_id)
+    return Response(
+        content,
+        media_type='application/zip',
+        headers={'Content-Disposition': 'attachment; filename="forge-project-transfer-v2.zip"'},
+    )
 
 
 @capability_router.post(
@@ -190,12 +153,7 @@ def preview_project_package(
     payload: ProjectPackagePreviewRequest,
     package: ProjectPackageService = Depends(project_package_service),
 ) -> dict[str, Any]:
-    try:
-        return package.preview(workspace_id, _decode_package(payload.archive_base64))
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except (ValueError, TypeError) as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
+    return package.preview(workspace_id, _decode_package(payload.archive_base64))
 
 
 @capability_router.post(
@@ -217,11 +175,5 @@ def import_project_package(
                 payload.expected_fingerprint,
             ),
         }
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except (ValueError, TypeError) as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
-    except RuntimeError as exc:
-        raise service_error(exc) from exc
     except DuplicateRecord as exc:
         raise service_error(DuplicateName('Project name already exists in this workspace')) from exc

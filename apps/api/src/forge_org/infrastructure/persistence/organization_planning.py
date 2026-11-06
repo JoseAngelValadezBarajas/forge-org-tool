@@ -6,6 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 from forge_org.domain.clock import utc_now
+from forge_org.domain.errors import InvalidInput
 from forge_org.domain.tags import normalize_tag_name
 
 from .common import row_dict
@@ -78,13 +79,13 @@ class OrganizationPlanningPersistence:
             'feature': ('feature_tags', 'feature_id'),
         }
         if item_type not in relations:
-            raise ValueError('Unsupported tagged item type')
+            raise InvalidInput('Unsupported tagged item type')
         relation_table, item_column = relations[item_type]
         self.connection.execute(f'DELETE FROM {relation_table} WHERE {item_column} = ?', (item_id,))
         normalized_names: dict[str, str] = {}
         for raw_name in names:
             if not isinstance(raw_name, str):
-                raise ValueError('Tags must be text')
+                raise InvalidInput('Tags must be text')
             name, normalized = normalize_tag_name(raw_name)
             normalized_names.setdefault(normalized, name)
 

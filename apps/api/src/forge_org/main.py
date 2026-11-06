@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from forge_org.api.error_handlers import register_error_handlers
 from forge_org.api.routes import router as legacy_router
 
 
@@ -19,6 +20,7 @@ def create_app() -> FastAPI:
     def health() -> HealthResponse:
         return HealthResponse(service='forge-org-api', status='ok', scope='organization-foundation')
 
+    register_error_handlers(app)
     app.include_router(legacy_router)
     return app
 

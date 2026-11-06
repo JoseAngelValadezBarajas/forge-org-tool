@@ -17,6 +17,7 @@ from forge_org.application.attachments import (
 )
 from forge_org.application.transfer import ProjectTransferService
 from forge_org.domain.clock import utc_now
+from forge_org.domain.errors import Conflict, InvalidInput
 from forge_org.domain.transfer_document import SCHEMA_VERSION_V2
 
 MAX_PACKAGE_BYTES = 5 * 1024 * 1024
@@ -55,16 +56,16 @@ class ProjectPackageService:
 
     def _read_package(self, archive_bytes: bytes) -> tuple[dict[str, Any], list[dict[str, Any]]]:
         if not archive_bytes or len(archive_bytes) > MAX_PACKAGE_BYTES:
-            raise ValueError('Project package must be between 1 byte and 5 MiB')
+            raise InvalidInput('Project package must be between 1 byte and 5 MiB')
         try:
             archive = zipfile.ZipFile(io.BytesIO(archive_bytes))
         except (zipfile.BadZipFile, OSError) as exc:
-            raise ValueError('Project package is not a valid ZIP archive') from exc
+            raise InvalidInput('Project package is not a valid ZIP archive') from exc
 
         with archive:
             infos = archive.infolist()
             if not infos or len(infos) > MAX_PACKAGE_ENTRIES:
-                raise ValueError('Project package exceeds the entry count limit')
+                raise InvalidInput('Project package exceeds the entry count limit')
             seen: set[str] = set()
             total_size = 0
             for info in infos:
@@ -84,51 +85,53 @@ class ProjectPackageService:
                     or info.flag_bits & 0x1
                     or info.compress_type not in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED}
                 ):
-                    raise ValueError('Project package contains an unsafe or unsupported ZIP entry')
+                    raise InvalidInput(
+                        'Project package contains an unsafe or unsupported ZIP entry'
+                    )
                 normalized_entry = '/'.join(entry_path.parts).casefold()
                 if normalized_entry in seen:
-                    raise ValueError('Project package contains duplicate normalized paths')
+                    raise InvalidInput('Project package contains duplicate normalized paths')
                 seen.add(normalized_entry)
                 total_size += info.file_size
                 if total_size > MAX_EXPANDED_BYTES:
-                    raise ValueError('Project package exceeds the expanded size limit')
+                    raise InvalidInput('Project package exceeds the expanded size limit')
                 if info.file_size < 0 or info.compress_size < 0:
-                    raise ValueError('Project package contains invalid size metadata')
+                    raise InvalidInput('Project package contains invalid size metadata')
 
             if 'manifest.json' not in seen:
-                raise ValueError('Project package is missing manifest.json')
+                raise InvalidInput('Project package is missing manifest.json')
             try:
                 manifest_bytes = archive.read('manifest.json')
                 manifest = json.loads(manifest_bytes.decode('utf-8'))
             except (KeyError, UnicodeDecodeError, json.JSONDecodeError, zipfile.BadZipFile) as exc:
-                raise ValueError('Project package manifest is invalid') from exc
+                raise InvalidInput('Project package manifest is invalid') from exc
             if (
                 not isinstance(manifest, dict)
                 or manifest.get('schema_version') != SCHEMA_VERSION_V2
             ):
-                raise ValueError('Project packages require the transfer v2 manifest')
+                raise InvalidInput('Project packages require the transfer v2 manifest')
             features = manifest.get('features')
             if not isinstance(features, list):
-                raise ValueError('Project package features must be an array')
+                raise InvalidInput('Project package features must be an array')
 
             asset_records: list[dict[str, Any]] = []
             found_paths = {'manifest.json'}
             archive_features: list[dict[str, Any]] = []
             for feature_index, feature in enumerate(features):
                 if not isinstance(feature, dict):
-                    raise ValueError('Project package features must be objects')
+                    raise InvalidInput('Project package features must be objects')
                 feature_copy = dict(feature)
                 declared_assets = feature_copy.pop('attachments', [])
                 if not isinstance(declared_assets, list) or len(declared_assets) > 5:
-                    raise ValueError('A Work Item can contain at most five attachments')
+                    raise InvalidInput('A Work Item can contain at most five attachments')
                 if declared_assets and feature.get('kind') != 'bug':
-                    raise ValueError('Only Bugs may contain screenshot attachments')
+                    raise InvalidInput('Only Bugs may contain screenshot attachments')
                 for attachment_index, declared in enumerate(declared_assets):
                     if not isinstance(declared, dict):
-                        raise ValueError('Attachment manifest entries must be objects')
+                        raise InvalidInput('Attachment manifest entries must be objects')
                     content_type = declared.get('content_type')
                     if not isinstance(content_type, str):
-                        raise ValueError('Project package attachment metadata is invalid')
+                        raise InvalidInput('Project package attachment metadata is invalid')
                     extension = CONTENT_TYPES.get(content_type)
                     archive_path = declared.get('path')
                     expected_path = self._expected_path(
@@ -150,13 +153,13 @@ class ProjectPackageService:
                         or not isinstance(byte_size, int)
                         or not 1 <= byte_size <= MAX_ATTACHMENT_BYTES
                     ):
-                        raise ValueError('Project package attachment metadata is invalid')
+                        raise InvalidInput('Project package attachment metadata is invalid')
                     try:
                         info = archive.getinfo(expected_path)
                         with archive.open(info) as stream:
                             content = stream.read(MAX_ATTACHMENT_BYTES + 1)
                     except (KeyError, OSError, RuntimeError, zipfile.BadZipFile) as exc:
-                        raise ValueError(
+                        raise InvalidInput(
                             'Project package attachment is missing or corrupt'
                         ) from exc
                     if (
@@ -165,7 +168,7 @@ class ProjectPackageService:
                         or BugAttachmentService._image_type(content) != content_type
                         or hashlib.sha256(content).hexdigest() != checksum
                     ):
-                        raise ValueError(
+                        raise InvalidInput(
                             'Project package attachment checksum or image content is invalid'
                         )
                     found_paths.add(expected_path)
@@ -183,13 +186,13 @@ class ProjectPackageService:
                 archive_features.append(feature_copy)
 
             if found_paths != seen:
-                raise ValueError('Project package contains unreferenced files')
+                raise InvalidInput('Project package contains unreferenced files')
             manifest = dict(manifest)
             manifest['features'] = archive_features
             normalized_document = self.transfer.validate(manifest)
             document_size = len(self.transfer.canonical(normalized_document).encode('utf-8'))
             if document_size > 7 * 1024 * 1024:
-                raise ValueError('Project package manifest exceeds the document limit')
+                raise InvalidInput('Project package manifest exceeds the document limit')
             return normalized_document, asset_records
 
     def preview(self, workspace_id: str, archive_bytes: bytes) -> dict[str, Any]:
@@ -222,7 +225,7 @@ class ProjectPackageService:
                 content = path.read_bytes()
                 checksum = hashlib.sha256(content).hexdigest()
                 if checksum != record['sha256'] or len(content) != record['byte_size']:
-                    raise ValueError('Stored Bug attachment failed integrity verification')
+                    raise InvalidInput('Stored Bug attachment failed integrity verification')
                 archive_path = self._expected_path(
                     feature_index, attachment_index, CONTENT_TYPES[record['content_type']]
                 )
@@ -246,7 +249,7 @@ class ProjectPackageService:
                 archive.writestr(name, content)
         result = output.getvalue()
         if len(result) > MAX_PACKAGE_BYTES:
-            raise ValueError('Project package exceeds the 5 MiB desktop transfer limit')
+            raise InvalidInput('Project package exceeds the 5 MiB desktop transfer limit')
         return result
 
     def import_project(
@@ -261,14 +264,14 @@ class ProjectPackageService:
         ]
         fingerprint = self._fingerprint(document, fingerprint_assets)
         if fingerprint != expected_fingerprint:
-            raise RuntimeError('Import fingerprint does not match the reviewed project package')
+            raise Conflict('Import fingerprint does not match the reviewed project package')
         document_fingerprint = hashlib.sha256(
             self.transfer.canonical(document).encode('utf-8')
         ).hexdigest()
         staged: list[Path] = []
         published: list[Path] = []
         if self.storage_root.is_symlink():
-            raise ValueError('Attachment storage root cannot be a symbolic link')
+            raise InvalidInput('Attachment storage root cannot be a symbolic link')
         self.storage_root.mkdir(parents=True, exist_ok=True)
         try:
             self.store.begin_immediate()
@@ -279,10 +282,10 @@ class ProjectPackageService:
             for asset in assets:
                 feature_id = generated.get(asset['feature_ref'])
                 if feature_id is None:
-                    raise ValueError('Attachment references an unknown Work Item')
+                    raise InvalidInput('Attachment references an unknown Work Item')
                 kind = self.store.feature_kind(result['project_id'], feature_id)
                 if kind != 'bug':
-                    raise ValueError('Attachments may only be linked to Bugs')
+                    raise InvalidInput('Attachments may only be linked to Bugs')
                 attachment_id = str(uuid4())
                 extension = CONTENT_TYPES[asset['content_type']]
                 relative_path = f'{attachment_id}{extension}'

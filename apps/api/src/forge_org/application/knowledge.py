@@ -1,6 +1,7 @@
 from typing import Any
 
 from forge_org.application.ports import PlanningStore
+from forge_org.domain.errors import NotFound
 from forge_org.domain.planning import clean_description, ensure_project_writable
 
 
@@ -11,14 +12,14 @@ class KnowledgeService:
     def project(self, workspace_id: str, project_id: str) -> dict[str, Any]:
         project = self.repository.get_project(workspace_id, project_id)
         if project is None:
-            raise LookupError('Project not found')
+            raise NotFound('Project not found')
         return project
 
     def feature(self, workspace_id: str, project_id: str, feature_id: str) -> dict[str, Any]:
         self.project(workspace_id, project_id)
         feature = self.repository.feature(project_id, feature_id)
         if feature is None:
-            raise LookupError('Feature not found')
+            raise NotFound('Feature not found')
         return feature
 
     def criteria(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:

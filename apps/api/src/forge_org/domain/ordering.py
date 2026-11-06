@@ -1,5 +1,7 @@
 """Ordering rules for sortable child collections."""
 
+from forge_org.domain.errors import InvalidInput
+
 
 def ensure_exact_ordering(requested: list[str], existing: list[str], message: str) -> None:
     """A reorder request must list every existing id exactly once."""
@@ -8,4 +10,4 @@ def ensure_exact_ordering(requested: list[str], existing: list[str], message: st
         or len(set(requested)) != len(requested)
         or set(requested) != set(existing)
     ):
-        raise ValueError(message)
+        raise InvalidInput(message)
