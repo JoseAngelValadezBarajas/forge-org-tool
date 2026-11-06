@@ -28,3 +28,9 @@ a:focus-visible {
 [data-layout='flow'] > div {
   display: contents;
 }
+
+/* Form fields keep the engine's 3:1 `outline`. Card borders are decorative, so they use the
+   quieter `outlineVariant` role like the Figma frames. */
+[data-variant='outlined'] {
+  border-color: var(--cf-v2-outline-variant);
+}

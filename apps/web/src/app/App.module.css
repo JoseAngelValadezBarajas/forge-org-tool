@@ -596,6 +596,13 @@
   .mobileWorkspace {
     min-width: 0;
   }
+  .mobileTheme {
+    width: 104px;
+  }
+  .mobileTheme > span,
+  .mobileTheme select {
+    width: 100%;
+  }
   .mobileWorkspace > div {
     gap: 0;
   }

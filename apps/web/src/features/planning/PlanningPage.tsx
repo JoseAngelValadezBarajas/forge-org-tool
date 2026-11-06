@@ -276,7 +276,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               </details>
               <TextInputV2
                 size="sm"
-                className={`${styles.epicFilter} ${styles.epicSearch}`}
+                className={styles.epicSearch}
                 type="search"
                 aria-label="Search Epics"
                 placeholder="Search Epics    ⌕"

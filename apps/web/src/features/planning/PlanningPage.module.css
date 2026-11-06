@@ -110,20 +110,31 @@
 }
 .epicFilter,
 .boardViewMenu > summary {
-  display: block;
+  display: flex;
+  align-items: center;
   box-sizing: border-box;
-  height: 27px;
-  min-height: 27px;
-  padding: 6px;
-  border: 0;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+  /* Same quiet outline as the V2 fields beside it so the toolbar reads as one row. */
+  border: 1px solid var(--cf-v2-outline);
   border-radius: 8px;
-  background: var(--forge-surface-interactive);
+  background: transparent;
   color: var(--forge-text-primary);
   font:
     500 11px/15px Inter,
     sans-serif;
   text-decoration: none;
   white-space: nowrap;
+}
+.epicFilter:has(> select) {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+.epicFilter select {
+  width: 100%;
 }
 .boardViewMenu {
   position: relative;
