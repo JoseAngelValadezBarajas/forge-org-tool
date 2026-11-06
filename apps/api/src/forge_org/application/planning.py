@@ -1,6 +1,7 @@
 from typing import Any
 
 from forge_org.application.ports import PlanningStore
+from forge_org.domain.ordering import ensure_exact_ordering
 from forge_org.domain.planning import (
     clean_description,
     clean_title,
@@ -170,6 +171,11 @@ class PlanningService:
     ) -> list[dict[str, Any]]:
         self.feature(workspace_id, project_id, feature_id)
         ensure_project_writable(self._project(workspace_id, project_id))
+        ensure_exact_ordering(
+            ids,
+            [item['id'] for item in self.repository.list_criteria(feature_id)],
+            'Criterion ordering must contain every criterion exactly once',
+        )
         return self.repository.reorder_criteria(feature_id, ids)
 
     def create_task(
@@ -203,6 +209,11 @@ class PlanningService:
         self, workspace_id: str, project_id: str, feature_id: str, ids: list[str]
     ) -> list[dict[str, Any]]:
         self.feature(workspace_id, project_id, feature_id)
+        ensure_exact_ordering(
+            ids,
+            [item['id'] for item in self.repository.list_tasks(feature_id)],
+            'Task reorder must include each task exactly once',
+        )
         return self.repository.reorder_tasks(feature_id, ids)
 
     def create_dependency(

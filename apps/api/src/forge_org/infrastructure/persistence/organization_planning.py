@@ -1,21 +1,14 @@
 """OrganizationPlanningPersistence persistence methods."""
 
 import sqlite3
-import unicodedata
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from ..connection import utc_now
+from forge_org.domain.clock import utc_now
+from forge_org.domain.tags import normalize_tag_name
+
 from .common import row_dict
-
-
-def _normalized_tag_name(raw_name: str) -> tuple[str, str]:
-    name = unicodedata.normalize('NFKC', raw_name).strip()
-    normalized = unicodedata.normalize('NFKC', name).casefold()
-    if not name or len(name) > 40:
-        raise ValueError('Tags must contain 1 to 40 characters')
-    return name, normalized
 
 
 class OrganizationPlanningPersistence:
@@ -31,7 +24,7 @@ class OrganizationPlanningPersistence:
         ]
 
     def create_workspace_tag(self, workspace_id: str, name: str, color: str) -> dict[str, Any]:
-        safe_name, normalized = _normalized_tag_name(name)
+        safe_name, normalized = normalize_tag_name(name)
         tag_id = str(uuid4())
         self.connection.execute(
             'INSERT INTO tags(id, workspace_id, name, normalized_name, color, created_at) '
@@ -53,7 +46,7 @@ class OrganizationPlanningPersistence:
             return None
         assignments: dict[str, Any] = {}
         if 'name' in values:
-            name, normalized = _normalized_tag_name(values['name'])
+            name, normalized = normalize_tag_name(values['name'])
             assignments.update(name=name, normalized_name=normalized)
         if 'color' in values:
             assignments['color'] = values['color']
@@ -92,7 +85,7 @@ class OrganizationPlanningPersistence:
         for raw_name in names:
             if not isinstance(raw_name, str):
                 raise ValueError('Tags must be text')
-            name, normalized = _normalized_tag_name(raw_name)
+            name, normalized = normalize_tag_name(raw_name)
             normalized_names.setdefault(normalized, name)
 
         assigned: list[str] = []
@@ -483,9 +476,6 @@ class OrganizationPlanningPersistence:
         return False
 
     def reorder_criteria(self, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
-        existing = [item['id'] for item in self.list_criteria(feature_id)]
-        if len(ids) != len(existing) or len(set(ids)) != len(ids) or set(ids) != set(existing):
-            raise ValueError('Criterion ordering must contain every criterion exactly once')
         try:
             for position, criterion_id in enumerate(ids):
                 self.connection.execute(
@@ -554,9 +544,6 @@ class OrganizationPlanningPersistence:
         )
 
     def reorder_tasks(self, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
-        existing = [item['id'] for item in self.list_tasks(feature_id)]
-        if len(ids) != len(existing) or set(ids) != set(existing):
-            raise ValueError('Task reorder must include each task exactly once')
         now = utc_now()
         for position, task_id in enumerate(ids):
             self.connection.execute(

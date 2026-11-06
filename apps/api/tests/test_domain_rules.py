@@ -50,3 +50,21 @@ def test_transfer_documents_are_validated_without_any_infrastructure() -> None:
     assert canonical_json({'b': 1, 'a': 2}) == '{"a":2,"b":1}'
     with pytest.raises(ValueError, match='Unsupported project import schema'):
         validate_document({'schema_version': 'nope'})
+
+
+def test_tag_names_are_normalized_and_bounded() -> None:
+    from forge_org.domain.tags import normalize_tag_name
+
+    assert normalize_tag_name('  Ｂug ') == ('Bug', 'bug')
+    for bad in ('', '   ', 'x' * 41):
+        with pytest.raises(ValueError, match='1 to 40'):
+            normalize_tag_name(bad)
+
+
+def test_reordering_must_list_every_id_once() -> None:
+    from forge_org.domain.ordering import ensure_exact_ordering
+
+    ensure_exact_ordering(['b', 'a'], ['a', 'b'], 'bad')
+    for requested in (['a'], ['a', 'a'], ['a', 'c']):
+        with pytest.raises(ValueError, match='bad'):
+            ensure_exact_ordering(requested, ['a', 'b'], 'bad')
