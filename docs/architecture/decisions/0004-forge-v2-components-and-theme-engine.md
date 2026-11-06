@@ -10,7 +10,7 @@
 
 ## Rules
 
-1. `tooling/scripts/forge-v2-usage.test.mjs` fails if the app imports a V1 component that has a V2 equivalent (the Component Host under `app/component-gallery` is excluded) or if the theme stops going through Theme Engine V2.
+1. `tooling/checks/forge-v2-usage.test.mjs` fails if the app imports a V1 component that has a V2 equivalent (the Component Host under `app/component-gallery` is excluded) or if the theme stops going through Theme Engine V2.
 2. Two token systems coexist: V1 `--forge-*` for remaining V1 components and app CSS, and V2 `--cf-v2-*` roles for V2 components. New CSS should prefer the V2 roles; do not depend on V2 component tokens (only the semantic roles are public).
 3. V2 overlays need the Popover API (Chrome/Edge 114, Safari 17, Firefox 125). Vitest runs in jsdom, so `src/test/setup.ts` models `showPopover`/`hidePopover` and `<dialog>.showModal`.
 

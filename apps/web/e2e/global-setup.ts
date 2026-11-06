@@ -6,7 +6,7 @@ import {
   assertOwnedRunEnvironment,
   cleanupRunEnvironment,
   createRunEnvironment,
-} from '../../../tooling/scripts/e2e-environment.mjs';
+} from '../../../tooling/e2e/e2e-environment.mjs';
 
 function currentRunEnvironment() {
   const root = process.env.FORGE_E2E_RUN_ROOT;

@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import test from 'node:test';
 import { PNG } from 'pngjs';
 
-const comparator = resolve('tooling/scripts/figma-visual-diff.mjs');
+const comparator = resolve('tooling/e2e/figma-visual-diff.mjs');
 
 function writeSolidPng(path, rgba) {
   const image = new PNG({ width: 2, height: 2 });

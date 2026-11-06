@@ -34,21 +34,8 @@ export function useTransferPage({
     : projectId
       ? `/projects/${workspaceId}/${projectId}`
       : '/';
-  const {
-    documentText,
-    error,
-    exportProject,
-    exportProjectPackage,
-    exported,
-    fileName,
-    importedProjectId,
-    importProject,
-    packageBase64,
-    preview,
-    previewImport,
-    selectSourceFile,
-    updateDocumentText,
-  } = useTransferController(workspaceId, projectId, contextualScope, destinationId);
+  const controller = useTransferController(workspaceId, projectId, contextualScope, destinationId);
+  const { importedProjectId, preview } = controller;
   const currentStep = importedProjectId ? 3 : preview ? 2 : 1;
   const successPath = contextualScope
     ? returnPath
@@ -117,6 +104,7 @@ export function useTransferPage({
     ? ['Select source', 'Preview', 'Confirm']
     : ['Select source', 'Review planning', 'Confirm'];
   return {
+    ...controller,
     projectId,
     scope,
     destinationId,
@@ -125,19 +113,6 @@ export function useTransferPage({
     destinationRecordName,
     destinationLookupFailed,
     returnPath,
-    documentText,
-    error,
-    exportProject,
-    exportProjectPackage,
-    exported,
-    fileName,
-    importedProjectId,
-    importProject,
-    packageBase64,
-    preview,
-    previewImport,
-    selectSourceFile,
-    updateDocumentText,
     currentStep,
     successPath,
     successLinkLabel,

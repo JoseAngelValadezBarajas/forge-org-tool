@@ -59,7 +59,7 @@ test('the packaged PyInstaller sidecar is launched as a killable process group',
 });
 
 test('Desktop smoke waits for its owned sidecars and uploads the installer after failed smoke', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
   const workflow = await readFile('.github/workflows/quality.yml', 'utf8');
   const cleanup = smoke.slice(smoke.lastIndexOf('\nfinally {'));
 
@@ -89,7 +89,7 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
 });
 
 test('installed Desktop acceptance preserves a Bug screenshot through restart', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /Add Bug screenshot/);
   assert.match(smoke, /Bug screenshot: \$bugAttachmentName/);
@@ -105,7 +105,7 @@ test('installed Desktop acceptance preserves a Bug screenshot through restart', 
 });
 
 test('Windows UI Automation matches the exact name before checking control type', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
   const wait = smoke.slice(
     smoke.indexOf('function Wait-ForgeAutomationElement'),
     smoke.indexOf('function Wait-ForgeAutomationNamedElement'),
@@ -117,7 +117,7 @@ test('Windows UI Automation matches the exact name before checking control type'
 });
 
 test('native screenshot picker handles Windows dialog combo boxes without weakening persistence checks', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /\$root\.FindAll\([\s\S]*TreeScope\]::Descendants/);
   assert.match(smoke, /candidateOwnedByApp/);
@@ -152,7 +152,7 @@ test('native screenshot picker handles Windows dialog combo boxes without weaken
 });
 
 test('native screenshot picker targets Open across Windows UIA control types and waits for selection to close', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
   const choose = smoke.slice(smoke.indexOf('function Choose-ForgeFile'), smoke.indexOf('\ntry {'));
   assert.match(choose, /GetWindowOwner\(\$candidateHandle\)/);
   assert.match(choose, /Picker UIA controls:/);
@@ -202,13 +202,13 @@ test('native screenshot picker targets Open across Windows UIA control types and
 });
 
 test('native combobox selection does not collapse an already closed dropdown', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /ExpandCollapseState\]::Expanded[\s\S]*?\.Collapse\(\)/);
 });
 
 test('installed WebView UI Automation supports stateful accessible buttons', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /TryGetCurrentPattern\([\s\S]*?TogglePattern/);
   assert.match(smoke, /ToggleState\]::Off[\s\S]*?\.Toggle\(\)/);
@@ -220,7 +220,7 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
 });
 
 test('installed acceptance opens Project Overview and follows its board link', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(
     smoke,
@@ -242,8 +242,8 @@ test('installed acceptance opens Project Overview and follows its board link', a
 });
 
 test('installed acceptance follows the current workspace landing state and verifies workspace persistence in SQLite', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
-  const databaseVerifier = await readFile('tooling/scripts/verify-desktop-smoke-db.py', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
+  const databaseVerifier = await readFile('tooling/release/verify-desktop-smoke-db.py', 'utf8');
 
   assert.match(
     smoke,
@@ -282,7 +282,7 @@ test('local installed-app acceptance prepares current frontend and Python sideca
 });
 
 test('Desktop acceptance can verify an explicitly supplied installer without changing its CI default', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /param\(\s*\[string\]\$InstallerPath\s*\)/);
   assert.match(smoke, /PSBoundParameters\.ContainsKey\('InstallerPath'\)/);
@@ -290,7 +290,7 @@ test('Desktop acceptance can verify an explicitly supplied installer without cha
 });
 
 test('Desktop acceptance captures the live Bug detail surface when the native picker is missing', async () => {
-  const smoke = await readFile('tooling/scripts/desktop-nsis-smoke.ps1', 'utf8');
+  const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
   assert.match(smoke, /Native picker failure UIA elements/);
   assert.match(smoke, /CaptureWindow\(\$root\.Current\.NativeWindowHandle, \$screenshotPath\)/);

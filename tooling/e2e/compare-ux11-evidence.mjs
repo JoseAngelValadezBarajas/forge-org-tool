@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
-const comparator = resolve(root, 'tooling/scripts/figma-visual-diff.mjs');
+const comparator = resolve(root, 'tooling/e2e/figma-visual-diff.mjs');
 const evidence = resolve(root, 'docs/evidence/ux-1.1/visual-parity');
 const cases = [
   ['344:3', '01-workspace-home-1440x960', '01-workspace-home-1440x960', '/', null],

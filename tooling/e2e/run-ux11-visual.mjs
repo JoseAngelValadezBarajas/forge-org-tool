@@ -4,11 +4,11 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const captureDirectory = resolve(root, 'docs/evidence/ux-1.1/visual-parity/actual');
-const runner = resolve(root, 'tooling/scripts/run-playwright-isolated.mjs');
+const runner = resolve(root, 'tooling/e2e/run-playwright-isolated.mjs');
 for (const project of ['chromium-desktop', 'chromium-mobile']) {
   const capture = spawnSync(
     process.execPath,
-    [runner, `--project=${project}`, 'apps/web/evidence/ux11-capture.spec.ts'],
+    [runner, `--project=${project}`, 'apps/web/e2e/visual/ux11-capture.spec.ts'],
     {
       cwd: root,
       env: { ...process.env, FORGE_UX11_CAPTURE_DIR: captureDirectory },
@@ -22,7 +22,7 @@ for (const project of ['chromium-desktop', 'chromium-mobile']) {
 
 const compare = spawnSync(
   process.execPath,
-  [resolve(root, 'tooling/scripts/compare-ux11-evidence.mjs')],
+  [resolve(root, 'tooling/e2e/compare-ux11-evidence.mjs')],
   {
     cwd: root,
     stdio: 'inherit',

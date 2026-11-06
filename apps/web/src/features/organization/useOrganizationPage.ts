@@ -5,34 +5,8 @@ import { useOrganizationController } from './useOrganizationController';
 export function useOrganizationPage() {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const {
-    activeProjects,
-    archivedProjects,
-    createProject,
-    createWorkspace,
-    dashboardLoading,
-    dashboardSummaries,
-    error,
-    loading,
-    projectDescription,
-    projectName,
-    projects,
-    retryWorkspaces,
-    search,
-    selectedWorkspace,
-    setProjectDescription,
-    setProjectName,
-    setSearch,
-    setShowArchived,
-    setWorkspaceName,
-    showArchived,
-    toggleProject,
-    visibleProjects,
-    workspaceId,
-    workspaceName,
-    workspaceDescription,
-    setWorkspaceDescription,
-  } = useOrganizationController();
+  const controller = useOrganizationController();
+  const { createProject, projects, workspaceId } = controller;
   const [recentEpics, setRecentEpics] = useState<
     Array<{
       workspaceId: string;
@@ -86,35 +60,11 @@ export function useOrganizationPage() {
     if (await createProject(event)) setProjectDialogOpen(false);
   }
   return {
+    ...controller,
     projectDialogOpen,
     setProjectDialogOpen,
     filtersOpen,
     setFiltersOpen,
-    activeProjects,
-    archivedProjects,
-    createWorkspace,
-    dashboardLoading,
-    dashboardSummaries,
-    error,
-    loading,
-    projectDescription,
-    projectName,
-    projects,
-    retryWorkspaces,
-    search,
-    selectedWorkspace,
-    setProjectDescription,
-    setProjectName,
-    setSearch,
-    setShowArchived,
-    setWorkspaceName,
-    showArchived,
-    toggleProject,
-    visibleProjects,
-    workspaceId,
-    workspaceName,
-    workspaceDescription,
-    setWorkspaceDescription,
     recentEpics,
     submitProject,
   };

@@ -24,7 +24,7 @@
 
 ## Tokens and reconciliation
 
-Design tokens are owned by the published `@corefoundry-labs/forge-tokens` package (V1 `--forge-*` and Theme Engine V2 `--cf-v2-*`); `tooling/scripts/check-token-references.mjs` verifies the app only references tokens that exist. The initial palette is **provisional**. The older Figma/React drift register identifies 23 differences. Resolve each through a reviewed ADR before claiming parity or changing global Figma variables.
+Design tokens are owned by the published `@corefoundry-labs/forge-tokens` package (V1 `--forge-*` and Theme Engine V2 `--cf-v2-*`); `tooling/checks/check-token-references.mjs` verifies the app only references tokens that exist. The initial palette is **provisional**. The older Figma/React drift register identifies 23 differences. Resolve each through a reviewed ADR before claiming parity or changing global Figma variables.
 
 ## Examples
 

@@ -252,7 +252,7 @@ function Set-ForgeElementValue($root, [System.Windows.Automation.ControlType]$co
 }
 
 function Assert-ForgeSqliteRecord([string]$databasePath, [string]$table, [string]$name) {
-  $result = & uv run --project apps/api --locked python tooling/scripts/verify-desktop-smoke-db.py $databasePath $table $name
+  $result = & uv run --project apps/api --locked python tooling/release/verify-desktop-smoke-db.py $databasePath $table $name
   if ($LASTEXITCODE -ne 0) { throw "Could not verify synthetic '$table' record in SQLite." }
 }
 
