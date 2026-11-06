@@ -27,8 +27,8 @@ from forge_org.api.schemas import (
     WorkspaceTagResponse,
     WorkspaceTagUpdate,
 )
+from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
 from forge_org.application.knowledge import KnowledgeService
-from forge_org.application.organization import DuplicateName, InvalidInput, NotFound
 from forge_org.application.planning import PlanningService
 
 capability_router = APIRouter(prefix='/api/v1', tags=['organization'])

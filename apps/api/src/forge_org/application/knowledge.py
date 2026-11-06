@@ -1,12 +1,11 @@
-import sqlite3
 from typing import Any
 
-from forge_org.infrastructure.persistence import OrganizationRepository
+from forge_org.application.ports import PlanningStore
 
 
 class KnowledgeService:
-    def __init__(self, connection: sqlite3.Connection):
-        self.repository = OrganizationRepository(connection)
+    def __init__(self, repository: PlanningStore) -> None:
+        self.repository = repository
 
     def project(self, workspace_id: str, project_id: str) -> dict[str, Any]:
         project = self.repository.get_project(workspace_id, project_id)

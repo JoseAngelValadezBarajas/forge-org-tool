@@ -15,9 +15,11 @@ from forge_org.application.organization import (
     OrganizationService,
 )
 from forge_org.application.planning import PlanningService
+from forge_org.application.ports import PlanningStore
 from forge_org.application.project_package import ProjectPackageService
 from forge_org.application.transfer import ProjectTransferService
 from forge_org.infrastructure.connection import connect, database_path
+from forge_org.infrastructure.persistence import OrganizationRepository
 
 
 def database() -> Iterator[sqlite3.Connection]:
@@ -28,8 +30,12 @@ def database() -> Iterator[sqlite3.Connection]:
         connection.close()
 
 
-def service(connection: sqlite3.Connection = Depends(database)) -> OrganizationService:
-    return OrganizationService(connection, database_path().parent / 'bug-attachments')
+def planning_store(connection: sqlite3.Connection = Depends(database)) -> PlanningStore:
+    return OrganizationRepository(connection)
+
+
+def service(store: PlanningStore = Depends(planning_store)) -> OrganizationService:
+    return OrganizationService(store, database_path().parent / 'bug-attachments')
 
 
 def service_error(exc: Exception) -> HTTPException:
@@ -44,8 +50,8 @@ def service_error(exc: Exception) -> HTTPException:
     return HTTPException(status_code=500, detail='Unexpected organization error')
 
 
-def planning_service(connection: sqlite3.Connection = Depends(database)) -> PlanningService:
-    return PlanningService(connection)
+def planning_service(store: PlanningStore = Depends(planning_store)) -> PlanningService:
+    return PlanningService(store)
 
 
 def transfer_service(connection: sqlite3.Connection = Depends(database)) -> ProjectTransferService:
@@ -58,8 +64,8 @@ def project_package_service(
     return ProjectPackageService(transfer, database_path().parent / 'bug-attachments')
 
 
-def knowledge_service(connection: sqlite3.Connection = Depends(database)) -> KnowledgeService:
-    return KnowledgeService(connection)
+def knowledge_service(store: PlanningStore = Depends(planning_store)) -> KnowledgeService:
+    return KnowledgeService(store)
 
 
 def bug_attachment_service(

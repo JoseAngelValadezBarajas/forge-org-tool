@@ -3,7 +3,6 @@
 import os
 import sqlite3
 from contextlib import closing
-from datetime import UTC, datetime
 from pathlib import Path
 from threading import RLock
 from typing import cast
@@ -11,11 +10,11 @@ from typing import cast
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 
+from forge_org.domain.clock import utc_now
+
+__all__ = ['utc_now']
+
 _MIGRATION_LOCK = RLock()
-
-
-def utc_now() -> str:
-    return datetime.now(UTC).isoformat()
 
 
 def database_path() -> Path:
