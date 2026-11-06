@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Query
 
-from forge_org.api.dependencies import knowledge_service, planning_service, service_error
+from forge_org.api.dependencies import planning_service, service_error
 from forge_org.api.schemas import (
     CriterionCreate,
     CriterionReorderRequest,
@@ -27,7 +27,6 @@ from forge_org.api.schemas import (
     WorkspaceTagUpdate,
 )
 from forge_org.application.errors import DuplicateName
-from forge_org.application.knowledge import KnowledgeService
 from forge_org.application.planning import PlanningService
 from forge_org.domain.errors import DuplicateRecord
 
@@ -336,9 +335,9 @@ def list_criteria(
     workspace_id: str,
     project_id: str,
     feature_id: str,
-    knowledge: KnowledgeService = Depends(knowledge_service),
+    planning: PlanningService = Depends(planning_service),
 ) -> list[dict[str, Any]]:
-    return knowledge.criteria(workspace_id, project_id, feature_id)
+    return planning.criteria(workspace_id, project_id, feature_id)
 
 
 @capability_router.post(
@@ -351,6 +350,6 @@ def create_criterion(
     project_id: str,
     feature_id: str,
     payload: CriterionCreate,
-    knowledge: KnowledgeService = Depends(knowledge_service),
+    planning: PlanningService = Depends(planning_service),
 ) -> dict[str, Any]:
-    return knowledge.create_criterion(workspace_id, project_id, feature_id, payload.description)
+    return planning.create_criterion(workspace_id, project_id, feature_id, payload.description)

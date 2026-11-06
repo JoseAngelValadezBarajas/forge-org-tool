@@ -142,6 +142,18 @@ class PlanningService:
             raise NotFound('Feature not found')
         return feature
 
+    def criteria(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:
+        self.feature(workspace_id, project_id, feature_id)
+        return self.repository.list_criteria(feature_id)
+
+    def create_criterion(
+        self, workspace_id: str, project_id: str, feature_id: str, description: str
+    ) -> dict[str, Any]:
+        self.feature(workspace_id, project_id, feature_id)
+        ensure_project_writable(self._project(workspace_id, project_id))
+        clean_description(description)
+        return self.repository.create_criterion(feature_id, description)
+
     def update_criterion(
         self,
         workspace_id: str,
