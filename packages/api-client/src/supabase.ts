@@ -1,4 +1,6 @@
 import { ApiError } from './errors.js';
+import { detectImageType } from './images.js';
+import { TRANSFER_LIMITS } from './limits.js';
 import { strFromU8, strToU8, Unzip, UnzipInflate, zipSync } from 'fflate';
 import type {
   BugAttachment,
@@ -23,12 +25,12 @@ function isRecord(value: unknown): value is JsonRecord {
 }
 
 const ATTACHMENT_BUCKET = 'forge-bug-attachments';
-const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
-const MAX_ATTACHMENTS_PER_BUG = 5;
-const MAX_PACKAGE_BYTES = 5 * 1024 * 1024;
-const MAX_PACKAGE_ENTRIES = 100;
-const MAX_EXPANDED_BYTES = 25 * 1024 * 1024;
-const MAX_DOCUMENT_BYTES = 7 * 1024 * 1024;
+const MAX_ATTACHMENT_BYTES = TRANSFER_LIMITS.max_attachment_bytes;
+const MAX_ATTACHMENTS_PER_BUG = TRANSFER_LIMITS.max_attachments_per_bug;
+const MAX_PACKAGE_BYTES = TRANSFER_LIMITS.max_package_bytes;
+const MAX_PACKAGE_ENTRIES = TRANSFER_LIMITS.max_package_entries;
+const MAX_EXPANDED_BYTES = TRANSFER_LIMITS.max_expanded_bytes;
+const MAX_DOCUMENT_BYTES = TRANSFER_LIMITS.max_document_bytes;
 const MAX_STORAGE_LIST_PAGE = 1000;
 const MAX_STORAGE_DELETE_BATCH = 1000;
 const MAX_STORAGE_CLEANUP_ATTEMPTS = 3;
@@ -302,25 +304,9 @@ export function createSupabaseHandler(
   }
 
   function validateImage(bytes: Uint8Array, contentType: string): void {
-    const png =
-      contentType === 'image/png' &&
-      bytes.length >= 24 &&
-      bytes[0] === 0x89 &&
-      bytes[1] === 0x50 &&
-      bytes[2] === 0x4e &&
-      bytes[3] === 0x47 &&
-      bytes[4] === 0x0d &&
-      bytes[5] === 0x0a &&
-      bytes[6] === 0x1a &&
-      bytes[7] === 0x0a;
-    const jpeg = contentType === 'image/jpeg' && bytes[0] === 0xff && bytes[1] === 0xd8;
-    const webp =
-      contentType === 'image/webp' &&
-      bytes.length >= 12 &&
-      String.fromCharCode(...bytes.subarray(0, 4)) === 'RIFF' &&
-      String.fromCharCode(...bytes.subarray(8, 12)) === 'WEBP';
-    if (!png && !jpeg && !webp)
+    if (detectImageType(bytes) !== contentType) {
       throw new ApiError(422, 'Screenshot content is not a supported image.');
+    }
   }
 
   function safeFileName(fileName: string): string {

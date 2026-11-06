@@ -10,6 +10,19 @@ import {
   signInSupabase,
 } from '../dist/index.js';
 import { planningCapability } from '../dist/planning.js';
+import { readFileSync } from 'node:fs';
+
+const conformance = JSON.parse(
+  readFileSync(
+    new globalThis.URL('../../../contracts/transfer/conformance.json', import.meta.url),
+    'utf8',
+  ),
+);
+
+function validPng() {
+  const vector = conformance.image_vectors.find((item) => item.name === 'valid png');
+  return new Uint8Array(globalThis.Buffer.from(vector.base64, 'base64'));
+}
 
 const profile = {
   provider: 'supabase',
@@ -859,17 +872,7 @@ describe('Supabase Data API adapter', () => {
 
   it('validates a ZIP manifest and stages screenshot bytes through private Storage', async () => {
     const calls = [];
-    const png = Uint8Array.from([
-      0x89,
-      0x50,
-      0x4e,
-      0x47,
-      0x0d,
-      0x0a,
-      0x1a,
-      0x0a,
-      ...new Uint8Array(32),
-    ]);
+    const png = validPng();
     const attachmentPath = 'attachments/feature-001/attachment-001.png';
     const sha256 = createHash('sha256').update(png).digest('hex');
     const manifest = {
@@ -952,17 +955,7 @@ describe('Supabase Data API adapter', () => {
 
   it('uses the actor-bound import session when ZIP attachment staging fails', async () => {
     const calls = [];
-    const png = Uint8Array.from([
-      0x89,
-      0x50,
-      0x4e,
-      0x47,
-      0x0d,
-      0x0a,
-      0x1a,
-      0x0a,
-      ...new Uint8Array(32),
-    ]);
+    const png = validPng();
     const attachmentPath = 'attachments/feature-001/attachment-001.png';
     const sha256 = createHash('sha256').update(png).digest('hex');
     const manifest = {

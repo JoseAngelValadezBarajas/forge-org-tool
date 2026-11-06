@@ -1,0 +1,78 @@
+{
+  "description": "Shared FORGE transfer conformance vectors. Consumed by the Python API tests and the TypeScript api-client tests; both implementations must agree.",
+  "limits": {
+    "max_attachment_bytes": 5242880,
+    "max_attachments_per_bug": 5,
+    "max_package_bytes": 5242880,
+    "max_package_entries": 100,
+    "max_expanded_bytes": 26214400,
+    "max_document_bytes": 7340032,
+    "max_epics": 100,
+    "max_features": 500,
+    "max_dependencies": 5000,
+    "max_tasks": 2000,
+    "max_criteria": 2000
+  },
+  "image_vectors": [
+    {
+      "name": "valid png",
+      "detected_type": "image/png",
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
+    },
+    {
+      "name": "valid jpeg",
+      "detected_type": "image/jpeg",
+      "base64": "/9j/4AAQSkZJRgABAQAAAQABAAD/2Q=="
+    },
+    {
+      "name": "valid webp",
+      "detected_type": "image/webp",
+      "base64": "UklGRhYAAABXRUJQVlA4IAoAAAAAAAAAAAAAAAAA"
+    },
+    {
+      "name": "png without IEND",
+      "detected_type": null,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLv"
+    },
+    {
+      "name": "png zero width",
+      "detected_type": null,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAAAAAAABCAIAAAB/tTjgAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
+    },
+    {
+      "name": "png oversized height",
+      "detected_type": null,
+      "base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAEABCAIAAADUfCanAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
+    },
+    {
+      "name": "png wrong IHDR length",
+      "detected_type": null,
+      "base64": "iVBORw0KGgoAAAAMSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
+    },
+    {
+      "name": "png magic only",
+      "detected_type": null,
+      "base64": "iVBORw0KGgoAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+    },
+    {
+      "name": "jpeg without EOI",
+      "detected_type": null,
+      "base64": "/9j/4AAQSkZJRgABAQAAAQABAAA="
+    },
+    {
+      "name": "webp wrong RIFF length",
+      "detected_type": null,
+      "base64": "UklGRg8nAABXRUJQVlA4IAoAAAAAAAAAAAAAAAAA"
+    },
+    {
+      "name": "plain text",
+      "detected_type": null,
+      "base64": "aGVsbG8gd29ybGQsIGRlZmluaXRlbHkgbm90IGFuIGltYWdlIGF0IGFsbA=="
+    },
+    {
+      "name": "empty",
+      "detected_type": null,
+      "base64": ""
+    }
+  ]
+}
