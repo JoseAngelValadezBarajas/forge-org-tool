@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
-import { isTauri } from '@tauri-apps/api/core';
-import { open } from '@tauri-apps/plugin-dialog';
-import { readFile } from '@tauri-apps/plugin-fs';
 import { organizationApi, type Feature } from '@forge-org/api-client';
+import { isNativeFilePickerAvailable, pickNativeScreenshot } from '../../platform/nativeFilePicker';
 import { useFeatureDetailController } from './useFeatureDetailController';
 
 export function useFeatureDetailPage() {
@@ -60,38 +58,19 @@ export function useFeatureDetailPage() {
 
   async function chooseBugScreenshot() {
     setScreenshotPickerError(null);
-    if (!isTauri()) {
+    if (!isNativeFilePickerAvailable()) {
       bugScreenshotInput.current?.click();
       return;
     }
 
     try {
-      const selected = await open({
-        multiple: false,
-        directory: false,
-        filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
-      });
-      if (!selected || Array.isArray(selected)) return;
-
-      const fileName = selected.split(/[\\/]/).pop() || 'screenshot';
-      const extension = fileName.split('.').pop()?.toLowerCase();
-      const contentType =
-        extension === 'png'
-          ? 'image/png'
-          : extension === 'jpg' || extension === 'jpeg'
-            ? 'image/jpeg'
-            : extension === 'webp'
-              ? 'image/webp'
-              : null;
-      if (!contentType) {
-        setScreenshotPickerError('Choose a PNG, JPEG, or WebP screenshot.');
+      const picked = await pickNativeScreenshot();
+      if (!picked) return;
+      if ('error' in picked) {
+        setScreenshotPickerError(picked.error);
         return;
       }
-
-      const selectedBytes = await readFile(selected);
-      const bytes = new Uint8Array(selectedBytes.length);
-      bytes.set(selectedBytes);
-      await uploadAttachment(new File([bytes.buffer], fileName, { type: contentType }));
+      await uploadAttachment(picked.file);
     } catch {
       setScreenshotPickerError('Unable to select or read screenshot.');
     }

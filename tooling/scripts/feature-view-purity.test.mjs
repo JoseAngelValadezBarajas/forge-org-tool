@@ -31,3 +31,22 @@ test('feature pages are views: no effects, no API calls', () => {
   }
   assert.deepEqual(offenders, []);
 });
+
+function sourceFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) return sourceFiles(full);
+    return /\.(ts|tsx)$/.test(entry.name) && !/\.test\./.test(entry.name) ? [full] : [];
+  });
+}
+
+// Platform capabilities (Tauri) are adapters under src/platform; features never import them.
+test('features do not import Tauri packages directly', () => {
+  const offenders = sourceFiles(featuresDir).filter((file) =>
+    /from\s+['"]@tauri-apps\//.test(fs.readFileSync(file, 'utf8')),
+  );
+  assert.deepEqual(
+    offenders.map((file) => path.relative(featuresDir, file)),
+    [],
+  );
+});

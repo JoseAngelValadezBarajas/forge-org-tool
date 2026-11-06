@@ -25,7 +25,7 @@ Local SQLite is the Python adapter described above. The Supabase (BYOC) provider
 
 ## Web counterpart
 
-The web app follows the same direction of dependency at feature level: a `*Page.tsx` is a view; its state, effects and API calls live in a sibling `use*.ts` hook, and the API client is the adapter. `feature-view-purity.test.mjs` fails if a page uses `useEffect` or calls the API directly.
+The web app follows the same direction of dependency at feature level: a `*Page.tsx` is a view; its state, effects and API calls live in a sibling `use*.ts` hook, and the API client is the adapter. `feature-view-purity.test.mjs` fails if a page uses `useEffect` or calls the API directly, or if any feature imports `@tauri-apps/*`; host capabilities such as the native screenshot picker are adapters in `apps/web/src/platform/`.
 
 ## Where rules go
 
