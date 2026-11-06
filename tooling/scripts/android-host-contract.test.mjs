@@ -51,14 +51,14 @@ describe('Android shell contract', () => {
     const workflow = await read('.github/workflows/android-debug.yml');
     const packageJson = JSON.parse(await read('package.json'));
     assert.match(workflow, /runs-on: ubuntu-24\.04/);
-    assert.match(workflow, /actions\/setup-java@v4/);
+    assert.match(workflow, /actions\/setup-java@[0-9a-f]{40}/);
     assert.match(workflow, /node-version: ['"]24['"]/);
-    assert.match(workflow, /android-actions\/setup-android@v3/);
+    assert.match(workflow, /android-actions\/setup-android@[0-9a-f]{40}/);
     assert.match(workflow, /packages: platform-tools/);
     assert.match(workflow, /NDK_HOME=\$ANDROID_HOME\/ndk\/27\.2\.12479018/);
     assert.match(workflow, /npx tauri android init --ci/);
     assert.match(workflow, /npx tauri android build --debug --apk/);
-    assert.match(workflow, /actions\/upload-artifact@v4/);
+    assert.match(workflow, /actions\/upload-artifact@[0-9a-f]{40}/);
     assert.match(workflow, /10\\\.0\\\.2\\\.2|127\\\.0\\\.0\\\.1:5173/);
     assert.match(
       workflow,

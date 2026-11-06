@@ -44,6 +44,11 @@ test('Desktop screenshot picker uses the native dialog and grants only selected-
   assert.ok(capability.permissions.includes('dialog:allow-open'));
   assert.ok(capability.permissions.includes('fs:allow-read-file'));
   assert.ok(!capability.permissions.some((permission) => permission.startsWith('fs:scope-')));
+  assert.ok(
+    !capability.permissions.some((permission) => permission.startsWith('shell:')),
+    'the webview must not hold shell or process permissions; the Rust host spawns the sidecar',
+  );
+  assert.equal(config.app.withGlobalTauri, false, 'no global Tauri API object on window');
 });
 
 test('the packaged PyInstaller sidecar is launched as a killable process group', async () => {
@@ -79,7 +84,7 @@ test('Desktop smoke waits for its owned sidecars and uploads the installer after
   );
   assert.match(
     workflow,
-    /run: npm run test:desktop:acceptance\s+- uses: actions\/upload-artifact@v4\s+if: always\(\)/,
+    /run: npm run test:desktop:acceptance\s+- uses: actions\/upload-artifact@[0-9a-f]{40}[^\n]*\s+if: always\(\)/,
   );
 });
 

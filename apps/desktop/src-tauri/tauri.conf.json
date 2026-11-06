@@ -8,7 +8,7 @@
     "devUrl": "http://127.0.0.1:5173"
   },
   "app": {
-    "withGlobalTauri": true,
+    "withGlobalTauri": false,
     "windows": [
       {
         "label": "main",

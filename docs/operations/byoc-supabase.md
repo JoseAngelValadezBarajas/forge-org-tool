@@ -7,7 +7,7 @@ This guide is for the owner of a Supabase project. FORGE does not create a proje
 Use a separate Supabase project for evaluation. Do not point the commands below at a production project unless you have reviewed the migration and made a backup.
 
 1. Create or select the project in Supabase.
-2. Take an owner-controlled backup/export, review the files, then apply [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql), [20261026_byoc_0002.sql](../../supabase/migrations/20261026_byoc_0002.sql), [20261026_byoc_0003.sql](../../supabase/migrations/20261026_byoc_0003.sql) if workspace deletion is required, and [20261028_byoc_0004.sql](../../supabase/migrations/20261028_byoc_0004.sql) through the owner's reviewed SQL editor or controlled Supabase CLI workflow. FORGE never applies these files.
+2. Take an owner-controlled backup/export, review the files, then apply [20261026_byoc_0001.sql](../../supabase/migrations/20261026_byoc_0001.sql), [20261026_byoc_0002.sql](../../supabase/migrations/20261026_byoc_0002.sql), [20261026_byoc_0003.sql](../../supabase/migrations/20261026_byoc_0003.sql) if workspace deletion is required, [20261028_byoc_0004.sql](../../supabase/migrations/20261028_byoc_0004.sql) and [20261105_byoc_0005.sql](../../supabase/migrations/20261105_byoc_0005.sql) through the owner's reviewed SQL editor or controlled Supabase CLI workflow. FORGE never applies these files.
 3. Confirm that `forge_storage_preflight()` returns `forge-byoc-v2`, the private `forge-bug-attachments` bucket exists, and the transfer/planning RPCs exist.
 4. Create the Supabase Auth identity used for the two-installation check. The first authenticated user becomes the owner of a workspace created through FORGE. Migration 0003 is optional for existing projects until an owner needs permanent workspace deletion; without it, the UI reports the provider's unavailable RPC instead of falling back to SQLite. Migration 0004 is required for existing projects before using JSON or contextual imports when `digest(bytea, unknown) does not exist` is reported.
 
@@ -97,6 +97,12 @@ it once, then reload FORGE and retry the import. It does not rewrite or delete
 any Workspace, Project, Epic, Work Item or attachment data. Its rollback only
 restores the previous function search path and should not be used while imports
 are in progress.
+
+Migration 0005 hardens the function search path left by 0004. The transfer RPCs
+are `SECURITY DEFINER`, so it changes their path from `public, extensions` to
+`pg_catalog, extensions, public`: trusted schemas are resolved before the
+user-writable `public` schema. Apply it after 0004; it changes function
+configuration only and its rollback restores the 0004 state.
 
 ## Operational boundaries
 

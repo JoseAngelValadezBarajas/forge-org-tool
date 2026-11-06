@@ -34,3 +34,29 @@ def test_digest_migration_rollback_restores_the_previous_rpc_search_path() -> No
     assert 'commit;' in sql
     for function in TRANSFER_FUNCTIONS:
         assert f'alter function {function} set search_path = public;' in normalized
+
+
+HARDENING = ROOT / 'supabase' / 'migrations' / '20261105_byoc_0005.sql'
+HARDENING_ROLLBACK = ROOT / 'supabase' / 'rollback' / '20261105_byoc_0005.sql'
+
+
+def test_search_path_hardening_resolves_trusted_schemas_before_public() -> None:
+    sql = HARDENING.read_text(encoding='utf-8').lower()
+    normalized = re.sub(r'\s+', ' ', sql)
+
+    assert 'begin;' in sql
+    assert 'commit;' in sql
+    assert 'from the installed application' in sql
+    for function in TRANSFER_FUNCTIONS:
+        assert (
+            f'alter function {function} set search_path = pg_catalog, extensions, public;'
+            in normalized
+        )
+
+
+def test_search_path_hardening_rollback_restores_the_0004_state() -> None:
+    sql = HARDENING_ROLLBACK.read_text(encoding='utf-8').lower()
+    normalized = re.sub(r'\s+', ' ', sql)
+
+    for function in TRANSFER_FUNCTIONS:
+        assert f'alter function {function} set search_path = public, extensions;' in normalized
