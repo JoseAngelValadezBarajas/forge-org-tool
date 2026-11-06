@@ -1,6 +1,5 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { organizationApi } from '@forge-org/api-client';
 import {
   Button,
   Card,
@@ -13,15 +12,16 @@ import {
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import styles from './OrganizationPage.module.css';
-import { useOrganizationController } from './useOrganizationController';
+import { useOrganizationPage } from './useOrganizationPage';
 
 export function OrganizationPage() {
-  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const {
+    projectDialogOpen,
+    setProjectDialogOpen,
+    filtersOpen,
+    setFiltersOpen,
     activeProjects,
     archivedProjects,
-    createProject,
     createWorkspace,
     dashboardLoading,
     dashboardSummaries,
@@ -45,59 +45,9 @@ export function OrganizationPage() {
     workspaceName,
     workspaceDescription,
     setWorkspaceDescription,
-  } = useOrganizationController();
-  const [recentEpics, setRecentEpics] = useState<
-    Array<{
-      workspaceId: string;
-      projectId: string;
-      id: string;
-      title: string;
-      updatedAt: string;
-      workItems: number;
-    }>
-  >([]);
-
-  useEffect(() => {
-    let current = true;
-    const active = projects.filter(
-      (project) => project.workspace_id === workspaceId && project.status === 'active',
-    );
-    void Promise.all(
-      active.map(async (project) => {
-        try {
-          const overview = await organizationApi.planningOverview(workspaceId, project.id);
-          return overview.epics
-            .filter((epic) => !epic.archived_at && epic.status !== 'done')
-            .map((epic) => ({
-              workspaceId,
-              projectId: project.id,
-              id: epic.id,
-              title: epic.title,
-              updatedAt: epic.updated_at,
-              workItems: epic.features.length,
-            }));
-        } catch {
-          return [];
-        }
-      }),
-    ).then((lists) => {
-      if (current) {
-        setRecentEpics(
-          lists
-            .flat()
-            .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
-            .slice(0, 2),
-        );
-      }
-    });
-    return () => {
-      current = false;
-    };
-  }, [projects, workspaceId]);
-
-  async function submitProject(event: FormEvent) {
-    if (await createProject(event)) setProjectDialogOpen(false);
-  }
+    recentEpics,
+    submitProject,
+  } = useOrganizationPage();
 
   if (loading)
     return (
