@@ -17,6 +17,7 @@ Rules, enforced by `apps/api/tests/test_layer_dependencies.py` (no allowlist):
 2. `api` route modules import no `sqlite3` or `forge_org.infrastructure`; `dependencies.py` is the only composition root.
 3. `infrastructure` does not import `api`.
 4. Adapters translate driver errors into domain errors (`DuplicateRecord`); callers never see `sqlite3.IntegrityError`.
+5. Domain and application raise typed errors (`NotFound`, `InvalidInput`, `Conflict`, `DuplicateName`) that subclass the matching built-ins. `api/error_handlers.py` is the only place that maps them to HTTP statuses; route modules do not repeat `try/except` mappings.
 
 ## Two storage providers
 
@@ -32,4 +33,5 @@ Local SQLite is the Python adapter described above. The Supabase (BYOC) provider
 
 - Moving a rule into the domain is a behaviour-preserving change guarded by the API characterization tests and the checked-in OpenAPI contract.
 - Adding a persistence backend means implementing the ports, not editing services.
+- The TypeScript Supabase adapter keeps its stateful closure in `supabase.ts`; its pure rules live in `attachment-validation.ts`, `project-package.ts`, `supabase-storage-paths.ts` and `supabase-shared.ts`.
 - Remaining debt: Supabase rules are still duplicated across SQL and TypeScript, and the large planning pages in the web app do not yet follow the hook-and-view split used by the application shell.
