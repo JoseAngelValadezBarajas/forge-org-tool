@@ -12,6 +12,7 @@ from typing import Any
 
 from forge_org.application.ports import AttachmentStore
 from forge_org.domain.clock import utc_now
+from forge_org.domain.errors import InvalidInput, NotFound, StorageCorrupt
 
 MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024
 MAX_ATTACHMENTS_PER_BUG = 5
@@ -55,9 +56,9 @@ class BugAttachmentService:
     ) -> dict[str, Any]:
         bug = self.store.find_bug(workspace_id, project_id, feature_id)
         if bug is None:
-            raise LookupError('Bug not found in this workspace and project')
+            raise NotFound('Bug not found in this workspace and project')
         if write and bug['project_status'] != 'active':
-            raise ValueError('Archived projects are read-only')
+            raise InvalidInput('Archived projects are read-only')
         return bug
 
     def list(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:
@@ -75,24 +76,24 @@ class BugAttachmentService:
     ) -> dict[str, Any]:
         self._bug(workspace_id, project_id, feature_id, write=True)
         if len(data_base64) > ((MAX_ATTACHMENT_BYTES + 2) // 3) * 4:
-            raise ValueError('Screenshot exceeds the 5 MiB limit')
+            raise InvalidInput('Screenshot exceeds the 5 MiB limit')
         try:
             content = base64.b64decode(data_base64, validate=True)
         except (binascii.Error, ValueError) as exc:
-            raise ValueError('Screenshot payload is not valid base64') from exc
+            raise InvalidInput('Screenshot payload is not valid base64') from exc
         if not content or len(content) > MAX_ATTACHMENT_BYTES:
-            raise ValueError('Screenshot must be between 1 byte and 5 MiB')
+            raise InvalidInput('Screenshot must be between 1 byte and 5 MiB')
         detected_type = self._image_type(content)
         if detected_type is None or detected_type != declared_type:
-            raise ValueError('Screenshot content does not match a supported image type')
+            raise InvalidInput('Screenshot content does not match a supported image type')
         safe_name = file_name.replace('\\', '/').split('/')[-1].strip()
         if not safe_name or len(safe_name) > 255 or '\x00' in safe_name:
-            raise ValueError('Screenshot filename is invalid')
+            raise InvalidInput('Screenshot filename is invalid')
         allowed_suffixes = {CONTENT_TYPES[detected_type]}
         if detected_type == 'image/jpeg':
             allowed_suffixes.add('.jpeg')
         if Path(safe_name).suffix.casefold() not in allowed_suffixes:
-            raise ValueError('Screenshot extension does not match its content')
+            raise InvalidInput('Screenshot extension does not match its content')
         attachment_id = str(uuid.uuid4())
         relative_path = f'{attachment_id}{CONTENT_TYPES[detected_type]}'
         self.storage_root.mkdir(parents=True, exist_ok=True)
@@ -126,7 +127,7 @@ class BugAttachmentService:
             destination.unlink(missing_ok=True)
             raise
         if not accepted:
-            raise ValueError('A Bug can have at most five screenshots')
+            raise InvalidInput('A Bug can have at most five screenshots')
         return next(
             item
             for item in self.list(workspace_id, project_id, feature_id)
@@ -139,10 +140,10 @@ class BugAttachmentService:
         self._bug(workspace_id, project_id, feature_id)
         row = self.store.get_attachment(feature_id, attachment_id)
         if row is None:
-            raise LookupError('Screenshot not found')
+            raise NotFound('Screenshot not found')
         relative_path = row['relative_path']
         if not re.fullmatch(r'[0-9a-f-]{36}\.(png|jpg|webp)', relative_path):
-            raise RuntimeError('Screenshot storage reference is invalid')
+            raise StorageCorrupt('Screenshot storage reference is invalid')
         path = self.storage_root / relative_path
         if (
             self.storage_root.is_symlink()
@@ -150,7 +151,7 @@ class BugAttachmentService:
             or path.is_symlink()
             or not path.is_file()
         ):
-            raise LookupError('Screenshot content not found')
+            raise NotFound('Screenshot content not found')
         return row, path
 
     def remove(

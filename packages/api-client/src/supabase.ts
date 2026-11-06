@@ -1,7 +1,5 @@
 import { ApiError } from './errors.js';
-import { detectImageType } from './images.js';
-import { TRANSFER_LIMITS } from './limits.js';
-import { strFromU8, strToU8, Unzip, UnzipInflate, zipSync } from 'fflate';
+import { strToU8, zipSync } from 'fflate';
 import type {
   BugAttachment,
   Criterion,
@@ -13,57 +11,39 @@ import type {
   Workspace,
   WorkspaceTag,
 } from './types.js';
-import type { SupabaseProfile, SupabaseSession } from './storage.js';
+import type { SupabaseProfile } from './storage.js';
 import type { ApiRequest, ApiRequestHandler } from './transport.js';
-
-type SessionProvider = () => Promise<SupabaseSession | null>;
-type JsonRecord = Record<string, unknown>;
-type AttachmentRecord = BugAttachment & { storage_path: string };
-
-function isRecord(value: unknown): value is JsonRecord {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-const ATTACHMENT_BUCKET = 'forge-bug-attachments';
-const MAX_ATTACHMENT_BYTES = TRANSFER_LIMITS.max_attachment_bytes;
-const MAX_ATTACHMENTS_PER_BUG = TRANSFER_LIMITS.max_attachments_per_bug;
-const MAX_PACKAGE_BYTES = TRANSFER_LIMITS.max_package_bytes;
-const MAX_PACKAGE_ENTRIES = TRANSFER_LIMITS.max_package_entries;
-const MAX_EXPANDED_BYTES = TRANSFER_LIMITS.max_expanded_bytes;
-const MAX_DOCUMENT_BYTES = TRANSFER_LIMITS.max_document_bytes;
-const MAX_STORAGE_LIST_PAGE = 1000;
-const MAX_STORAGE_DELETE_BATCH = 1000;
-const MAX_STORAGE_CLEANUP_ATTEMPTS = 3;
-
-function bodyOf(init: RequestInit): JsonRecord {
-  if (typeof init.body !== 'string' || init.body.length === 0) return {};
-  return JSON.parse(init.body) as JsonRecord;
-}
-
-function one<T>(value: T | T[]): T {
-  if (Array.isArray(value)) {
-    if (value.length === 0) throw new ApiError(404, 'Resource not found.');
-    return value[0];
-  }
-  return value;
-}
-
-function query(parameters: Record<string, string | undefined>): string {
-  const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(parameters)) {
-    if (value !== undefined && value !== '') search.set(key, value);
-  }
-  const rendered = search.toString();
-  return rendered ? `?${rendered}` : '';
-}
-
-function routeParts(path: string): string[] {
-  return path.split('?')[0].split('/').filter(Boolean).slice(2);
-}
-
-function unsupported(): ApiError {
-  return new ApiError(501, 'This capability is not available in the configured Supabase schema.');
-}
+import {
+  storageCleanupScope,
+  storagePathForEntry,
+  storageDeleteBatches,
+  shouldRetryStorageCleanup,
+  type StorageListEntry,
+} from './supabase-storage-paths.js';
+import {
+  decodeBase64,
+  validateImage,
+  safeFileName,
+  sha256,
+  sha256Text,
+  verifyAttachmentBlob,
+} from './attachment-validation.js';
+import { parsePackage } from './project-package.js';
+import {
+  type SessionProvider,
+  type JsonRecord,
+  type AttachmentRecord,
+  ATTACHMENT_BUCKET,
+  MAX_ATTACHMENTS_PER_BUG,
+  MAX_PACKAGE_BYTES,
+  MAX_STORAGE_LIST_PAGE,
+  MAX_STORAGE_CLEANUP_ATTEMPTS,
+  bodyOf,
+  one,
+  query,
+  routeParts,
+  unsupported,
+} from './supabase-shared.js';
 
 export function createSupabaseHandler(
   profile: SupabaseProfile,
@@ -122,50 +102,6 @@ export function createSupabaseHandler(
     return response.blob();
   }
 
-  type StorageListEntry = {
-    name?: unknown;
-    id?: unknown;
-  };
-
-  function storageCleanupScope(workspaceId: string): string {
-    if (
-      workspaceId.length === 0 ||
-      workspaceId === '.' ||
-      workspaceId === '..' ||
-      workspaceId.includes('/') ||
-      workspaceId.includes('\\')
-    ) {
-      throw new ApiError(422, 'Workspace storage scope is invalid.');
-    }
-    return `${workspaceId}/`;
-  }
-
-  function storagePathForEntry(
-    prefix: string,
-    entry: StorageListEntry,
-    workspacePrefix: string,
-  ): string {
-    if (typeof entry.name !== 'string' || entry.name.length === 0) {
-      throw new ApiError(502, 'Supabase returned an invalid Storage entry.');
-    }
-    if (
-      entry.name === '.' ||
-      entry.name === '..' ||
-      entry.name.includes('/') ||
-      entry.name.includes('\\')
-    ) {
-      throw new ApiError(502, 'Supabase returned a Storage entry outside the workspace scope.');
-    }
-    const path = `${prefix}${entry.name}`;
-    if (
-      !path.startsWith(workspacePrefix) ||
-      path.split('/').some((part) => part === '.' || part === '..')
-    ) {
-      throw new ApiError(502, 'Supabase returned a Storage entry outside the workspace scope.');
-    }
-    return path;
-  }
-
   async function listWorkspaceStoragePaths(workspaceId: string): Promise<string[]> {
     const workspacePrefix = storageCleanupScope(workspaceId);
     const pendingPrefixes = [workspacePrefix];
@@ -213,21 +149,6 @@ export function createSupabaseHandler(
     return files;
   }
 
-  function storageDeleteBatches(paths: string[]): string[][] {
-    const batches: string[][] = [];
-    for (let index = 0; index < paths.length; index += MAX_STORAGE_DELETE_BATCH) {
-      batches.push(paths.slice(index, index + MAX_STORAGE_DELETE_BATCH));
-    }
-    return batches;
-  }
-
-  function shouldRetryStorageCleanup(cause: unknown): boolean {
-    return (
-      cause instanceof ApiError &&
-      (cause.status === 408 || cause.status === 429 || cause.status >= 500)
-    );
-  }
-
   async function cleanupWorkspaceStorage(workspaceId: string): Promise<void> {
     let lastFailure: unknown;
 
@@ -271,95 +192,6 @@ export function createSupabaseHandler(
       { method: 'POST', body: JSON.stringify(payload) },
       { preflight: name === 'forge_storage_preflight' },
     );
-  }
-
-  function decodeBase64(value: string): Uint8Array {
-    if (!value || value.length > Math.ceil((MAX_ATTACHMENT_BYTES * 4) / 3)) {
-      throw new ApiError(422, 'Screenshot exceeds the 5 MiB limit.');
-    }
-    let binary: string;
-    try {
-      binary = atob(value);
-    } catch {
-      throw new ApiError(422, 'Screenshot payload is not valid base64.');
-    }
-    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-    if (bytes.length === 0 || bytes.length > MAX_ATTACHMENT_BYTES) {
-      throw new ApiError(422, 'Screenshot must be between 1 byte and 5 MiB.');
-    }
-    return bytes;
-  }
-
-  function decodeBytes(value: string, limit: number, message: string): Uint8Array {
-    if (!value || value.length > Math.ceil((limit * 4) / 3)) throw new ApiError(422, message);
-    try {
-      const binary = atob(value);
-      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-      if (bytes.length === 0 || bytes.length > limit) throw new ApiError(422, message);
-      return bytes;
-    } catch (cause) {
-      if (cause instanceof ApiError) throw cause;
-      throw new ApiError(422, message);
-    }
-  }
-
-  function validateImage(bytes: Uint8Array, contentType: string): void {
-    if (detectImageType(bytes) !== contentType) {
-      throw new ApiError(422, 'Screenshot content is not a supported image.');
-    }
-  }
-
-  function safeFileName(fileName: string): string {
-    const name = fileName.replaceAll('\\', '/').split('/').pop()?.trim() ?? '';
-    if (!name || name.length > 255 || name.includes('\0') || name.includes('..')) {
-      throw new ApiError(422, 'Screenshot filename is invalid.');
-    }
-    return name;
-  }
-
-  async function sha256(bytes: Uint8Array): Promise<string> {
-    const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes.slice().buffer);
-    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join(
-      '',
-    );
-  }
-
-  function stableStringify(value: unknown): string {
-    if (value === null || typeof value !== 'object') return JSON.stringify(value);
-    if (Array.isArray(value)) return `[${value.map((item) => stableStringify(item)).join(',')}]`;
-    return `{${Object.keys(value as JsonRecord)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify((value as JsonRecord)[key])}`)
-      .join(',')}}`;
-  }
-
-  async function sha256Text(value: unknown): Promise<string> {
-    return sha256(new TextEncoder().encode(stableStringify(value)));
-  }
-
-  async function verifyAttachmentBlob(
-    blob: Blob,
-    contentType: string,
-    expectedByteSize: number,
-    expectedSha256: string,
-  ): Promise<Blob> {
-    const bytes = new Uint8Array(await blob.arrayBuffer());
-    if (
-      (blob.type && blob.type.toLowerCase() !== contentType.toLowerCase()) ||
-      bytes.byteLength !== expectedByteSize ||
-      bytes.byteLength > MAX_ATTACHMENT_BYTES
-    ) {
-      throw new ApiError(422, 'Stored screenshot does not match attachment metadata.');
-    }
-    try {
-      validateImage(bytes, contentType);
-    } catch {
-      throw new ApiError(422, 'Stored screenshot does not match attachment metadata.');
-    }
-    if ((await sha256(bytes)) !== expectedSha256) {
-      throw new ApiError(422, 'Stored screenshot checksum does not match attachment metadata.');
-    }
-    return new Blob([bytes], { type: contentType });
   }
 
   async function uploadAttachment(
@@ -449,214 +281,6 @@ export function createSupabaseHandler(
       record.byte_size,
       record.sha256,
     );
-  }
-
-  function concatChunks(chunks: Uint8Array[], byteLength: number): Uint8Array {
-    const bytes = new Uint8Array(byteLength);
-    let offset = 0;
-    for (const chunk of chunks) {
-      bytes.set(chunk, offset);
-      offset += chunk.byteLength;
-    }
-    return bytes;
-  }
-
-  function unzipEntriesBounded(archiveBytes: Uint8Array): Record<string, Uint8Array> {
-    const entries: Record<string, Uint8Array> = {};
-    const seen = new Set<string>();
-    let entryCount = 0;
-    let declaredExpandedBytes = 0;
-    let expandedBytes = 0;
-    let failure: ApiError | null = null;
-    const fail = (message: string): void => {
-      failure ??= new ApiError(422, message);
-    };
-    const unzip = new Unzip((file) => {
-      if (failure) return;
-      entryCount += 1;
-      const normalizedName = file.name.normalize('NFC').toLowerCase();
-      if (entryCount > MAX_PACKAGE_ENTRIES || seen.has(normalizedName)) {
-        fail('Project package exceeds decompression budget.');
-        return;
-      }
-      seen.add(normalizedName);
-      if (
-        file.originalSize !== undefined &&
-        (!Number.isSafeInteger(file.originalSize) || file.originalSize > MAX_EXPANDED_BYTES)
-      ) {
-        fail('Project package exceeds decompression budget.');
-        return;
-      }
-      if (file.compression !== 0 && file.compression !== 8) {
-        fail('Project package contains an unsupported compression method.');
-        return;
-      }
-      const declaredSize = file.originalSize ?? 0;
-      if (declaredSize > MAX_EXPANDED_BYTES - declaredExpandedBytes) {
-        fail('Project package exceeds decompression budget.');
-        return;
-      }
-      declaredExpandedBytes += declaredSize;
-      const fixed = file.originalSize === undefined ? null : new Uint8Array(declaredSize);
-      const chunks: Uint8Array[] = [];
-      let fileSize = 0;
-      let offset = 0;
-      file.ondata = (error, chunk, final) => {
-        if (error) {
-          fail('Project package is not a valid ZIP archive.');
-          return;
-        }
-        if (failure) return;
-        fileSize += chunk.byteLength;
-        expandedBytes += chunk.byteLength;
-        if (
-          fileSize > MAX_EXPANDED_BYTES ||
-          expandedBytes > MAX_EXPANDED_BYTES ||
-          (fixed !== null && offset + chunk.byteLength > fixed.byteLength)
-        ) {
-          fail('Project package exceeds decompression budget.');
-          file.terminate();
-          return;
-        }
-        if (fixed !== null) {
-          fixed.set(chunk, offset);
-          offset += chunk.byteLength;
-        } else {
-          chunks.push(chunk);
-        }
-        if (final) {
-          if (fixed !== null && offset !== fixed.byteLength) {
-            fail('Project package decompression size mismatch.');
-            return;
-          }
-          entries[file.name] = fixed ?? concatChunks(chunks, fileSize);
-        }
-      };
-      file.start();
-    });
-    unzip.register(UnzipInflate);
-    try {
-      unzip.push(archiveBytes, true);
-    } catch (cause) {
-      if (cause instanceof ApiError) throw cause;
-      throw new ApiError(422, 'Project package is not a valid ZIP archive.');
-    }
-    if (failure) throw failure;
-    return entries;
-  }
-
-  type PackageAsset = {
-    featureRef: string;
-    path: string;
-    fileName: string;
-    contentType: 'image/png' | 'image/jpeg' | 'image/webp';
-    bytes: Uint8Array;
-    sha256: string;
-  };
-
-  async function parsePackage(
-    value: string,
-  ): Promise<{ document: JsonRecord; assets: PackageAsset[] }> {
-    const archiveBytes = decodeBytes(
-      value,
-      MAX_PACKAGE_BYTES,
-      'Project package is not valid base64.',
-    );
-    const entries = unzipEntriesBounded(archiveBytes);
-    const paths = Object.keys(entries);
-    if (!paths.includes('manifest.json') || paths.length > MAX_PACKAGE_ENTRIES) {
-      throw new ApiError(422, 'Project package manifest is invalid.');
-    }
-    let manifest: JsonRecord;
-    try {
-      const parsedManifest: unknown = JSON.parse(strFromU8(entries['manifest.json']));
-      if (!isRecord(parsedManifest)) throw new Error('manifest must be an object');
-      manifest = parsedManifest;
-    } catch {
-      throw new ApiError(422, 'Project package manifest is invalid.');
-    }
-    if (
-      manifest.schema_version !== 'forge-project-transfer-v2' ||
-      !Array.isArray(manifest.features)
-    ) {
-      throw new ApiError(422, 'Project packages require the transfer v2 manifest.');
-    }
-    const assets: PackageAsset[] = [];
-    const referenced = new Set(['manifest.json']);
-    const normalizedFeatures = (manifest.features as unknown[]).map((featureValue) => {
-      if (!isRecord(featureValue)) {
-        throw new ApiError(422, 'Project package features must be objects.');
-      }
-      const feature = featureValue;
-      const declarations = Array.isArray(feature.attachments) ? feature.attachments : [];
-      if (
-        declarations.length > MAX_ATTACHMENTS_PER_BUG ||
-        (declarations.length > 0 && feature.kind !== 'bug')
-      ) {
-        throw new ApiError(422, 'Only Bugs may contain at most five screenshot attachments.');
-      }
-      declarations.forEach((declarationValue) => {
-        if (!isRecord(declarationValue)) {
-          throw new ApiError(422, 'Project package attachment metadata is invalid.');
-        }
-        const declaration = declarationValue;
-        const path = String(declaration.path ?? '');
-        const contentType = declaration.content_type as PackageAsset['contentType'];
-        const fileName = String(declaration.file_name ?? '');
-        if (
-          !/^attachments\/feature-[0-9]{3}\/attachment-[0-9]{3}\.(png|jpg|jpeg|webp)$/.test(path)
-        ) {
-          throw new ApiError(422, 'Project package contains an unsafe attachment path.');
-        }
-        if (!['image/png', 'image/jpeg', 'image/webp'].includes(contentType)) {
-          throw new ApiError(422, 'Project package contains an unsupported image type.');
-        }
-        if (
-          !fileName ||
-          fileName.length > 255 ||
-          fileName.includes('/') ||
-          fileName.includes('\\')
-        ) {
-          throw new ApiError(422, 'Project package attachment filename is invalid.');
-        }
-        if (referenced.has(path) || !entries[path])
-          throw new ApiError(422, 'Project package attachment is missing.');
-        referenced.add(path);
-        const bytes = entries[path];
-        if (
-          bytes.byteLength !== Number(declaration.byte_size) ||
-          bytes.byteLength > MAX_ATTACHMENT_BYTES
-        ) {
-          throw new ApiError(422, 'Project package attachment size does not match its manifest.');
-        }
-        validateImage(bytes, contentType);
-        assets.push({
-          featureRef: String(feature.ref),
-          path,
-          fileName,
-          contentType,
-          bytes,
-          sha256: String(declaration.sha256),
-        });
-      });
-      const withoutAttachments: JsonRecord = { ...feature };
-      delete withoutAttachments.attachments;
-      return withoutAttachments;
-    });
-    if (paths.some((path) => !referenced.has(path))) {
-      throw new ApiError(422, 'Project package contains an unreferenced entry.');
-    }
-    for (const asset of assets) {
-      if ((await sha256(asset.bytes)) !== asset.sha256) {
-        throw new ApiError(422, 'Project package attachment checksum does not match.');
-      }
-    }
-    const document: JsonRecord = { ...manifest, features: normalizedFeatures };
-    delete document.attachments;
-    if (JSON.stringify(document).length > MAX_DOCUMENT_BYTES) {
-      throw new ApiError(422, 'Project package document is too large.');
-    }
-    return { document, assets };
   }
 
   async function packageExport(workspaceId: string, projectId: string): Promise<Blob> {

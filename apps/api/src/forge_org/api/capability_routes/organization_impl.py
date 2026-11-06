@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Query, status
 
-from forge_org.api.dependencies import service, service_error
+from forge_org.api.dependencies import service
 from forge_org.api.schemas import (
     ProjectCreate,
     ProjectResponse,
@@ -15,9 +15,6 @@ from forge_org.api.schemas import (
     WorkspaceUpdate,
 )
 from forge_org.application.organization import (
-    DuplicateName,
-    InvalidInput,
-    NotFound,
     OrganizationService,
 )
 
@@ -35,30 +32,21 @@ def list_workspaces(organization: OrganizationService = Depends(service)) -> lis
 def create_workspace(
     payload: WorkspaceCreate, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.create_workspace(payload.name, payload.description)
-    except (DuplicateName, InvalidInput) as exc:
-        raise service_error(exc) from exc
+    return organization.create_workspace(payload.name, payload.description)
 
 
 @organization_router.get('/workspaces/{workspace_id}', response_model=WorkspaceResponse)
 def get_workspace(
     workspace_id: str, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.workspace(workspace_id)
-    except NotFound as exc:
-        raise service_error(exc) from exc
+    return organization.workspace(workspace_id)
 
 
 @organization_router.delete('/workspaces/{workspace_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_workspace(
     workspace_id: str, organization: OrganizationService = Depends(service)
 ) -> None:
-    try:
-        organization.delete_workspace(workspace_id)
-    except NotFound as exc:
-        raise service_error(exc) from exc
+    organization.delete_workspace(workspace_id)
 
 
 @organization_router.patch('/workspaces/{workspace_id}', response_model=WorkspaceResponse)
@@ -67,30 +55,21 @@ def update_workspace(
     payload: WorkspaceUpdate,
     organization: OrganizationService = Depends(service),
 ) -> dict[str, Any]:
-    try:
-        return organization.update_workspace(workspace_id, payload.model_dump(exclude_unset=True))
-    except (DuplicateName, InvalidInput, NotFound) as exc:
-        raise service_error(exc) from exc
+    return organization.update_workspace(workspace_id, payload.model_dump(exclude_unset=True))
 
 
 @organization_router.post('/workspaces/{workspace_id}/archive', response_model=WorkspaceResponse)
 def archive_workspace(
     workspace_id: str, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.set_workspace_status(workspace_id, True)
-    except NotFound as exc:
-        raise service_error(exc) from exc
+    return organization.set_workspace_status(workspace_id, True)
 
 
 @organization_router.post('/workspaces/{workspace_id}/restore', response_model=WorkspaceResponse)
 def restore_workspace(
     workspace_id: str, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.set_workspace_status(workspace_id, False)
-    except NotFound as exc:
-        raise service_error(exc) from exc
+    return organization.set_workspace_status(workspace_id, False)
 
 
 @organization_router.get(
@@ -102,10 +81,7 @@ def list_projects(
     status_filter: str = Query(default='active', alias='status'),
     organization: OrganizationService = Depends(service),
 ) -> list[dict[str, Any]]:
-    try:
-        return organization.projects(workspace_id, search, status_filter)
-    except (InvalidInput, NotFound) as exc:
-        raise service_error(exc) from exc
+    return organization.projects(workspace_id, search, status_filter)
 
 
 @organization_router.post(
@@ -116,10 +92,7 @@ def list_projects(
 def create_project(
     workspace_id: str, payload: ProjectCreate, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.create_project(workspace_id, payload.name, payload.description)
-    except (DuplicateName, InvalidInput, NotFound) as exc:
-        raise service_error(exc) from exc
+    return organization.create_project(workspace_id, payload.name, payload.description)
 
 
 @organization_router.get(
@@ -128,10 +101,7 @@ def create_project(
 def get_project(
     workspace_id: str, project_id: str, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.project(workspace_id, project_id)
-    except NotFound as exc:
-        raise service_error(exc) from exc
+    return organization.project(workspace_id, project_id)
 
 
 @organization_router.patch(
@@ -143,12 +113,9 @@ def update_project(
     payload: ProjectUpdate,
     organization: OrganizationService = Depends(service),
 ) -> dict[str, Any]:
-    try:
-        return organization.update_project(
-            workspace_id, project_id, payload.model_dump(exclude_unset=True)
-        )
-    except (DuplicateName, InvalidInput, NotFound) as exc:
-        raise service_error(exc) from exc
+    return organization.update_project(
+        workspace_id, project_id, payload.model_dump(exclude_unset=True)
+    )
 
 
 @organization_router.post(
@@ -157,10 +124,7 @@ def update_project(
 def archive_project(
     workspace_id: str, project_id: str, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.set_project_status(workspace_id, project_id, 'archived')
-    except (InvalidInput, NotFound) as exc:
-        raise service_error(exc) from exc
+    return organization.set_project_status(workspace_id, project_id, 'archived')
 
 
 @organization_router.post(
@@ -169,10 +133,7 @@ def archive_project(
 def restore_project(
     workspace_id: str, project_id: str, organization: OrganizationService = Depends(service)
 ) -> dict[str, Any]:
-    try:
-        return organization.set_project_status(workspace_id, project_id, 'active')
-    except (InvalidInput, NotFound) as exc:
-        raise service_error(exc) from exc
+    return organization.set_project_status(workspace_id, project_id, 'active')
 
 
 def build_router(_source: APIRouter | None = None) -> APIRouter:

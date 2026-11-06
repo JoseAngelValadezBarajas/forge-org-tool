@@ -11,7 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from forge_org.application import attachments, project_package, transfer
+from forge_org.application import attachments, project_package
+from forge_org.domain import transfer_document as transfer
 
 ROOT = Path(__file__).parents[3]
 CONFORMANCE = json.loads((ROOT / 'contracts' / 'transfer' / 'conformance.json').read_text('utf-8'))

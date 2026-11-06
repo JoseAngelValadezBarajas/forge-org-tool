@@ -7,7 +7,6 @@ from collections.abc import Iterator
 from fastapi import Depends, HTTPException
 
 from forge_org.application.attachments import BugAttachmentService
-from forge_org.application.knowledge import KnowledgeService
 from forge_org.application.organization import (
     DuplicateName,
     InvalidInput,
@@ -77,7 +76,3 @@ def project_package_service(
     attachments: BugAttachmentService = Depends(bug_attachment_service),
 ) -> ProjectPackageService:
     return ProjectPackageService(transfer, attachments, database_path().parent / 'bug-attachments')
-
-
-def knowledge_service(store: PlanningStore = Depends(planning_store)) -> KnowledgeService:
-    return KnowledgeService(store)

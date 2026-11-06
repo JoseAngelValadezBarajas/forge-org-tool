@@ -3,6 +3,7 @@
 import sqlite3
 from typing import Any
 
+from .common import unique_as_duplicate
 from .organization import OrganizationRepository
 
 
@@ -16,6 +17,7 @@ class SqliteTransferStore:
     def begin_immediate(self) -> None:
         self.connection.execute('BEGIN IMMEDIATE')
 
+    @unique_as_duplicate
     def commit(self) -> None:
         self.connection.commit()
 
@@ -146,6 +148,7 @@ class SqliteTransferStore:
         ).fetchall()
 
     # -- import writes (no commit) ---------------------------------------------
+    @unique_as_duplicate
     def insert_project(
         self,
         project_id: str,
@@ -160,6 +163,7 @@ class SqliteTransferStore:
             (project_id, workspace_id, name, description, now, now),
         )
 
+    @unique_as_duplicate
     def insert_epic(
         self,
         epic_id: str,
@@ -175,6 +179,7 @@ class SqliteTransferStore:
             (epic_id, project_id, title, description, priority, now, now),
         )
 
+    @unique_as_duplicate
     def insert_feature(
         self, feature_id: str, project_id: str, values: dict[str, Any], now: str
     ) -> None:
@@ -202,6 +207,7 @@ class SqliteTransferStore:
             ),
         )
 
+    @unique_as_duplicate
     def set_work_item_tags(
         self, workspace_id: str, item_type: str, item_id: str, tags: list[Any]
     ) -> None:
@@ -209,6 +215,7 @@ class SqliteTransferStore:
             workspace_id, item_type, item_id, tags
         )
 
+    @unique_as_duplicate
     def insert_task(
         self,
         task_id: str,
@@ -225,6 +232,7 @@ class SqliteTransferStore:
             (task_id, feature_id, title, description, status, position, now, now),
         )
 
+    @unique_as_duplicate
     def insert_criterion(
         self,
         criterion_id: str,
@@ -240,6 +248,7 @@ class SqliteTransferStore:
             (criterion_id, feature_id, description, satisfied, position, now, now),
         )
 
+    @unique_as_duplicate
     def insert_dependency(
         self, dependency_id: str, project_id: str, blocking_id: str, blocked_id: str, now: str
     ) -> None:
@@ -249,6 +258,7 @@ class SqliteTransferStore:
             (dependency_id, project_id, blocking_id, blocked_id, now, now),
         )
 
+    @unique_as_duplicate
     def insert_attachment(self, feature_id: str, attachment: dict[str, Any]) -> None:
         self.connection.execute(
             'INSERT INTO bug_attachments(id, feature_id, relative_path, file_name, '
@@ -274,6 +284,7 @@ class SqliteTransferStore:
         )
 
     # -- contextual import: move a staged project's content into the destination ----
+    @unique_as_duplicate
     def adopt_staged_project(
         self, scope: str, staged_project_id: str, project_id: str, destination_id: str
     ) -> None:
