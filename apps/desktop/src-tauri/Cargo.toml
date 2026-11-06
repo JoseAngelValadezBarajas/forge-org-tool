@@ -24,7 +24,7 @@ forge-org-desktop-policy = { path = ".." }
 tauri = { version = "2.0.0", features = ["tray-icon"] }
 tauri-plugin-shell = "2.0.0"
 tauri-plugin-single-instance = "2.0.0"
-rand = "0.9"
+rand = "0.10"
 
 [features]
 default = ["custom-protocol"]
