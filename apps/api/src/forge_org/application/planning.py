@@ -1,6 +1,12 @@
 from typing import Any
 
 from forge_org.application.ports import PlanningStore
+from forge_org.domain.planning import (
+    clean_description,
+    clean_title,
+    dependency_endpoints,
+    ensure_project_writable,
+)
 
 
 class PlanningService:
@@ -27,10 +33,8 @@ class PlanningService:
         tags: list[str] | None = None,
     ) -> dict[str, Any]:
         self._project(workspace_id, project_id)
-        if not title.strip():
-            raise ValueError('Title is required')
         return self.repository.create_epic(
-            workspace_id, project_id, title.strip(), description, priority, tags or []
+            workspace_id, project_id, clean_title(title), description, priority, tags or []
         )
 
     def update_epic(
@@ -39,10 +43,8 @@ class PlanningService:
         self._project(workspace_id, project_id)
         if self.repository.get_epic(project_id, epic_id) is None:
             raise LookupError('Epic not found')
-        if 'title' in values and not values['title'].strip():
-            raise ValueError('Title is required')
         if 'title' in values:
-            values['title'] = values['title'].strip()
+            values['title'] = clean_title(values['title'])
         return self.repository.update_epic(workspace_id, project_id, epic_id, values) or {}
 
     def list_features(
@@ -63,14 +65,13 @@ class PlanningService:
         self, workspace_id: str, project_id: str, values: dict[str, Any]
     ) -> dict[str, Any]:
         self._project(workspace_id, project_id)
-        if not values.get('title', '').strip():
-            raise ValueError('Title is required')
+        title = clean_title(values.get('title'))
         if (
             values.get('epic_id')
             and self.repository.get_epic(project_id, values['epic_id']) is None
         ):
             raise LookupError('Epic not found')
-        values['title'] = values['title'].strip()
+        values['title'] = title
         return self.repository.create_feature(workspace_id, project_id, values)
 
     def update_feature(
@@ -87,9 +88,7 @@ class PlanningService:
         ):
             raise LookupError('Epic not found')
         if 'title' in values:
-            if not values['title'].strip():
-                raise ValueError('Title is required')
-            values['title'] = values['title'].strip()
+            values['title'] = clean_title(values['title'])
         return self.repository.update_feature(workspace_id, project_id, feature_id, values) or {}
 
     def workspace_tags(self, workspace_id: str) -> list[dict[str, Any]]:
@@ -150,10 +149,9 @@ class PlanningService:
         values: dict[str, Any],
     ) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id)
-        if self._project(workspace_id, project_id)['status'] != 'active':
-            raise ValueError('Archived projects are read-only')
-        if 'description' in values and not str(values['description'] or '').strip():
-            raise ValueError('Description is required')
+        ensure_project_writable(self._project(workspace_id, project_id))
+        if 'description' in values:
+            clean_description(values['description'])
         item = self.repository.update_criterion(feature_id, criterion_id, values)
         if item is None:
             raise LookupError('Acceptance criterion not found')
@@ -163,8 +161,7 @@ class PlanningService:
         self, workspace_id: str, project_id: str, feature_id: str, criterion_id: str
     ) -> None:
         self.feature(workspace_id, project_id, feature_id)
-        if self._project(workspace_id, project_id)['status'] != 'active':
-            raise ValueError('Archived projects are read-only')
+        ensure_project_writable(self._project(workspace_id, project_id))
         if not self.repository.delete_criterion(feature_id, criterion_id):
             raise LookupError('Acceptance criterion not found')
 
@@ -172,17 +169,14 @@ class PlanningService:
         self, workspace_id: str, project_id: str, feature_id: str, ids: list[str]
     ) -> list[dict[str, Any]]:
         self.feature(workspace_id, project_id, feature_id)
-        if self._project(workspace_id, project_id)['status'] != 'active':
-            raise ValueError('Archived projects are read-only')
+        ensure_project_writable(self._project(workspace_id, project_id))
         return self.repository.reorder_criteria(feature_id, ids)
 
     def create_task(
         self, workspace_id: str, project_id: str, feature_id: str, values: dict[str, Any]
     ) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id)
-        if not values.get('title', '').strip():
-            raise ValueError('Title is required')
-        values['title'] = values['title'].strip()
+        values['title'] = clean_title(values.get('title'))
         return self.repository.create_task(feature_id, values)
 
     def tasks(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:
@@ -199,9 +193,7 @@ class PlanningService:
     ) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id)
         if 'title' in values:
-            if not values['title'].strip():
-                raise ValueError('Title is required')
-            values['title'] = values['title'].strip()
+            values['title'] = clean_title(values['title'])
         updated = self.repository.update_task(feature_id, task_id, values)
         if updated is None:
             raise LookupError('Task not found')
@@ -217,9 +209,7 @@ class PlanningService:
         self, workspace_id: str, project_id: str, values: dict[str, Any]
     ) -> dict[str, Any]:
         self._project(workspace_id, project_id)
-        blocking, blocked = values.get('blocking_feature_id'), values.get('blocked_feature_id')
-        if not blocking or not blocked or blocking == blocked:
-            raise ValueError('Dependency must connect two different features')
+        blocking, blocked = dependency_endpoints(values)
         self.feature(workspace_id, project_id, blocking)
         self.feature(workspace_id, project_id, blocked)
         return self.repository.create_dependency(project_id, blocking, blocked)

@@ -1,6 +1,7 @@
 from typing import Any
 
 from forge_org.application.ports import PlanningStore
+from forge_org.domain.planning import clean_description, ensure_project_writable
 
 
 class KnowledgeService:
@@ -28,8 +29,6 @@ class KnowledgeService:
         self, workspace_id: str, project_id: str, feature_id: str, description: str
     ) -> dict[str, Any]:
         self.feature(workspace_id, project_id, feature_id)
-        if self.project(workspace_id, project_id)['status'] != 'active':
-            raise ValueError('Archived projects are read-only')
-        if not description.strip():
-            raise ValueError('Description is required')
+        ensure_project_writable(self.project(workspace_id, project_id))
+        clean_description(description)
         return self.repository.create_criterion(feature_id, description)
