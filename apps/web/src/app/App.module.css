@@ -587,7 +587,11 @@
   }
   .mobileEpicHeader.mobileHeader > .brand {
     width: auto;
+    min-width: 0;
+    overflow: hidden;
     font-size: 17px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .mobileHeader:not(.mobileEpicHeader) .mark {
     flex-basis: 36px;

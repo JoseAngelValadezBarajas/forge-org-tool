@@ -59,13 +59,29 @@ test('no route overflows the page horizontally at any supported width @responsiv
     for (const route of routes) {
       await page.goto(route);
       await page.waitForLoadState('networkidle');
-      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
-        scrollWidth: document.documentElement.scrollWidth,
-        clientWidth: document.documentElement.clientWidth,
-      }));
-      if (scrollWidth > clientWidth) {
+      // Wait for the route to finish loading so we measure the final layout, not a loading state.
+      await expect(page.locator('[data-state="loading"], [aria-busy="true"]')).toHaveCount(0);
+      const report = await page.evaluate(() => {
+        const clientWidth = document.documentElement.clientWidth;
+        const culprits = Array.from(document.querySelectorAll('body *'))
+          .filter(
+            (element) =>
+              element.getBoundingClientRect().right > clientWidth + 0.5 ||
+              // Unwrappable text or content spilling out of its own box.
+              (element.scrollWidth > element.clientWidth + 1 &&
+                getComputedStyle(element).overflowX === 'visible' &&
+                element.getBoundingClientRect().left + element.scrollWidth > clientWidth + 0.5),
+          )
+          .slice(0, 3)
+          .map(
+            (element) =>
+              `${element.tagName.toLowerCase()}.${String(element.className).split(' ')[0]}`,
+          );
+        return { scrollWidth: document.documentElement.scrollWidth, clientWidth, culprits };
+      });
+      if (report.scrollWidth > report.clientWidth) {
         overflows.push(
-          `${viewport.name} ${viewport.width}px ${route}: ${scrollWidth} > ${clientWidth}`,
+          `${viewport.name} ${viewport.width}px ${route}: ${report.scrollWidth} > ${report.clientWidth} (${report.culprits.join(', ')})`,
         );
       }
     }
