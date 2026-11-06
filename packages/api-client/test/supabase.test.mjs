@@ -13,7 +13,10 @@ import { planningCapability } from '../dist/planning.js';
 import { readFileSync } from 'node:fs';
 
 const conformance = JSON.parse(
-  readFileSync(new URL('../../../contracts/transfer/conformance.json', import.meta.url), 'utf8'),
+  readFileSync(
+    new globalThis.URL('../../../contracts/transfer/conformance.json', import.meta.url),
+    'utf8',
+  ),
 );
 
 function validPng() {

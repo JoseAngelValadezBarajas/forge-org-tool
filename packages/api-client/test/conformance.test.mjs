@@ -4,7 +4,10 @@ import { describe, it } from 'node:test';
 import { TRANSFER_LIMITS, detectImageType } from '../dist/index.js';
 
 const conformance = JSON.parse(
-  readFileSync(new URL('../../../contracts/transfer/conformance.json', import.meta.url), 'utf8'),
+  readFileSync(
+    new globalThis.URL('../../../contracts/transfer/conformance.json', import.meta.url),
+    'utf8',
+  ),
 );
 
 describe('shared transfer conformance vectors', () => {
@@ -14,7 +17,7 @@ describe('shared transfer conformance vectors', () => {
 
   for (const vector of conformance.image_vectors) {
     it(`detects image type for: ${vector.name}`, () => {
-      const bytes = new Uint8Array(Buffer.from(vector.base64, 'base64'));
+      const bytes = new Uint8Array(globalThis.Buffer.from(vector.base64, 'base64'));
       assert.equal(detectImageType(bytes), vector.detected_type);
     });
   }
