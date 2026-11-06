@@ -50,9 +50,10 @@ export function assertReleaseMetadata(rootDir, { version, tag }) {
   const mismatches = Object.entries(metadata)
     .filter(([, actual]) => actual !== version)
     .map(([field, actual]) => `${field}=${actual ?? '<missing>'}, expected ${version}`);
-  const expectedTag = `v${version}-preview.1`;
-  if (tag !== expectedTag) {
-    mismatches.push(`tag=${tag}, expected ${expectedTag}`);
+  const escapedVersion = version.replaceAll('.', String.raw`\.`);
+  const tagPattern = new RegExp(String.raw`^v${escapedVersion}-preview\.[1-9][0-9]*$`);
+  if (!tagPattern.test(tag)) {
+    mismatches.push(`tag=${tag}, expected v${version}-preview.<n>`);
   }
   if (mismatches.length > 0) {
     throw new Error(`Release metadata mismatch: ${mismatches.join('; ')}`);
@@ -61,7 +62,8 @@ export function assertReleaseMetadata(rootDir, { version, tag }) {
 }
 
 if (import.meta.main) {
-  const version = process.env.RELEASE_VERSION ?? '0.1.3';
+  const version =
+    process.env.RELEASE_VERSION ?? readJson(path.join(process.cwd(), 'package.json')).version;
   const tag = process.env.RELEASE_TAG ?? '';
   assertReleaseMetadata(process.cwd(), { version, tag });
   console.log(`Release metadata verified for ${tag}`);
