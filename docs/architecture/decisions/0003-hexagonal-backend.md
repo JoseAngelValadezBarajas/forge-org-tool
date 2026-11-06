@@ -23,6 +23,10 @@ Rules, enforced by `apps/api/tests/test_layer_dependencies.py` (no allowlist):
 
 Local SQLite is the Python adapter described above. The Supabase (BYOC) provider is a client-side adapter implemented in SQL and TypeScript, so it cannot literally implement the Python ports. The product rules it shares with the domain (limits, screenshot validation) are pinned by `contracts/transfer/conformance.json` and tested in both languages (see `transfer-conformance.md`). New shared rules start in the domain module and the conformance file.
 
+## Web counterpart
+
+The web app follows the same direction of dependency at feature level: a `*Page.tsx` is a view; its state, effects and API calls live in a sibling `use*.ts` hook, and the API client is the adapter. `feature-view-purity.test.mjs` fails if a page uses `useEffect` or calls the API directly.
+
 ## Where rules go
 
 - A rule that does not need a repository is a function in `domain` (`planning.py`, `organization.py`, `transfer_document.py`) with a unit test that runs without a database.
@@ -34,4 +38,4 @@ Local SQLite is the Python adapter described above. The Supabase (BYOC) provider
 - Moving a rule into the domain is a behaviour-preserving change guarded by the API characterization tests and the checked-in OpenAPI contract.
 - Adding a persistence backend means implementing the ports, not editing services.
 - The TypeScript Supabase adapter keeps its stateful closure in `supabase.ts`; its pure rules live in `attachment-validation.ts`, `project-package.ts`, `supabase-storage-paths.ts` and `supabase-shared.ts`.
-- Remaining debt: Supabase rules are still duplicated across SQL and TypeScript, and the large planning pages in the web app do not yet follow the hook-and-view split used by the application shell.
+- Remaining debt: Supabase rules are still duplicated across SQL and TypeScript.
