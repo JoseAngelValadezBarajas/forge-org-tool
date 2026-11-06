@@ -15,7 +15,7 @@ test('frontend installs published visual package artifacts', () => {
     const packagePath = resolve(root, 'node_modules', ...name.split('/'));
     const manifest = JSON.parse(readFileSync(resolve(packagePath, 'package.json'), 'utf8'));
     assert.equal(manifest.name, name);
-    assert.equal(manifest.version, '1.0.2');
+    assert.equal(manifest.version, '1.1.0');
     for (const file of files)
       assert.equal(existsSync(resolve(packagePath, file)), true, `${name}/${file}`);
   }

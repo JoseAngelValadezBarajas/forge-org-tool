@@ -1,5 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { Button, Card, FormField, Input, StatusChip } from '@corefoundry-labs/forge-ui';
+import {
+  AlertV2,
+  BadgeV2,
+  ButtonV2,
+  CardV2,
+  FormField,
+  TextInputV2,
+} from '@corefoundry-labs/forge-ui';
 import {
   configureStorage,
   getStorageSnapshot,
@@ -12,12 +19,12 @@ import {
 import styles from './StorageSettings.module.css';
 import { getForgeRuntimePlatform } from '../../runtimePlatform';
 
-function toneFor(snapshot: StorageSnapshot): 'success' | 'warning' | 'danger' {
+function toneFor(snapshot: StorageSnapshot): 'success' | 'warning' | 'error' {
   if (snapshot.status === 'ready') return 'success';
   if (snapshot.status === 'authentication_required' || snapshot.status === 'schema_missing') {
     return 'warning';
   }
-  return 'danger';
+  return 'error';
 }
 
 export function StorageSettings() {
@@ -97,7 +104,7 @@ export function StorageSettings() {
   const needsSignIn = cloudConfigured && snapshot.status === 'authentication_required';
 
   return (
-    <Card as="section" aria-labelledby="storage-settings-heading" className={styles.card}>
+    <CardV2 as="section" aria-labelledby="storage-settings-heading" className={styles.card}>
       <div className={styles.heading}>
         <div>
           <span className={styles.eyebrow}>STORAGE</span>
@@ -107,7 +114,7 @@ export function StorageSettings() {
             and paid for by you.
           </p>
         </div>
-        <StatusChip tone={toneFor(snapshot)}>{snapshot.status.replaceAll('_', ' ')}</StatusChip>
+        <BadgeV2 tone={toneFor(snapshot)}>{snapshot.status.replaceAll('_', ' ')}</BadgeV2>
       </div>
 
       <fieldset className={styles.providers}>
@@ -152,21 +159,21 @@ export function StorageSettings() {
         <p className={styles.future}>Firebase · Coming later</p>
       </fieldset>
 
-      <p className={styles.status} role="status">
+      <AlertV2 className={styles.status} tone="info">
         {snapshot.message}
         {snapshot.projectUrl && <span> · {snapshot.projectUrl}</span>}
-      </p>
+      </AlertV2>
       {error && (
-        <p className={styles.error} role="alert">
+        <AlertV2 className={styles.error} tone="error">
           {error}
-        </p>
+        </AlertV2>
       )}
 
       {cloudConfigured && (
         <div className={styles.cloudPanel}>
           <form onSubmit={(event) => void saveSupabase(event)} className={styles.form}>
             <FormField label="Supabase project URL">
-              <Input
+              <TextInputV2
                 aria-label="Supabase project URL"
                 type="url"
                 value={projectUrl}
@@ -176,7 +183,7 @@ export function StorageSettings() {
               />
             </FormField>
             <FormField label="Supabase publishable key">
-              <Input
+              <TextInputV2
                 aria-label="Supabase publishable key"
                 type="password"
                 value={publishableKey}
@@ -190,9 +197,9 @@ export function StorageSettings() {
               Only the public <code>sb_publishable_*</code> key is accepted. Never enter a secret,
               service-role key or PostgreSQL password.
             </p>
-            <Button type="submit" disabled={busy || !publishableKey}>
+            <ButtonV2 type="submit" disabled={busy || !publishableKey}>
               Save Supabase settings
-            </Button>
+            </ButtonV2>
           </form>
 
           {needsSignIn && (
@@ -202,7 +209,7 @@ export function StorageSettings() {
                 Your password is sent only to Supabase Auth and is never saved by FORGE.
               </p>
               <FormField label="Supabase email">
-                <Input
+                <TextInputV2
                   aria-label="Supabase email"
                   type="email"
                   value={email}
@@ -212,7 +219,7 @@ export function StorageSettings() {
                 />
               </FormField>
               <FormField label="Supabase password">
-                <Input
+                <TextInputV2
                   aria-label="Supabase password"
                   type="password"
                   value={password}
@@ -235,25 +242,25 @@ export function StorageSettings() {
                   </small>
                 </span>
               </label>
-              <Button type="submit" disabled={busy}>
+              <ButtonV2 type="submit" disabled={busy}>
                 Sign in to Supabase
-              </Button>
+              </ButtonV2>
             </form>
           )}
 
           <div className={styles.actions}>
-            <Button
+            <ButtonV2
               type="button"
               variant="secondary"
               onClick={() => void refreshConnection()}
               disabled={busy}
             >
               Refresh connection
-            </Button>
+            </ButtonV2>
             {snapshot.userEmail && (
-              <Button type="button" variant="ghost" onClick={signOut}>
+              <ButtonV2 type="button" variant="ghost" onClick={signOut}>
                 Sign out {snapshot.userEmail}
-              </Button>
+              </ButtonV2>
             )}
           </div>
           <p className={styles.warning}>
@@ -262,6 +269,6 @@ export function StorageSettings() {
           </p>
         </div>
       )}
-    </Card>
+    </CardV2>
   );
 }

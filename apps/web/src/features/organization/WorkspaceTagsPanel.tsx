@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { organizationApi, type WorkspaceTag } from '@forge-org/api-client';
-import { Button, Card, FormField, Input } from '@corefoundry-labs/forge-ui';
+import { AlertV2, ButtonV2, CardV2, FormField, TextInputV2 } from '@corefoundry-labs/forge-ui';
 import styles from './WorkspaceTagsPanel.module.css';
 
 type Draft = { name: string; color: string };
@@ -79,7 +79,7 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
 
   if (!workspaceId) return null;
   return (
-    <Card>
+    <CardV2>
       <div className={styles.layout}>
         <section aria-labelledby="workspace-tags-heading" className={styles.catalog}>
           <h2 id="workspace-tags-heading">Manage workspace tags</h2>
@@ -87,10 +87,10 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
             Tags are shared across this Workspace. Removing a tag never deletes its Epics or Work
             Items.
           </p>
-          {error && <p role="alert">{error}</p>}
+          {error && <AlertV2 tone="error">{error}</AlertV2>}
           <form onSubmit={createTag}>
             <FormField label="New tag name">
-              <Input
+              <TextInputV2
                 aria-label="New tag name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -99,14 +99,14 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
               />
             </FormField>
             <FormField label="New tag color">
-              <Input
+              <TextInputV2
                 aria-label="New tag color"
                 type="color"
                 value={color}
                 onChange={(event) => setColor(event.target.value)}
               />
             </FormField>
-            <Button type="submit">Create workspace tag</Button>
+            <ButtonV2 type="submit">Create workspace tag</ButtonV2>
           </form>
           {tags.length === 0 ? (
             <p>No workspace tags yet.</p>
@@ -123,7 +123,7 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
                       }}
                     >
                       <FormField label={`Name for tag ${tag.name}`}>
-                        <Input
+                        <TextInputV2
                           aria-label={`Name for tag ${tag.name}`}
                           value={draft.name}
                           maxLength={40}
@@ -137,7 +137,7 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
                         />
                       </FormField>
                       <FormField label={`Color for tag ${tag.name}`}>
-                        <Input
+                        <TextInputV2
                           aria-label={`Color for tag ${tag.name}`}
                           type="color"
                           value={draft.color}
@@ -149,14 +149,14 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
                           }
                         />
                       </FormField>
-                      <Button type="submit">Save tag {tag.name}</Button>
-                      <Button
+                      <ButtonV2 type="submit">Save tag {tag.name}</ButtonV2>
+                      <ButtonV2
                         type="button"
                         variant="secondary"
                         onClick={() => void deleteTag(tag.id)}
                       >
                         Delete tag {tag.name}
-                      </Button>
+                      </ButtonV2>
                     </form>
                   </li>
                 );
@@ -174,6 +174,6 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
           </ul>
         </aside>
       </div>
-    </Card>
+    </CardV2>
   );
 }

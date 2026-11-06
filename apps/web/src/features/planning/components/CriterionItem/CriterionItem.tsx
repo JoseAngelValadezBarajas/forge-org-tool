@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Criterion } from '@forge-org/api-client';
-import { Checkbox, StatusChip } from '@corefoundry-labs/forge-ui';
+import { BadgeV2, CheckboxV2 } from '@corefoundry-labs/forge-ui';
 import styles from './CriterionItem.module.css';
 
 type CriterionItemProps = {
@@ -33,16 +33,16 @@ export function CriterionItem({
       data-state={state}
     >
       {compact ? (
-        <Checkbox
+        <CheckboxV2
           aria-label={`Satisfy ${criterion.description}`}
           checked={criterion.satisfied}
           disabled={archived}
           onChange={(event) => onSatisfiedChange?.(event.target.checked)}
         />
       ) : (
-        <StatusChip tone={criterion.satisfied ? 'success' : 'neutral'}>
+        <BadgeV2 tone={criterion.satisfied ? 'success' : 'neutral'}>
           {criterion.satisfied ? 'Satisfied' : 'Pending'}
-        </StatusChip>
+        </BadgeV2>
       )}
       <span className={styles.description}>{criterion.description}</span>
       {children}

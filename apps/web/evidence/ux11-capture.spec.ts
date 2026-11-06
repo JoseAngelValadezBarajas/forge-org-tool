@@ -16,13 +16,18 @@ async function patchJson(page: Page, path: string, body: unknown) {
   return response.json();
 }
 
+function workspaceMenuItemName(name: string) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^${escaped}( \\(active\\))?$`);
+}
+
 async function selectWorkspace(page: Page, name: string) {
   const workspaceTrigger = page.getByRole('button', { name: /^Workspace:/ }).first();
   await expect(workspaceTrigger).toBeVisible();
   await workspaceTrigger.click();
   await page
     .getByRole('menu', { name: 'Workspaces' })
-    .getByRole('menuitemradio', { name, exact: true })
+    .getByRole('menuitem', { name: workspaceMenuItemName(name) })
     .click();
 }
 
@@ -460,7 +465,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   const primaryAction = page.getByRole('button', { name: 'New Epic' });
   const toolbar = page.getByLabel('Epic board filters');
   const firstCard = projectBoard.locator('[data-testid^="epic-card-"]').first();
-  expect(await rect(page.locator('[data-node-id="344:89"] button'))).toEqual({
+  expect(await rect(page.locator('[data-node-id="344:89"] button[aria-haspopup="menu"]'))).toEqual({
     x: 18,
     y: 128,
     width: 208,
@@ -481,7 +486,9 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
     viewport: { width: 1440, height: 960, deviceScaleFactor: 1, zoomPercent: 100 },
     actual: {
       sidebar: await rect(page.getByTestId('app-sidebar')),
-      workspaceSelector: await rect(page.locator('[data-node-id="344:89"] button')),
+      workspaceSelector: await rect(
+        page.locator('[data-node-id="344:89"] button[aria-haspopup="menu"]'),
+      ),
       topbar: await rect(page.getByTestId('app-topbar')),
       breadcrumb: await rect(page.locator('[data-node-id="344:106"]')),
       search: await rect(page.locator('[data-node-id="344:107"]')),

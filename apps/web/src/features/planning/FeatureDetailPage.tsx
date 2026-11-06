@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Badge, Button, Card, Dialog, Input, Select, Textarea } from '@corefoundry-labs/forge-ui';
+import {
+  AlertV2,
+  BadgeV2,
+  ButtonV2,
+  CardV2,
+  DialogV2,
+  SelectV2,
+  TextInputV2,
+  Textarea,
+} from '@corefoundry-labs/forge-ui';
 import { type Feature } from '@forge-org/api-client';
 import { PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './FeatureDetailPage.module.css';
@@ -73,7 +82,7 @@ export function FeatureDetailPage() {
   } = useFeatureDetailPage();
 
   const criteriaPanel = (
-    <Card as="section" aria-label="Acceptance criteria" className={styles.criteriaCard}>
+    <CardV2 as="section" aria-label="Acceptance criteria" className={styles.criteriaCard}>
       <div className={styles.sectionHeading}>
         <div>
           <h2>
@@ -98,12 +107,12 @@ export function FeatureDetailPage() {
             >
               {editingCriterionId === item.id ? (
                 <div className={styles.inlineEditor}>
-                  <Input
+                  <TextInputV2
                     aria-label={`Edit criterion ${item.description}`}
                     value={criterionDraft}
                     onChange={(event) => setCriterionDraft(event.target.value)}
                   />
-                  <Button
+                  <ButtonV2
                     type="button"
                     onClick={() => {
                       void updateCriterion(item.id, { description: criterionDraft });
@@ -111,14 +120,14 @@ export function FeatureDetailPage() {
                     }}
                   >
                     Save criterion
-                  </Button>
-                  <Button
+                  </ButtonV2>
+                  <ButtonV2
                     type="button"
                     variant="secondary"
                     onClick={() => setEditingCriterionId(null)}
                   >
                     Cancel
-                  </Button>
+                  </ButtonV2>
                 </div>
               ) : (
                 !archived && (
@@ -126,7 +135,7 @@ export function FeatureDetailPage() {
                     <details className={styles.criterionMoreActions}>
                       <summary>More criterion actions</summary>
                       <div className={styles.criterionMoreActionsMenu}>
-                        <Button
+                        <ButtonV2
                           type="button"
                           variant="secondary"
                           onClick={() => {
@@ -135,30 +144,30 @@ export function FeatureDetailPage() {
                           }}
                         >
                           Edit
-                        </Button>
-                        <Button
+                        </ButtonV2>
+                        <ButtonV2
                           type="button"
                           variant="secondary"
                           disabled={index === 0}
                           onClick={() => void moveCriterion(index, -1)}
                         >
                           Move up
-                        </Button>
-                        <Button
+                        </ButtonV2>
+                        <ButtonV2
                           type="button"
                           variant="secondary"
                           disabled={index === criteria.length - 1}
                           onClick={() => void moveCriterion(index, 1)}
                         >
                           Move down
-                        </Button>
-                        <Button
+                        </ButtonV2>
+                        <ButtonV2
                           type="button"
                           variant="secondary"
                           onClick={() => void removeCriterion(item.id)}
                         >
                           Delete
-                        </Button>
+                        </ButtonV2>
                       </div>
                     </details>
                   </div>
@@ -173,21 +182,21 @@ export function FeatureDetailPage() {
           <summary>Add acceptance criterion</summary>
           <form onSubmit={addCriterion}>
             <label htmlFor="criterion-title">Acceptance criterion</label>
-            <Input
+            <TextInputV2
               id="criterion-title"
               aria-label="Acceptance criterion"
               value={criterion}
               onChange={(event) => setCriterion(event.target.value)}
               required
             />
-            <Button type="submit">Add criterion</Button>
+            <ButtonV2 type="submit">Add criterion</ButtonV2>
           </form>
         </details>
       )}
-    </Card>
+    </CardV2>
   );
   const tasksPanel = (
-    <Card as="section" aria-label="Tasks" className={styles.tasksCard}>
+    <CardV2 as="section" aria-label="Tasks" className={styles.tasksCard}>
       <div className={styles.sectionHeading}>
         <div>
           <h2>
@@ -222,18 +231,18 @@ export function FeatureDetailPage() {
           <summary>Add task</summary>
           <form onSubmit={addTask}>
             <label htmlFor="task-title">Task title</label>
-            <Input
+            <TextInputV2
               id="task-title"
               aria-label="Task title"
               value={taskTitle}
               onChange={(event) => setTaskTitle(event.target.value)}
               required
             />
-            <Button type="submit">Add task</Button>
+            <ButtonV2 type="submit">Add task</ButtonV2>
           </form>
         </details>
       )}
-    </Card>
+    </CardV2>
   );
   return (
     <section
@@ -256,19 +265,19 @@ export function FeatureDetailPage() {
           </p>
         </div>
         {feature && !archived && (
-          <Button
+          <ButtonV2
             className={styles.editAction}
             aria-label="Edit details"
             disabled={moving}
             onClick={() => setEditing(true)}
           >
             {isBug ? 'Edit Bug' : 'Edit Story'}
-          </Button>
+          </ButtonV2>
         )}
       </header>
       {feature && (
         <div className={styles.metadata} aria-label="Work item metadata">
-          <Select
+          <SelectV2
             aria-label="Work item status"
             value={feature.status ?? 'backlog'}
             disabled={archived || moving || editing}
@@ -282,17 +291,17 @@ export function FeatureDetailPage() {
                 {item.label}
               </option>
             ))}
-          </Select>
+          </SelectV2>
           {isBug && (
-            <Badge className={styles.pill}>
+            <BadgeV2 className={styles.pill}>
               {titleCase(feature.bug_severity ?? 'medium')} severity
-            </Badge>
+            </BadgeV2>
           )}
-          <Badge className={styles.pill}>{titleCase(feature.priority)} priority</Badge>
+          <BadgeV2 className={styles.pill}>{titleCase(feature.priority)} priority</BadgeV2>
           {selectedTags.map((tag) => (
-            <Badge className={styles.pill} key={tag}>
+            <BadgeV2 className={styles.pill} key={tag}>
               {tag}
-            </Badge>
+            </BadgeV2>
           ))}
           <details className={styles.moreActions}>
             <summary>⋯ More</summary>
@@ -311,29 +320,31 @@ export function FeatureDetailPage() {
         </div>
       )}
       {(error || moveError) && (
-        <p role="alert" className={styles.error}>
+        <AlertV2 tone="error" className={styles.error}>
           {error || moveError}
-        </p>
+        </AlertV2>
       )}
       {archived && (
-        <p role="status" className={styles.archived}>
+        <AlertV2 tone="info" className={styles.archived}>
           Archived work item · read-only
-        </p>
+        </AlertV2>
       )}
       {feature && (
         <>
           {editing && (
-            <Dialog
+            <DialogV2
+              onOpenChange={(nextOpen) => {
+                if (!nextOpen) {
+                  void reload();
+                  setEditing(false);
+                }
+              }}
               title={isBug ? 'Edit Bug' : 'Edit Story'}
               open
-              onCancel={() => {
-                void reload();
-                setEditing(false);
-              }}
             >
               <form className={styles.editForm} onSubmit={(event) => void submitFeature(event)}>
                 <label htmlFor="feature-detail-title">Title</label>
-                <Input
+                <TextInputV2
                   id="feature-detail-title"
                   aria-label="Edit feature title"
                   value={featureTitle}
@@ -367,7 +378,7 @@ export function FeatureDetailPage() {
                 {feature.kind === 'bug' && (
                   <section className={styles.editSection} aria-label="Bug details">
                     <label htmlFor="bug-severity">Severity</label>
-                    <select
+                    <SelectV2
                       id="bug-severity"
                       aria-label="Bug severity"
                       value={bugSeverity}
@@ -376,7 +387,7 @@ export function FeatureDetailPage() {
                       {['low', 'medium', 'high', 'critical'].map((severity) => (
                         <option key={severity}>{severity}</option>
                       ))}
-                    </select>
+                    </SelectV2>
                     <label htmlFor="steps-to-reproduce">Steps to reproduce</label>
                     <Textarea
                       id="steps-to-reproduce"
@@ -426,8 +437,8 @@ export function FeatureDetailPage() {
                   )}
                 </fieldset>
                 <div className={styles.actions}>
-                  <Button type="submit">Save changes</Button>
-                  <Button
+                  <ButtonV2 type="submit">Save changes</ButtonV2>
+                  <ButtonV2
                     type="button"
                     variant="secondary"
                     onClick={() => {
@@ -436,16 +447,20 @@ export function FeatureDetailPage() {
                     }}
                   >
                     Cancel
-                  </Button>
+                  </ButtonV2>
                 </div>
               </form>
-            </Dialog>
+            </DialogV2>
           )}
           <div className={styles.layout}>
             <div className={styles.content}>
               {isBug ? (
                 <>
-                  <Card as="section" aria-label="How to reproduce" className={styles.reproduction}>
+                  <CardV2
+                    as="section"
+                    aria-label="How to reproduce"
+                    className={styles.reproduction}
+                  >
                     <h2>How to reproduce</h2>
                     {feature.steps_to_reproduce ? (
                       <ol className={styles.steps}>
@@ -466,21 +481,21 @@ export function FeatureDetailPage() {
                         <p>{feature.goal}</p>
                       </section>
                     )}
-                  </Card>
+                  </CardV2>
                   <div className={styles.resultGrid}>
-                    <Card as="section" aria-label="Actual result" className={styles.actual}>
+                    <CardV2 as="section" aria-label="Actual result" className={styles.actual}>
                       <h2>Actual result</h2>
                       <p>{feature.actual_result || 'Not provided.'}</p>
-                    </Card>
-                    <Card as="section" aria-label="Expected result" className={styles.expected}>
+                    </CardV2>
+                    <CardV2 as="section" aria-label="Expected result" className={styles.expected}>
                       <h2>Expected result</h2>
                       <p>{feature.expected_result || 'Not provided.'}</p>
-                    </Card>
+                    </CardV2>
                   </div>
                 </>
               ) : (
                 <>
-                  <Card as="section" aria-label="Description" className={styles.descriptionCard}>
+                  <CardV2 as="section" aria-label="Description" className={styles.descriptionCard}>
                     <h2>Description</h2>
                     <p>{feature.description || 'No description yet.'}</p>
                     {feature.goal && (
@@ -489,14 +504,14 @@ export function FeatureDetailPage() {
                         <p>{feature.goal}</p>
                       </section>
                     )}
-                  </Card>
+                  </CardV2>
                   {criteriaPanel}
                 </>
               )}
-              <Card as="section" aria-label="Notes" className={styles.notesCard}>
+              <CardV2 as="section" aria-label="Notes" className={styles.notesCard}>
                 <h2>Notes</h2>
                 <p>{feature.notes || 'No notes yet.'}</p>
-              </Card>
+              </CardV2>
               {isBug && (
                 <details className={styles.extraDetails}>
                   <summary>Acceptance criteria</summary>
@@ -510,7 +525,7 @@ export function FeatureDetailPage() {
             >
               {isBug ? (
                 <>
-                  <Card as="section" aria-label="Screenshots" className={styles.screenshotsCard}>
+                  <CardV2 as="section" aria-label="Screenshots" className={styles.screenshotsCard}>
                     <h2>
                       Screenshots{' '}
                       <span className={styles.count}>
@@ -535,20 +550,20 @@ export function FeatureDetailPage() {
                                 <span>{attachment.file_name}</span>
                               </a>
                               {!archived && (
-                                <Button
+                                <ButtonV2
                                   variant="ghost"
                                   onClick={() => void removeAttachment(attachment.id)}
                                 >
                                   Remove {attachment.file_name}
-                                </Button>
+                                </ButtonV2>
                               )}
                             </li>
                           );
                         })}
                       </ul>
                     )}
-                  </Card>
-                  <Card
+                  </CardV2>
+                  <CardV2
                     as="section"
                     aria-label="Attach another screenshot"
                     className={styles.uploadCard}
@@ -556,7 +571,7 @@ export function FeatureDetailPage() {
                     <h2>Attach another screenshot</h2>
                     <p>PNG, JPG or WebP · up to 5 MB</p>
                     {!archived && (
-                      <Button
+                      <ButtonV2
                         variant="secondary"
                         className={styles.chooseImage}
                         aria-label="Add Bug screenshot"
@@ -564,7 +579,7 @@ export function FeatureDetailPage() {
                         onClick={() => void chooseBugScreenshot()}
                       >
                         + Choose image
-                      </Button>
+                      </ButtonV2>
                     )}
                     <input
                       ref={bugScreenshotInput}
@@ -579,9 +594,11 @@ export function FeatureDetailPage() {
                         event.currentTarget.value = '';
                       }}
                     />
-                    {screenshotPickerError && <p role="alert">{screenshotPickerError}</p>}
-                  </Card>
-                  <Card as="section" aria-label="Properties" className={styles.bugProperties}>
+                    {screenshotPickerError && (
+                      <AlertV2 tone="error">{screenshotPickerError}</AlertV2>
+                    )}
+                  </CardV2>
+                  <CardV2 as="section" aria-label="Properties" className={styles.bugProperties}>
                     <h2>
                       {selectedTags.join(', ') || 'Bug'} · {titleCase(feature.priority)}
                     </h2>
@@ -594,7 +611,7 @@ export function FeatureDetailPage() {
                         {epicName}
                       </Link>
                     )}
-                  </Card>
+                  </CardV2>
                   <details className={styles.extraDetails}>
                     <summary>Tasks</summary>
                     {tasksPanel}
@@ -602,7 +619,7 @@ export function FeatureDetailPage() {
                 </>
               ) : (
                 <>
-                  <Card as="section" aria-label="Properties" className={styles.propertiesCard}>
+                  <CardV2 as="section" aria-label="Properties" className={styles.propertiesCard}>
                     <h2>Properties</h2>
                     <dl className={styles.properties}>
                       <div>
@@ -632,9 +649,9 @@ export function FeatureDetailPage() {
                         <dd>{selectedTags.length ? selectedTags.join(', ') : 'No tags'}</dd>
                       </div>
                     </dl>
-                  </Card>
+                  </CardV2>
                   {tasksPanel}
-                  <Card as="section" aria-label="Quick actions" className={styles.quickActions}>
+                  <CardV2 as="section" aria-label="Quick actions" className={styles.quickActions}>
                     <h2>Quick actions</h2>
                     {feature.epic_id && (
                       <Link
@@ -646,11 +663,11 @@ export function FeatureDetailPage() {
                     <Link to={`/transfer/${workspaceId}/${projectId}/tasks/${feature.id}`}>
                       Import / export Tasks ↗
                     </Link>
-                  </Card>
+                  </CardV2>
                 </>
               )}
               {dependencies.length > 0 && (
-                <Card as="section" aria-label="Dependencies" className={styles.dependencies}>
+                <CardV2 as="section" aria-label="Dependencies" className={styles.dependencies}>
                   <h2>Dependencies</h2>
                   <ul>
                     {dependencies.map((item) => (
@@ -660,7 +677,7 @@ export function FeatureDetailPage() {
                       </li>
                     ))}
                   </ul>
-                </Card>
+                </CardV2>
               )}
             </aside>
           </div>

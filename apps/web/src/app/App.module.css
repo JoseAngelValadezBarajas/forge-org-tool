@@ -264,8 +264,7 @@
   background: var(--forge-surface-raised);
   color: var(--forge-text);
 }
-.storageMenuTrigger:focus-visible,
-.storageMenuItem:focus-visible {
+.storageMenuTrigger:focus-visible {
   outline: 2px solid var(--forge-accent);
   outline-offset: 1px;
 }
@@ -277,53 +276,6 @@
 .storageMenuChevron {
   margin-left: auto;
   flex: 0 0 auto;
-}
-.storageMenu {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 8px);
-  z-index: 10;
-  display: grid;
-  width: 220px;
-  padding: 6px;
-  border: 1px solid var(--forge-border-subtle);
-  border-radius: 10px;
-  background: var(--forge-surface-raised);
-  box-shadow: 0 12px 28px rgb(0 0 0 / 28%);
-}
-.storageMenuItem {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  min-height: 34px;
-  padding: 7px 9px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--forge-text-muted);
-  font: inherit;
-  font-size: 12px;
-  text-align: left;
-  cursor: pointer;
-}
-.storageMenuItem:hover,
-.storageMenuItem[aria-checked='true'] {
-  background: var(--forge-accent-soft);
-  color: var(--forge-text);
-}
-.storageMenuIndicator {
-  display: inline-grid;
-  place-items: center;
-  width: 12px;
-  color: var(--forge-accent);
-  font-size: 16px;
-  line-height: 12px;
-}
-.storageMenuSeparator {
-  height: 1px;
-  margin: 5px 4px;
-  background: var(--forge-border-subtle);
 }
 .contentColumn {
   min-width: 0;
@@ -386,39 +338,9 @@
   }
 }
 .themeControl {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  width: 95px;
-  height: 27px;
-}
-.themeControl select {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 27px;
-  height: 27px;
-  padding: 0 6px;
-  color: var(--forge-text-muted);
-  background: var(--forge-surface-interactive);
-  border: 0;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 500;
-  appearance: none;
-  color: transparent;
-}
-.themeLabel {
-  position: absolute;
-  left: 6px;
-  z-index: 1;
-  color: var(--forge-text-primary);
-  font:
-    500 11px/15px Inter,
-    sans-serif;
-  pointer-events: none;
-}
-.themeControl option {
-  color: var(--forge-text-primary);
+  gap: var(--forge-space-2);
 }
 .mobileBrand {
   display: none;
@@ -537,11 +459,6 @@
   width: 42px;
   height: 42px;
   padding: 10px;
-}
-.shellGrid[data-sidebar-collapsed='true'] .storageMenu {
-  right: auto;
-  bottom: 0;
-  left: 48px;
 }
 .breadcrumb {
   margin-bottom: var(--forge-space-5);
@@ -705,19 +622,6 @@
   .mobileTheme {
     gap: 0;
     font-size: 0;
-  }
-  .mobileTheme select {
-    box-sizing: border-box;
-    width: 72px;
-    min-height: 40px;
-    font-size: 0.75rem;
-  }
-  .mobileTheme .themeLabel {
-    display: none;
-  }
-  .mobileTheme select {
-    color: var(--forge-text-primary);
-    appearance: auto;
   }
   .mobileHeader > button {
     min-width: 44px;

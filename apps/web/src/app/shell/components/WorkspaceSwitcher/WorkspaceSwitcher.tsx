@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { DropdownMenuV2, type DropdownMenuV2Item } from '@corefoundry-labs/forge-ui';
 import { ChevronDown, Folder, Settings } from '@corefoundry-labs/forge-icons';
 import styles from './WorkspaceSwitcher.module.css';
 
@@ -26,38 +26,30 @@ export function WorkspaceSwitcher({
   dataNodeId,
   compact = false,
 }: WorkspaceSwitcherProps) {
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const wasOpen = useRef(false);
   const selectedName = workspaces.find((workspace) => workspace.id === value)?.name ?? currentName;
 
-  useEffect(() => {
-    if (open) itemRefs.current[0]?.focus();
-    else if (wasOpen.current) triggerRef.current?.focus();
-    wasOpen.current = open;
-  }, [open]);
-
-  function handleKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    const items = itemRefs.current.filter((item): item is HTMLButtonElement => item !== null);
-    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setOpen(false);
-      return;
-    }
-    if (!items.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-    event.preventDefault();
-    const nextIndex =
-      event.key === 'Home'
-        ? 0
-        : event.key === 'End'
-          ? items.length - 1
-          : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
-    items[nextIndex]?.focus();
-  }
-
   if ((onChange || onManage) && (workspaces.length > 0 || onManage)) {
+    const items: DropdownMenuV2Item[] = [
+      ...(onManage
+        ? [
+            {
+              id: 'manage-workspaces',
+              label: 'Manage workspaces',
+              icon: <Settings aria-hidden="true" size={15} />,
+              onSelect: onManage,
+            },
+          ]
+        : []),
+      ...(onManage && workspaces.length > 0
+        ? [{ type: 'separator' as const, id: 'workspace-separator' }]
+        : []),
+      ...workspaces.map((workspace) => ({
+        id: workspace.id,
+        label: workspace.id === value ? `${workspace.name} (active)` : workspace.name,
+        onSelect: () => onChange?.(workspace.id),
+      })),
+    ];
+
     return (
       <div
         className={[styles.field, compact && styles.compactField].filter(Boolean).join(' ')}
@@ -66,70 +58,24 @@ export function WorkspaceSwitcher({
       >
         <span className={compact ? styles.compactLabel : undefined}>Workspace</span>
         <div className={styles.selector}>
-          <button
-            type="button"
-            className={[styles.trigger, compact && styles.compactTrigger].filter(Boolean).join(' ')}
-            aria-label={`Workspace: ${selectedName}`}
-            aria-haspopup="menu"
-            aria-expanded={open}
-            ref={triggerRef}
-            onClick={() => setOpen((isOpen) => !isOpen)}
-          >
-            {compact && <Folder className={styles.compactIcon} aria-hidden="true" size={20} />}
-            <span className={styles.selectedName}>{selectedName}</span>
-            <ChevronDown aria-hidden="true" size={14} className={styles.chevron} />
-          </button>
-          {open && (
-            <div
-              className={styles.menu}
-              role="menu"
-              aria-label="Workspaces"
-              tabIndex={-1}
-              onKeyDown={handleKeyDown}
-            >
-              {onManage && (
-                <button
-                  type="button"
-                  role="menuitem"
-                  className={styles.menuItem}
-                  ref={(node) => {
-                    itemRefs.current[0] = node;
-                  }}
-                  onClick={() => {
-                    setOpen(false);
-                    onManage();
-                  }}
-                >
-                  <Settings aria-hidden="true" size={15} />
-                  <span>Manage workspaces</span>
-                </button>
-              )}
-              {onManage && workspaces.length > 0 && (
-                <div className={styles.menuSeparator} role="separator" />
-              )}
-              {workspaces.map((workspace, index) => (
-                <button
-                  key={workspace.id}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={workspace.id === value}
-                  className={styles.menuItem}
-                  ref={(node) => {
-                    itemRefs.current[index + (onManage ? 1 : 0)] = node;
-                  }}
-                  onClick={() => {
-                    setOpen(false);
-                    onChange?.(workspace.id);
-                  }}
-                >
-                  <span className={styles.menuIndicator} aria-hidden="true">
-                    {workspace.id === value ? '•' : ''}
-                  </span>
-                  <span>{workspace.name}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          <DropdownMenuV2
+            aria-label="Workspaces"
+            density="comfortable"
+            items={items}
+            trigger={
+              <button
+                type="button"
+                className={[styles.trigger, compact && styles.compactTrigger]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-label={`Workspace: ${selectedName}`}
+              >
+                {compact && <Folder className={styles.compactIcon} aria-hidden="true" size={20} />}
+                <span className={styles.selectedName}>{selectedName}</span>
+                <ChevronDown aria-hidden="true" size={14} className={styles.chevron} />
+              </button>
+            }
+          />
         </div>
       </div>
     );

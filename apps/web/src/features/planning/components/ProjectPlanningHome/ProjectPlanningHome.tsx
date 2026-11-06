@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Card } from '@corefoundry-labs/forge-ui';
+import { CardV2 } from '@corefoundry-labs/forge-ui';
 import styles from './ProjectPlanningHome.module.css';
 
 export type ProjectPlanningHomeState = 'Default' | 'Empty' | 'Archived';
@@ -18,7 +18,7 @@ export function ProjectPlanningHome({
 }: ProjectPlanningHomeProps) {
   if (state) {
     return (
-      <Card
+      <CardV2
         as="section"
         className={styles.specimen}
         aria-label="Project planning"
@@ -31,7 +31,7 @@ export function ProjectPlanningHome({
         <p className={styles.description}>Epics · Features · Tasks and actions</p>
         <small className={styles.reference}>projects/ProjectPlanningHome</small>
         {children && <div className={styles.content}>{children}</div>}
-      </Card>
+      </CardV2>
     );
   }
 

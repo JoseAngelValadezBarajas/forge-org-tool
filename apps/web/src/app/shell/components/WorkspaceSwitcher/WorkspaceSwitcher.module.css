@@ -43,8 +43,7 @@
   border-color: var(--forge-accent);
   background: var(--forge-surface-raised);
 }
-.trigger:focus-visible,
-.menuItem:focus-visible {
+.trigger:focus-visible {
   outline: 2px solid var(--forge-accent);
   outline-offset: 2px;
 }
@@ -57,62 +56,6 @@
 .chevron {
   flex: 0 0 auto;
   color: var(--forge-text-secondary);
-}
-.menu {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 7px);
-  left: 0;
-  display: grid;
-  gap: 3px;
-  box-sizing: border-box;
-  width: 208px;
-  max-height: min(320px, 60vh);
-  overflow-y: auto;
-  padding: 6px;
-  border: 1px solid var(--forge-border-subtle);
-  border-radius: 9px;
-  background: var(--forge-surface-raised);
-  box-shadow: 0 10px 24px rgb(0 0 0 / 28%);
-}
-.menuItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 36px;
-  padding: 8px 9px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--forge-text-muted);
-  font: inherit;
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-}
-.menuItem:hover,
-.menuItem[aria-checked='true'] {
-  background: var(--forge-accent-soft);
-  color: var(--forge-accent);
-}
-.menuItem > span:last-child {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.menuIndicator {
-  flex: 0 0 9px;
-  width: 9px;
-  color: var(--forge-accent);
-  text-align: center;
-}
-.menuSeparator {
-  height: 1px;
-  margin: 4px 2px;
-  background: var(--forge-border-subtle);
 }
 .current {
   display: grid;
@@ -164,10 +107,6 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-}
-.compactField .menu {
-  left: 0;
-  width: 208px;
 }
 @media (max-width: 720px) {
   .field {

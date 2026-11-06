@@ -12,6 +12,9 @@ const componentPaths = Array.from(
   ([, componentPath]) => componentPath,
 );
 
+// ThemeScope styles itself through inline custom properties and ships no CSS module.
+const withoutStylesheet = new Set(['components/layout/ThemeScope']);
+
 test('installed UI artifact exposes self-contained component directories', () => {
   const violations = [];
 
@@ -24,7 +27,10 @@ test('installed UI artifact exposes self-contained component directories', () =>
       continue;
     }
 
-    for (const file of [`${componentName}.js`, `${componentName}.module.css`, 'index.js']) {
+    const required = [`${componentName}.js`, `${componentName}.module.css`, 'index.js'].filter(
+      (file) => !(withoutStylesheet.has(componentPath) && file.endsWith('.module.css')),
+    );
+    for (const file of required) {
       if (!existsSync(path.join(componentDirectory, file))) {
         violations.push(`${componentPath} is missing ${file}`);
       }

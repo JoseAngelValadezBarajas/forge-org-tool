@@ -1,5 +1,12 @@
 import { useEffect, useRef, type FormEvent } from 'react';
-import { Button, FormField, Input, Select, Textarea } from '@corefoundry-labs/forge-ui';
+import {
+  AlertV2,
+  ButtonV2,
+  FormField,
+  SelectV2,
+  TextInputV2,
+  Textarea,
+} from '@corefoundry-labs/forge-ui';
 import type { WorkspaceTag } from '@forge-org/api-client';
 import styles from './CreateEpicDrawer.module.css';
 
@@ -62,7 +69,7 @@ export function CreateEpicDrawer({
       <p className={styles.description}>An Epic groups Stories, Bugs and Tasks.</p>
       <form className={styles.form} onSubmit={onSubmit}>
         <FormField label="Epic title">
-          <Input
+          <TextInputV2
             id="epic-title"
             placeholder="e.g. Behavioral Analytics"
             ref={titleInputRef}
@@ -80,7 +87,7 @@ export function CreateEpicDrawer({
           />
         </FormField>
         <FormField label="Priority">
-          <Select
+          <SelectV2
             aria-label="Priority"
             value={priority}
             onChange={(event) => onPriorityChange(event.target.value)}
@@ -90,11 +97,11 @@ export function CreateEpicDrawer({
                 {value}
               </option>
             ))}
-          </Select>
+          </SelectV2>
         </FormField>
         <fieldset className={styles.tagChoices}>
           <legend>Workspace tags</legend>
-          {tagCatalogError && <p role="status">{tagCatalogError}</p>}
+          {tagCatalogError && <AlertV2 tone="info">{tagCatalogError}</AlertV2>}
           {workspaceTags.map((tag) => (
             <label key={tag.id} className={styles.tagChoice}>
               <input
@@ -123,12 +130,12 @@ export function CreateEpicDrawer({
           {workspaceTags.length === 0 && !tagCatalogError && <p>No workspace tags yet.</p>}
         </fieldset>
         <div className={styles.actions}>
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <ButtonV2 type="button" variant="secondary" onClick={onCancel}>
             Cancel
-          </Button>
-          <Button type="submit" className={styles.submitButton}>
+          </ButtonV2>
+          <ButtonV2 type="submit" className={styles.submitButton}>
             Create Epic
-          </Button>
+          </ButtonV2>
         </div>
       </form>
     </section>

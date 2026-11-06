@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   getConfiguredStorageProviders,
@@ -20,7 +20,7 @@ const SIDEBAR_COLLAPSED_KEY = 'forge-sidebar-collapsed';
 export function useApplicationShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, forgeTheme, setTheme } = useTheme();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -46,7 +46,6 @@ export function useApplicationShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true',
   );
-  const [storageMenuOpen, setStorageMenuOpen] = useState(false);
   const [storageSnapshot, setStorageSnapshot] = useState<StorageSnapshot>(() =>
     getStorageSnapshot(),
   );
@@ -56,9 +55,6 @@ export function useApplicationShell() {
   const [storageRevision, setStorageRevision] = useState(0);
   const storageProviderRef = useRef(storageSnapshot.provider);
   const storageDataRevision = useRef(0);
-  const storageMenuTriggerRef = useRef<HTMLButtonElement>(null);
-  const storageMenuItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const previousStorageMenuOpen = useRef(false);
   const [contextOverview, setContextOverview] = useState<PlanningOverview | null>(null);
   const workspaceFallbackName = navigationError
     ? 'Workspace unavailable'
@@ -96,14 +92,6 @@ export function useApplicationShell() {
     window.addEventListener('forge:storage-changed', onStorageChanged);
     return () => window.removeEventListener('forge:storage-changed', onStorageChanged);
   }, []);
-  useEffect(() => {
-    if (storageMenuOpen) {
-      storageMenuItemRefs.current[0]?.focus();
-    } else if (previousStorageMenuOpen.current) {
-      storageMenuTriggerRef.current?.focus();
-    }
-    previousStorageMenuOpen.current = storageMenuOpen;
-  }, [storageMenuOpen]);
   useEffect(() => {
     if (storageSnapshot.provider !== 'supabase') return;
     let current = true;
@@ -250,19 +238,13 @@ export function useApplicationShell() {
       }
       if (event.key === 'Escape') {
         setPaletteOpen(false);
-        setStorageMenuOpen(false);
       }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
-  function registerStorageMenuItem(index: number, node: HTMLButtonElement | null) {
-    storageMenuItemRefs.current[index] = node;
-  }
-
   function go(path: string) {
     setPaletteOpen(false);
-    setStorageMenuOpen(false);
     navigate(path);
   }
 
@@ -271,34 +253,12 @@ export function useApplicationShell() {
       const nextSnapshot = switchStorageProvider(provider);
       setStorageSnapshot(nextSnapshot);
       setConfiguredStorageProviders(getConfiguredStorageProviders());
-      setStorageMenuOpen(false);
       if (nextSnapshot.status === 'authentication_required') navigate('/settings/storage');
     } catch {
-      setStorageMenuOpen(false);
       navigate('/settings/storage');
     }
   }
 
-  function handleStorageMenuKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    const items = storageMenuItemRefs.current.filter(
-      (item): item is HTMLButtonElement => item !== null,
-    );
-    const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement);
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setStorageMenuOpen(false);
-      return;
-    }
-    if (!items.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-    event.preventDefault();
-    const nextIndex =
-      event.key === 'Home'
-        ? 0
-        : event.key === 'End'
-          ? items.length - 1
-          : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
-    items[nextIndex]?.focus();
-  }
   function selectWorkspace(id: string) {
     setActiveWorkspaceId(id);
     activeWorkspaceIdRef.current = id;
@@ -378,8 +338,6 @@ export function useApplicationShell() {
     setProjectQuery,
     sidebarCollapsed,
     setSidebarCollapsed,
-    storageMenuOpen,
-    setStorageMenuOpen,
     storageSnapshot,
     configuredStorageProviders,
     storageRevision,
@@ -387,8 +345,6 @@ export function useApplicationShell() {
     context,
     navigationWorkspaceId,
     activeWorkspace,
-    storageMenuTriggerRef,
-    registerStorageMenuItem,
     workspaceFallbackName,
     isMobileEpicBoard,
     activeProject,
@@ -403,10 +359,10 @@ export function useApplicationShell() {
     productDestinations,
     theme,
     resolvedTheme,
+    forgeTheme,
     setTheme,
     go,
     selectStorageProvider,
-    handleStorageMenuKeyDown,
     selectWorkspace,
   };
 }

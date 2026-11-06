@@ -18,7 +18,7 @@ it('shows an accessible menu and reports a real selection change', () => {
   );
   fireEvent.click(screen.getByRole('button', { name: 'Workspace: Local' }));
   const menu = screen.getByRole('menu', { name: 'Workspaces' });
-  fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Research' }));
+  fireEvent.click(within(menu).getByRole('menuitem', { name: 'Research' }));
   expect(onChange).toHaveBeenCalledWith('w2');
   expect(screen.queryByRole('menu', { name: 'Workspaces' })).not.toBeInTheDocument();
 

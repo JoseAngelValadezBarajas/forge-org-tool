@@ -8,17 +8,20 @@ test('root package tooling has one dependency definition and concrete Rust targe
   const dependencyDefinitions = [...source.matchAll(/"devDependencies"\s*:/g)];
 
   assert.equal(dependencyDefinitions.length, 1);
-  assert.deepEqual(packageJson.devDependencies, {
-    '@eslint/js': '^9.39.5',
-    eslint: '^9.39.5',
-    'eslint-config-prettier': '^10.1.8',
-    'eslint-plugin-jsx-a11y': '^6.10.2',
-    'eslint-plugin-react-hooks': '^7.1.1',
-    'openapi-typescript': '^7.13.0',
-    prettier: '^3.9.10',
-    'typescript-eslint': '^8.72.0',
-    typescript: '^5.9.3',
-  });
+  // Versions are owned by Dependabot and the lockfile; the contract is which tools exist.
+  for (const tool of [
+    '@eslint/js',
+    'eslint',
+    'eslint-config-prettier',
+    'eslint-plugin-jsx-a11y',
+    'eslint-plugin-react-hooks',
+    'openapi-typescript',
+    'prettier',
+    'typescript',
+    'typescript-eslint',
+  ]) {
+    assert.ok(tool in packageJson.devDependencies, `${tool} must stay a root devDependency`);
+  }
   assert.match(
     packageJson.scripts['lint:fix'],
     /cargo fmt --manifest-path apps\/desktop\/Cargo\.toml/,
