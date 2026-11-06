@@ -1,5 +1,7 @@
-"""Persistence ports exposed to application services."""
+"""Persistence adapters implementing the application ports."""
 
+from .attachments import SqliteAttachmentStore
 from .organization import OrganizationRepository
+from .transfer import SqliteTransferStore
 
-__all__ = ['OrganizationRepository']
+__all__ = ['OrganizationRepository', 'SqliteAttachmentStore', 'SqliteTransferStore']

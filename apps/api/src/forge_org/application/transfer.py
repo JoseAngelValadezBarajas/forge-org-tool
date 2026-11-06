@@ -1,12 +1,11 @@
 import hashlib
 import json
-import sqlite3
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from forge_org.infrastructure.connection import utc_now
-from forge_org.infrastructure.persistence import OrganizationRepository
+from forge_org.application.ports import TransferStore
+from forge_org.domain.clock import utc_now
 
 SCHEMA_VERSION = 'forge-project-import-v1'
 SCHEMA_VERSION_V2 = 'forge-project-transfer-v2'
@@ -19,8 +18,8 @@ MAX_DOCUMENT_BYTES = 7 * 1024 * 1024
 
 
 class ProjectTransferService:
-    def __init__(self, connection: sqlite3.Connection, storage_root: Path | None = None) -> None:
-        self.connection = connection
+    def __init__(self, store: TransferStore, storage_root: Path | None = None) -> None:
+        self.store = store
         self.storage_root = storage_root
 
     @staticmethod
@@ -185,12 +184,7 @@ class ProjectTransferService:
         return normalized
 
     def preview(self, workspace_id: str, document: dict[str, Any]) -> dict[str, Any]:
-        if (
-            self.connection.execute(
-                'SELECT 1 FROM workspaces WHERE id = ?', (workspace_id,)
-            ).fetchone()
-            is None
-        ):
+        if not self.store.workspace_exists(workspace_id):
             raise LookupError('Workspace not found')
         normalized = self.validate(document)
         canonical = self.canonical(normalized)
@@ -230,35 +224,28 @@ class ProjectTransferService:
         now = utc_now()
         refs: list[dict[str, str]] = []
         try:
-            self.connection.execute(
-                "INSERT INTO projects(id, workspace_id, name, description, status, created_at, updated_at, archived_at) VALUES (?, ?, ?, ?, 'active', ?, ?, NULL)",
-                (
-                    project_id,
-                    workspace_id,
-                    normalized['project']['name'],
-                    normalized['project'].get('description'),
-                    now,
-                    now,
-                ),
+            self.store.insert_project(
+                project_id,
+                workspace_id,
+                normalized['project']['name'],
+                normalized['project'].get('description'),
+                now,
             )
+            is_v2 = normalized['schema_version'] == SCHEMA_VERSION_V2
             epic_ids: dict[str, str] = {}
             for epic in normalized['epics']:
                 epic_id = str(uuid4())
                 epic_ids[epic['ref']] = epic_id
-                self.connection.execute(
-                    'INSERT INTO epics(id, project_id, title, description, priority, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    (
-                        epic_id,
-                        project_id,
-                        epic['title'],
-                        epic.get('description'),
-                        epic.get('priority', 'medium'),
-                        now,
-                        now,
-                    ),
+                self.store.insert_epic(
+                    epic_id,
+                    project_id,
+                    epic['title'],
+                    epic.get('description'),
+                    epic.get('priority', 'medium'),
+                    now,
                 )
-                if normalized['schema_version'] == SCHEMA_VERSION_V2:
-                    OrganizationRepository(self.connection)._set_work_item_tags(
+                if is_v2:
+                    self.store.set_work_item_tags(
                         workspace_id, 'epic', epic_id, epic.get('tags', [])
                     )
                 refs.append({'ref': epic['ref'], 'generated_id': epic_id})
@@ -266,80 +253,61 @@ class ProjectTransferService:
             for feature in normalized['features']:
                 feature_id = str(uuid4())
                 feature_ids[feature['ref']] = feature_id
-                self.connection.execute(
-                    'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, kind, bug_severity, steps_to_reproduce, expected_result, actual_result, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    (
-                        feature_id,
-                        project_id,
-                        epic_ids.get(feature.get('epic_ref')),
-                        feature['title'],
-                        feature.get('description'),
-                        feature.get('goal'),
-                        feature.get('priority', 'medium'),
-                        feature.get('status', 'backlog'),
-                        feature.get(
-                            'kind',
-                            'story'
-                            if normalized['schema_version'] == SCHEMA_VERSION_V2
-                            else 'feature',
-                        ),
-                        feature.get('bug_severity'),
-                        feature.get('steps_to_reproduce'),
-                        feature.get('expected_result'),
-                        feature.get('actual_result'),
-                        feature.get('notes'),
-                        now,
-                        now,
-                    ),
+                self.store.insert_feature(
+                    feature_id,
+                    project_id,
+                    {
+                        'epic_id': epic_ids.get(feature.get('epic_ref')),
+                        'title': feature['title'],
+                        'description': feature.get('description'),
+                        'goal': feature.get('goal'),
+                        'priority': feature.get('priority', 'medium'),
+                        'status': feature.get('status', 'backlog'),
+                        'kind': feature.get('kind', 'story' if is_v2 else 'feature'),
+                        'bug_severity': feature.get('bug_severity'),
+                        'steps_to_reproduce': feature.get('steps_to_reproduce'),
+                        'expected_result': feature.get('expected_result'),
+                        'actual_result': feature.get('actual_result'),
+                        'notes': feature.get('notes'),
+                    },
+                    now,
                 )
-                if normalized['schema_version'] == SCHEMA_VERSION_V2:
-                    OrganizationRepository(self.connection)._set_work_item_tags(
+                if is_v2:
+                    self.store.set_work_item_tags(
                         workspace_id, 'feature', feature_id, feature.get('tags', [])
                     )
                 refs.append({'ref': feature['ref'], 'generated_id': feature_id})
                 for task in feature.get('tasks', []):
-                    self.connection.execute(
-                        'INSERT INTO tasks(id, feature_id, title, description, status, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                        (
-                            str(uuid4()),
-                            feature_id,
-                            task['title'],
-                            task.get('description'),
-                            task.get('status', 'todo'),
-                            task.get('position', 0),
-                            now,
-                            now,
-                        ),
+                    self.store.insert_task(
+                        str(uuid4()),
+                        feature_id,
+                        task['title'],
+                        task.get('description'),
+                        task.get('status', 'todo'),
+                        task.get('position', 0),
+                        now,
                     )
                 for criterion in feature.get('acceptance_criteria', []):
-                    self.connection.execute(
-                        'INSERT INTO acceptance_criteria(id, feature_id, description, satisfied, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                        (
-                            str(uuid4()),
-                            feature_id,
-                            criterion['description'],
-                            bool(criterion.get('satisfied', False)),
-                            criterion.get('position', 0),
-                            now,
-                            now,
-                        ),
+                    self.store.insert_criterion(
+                        str(uuid4()),
+                        feature_id,
+                        criterion['description'],
+                        bool(criterion.get('satisfied', False)),
+                        criterion.get('position', 0),
+                        now,
                     )
             for dependency in normalized['dependencies']:
-                self.connection.execute(
-                    'INSERT INTO feature_dependencies(id, project_id, blocking_feature_id, blocked_feature_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-                    (
-                        str(uuid4()),
-                        project_id,
-                        feature_ids[dependency['blocking_feature_ref']],
-                        feature_ids[dependency['blocked_feature_ref']],
-                        now,
-                        now,
-                    ),
+                self.store.insert_dependency(
+                    str(uuid4()),
+                    project_id,
+                    feature_ids[dependency['blocking_feature_ref']],
+                    feature_ids[dependency['blocked_feature_ref']],
+                    now,
                 )
             if commit:
-                self.connection.commit()
+                self.store.commit()
         except Exception:
-            self.connection.rollback()
+            self.store.rollback()
             raise
         return {
             'schema_version': normalized['schema_version'],
@@ -354,41 +322,19 @@ class ProjectTransferService:
     ) -> dict[str, Any]:
         if schema_version not in {SCHEMA_VERSION, SCHEMA_VERSION_V2}:
             raise ValueError('Unsupported project export schema')
-        project = self.connection.execute(
-            'SELECT * FROM projects WHERE workspace_id = ? AND id = ?', (workspace_id, project_id)
-        ).fetchone()
+        project = self.store.export_project_row(workspace_id, project_id)
         if project is None:
             raise LookupError('Project not found')
-        epics = [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT * FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
-            ).fetchall()
-        ]
+        epics = self.store.export_epics(project_id)
         epic_refs = {item['id']: f'epic:{index + 1:03d}' for index, item in enumerate(epics)}
         features = []
         feature_refs_by_id: dict[str, str] = {}
-        for index, item in enumerate(
-            self.connection.execute(
-                'SELECT * FROM features WHERE project_id = ? ORDER BY created_at', (project_id,)
-            ).fetchall()
-        ):
+        for index, item in enumerate(self.store.export_features(project_id)):
             feature = dict(item)
             feature_ref = f'feature:{index + 1:03d}'
             feature_refs_by_id[item['id']] = feature_ref
-            tasks = [
-                dict(row)
-                for row in self.connection.execute(
-                    'SELECT * FROM tasks WHERE feature_id = ? ORDER BY position, id', (item['id'],)
-                ).fetchall()
-            ]
-            criteria = [
-                dict(row)
-                for row in self.connection.execute(
-                    'SELECT * FROM acceptance_criteria WHERE feature_id = ? ORDER BY position, id',
-                    (item['id'],),
-                ).fetchall()
-            ]
+            tasks = self.store.export_tasks(item['id'])
+            criteria = self.store.export_criteria(item['id'])
             features.append(
                 {
                     'ref': feature_ref,
@@ -432,13 +378,7 @@ class ProjectTransferService:
                     ),
                 }
             )
-        dependencies = [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT blocking_feature_id, blocked_feature_id FROM feature_dependencies WHERE project_id = ? ORDER BY created_at, id',
-                (project_id,),
-            ).fetchall()
-        ]
+        dependencies = self.store.export_dependencies(project_id)
         exported_dependencies = [
             {
                 'blocking_feature_ref': feature_refs_by_id[item['blocking_feature_id']],
@@ -479,42 +419,22 @@ class ProjectTransferService:
         destination_id: str,
         document: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
-        project = self.connection.execute(
-            'SELECT status FROM projects WHERE workspace_id = ? AND id = ?',
-            (workspace_id, project_id),
-        ).fetchone()
-        if project is None:
+        status = self.store.project_status(workspace_id, project_id)
+        if status is None:
             raise LookupError('Project not found')
-        if project['status'] != 'active':
+        if status != 'active':
             raise ValueError('Archived projects do not accept imports')
         if scope == 'epics':
-            if (
-                destination_id != project_id
-                and self.connection.execute(
-                    'SELECT 1 FROM epics WHERE project_id = ? AND id = ?',
-                    (project_id, destination_id),
-                ).fetchone()
-                is None
+            if destination_id != project_id and not self.store.epic_exists(
+                project_id, destination_id
             ):
                 raise LookupError('Destination Epic not found in this project')
-            target_epic = None
-            target_feature = None
         elif scope == 'work-items':
-            target_epic = self.connection.execute(
-                'SELECT id FROM epics WHERE project_id = ? AND id = ?',
-                (project_id, destination_id),
-            ).fetchone()
-            if target_epic is None:
+            if not self.store.epic_exists(project_id, destination_id):
                 raise LookupError('Destination Epic not found in this project')
-            target_feature = None
         elif scope == 'tasks':
-            target_feature = self.connection.execute(
-                'SELECT id FROM features WHERE project_id = ? AND id = ?',
-                (project_id, destination_id),
-            ).fetchone()
-            if target_feature is None:
+            if not self.store.feature_exists(project_id, destination_id):
                 raise LookupError('Destination Work Item not found in this project')
-            target_epic = None
         else:
             raise ValueError('Unsupported contextual transfer scope')
         if document is None:
@@ -591,31 +511,24 @@ class ProjectTransferService:
         references: list[dict[str, str]] = []
         if scope == 'tasks':
             feature_id = destination_id
-            position = self.connection.execute(
-                'SELECT COALESCE(MAX(position) + 1, 0) FROM tasks WHERE feature_id = ?',
-                (feature_id,),
-            ).fetchone()[0]
+            position = self.store.next_task_position(feature_id)
             try:
                 for task in normalized['features'][0]['tasks']:
                     task_id = str(uuid4())
-                    self.connection.execute(
-                        'INSERT INTO tasks(id, feature_id, title, description, status, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                        (
-                            task_id,
-                            feature_id,
-                            task['title'],
-                            task.get('description'),
-                            task.get('status', 'todo'),
-                            position,
-                            now,
-                            now,
-                        ),
+                    self.store.insert_task(
+                        task_id,
+                        feature_id,
+                        task['title'],
+                        task.get('description'),
+                        task.get('status', 'todo'),
+                        position,
+                        now,
                     )
                     references.append({'ref': task['ref'], 'generated_id': task_id})
                     position += 1
-                self.connection.commit()
+                self.store.commit()
             except Exception:
-                self.connection.rollback()
+                self.store.rollback()
                 raise
             return {
                 'schema_version': normalized['schema_version'],
@@ -639,28 +552,10 @@ class ProjectTransferService:
                 workspace_id, staged_document, staged_preview['fingerprint'], commit=False
             )
             staged_project_id = imported['project_id']
-            if scope == 'epics':
-                self.connection.execute(
-                    'UPDATE epics SET project_id = ? WHERE project_id = ?',
-                    (project_id, staged_project_id),
-                )
-                self.connection.execute(
-                    'UPDATE features SET project_id = ? WHERE project_id = ?',
-                    (project_id, staged_project_id),
-                )
-            else:
-                self.connection.execute(
-                    'UPDATE features SET project_id = ?, epic_id = ? WHERE project_id = ?',
-                    (project_id, destination_id, staged_project_id),
-                )
-            self.connection.execute(
-                'UPDATE feature_dependencies SET project_id = ? WHERE project_id = ?',
-                (project_id, staged_project_id),
-            )
-            self.connection.execute('DELETE FROM projects WHERE id = ?', (staged_project_id,))
-            self.connection.commit()
+            self.store.adopt_staged_project(scope, staged_project_id, project_id, destination_id)
+            self.store.commit()
         except Exception:
-            self.connection.rollback()
+            self.store.rollback()
             raise
         return {
             'schema_version': normalized['schema_version'],
@@ -681,34 +576,18 @@ class ProjectTransferService:
     ) -> dict[str, Any]:
         document = self.export_project(workspace_id, project_id, schema_version)
         if scope == 'epics':
-            epic = self.connection.execute(
-                'SELECT id FROM epics WHERE project_id = ? AND id = ?', (project_id, destination_id)
-            ).fetchone()
-            if epic is None:
+            if not self.store.epic_exists(project_id, destination_id):
                 raise LookupError('Epic not found in this project')
-            epic_id_order = [
-                row['id']
-                for row in self.connection.execute(
-                    'SELECT id FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
-                ).fetchall()
-            ]
+            epic_id_order = self.store.epic_ids_in_export_order(project_id)
             epic_ref = f'epic:{epic_id_order.index(destination_id) + 1:03d}'
             document['epics'] = [item for item in document['epics'] if item['ref'] == epic_ref]
             document['features'] = [
                 item for item in document['features'] if item.get('epic_ref') == epic_ref
             ]
         elif scope == 'work-items':
-            target = self.connection.execute(
-                'SELECT id FROM epics WHERE project_id = ? AND id = ?', (project_id, destination_id)
-            ).fetchone()
-            if target is None:
+            if not self.store.epic_exists(project_id, destination_id):
                 raise LookupError('Epic not found in this project')
-            epic_id_order = [
-                row['id']
-                for row in self.connection.execute(
-                    'SELECT id FROM epics WHERE project_id = ? ORDER BY created_at', (project_id,)
-                ).fetchall()
-            ]
+            epic_id_order = self.store.epic_ids_in_export_order(project_id)
             epic_ref = f'epic:{epic_id_order.index(destination_id) + 1:03d}'
             document['epics'] = []
             document['features'] = [
@@ -719,21 +598,9 @@ class ProjectTransferService:
             if not document['features']:
                 raise ValueError('Epic has no Work Items to export')
         elif scope == 'tasks':
-            if (
-                self.connection.execute(
-                    'SELECT 1 FROM features WHERE project_id = ? AND id = ?',
-                    (project_id, destination_id),
-                ).fetchone()
-                is None
-            ):
+            if not self.store.feature_exists(project_id, destination_id):
                 raise LookupError('Work Item not found in this project')
-            feature_ids = [
-                row['id']
-                for row in self.connection.execute(
-                    'SELECT id FROM features WHERE project_id = ? ORDER BY created_at',
-                    (project_id,),
-                ).fetchall()
-            ]
+            feature_ids = self.store.feature_ids_in_export_order(project_id)
             feature_ref = f'feature:{feature_ids.index(destination_id) + 1:03d}'
             document['epics'] = []
             document['dependencies'] = []
@@ -756,15 +623,4 @@ class ProjectTransferService:
         return self.validate(document)
 
     def _tag_names(self, item_type: str, item_id: str) -> list[str]:
-        table, column = {
-            'epic': ('epic_tags', 'epic_id'),
-            'feature': ('feature_tags', 'feature_id'),
-        }[item_type]
-        return [
-            row[0]
-            for row in self.connection.execute(
-                f'SELECT tags.name FROM {table} JOIN tags ON tags.id = {table}.tag_id '
-                f'WHERE {column} = ? ORDER BY tags.normalized_name',
-                (item_id,),
-            ).fetchall()
-        ]
+        return self.store.tag_names(item_type, item_id)

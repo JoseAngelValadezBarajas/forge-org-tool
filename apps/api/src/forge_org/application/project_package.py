@@ -16,7 +16,7 @@ from forge_org.application.attachments import (
     BugAttachmentService,
 )
 from forge_org.application.transfer import SCHEMA_VERSION_V2, ProjectTransferService
-from forge_org.infrastructure.connection import utc_now
+from forge_org.domain.clock import utc_now
 
 MAX_PACKAGE_BYTES = 5 * 1024 * 1024
 MAX_PACKAGE_ENTRIES = 100
@@ -24,11 +24,16 @@ MAX_EXPANDED_BYTES = 25 * 1024 * 1024
 
 
 class ProjectPackageService:
-    def __init__(self, transfer: ProjectTransferService, storage_root: Path) -> None:
+    def __init__(
+        self,
+        transfer: ProjectTransferService,
+        attachments: BugAttachmentService,
+        storage_root: Path,
+    ) -> None:
         self.transfer = transfer
-        self.connection = transfer.connection
+        self.store = transfer.store
         self.storage_root = storage_root
-        self.attachments = BugAttachmentService(self.connection, storage_root)
+        self.attachments = attachments
 
     @staticmethod
     def _fingerprint(document: dict[str, Any], assets: list[dict[str, Any]]) -> str:
@@ -198,9 +203,7 @@ class ProjectPackageService:
 
     def export(self, workspace_id: str, project_id: str) -> bytes:
         document = self.transfer.export_project(workspace_id, project_id, SCHEMA_VERSION_V2)
-        feature_rows = self.connection.execute(
-            'SELECT id, kind FROM features WHERE project_id = ? ORDER BY created_at', (project_id,)
-        ).fetchall()
+        feature_rows = self.store.feature_kinds_in_export_order(project_id)
         files: list[tuple[str, bytes]] = []
         for feature_index, (feature, row) in enumerate(
             zip(document['features'], feature_rows, strict=True)
@@ -267,7 +270,7 @@ class ProjectPackageService:
             raise ValueError('Attachment storage root cannot be a symbolic link')
         self.storage_root.mkdir(parents=True, exist_ok=True)
         try:
-            self.connection.execute('BEGIN IMMEDIATE')
+            self.store.begin_immediate()
             result = self.transfer.import_project(
                 workspace_id, document, document_fingerprint, commit=False
             )
@@ -276,11 +279,8 @@ class ProjectPackageService:
                 feature_id = generated.get(asset['feature_ref'])
                 if feature_id is None:
                     raise ValueError('Attachment references an unknown Work Item')
-                row = self.connection.execute(
-                    'SELECT kind FROM features WHERE id = ? AND project_id = ?',
-                    (feature_id, result['project_id']),
-                ).fetchone()
-                if row is None or row['kind'] != 'bug':
+                kind = self.store.feature_kind(result['project_id'], feature_id)
+                if kind != 'bug':
                     raise ValueError('Attachments may only be linked to Bugs')
                 attachment_id = str(uuid4())
                 extension = CONTENT_TYPES[asset['content_type']]
@@ -295,23 +295,21 @@ class ProjectPackageService:
                 os.replace(temporary, destination)
                 staged.remove(temporary)
                 published.append(destination)
-                self.connection.execute(
-                    'INSERT INTO bug_attachments(id, feature_id, relative_path, file_name, '
-                    'content_type, byte_size, sha256, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                    (
-                        attachment_id,
-                        feature_id,
-                        relative_path,
-                        asset['file_name'],
-                        asset['content_type'],
-                        asset['byte_size'],
-                        asset['sha256'],
-                        utc_now(),
-                    ),
+                self.store.insert_attachment(
+                    feature_id,
+                    {
+                        'id': attachment_id,
+                        'relative_path': relative_path,
+                        'file_name': asset['file_name'],
+                        'content_type': asset['content_type'],
+                        'byte_size': asset['byte_size'],
+                        'sha256': asset['sha256'],
+                        'created_at': utc_now(),
+                    },
                 )
-            self.connection.commit()
+            self.store.commit()
         except Exception:
-            self.connection.rollback()
+            self.store.rollback()
             for path in (*staged, *published):
                 path.unlink(missing_ok=True)
             raise

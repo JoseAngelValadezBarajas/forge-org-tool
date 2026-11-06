@@ -13,7 +13,7 @@ FORBIDDEN_FOR_DOMAIN = ('sqlite3', 'fastapi', 'pydantic', 'sqlalchemy', 'forge_o
 FORBIDDEN_FOR_APPLICATION = FORBIDDEN_FOR_DOMAIN
 FORBIDDEN_FOR_INFRASTRUCTURE = ('fastapi', 'forge_org.api')
 
-LEGACY_APPLICATION_MODULES = {'attachments', 'project_package', 'transfer'}
+LEGACY_APPLICATION_MODULES: set[str] = set()
 
 
 def _imports(path: Path) -> set[str]:
@@ -47,7 +47,7 @@ def test_application_depends_on_ports_not_infrastructure() -> None:
     )
 
 
-def test_legacy_application_allowlist_only_lists_modules_that_still_violate() -> None:
+def test_legacy_application_allowlist_only_lists_modules_that_still_violate() -> None:  # noqa: D103
     for name in LEGACY_APPLICATION_MODULES:
         path = SRC / 'application' / f'{name}.py'
         assert any(
