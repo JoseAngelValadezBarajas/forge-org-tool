@@ -17,7 +17,7 @@ from forge_org.api.schemas import (
     ProjectPackageImportRequest,
     ProjectPackagePreviewRequest,
 )
-from forge_org.application.organization import DuplicateName, InvalidInput, NotFound
+from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
 from forge_org.application.project_package import MAX_PACKAGE_BYTES, ProjectPackageService
 from forge_org.application.transfer import ProjectTransferService
 

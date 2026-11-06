@@ -1,27 +1,18 @@
-import sqlite3
 from pathlib import Path
 from typing import Any
 
+from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
+from forge_org.application.ports import PlanningStore
+from forge_org.domain.clock import utc_now
+from forge_org.domain.errors import DuplicateRecord
 from forge_org.domain.organization import ACTIVE, ARCHIVED, normalized_name, validate_project_status
-from forge_org.infrastructure.connection import utc_now
-from forge_org.infrastructure.persistence import OrganizationRepository
 
-
-class NotFound(Exception):
-    pass
-
-
-class DuplicateName(Exception):
-    pass
-
-
-class InvalidInput(Exception):
-    pass
+__all__ = ['DuplicateName', 'InvalidInput', 'NotFound', 'OrganizationService']
 
 
 class OrganizationService:
-    def __init__(self, connection: sqlite3.Connection, attachment_root: Path | None = None) -> None:
-        self.repository = OrganizationRepository(connection)
+    def __init__(self, repository: PlanningStore, attachment_root: Path | None = None) -> None:
+        self.repository = repository
         self.attachment_root = attachment_root
 
     def list_workspaces(self) -> list[dict[str, Any]]:
@@ -38,7 +29,7 @@ class OrganizationService:
             return self.repository.create_workspace(normalized_name(name), description)
         except ValueError as exc:
             raise InvalidInput(str(exc)) from exc
-        except sqlite3.IntegrityError as exc:
+        except DuplicateRecord as exc:
             raise DuplicateName('Workspace name already exists') from exc
 
     def update_workspace(self, workspace_id: str, values: dict[str, Any]) -> dict[str, Any]:
@@ -52,7 +43,7 @@ class OrganizationService:
             return self.repository.update_workspace(workspace_id, values) or self.workspace(
                 workspace_id
             )
-        except sqlite3.IntegrityError as exc:
+        except DuplicateRecord as exc:
             raise DuplicateName('Workspace name already exists') from exc
 
     def set_workspace_status(self, workspace_id: str, archived: bool) -> dict[str, Any]:
@@ -90,7 +81,7 @@ class OrganizationService:
             return self.repository.create_project(workspace_id, normalized_name(name), description)
         except ValueError as exc:
             raise InvalidInput(str(exc)) from exc
-        except sqlite3.IntegrityError as exc:
+        except DuplicateRecord as exc:
             raise DuplicateName('Project name already exists in this workspace') from exc
 
     def update_project(
@@ -109,7 +100,7 @@ class OrganizationService:
             return self.repository.update_project(workspace_id, project_id, values) or self.project(
                 workspace_id, project_id
             )
-        except sqlite3.IntegrityError as exc:
+        except DuplicateRecord as exc:
             raise DuplicateName('Project name already exists in this workspace') from exc
 
     def set_project_status(self, workspace_id: str, project_id: str, status: str) -> dict[str, Any]:
