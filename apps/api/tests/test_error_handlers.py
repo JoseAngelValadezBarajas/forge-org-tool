@@ -1,8 +1,17 @@
+from collections.abc import Callable
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from forge_org.api.error_handlers import register_error_handlers
 from forge_org.domain.errors import Conflict, DuplicateName, InvalidInput, NotFound, StorageCorrupt
+
+
+def _raiser(error: Exception) -> Callable[[], None]:
+    def raiser() -> None:
+        raise error
+
+    return raiser
 
 
 def _client() -> TestClient:
@@ -16,11 +25,7 @@ def _client() -> TestClient:
         'corrupt': StorageCorrupt('internal detail'),
     }
     for path, error in cases.items():
-
-        def raiser(error: Exception = error) -> None:
-            raise error
-
-        app.get(f'/{path}')(raiser)
+        app.get(f'/{path}')(_raiser(error))
     return TestClient(app, raise_server_exceptions=False)
 
 
