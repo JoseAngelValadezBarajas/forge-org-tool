@@ -4,6 +4,9 @@ import { createSupabaseHandler } from './supabase.js';
 import { initializeStoredStorage, registerSupabaseHandlerFactory } from './storage.js';
 
 export { ApiError } from './errors.js';
+export { detectImageType } from './images.js';
+export type { ImageContentType } from './images.js';
+export { TRANSFER_LIMITS } from './limits.js';
 export { getApiBlob, getApiJson, sendJson } from './transport.js';
 export type { ApiRequest } from './transport.js';
 export {
