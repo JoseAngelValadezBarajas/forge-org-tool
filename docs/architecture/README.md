@@ -15,6 +15,10 @@ Status: implementation target for the local-first 1.0 MVP. `docs/product/mvp-1.0
 
 `web app → feature → @corefoundry-labs/forge-ui + @forge-org/api-client`; `@corefoundry-labs/forge-ui → @corefoundry-labs/forge-tokens`; backend `API → application → domain`, with infrastructure implementing persistence. Cross-feature imports use documented public feature barrels. No feature-specific product composition is moved into a generic package.
 
+## Backend ports
+
+`application/ports.py` defines `PlanningStore`, `AttachmentStore` and `TransferStore`. SQLite adapters live in `infrastructure/persistence`; `api/dependencies.py` wires them per request. Services never import `sqlite3` or infrastructure, and uniqueness failures reach them as `domain.errors.DuplicateRecord`. The three storage-facing rule sets are kept in agreement by `docs/architecture/transfer-conformance.md`.
+
 ## Capability scope
 
 Active product scope is Organization, Planning, Project Transfer and shared UI. Decisions, Invariants, Readiness, repository connections/observation, Context Packages, Runs, Handoffs, Delivery and release/verification governance are retired from active navigation and API. Upgraded databases retain their legacy tables and records, but these capabilities are not exposed by the 1.0 API. New databases contain only current product tables and migration metadata.
