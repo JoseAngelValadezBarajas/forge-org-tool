@@ -15,8 +15,9 @@ from forge_org.application.attachments import (
     MAX_ATTACHMENT_BYTES,
     BugAttachmentService,
 )
-from forge_org.application.transfer import SCHEMA_VERSION_V2, ProjectTransferService
+from forge_org.application.transfer import ProjectTransferService
 from forge_org.domain.clock import utc_now
+from forge_org.domain.transfer_document import SCHEMA_VERSION_V2
 
 MAX_PACKAGE_BYTES = 5 * 1024 * 1024
 MAX_PACKAGE_ENTRIES = 100
