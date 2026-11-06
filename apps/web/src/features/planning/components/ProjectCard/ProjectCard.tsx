@@ -14,7 +14,12 @@ type ProjectCardProps = {
 export function ProjectCard({ project, workspaceId, href, children }: ProjectCardProps) {
   const archived = project.status === 'archived';
   return (
-    <CardV2 className={styles.card} data-state={archived ? 'Archived' : 'Active'}>
+    <CardV2
+      data-layout="flow"
+      variant="outlined"
+      className={styles.card}
+      data-state={archived ? 'Archived' : 'Active'}
+    >
       <header className={styles.header}>
         <div className={styles.titleGroup}>
           <h3>

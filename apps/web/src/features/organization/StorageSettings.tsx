@@ -104,7 +104,13 @@ export function StorageSettings() {
   const needsSignIn = cloudConfigured && snapshot.status === 'authentication_required';
 
   return (
-    <CardV2 as="section" aria-labelledby="storage-settings-heading" className={styles.card}>
+    <CardV2
+      data-layout="flow"
+      variant="outlined"
+      as="section"
+      aria-labelledby="storage-settings-heading"
+      className={styles.card}
+    >
       <div className={styles.heading}>
         <div>
           <span className={styles.eyebrow}>STORAGE</span>

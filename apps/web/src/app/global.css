@@ -22,3 +22,9 @@ a:focus-visible {
   outline: 2px solid var(--forge-accent);
   outline-offset: 3px;
 }
+
+/* CardV2 wraps its children in a body element. Cards that act as flex/grid containers
+   (data-layout="flow") flatten it so their children keep participating in the layout. */
+[data-layout='flow'] > div {
+  display: contents;
+}

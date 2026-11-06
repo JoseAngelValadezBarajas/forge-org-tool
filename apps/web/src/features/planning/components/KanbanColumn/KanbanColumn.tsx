@@ -35,6 +35,8 @@ export function KanbanColumn({
       className={[styles.column, compact && styles.compact].filter(Boolean).join(' ')}
     >
       <CardV2
+        data-layout="flow"
+        variant="outlined"
         className={[styles.surface, compact && styles.compactSurface].filter(Boolean).join(' ')}
         data-kanban-status={status}
         onDragOver={(event) => {

@@ -56,7 +56,7 @@ export function WorkspaceManagementPage() {
       {loading ? (
         <FeedbackStateV2 state="loading" title="Loading workspaces…" />
       ) : workspaces.length === 0 ? (
-        <CardV2 className={styles.empty}>
+        <CardV2 data-layout="flow" variant="outlined" className={styles.empty}>
           <h2>No workspaces yet</h2>
           <p>Create the first workspace for this storage provider.</p>
           <ButtonV2 type="button" onClick={() => setCreateOpen(true)}>
@@ -67,6 +67,8 @@ export function WorkspaceManagementPage() {
         <section aria-label="Available workspaces" className={styles.list}>
           {workspaces.map((workspace) => (
             <CardV2
+              data-layout="flow"
+              variant="outlined"
               key={workspace.id}
               className={styles.workspace}
               role="article"

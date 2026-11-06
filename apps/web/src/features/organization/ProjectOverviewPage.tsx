@@ -91,7 +91,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
             />
           )}
           <section aria-label="Project details">
-            <CardV2>
+            <CardV2 variant="outlined">
               <SectionHeader
                 title={project.name}
                 actions={
@@ -217,7 +217,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
             </div>
           </section>
           <section aria-label="Pending Features">
-            <CardV2>
+            <CardV2 variant="outlined">
               <h2>Pending Features</h2>
               {pending.length === 0 ? (
                 <p>No pending Features.</p>
@@ -238,7 +238,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
             </CardV2>
           </section>
           <section aria-label="Workspace details">
-            <CardV2>
+            <CardV2 variant="outlined">
               <h2>Owning Workspace</h2>
               <p>{overview.workspace.name}</p>
               {overview.workspace.description && <p>{overview.workspace.description}</p>}

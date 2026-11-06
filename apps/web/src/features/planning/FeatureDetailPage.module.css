@@ -64,7 +64,6 @@
   min-height: 40px;
   min-width: 0;
 }
-.metadata > select,
 .pill,
 .moreActions > summary {
   display: inline-flex;
@@ -82,11 +81,10 @@
   font-weight: 500;
   text-transform: capitalize;
 }
-.metadata > select {
+.metadata > span:has(> select) {
   width: 155px;
-  padding-block: 0;
 }
-.bugPage .metadata > select {
+.bugPage .metadata > span:has(> select) {
   width: 139px;
 }
 .pill {
@@ -564,11 +562,9 @@
   .editAction {
     flex-basis: auto;
   }
-  .metadata > select,
-  .bugPage .metadata > select {
+  .metadata > span:has(> select),
+  .bugPage .metadata > span:has(> select) {
     width: 139px;
-    min-height: 40px;
-    height: 40px;
   }
   .pill {
     min-width: 0;

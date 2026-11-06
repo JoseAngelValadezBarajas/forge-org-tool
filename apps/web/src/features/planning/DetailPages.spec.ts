@@ -136,7 +136,7 @@ test.beforeEach(async ({ page }, info) => {
   );
 });
 
-test('UX-03 exact Epic board geometry, type filtering and durable status move', async ({
+test('UX-03 exact Epic board geometry, type filtering and durable status move @visual', async ({
   page,
 }, info) => {
   const { path, root, epic, story } = await seed(page);
@@ -215,7 +215,7 @@ test('UX-03 exact Epic board geometry, type filtering and durable status move', 
   await page.screenshot({ path: info.outputPath('ux03-epic.png') });
 });
 
-test('UX-03 board shells keep the header inside the viewport and share column geometry', async ({
+test('UX-03 board shells keep the header inside the viewport and share column geometry @visual', async ({
   page,
 }) => {
   const { path, epic } = await seed(page);
@@ -246,7 +246,9 @@ test('UX-03 board shells keep the header inside the viewport and share column ge
   }
 });
 
-test('UX-04 Story panels, criteria, task status and notes persist', async ({ page }, info) => {
+test('UX-04 Story panels, criteria, task status and notes persist @visual', async ({
+  page,
+}, info) => {
   const { path, root, story } = await seed(page);
   await page.goto(`${path}/features/${story.id}`);
   const description = page.getByRole('region', { name: 'Description', exact: true });
@@ -318,7 +320,9 @@ test('UX-04 Story panels, criteria, task status and notes persist', async ({ pag
   await noOverflow(page);
 });
 
-test('UX-05 Bug panels and real screenshot upload survive reload', async ({ page }, info) => {
+test('UX-05 Bug panels and real screenshot upload survive reload @visual', async ({
+  page,
+}, info) => {
   const { path, bug } = await seed(page);
   await page.goto(`${path}/features/${bug.id}`);
   const reproduce = page.getByRole('region', { name: 'How to reproduce', exact: true });
@@ -370,7 +374,7 @@ test('UX-05 Bug panels and real screenshot upload survive reload', async ({ page
   await page.screenshot({ path: info.outputPath('ux05-bug.png') });
 });
 
-test('UX-10 mobile Epic composition matches the exact reference coordinates', async ({
+test('UX-10 mobile Epic composition matches the exact reference coordinates @visual', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'chromium-mobile', 'The reference node is 390 × 844.');

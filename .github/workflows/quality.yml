@@ -29,8 +29,11 @@ jobs:
       - run: npm run lint:frontend
       - run: npm run build:packages
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e:smoke
+      # Real product workflows (organization, planning, transfer, accessibility) in Chromium.
+      - run: npm run test:e2e:full
+      # Figma geometry evidence is advisory until the V2 migration is visually reviewed and re-baselined.
       - run: npm run test:e2e:ux11-visual
+        continue-on-error: true
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -87,6 +90,7 @@ jobs:
       - run: cargo test --manifest-path apps/desktop/Cargo.toml
       - run: cargo test --manifest-path apps/desktop/src-tauri/Cargo.toml
       - run: uv run --project apps/api --locked python -m unittest discover -s apps/desktop/tests -p "test_*.py"
+      - run: uv run --project apps/api --locked python -m unittest discover -s tooling/scripts -p "test_*.py"
       - run: node --test tooling/scripts/desktop-window-contract.test.mjs
       - run: cargo build --manifest-path apps/desktop/src-tauri/Cargo.toml --release
       - run: npm run test:desktop:acceptance

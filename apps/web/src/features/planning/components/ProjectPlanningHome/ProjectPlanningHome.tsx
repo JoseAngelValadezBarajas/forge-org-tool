@@ -19,6 +19,8 @@ export function ProjectPlanningHome({
   if (state) {
     return (
       <CardV2
+        data-layout="flow"
+        variant="outlined"
         as="section"
         className={styles.specimen}
         aria-label="Project planning"

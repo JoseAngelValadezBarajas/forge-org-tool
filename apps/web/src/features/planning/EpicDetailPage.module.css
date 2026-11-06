@@ -55,6 +55,7 @@
 }
 .epicSummary {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   flex-wrap: wrap;
   gap: 18px;
@@ -156,7 +157,7 @@
   min-height: 43px;
 }
 .filters > input,
-.filters > select {
+.filters > span:has(> select) {
   box-sizing: border-box;
   min-width: 0;
   width: 100%;
@@ -474,7 +475,7 @@
     gap: var(--forge-space-2);
   }
   .filters > input,
-  .filters > select {
+  .filters > span:has(> select) {
     min-height: 40px;
     height: 40px;
   }

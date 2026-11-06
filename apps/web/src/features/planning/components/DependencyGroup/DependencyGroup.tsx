@@ -23,6 +23,8 @@ export function DependencyGroup({
 
   return (
     <CardV2
+      data-layout="flow"
+      variant="outlined"
       className={styles.group}
       data-state={displayState}
       role="group"

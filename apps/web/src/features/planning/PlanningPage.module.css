@@ -208,7 +208,8 @@
 .board.epicBoard > section > div.compactSurface {
   height: 100%;
 }
-.board.epicBoard > section > [data-kanban-status] > [data-state] {
+.board.epicBoard > section > [data-kanban-status] > [data-state],
+.board.epicBoard > section > [data-kanban-status] > div > [data-state] {
   width: calc(100% + 2px);
 }
 .board:focus-visible {

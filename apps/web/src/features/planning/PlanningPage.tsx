@@ -153,6 +153,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               />
               <FormField label="Epic for new feature">
                 <SelectV2
+                  size="sm"
                   aria-label="Epic for new feature"
                   value={featureEpicId}
                   onChange={(event) => setFeatureEpicId(event.target.value)}
@@ -214,6 +215,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 <div aria-label="Bug details">
                   <FormField label="Bug severity">
                     <SelectV2
+                      size="sm"
                       aria-label="Bug severity"
                       value={bugSeverity}
                       onChange={(event) => setBugSeverity(event.target.value as typeof bugSeverity)}
@@ -275,6 +277,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 </div>
               </details>
               <TextInputV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicSearch}`}
                 type="search"
                 aria-label="Search Epics"
@@ -283,6 +286,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 onChange={(event) => setEpicSearch(event.target.value)}
               />
               <SelectV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicStatusFilter}`}
                 aria-label="Filter Epics by status"
                 value={epicStatusFilter}
@@ -294,6 +298,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 ))}
               </SelectV2>
               <SelectV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicPriorityFilter}`}
                 aria-label="Filter Epics by priority"
                 value={epicPriorityFilter}
@@ -308,6 +313,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 ))}
               </SelectV2>
               <SelectV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicTagFilter}`}
                 aria-label="Filter Epics by tag"
                 value={epicTagFilter}
@@ -430,6 +436,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
             <section aria-label="Mobile Epic board" className={styles.mobileBoard}>
               <FormField label="Epic status">
                 <SelectV2
+                  size="sm"
                   aria-label="Mobile Epic status"
                   value={mobileEpicStatus}
                   onChange={(event) => setMobileEpicStatus(event.target.value)}
@@ -454,6 +461,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       <label>
                         Move Epic
                         <SelectV2
+                          size="sm"
                           aria-label={`Status for Epic ${epic.title}`}
                           value={epic.status}
                           onChange={(event) =>
@@ -506,6 +514,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                     <label>
                       Recover Epic status
                       <SelectV2
+                        size="sm"
                         aria-label={`Status for Epic ${epic.title}`}
                         value={epic.status}
                         onChange={(event) =>
@@ -530,6 +539,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
           <section aria-label="Mobile work item board" className={styles.mobileBoard}>
             <FormField label="Work item status">
               <SelectV2
+                size="sm"
                 aria-label="Mobile work item status"
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
@@ -553,6 +563,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                   <label>
                     Move work item
                     <SelectV2
+                      size="sm"
                       aria-label={`Mobile status for ${feature.title}`}
                       value={feature.status}
                       onChange={(event) =>
@@ -590,6 +601,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                     <label>
                       Move to workflow status
                       <SelectV2
+                        size="sm"
                         aria-label={`Status for ${feature.title}`}
                         value={feature.status}
                         onChange={(event) =>

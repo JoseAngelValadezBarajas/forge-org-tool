@@ -45,7 +45,7 @@ export function WorkspaceSettingsPage() {
   if (loading) return <FeedbackStateV2 state="loading" title="Loading Workspace settings…" />;
   if (!workspace) {
     return (
-      <CardV2>
+      <CardV2 variant="outlined">
         <AlertV2 tone="error">{error || 'Workspace not found.'}</AlertV2>
         <Link to="/">Back to Projects</Link>
       </CardV2>
@@ -106,7 +106,12 @@ export function WorkspaceSettingsPage() {
       )}
       {!workspace.archived_at ? (
         <div className={styles.tagsComposition} aria-label="Workspace tag composition">
-          <CardV2 as="section" aria-label={`Tags in ${workspace.name}`} className={styles.catalog}>
+          <CardV2
+            variant="outlined"
+            as="section"
+            aria-label={`Tags in ${workspace.name}`}
+            className={styles.catalog}
+          >
             <h2>Tags in {workspace.name}</h2>
             <p className={styles.catalogIntro}>
               Tags belong to a workspace and can be reused in all projects.
@@ -166,7 +171,7 @@ export function WorkspaceSettingsPage() {
           </aside>
         </div>
       ) : (
-        <CardV2 className={styles.archivedNotice}>
+        <CardV2 variant="outlined" className={styles.archivedNotice}>
           <BadgeV2 tone="warning">Archived</BadgeV2>
           <h2>Manage workspace tags</h2>
           <p>Restore this Workspace to manage its shared tags.</p>

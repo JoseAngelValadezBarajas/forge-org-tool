@@ -5,7 +5,7 @@ export function OrganizationEmptyState() {
   return (
     <div className={styles.stack}>
       <SectionHeader title="Organization" eyebrow="FORGE / M1 Foundation" />
-      <CardV2>
+      <CardV2 variant="outlined">
         <BadgeV2 tone="warning">Fixture</BadgeV2>
         <h3>No workspace fixture</h3>
         <p>

@@ -82,7 +82,12 @@ export function FeatureDetailPage() {
   } = useFeatureDetailPage();
 
   const criteriaPanel = (
-    <CardV2 as="section" aria-label="Acceptance criteria" className={styles.criteriaCard}>
+    <CardV2
+      variant="outlined"
+      as="section"
+      aria-label="Acceptance criteria"
+      className={styles.criteriaCard}
+    >
       <div className={styles.sectionHeading}>
         <div>
           <h2>
@@ -196,7 +201,7 @@ export function FeatureDetailPage() {
     </CardV2>
   );
   const tasksPanel = (
-    <CardV2 as="section" aria-label="Tasks" className={styles.tasksCard}>
+    <CardV2 variant="outlined" as="section" aria-label="Tasks" className={styles.tasksCard}>
       <div className={styles.sectionHeading}>
         <div>
           <h2>
@@ -278,6 +283,7 @@ export function FeatureDetailPage() {
       {feature && (
         <div className={styles.metadata} aria-label="Work item metadata">
           <SelectV2
+            size="sm"
             aria-label="Work item status"
             value={feature.status ?? 'backlog'}
             disabled={archived || moving || editing}
@@ -379,6 +385,7 @@ export function FeatureDetailPage() {
                   <section className={styles.editSection} aria-label="Bug details">
                     <label htmlFor="bug-severity">Severity</label>
                     <SelectV2
+                      size="sm"
                       id="bug-severity"
                       aria-label="Bug severity"
                       value={bugSeverity}
@@ -457,6 +464,7 @@ export function FeatureDetailPage() {
               {isBug ? (
                 <>
                   <CardV2
+                    variant="outlined"
                     as="section"
                     aria-label="How to reproduce"
                     className={styles.reproduction}
@@ -483,11 +491,21 @@ export function FeatureDetailPage() {
                     )}
                   </CardV2>
                   <div className={styles.resultGrid}>
-                    <CardV2 as="section" aria-label="Actual result" className={styles.actual}>
+                    <CardV2
+                      variant="outlined"
+                      as="section"
+                      aria-label="Actual result"
+                      className={styles.actual}
+                    >
                       <h2>Actual result</h2>
                       <p>{feature.actual_result || 'Not provided.'}</p>
                     </CardV2>
-                    <CardV2 as="section" aria-label="Expected result" className={styles.expected}>
+                    <CardV2
+                      variant="outlined"
+                      as="section"
+                      aria-label="Expected result"
+                      className={styles.expected}
+                    >
                       <h2>Expected result</h2>
                       <p>{feature.expected_result || 'Not provided.'}</p>
                     </CardV2>
@@ -495,7 +513,12 @@ export function FeatureDetailPage() {
                 </>
               ) : (
                 <>
-                  <CardV2 as="section" aria-label="Description" className={styles.descriptionCard}>
+                  <CardV2
+                    variant="outlined"
+                    as="section"
+                    aria-label="Description"
+                    className={styles.descriptionCard}
+                  >
                     <h2>Description</h2>
                     <p>{feature.description || 'No description yet.'}</p>
                     {feature.goal && (
@@ -508,7 +531,12 @@ export function FeatureDetailPage() {
                   {criteriaPanel}
                 </>
               )}
-              <CardV2 as="section" aria-label="Notes" className={styles.notesCard}>
+              <CardV2
+                variant="outlined"
+                as="section"
+                aria-label="Notes"
+                className={styles.notesCard}
+              >
                 <h2>Notes</h2>
                 <p>{feature.notes || 'No notes yet.'}</p>
               </CardV2>
@@ -525,7 +553,12 @@ export function FeatureDetailPage() {
             >
               {isBug ? (
                 <>
-                  <CardV2 as="section" aria-label="Screenshots" className={styles.screenshotsCard}>
+                  <CardV2
+                    variant="outlined"
+                    as="section"
+                    aria-label="Screenshots"
+                    className={styles.screenshotsCard}
+                  >
                     <h2>
                       Screenshots{' '}
                       <span className={styles.count}>
@@ -564,6 +597,7 @@ export function FeatureDetailPage() {
                     )}
                   </CardV2>
                   <CardV2
+                    variant="outlined"
                     as="section"
                     aria-label="Attach another screenshot"
                     className={styles.uploadCard}
@@ -598,7 +632,12 @@ export function FeatureDetailPage() {
                       <AlertV2 tone="error">{screenshotPickerError}</AlertV2>
                     )}
                   </CardV2>
-                  <CardV2 as="section" aria-label="Properties" className={styles.bugProperties}>
+                  <CardV2
+                    variant="outlined"
+                    as="section"
+                    aria-label="Properties"
+                    className={styles.bugProperties}
+                  >
                     <h2>
                       {selectedTags.join(', ') || 'Bug'} · {titleCase(feature.priority)}
                     </h2>
@@ -619,7 +658,12 @@ export function FeatureDetailPage() {
                 </>
               ) : (
                 <>
-                  <CardV2 as="section" aria-label="Properties" className={styles.propertiesCard}>
+                  <CardV2
+                    variant="outlined"
+                    as="section"
+                    aria-label="Properties"
+                    className={styles.propertiesCard}
+                  >
                     <h2>Properties</h2>
                     <dl className={styles.properties}>
                       <div>
@@ -651,7 +695,13 @@ export function FeatureDetailPage() {
                     </dl>
                   </CardV2>
                   {tasksPanel}
-                  <CardV2 as="section" aria-label="Quick actions" className={styles.quickActions}>
+                  <CardV2
+                    data-layout="flow"
+                    variant="outlined"
+                    as="section"
+                    aria-label="Quick actions"
+                    className={styles.quickActions}
+                  >
                     <h2>Quick actions</h2>
                     {feature.epic_id && (
                       <Link
@@ -667,7 +717,12 @@ export function FeatureDetailPage() {
                 </>
               )}
               {dependencies.length > 0 && (
-                <CardV2 as="section" aria-label="Dependencies" className={styles.dependencies}>
+                <CardV2
+                  variant="outlined"
+                  as="section"
+                  aria-label="Dependencies"
+                  className={styles.dependencies}
+                >
                   <h2>Dependencies</h2>
                   <ul>
                     {dependencies.map((item) => (

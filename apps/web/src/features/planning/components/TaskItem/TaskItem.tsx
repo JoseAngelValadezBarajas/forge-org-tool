@@ -49,6 +49,7 @@ export function TaskItem({
       )}
       <strong className={styles.title}>{task.title}</strong>
       <SelectV2
+        size="sm"
         aria-label={`Status for ${task.title}`}
         value={task.status}
         disabled={archived}

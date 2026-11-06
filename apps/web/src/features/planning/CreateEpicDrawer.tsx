@@ -88,6 +88,7 @@ export function CreateEpicDrawer({
         </FormField>
         <FormField label="Priority">
           <SelectV2
+            size="sm"
             aria-label="Priority"
             value={priority}
             onChange={(event) => onPriorityChange(event.target.value)}

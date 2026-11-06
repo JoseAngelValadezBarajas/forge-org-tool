@@ -31,7 +31,7 @@ const statusTone: Record<Feature['status'], 'neutral' | 'primary' | 'success'> =
 
 export function FeatureCard({ feature, href, children, readOnly = false }: FeatureCardProps) {
   return (
-    <CardV2 className={styles.card}>
+    <CardV2 data-layout="flow" variant="outlined" className={styles.card}>
       <div className={styles.heading}>
         <Link className={styles.title} to={href}>
           {feature.title}

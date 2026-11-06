@@ -79,7 +79,7 @@ export function WorkspaceTagsPanel({ workspaceId }: { workspaceId: string }) {
 
   if (!workspaceId) return null;
   return (
-    <CardV2>
+    <CardV2 variant="outlined">
       <div className={styles.layout}>
         <section aria-labelledby="workspace-tags-heading" className={styles.catalog}>
           <h2 id="workspace-tags-heading">Manage workspace tags</h2>

@@ -50,6 +50,8 @@ export function EpicCard({
   if (compact) {
     return (
       <CardV2
+        data-layout="flow"
+        variant="outlined"
         as="article"
         className={`${styles.card} ${styles.compact}`}
         data-state={state}
@@ -83,7 +85,7 @@ export function EpicCard({
     );
   }
   return (
-    <CardV2 className={styles.card} data-state={state}>
+    <CardV2 data-layout="flow" variant="outlined" className={styles.card} data-state={state}>
       <header className={styles.header}>
         <div>
           <h3>{href ? <Link to={href}>{epic.title}</Link> : epic.title}</h3>

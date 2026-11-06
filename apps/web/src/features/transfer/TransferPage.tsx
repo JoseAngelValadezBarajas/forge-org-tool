@@ -55,7 +55,7 @@ export function TransferPage({
   });
 
   const contextualPreviewPanel = contextualScope ? (
-    <CardV2 className={styles.contextCard}>
+    <CardV2 variant="outlined" className={styles.contextCard}>
       <section
         aria-labelledby="context-preview-title"
         className={`${styles.panel} ${styles.previewPanel}`}
@@ -130,7 +130,7 @@ export function TransferPage({
       <div
         className={`${styles.workflowGrid} ${contextualScope ? styles.contextWorkflowGrid : ''}`}
       >
-        <CardV2 className={contextualScope ? styles.contextCard : undefined}>
+        <CardV2 variant="outlined" className={contextualScope ? styles.contextCard : undefined}>
           <section
             aria-labelledby={contextualScope ? undefined : 'import-title'}
             className={styles.panel}
@@ -229,7 +229,7 @@ export function TransferPage({
         </CardV2>
 
         {!contextualScope && projectId && (
-          <CardV2>
+          <CardV2 variant="outlined">
             <section aria-labelledby="export-title" className={styles.panel}>
               <h3 id="export-title">
                 {contextualScope ? `Export ${contextualScope}` : 'Export current project'}
@@ -271,7 +271,7 @@ export function TransferPage({
       </div>
 
       {!contextualScope && preview && (
-        <CardV2>
+        <CardV2 variant="outlined">
           <section aria-labelledby="review-title" className={styles.panel}>
             <h3 id="review-title">Review planning changes</h3>
             <BadgeV2 tone="warning">FINGERPRINT_REQUIRED</BadgeV2>
@@ -303,7 +303,7 @@ export function TransferPage({
       )}
 
       {importedProjectId && (
-        <CardV2>
+        <CardV2 variant="outlined">
           <section aria-labelledby="import-success-title" className={styles.panel}>
             <h3 id="import-success-title">Import complete</h3>
             <BadgeV2 tone="success">IMPORTED_PLANNING_ONLY</BadgeV2>

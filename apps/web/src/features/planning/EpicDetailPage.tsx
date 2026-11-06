@@ -78,6 +78,8 @@ export function EpicDetailPage() {
 
   const itemCard = (feature: Feature) => (
     <CardV2
+      data-layout="flow"
+      variant="outlined"
       as="article"
       key={feature.id}
       aria-label={feature.title}
@@ -125,6 +127,7 @@ export function EpicDetailPage() {
             <label>
               Priority
               <SelectV2
+                size="sm"
                 aria-label={`Priority for ${feature.title}`}
                 value={feature.priority}
                 onChange={(event) =>
@@ -139,6 +142,7 @@ export function EpicDetailPage() {
             <label>
               Move to status
               <SelectV2
+                size="sm"
                 aria-label={`Status for ${feature.title}`}
                 value={feature.status}
                 onChange={(event) =>
@@ -163,6 +167,7 @@ export function EpicDetailPage() {
   const featureFilters = (
     <div className={styles.filters} aria-label="Work item filters">
       <SelectV2
+        size="sm"
         aria-label="Filter Work Items by type"
         value={featureKind}
         onChange={(event) => setFeatureKind(event.target.value)}
@@ -179,6 +184,7 @@ export function EpicDetailPage() {
         onChange={(event) => setFeatureSearch(event.target.value)}
       />
       <SelectV2
+        size="sm"
         id="epic-board-priority"
         aria-label="Filter Work Items by priority"
         value={featurePriority}
@@ -283,7 +289,13 @@ export function EpicDetailPage() {
             </AlertV2>
           )}
           {saved && <AlertV2 tone="success">Epic saved.</AlertV2>}
-          <CardV2 as="section" aria-label="Epic context" className={styles.epicSummary}>
+          <CardV2
+            data-layout="flow"
+            variant="outlined"
+            as="section"
+            aria-label="Epic context"
+            className={styles.epicSummary}
+          >
             <p className={styles.progress}>
               {features.length} work items <span>•</span> {completedCount} completed <span>•</span>{' '}
               {features.length ? Math.round((completedCount / features.length) * 100) : 0}% progress
@@ -339,6 +351,7 @@ export function EpicDetailPage() {
               />
               <label htmlFor="epic-status">Status</label>
               <SelectV2
+                size="sm"
                 id="epic-status"
                 aria-label="Epic status"
                 value={status}
@@ -520,6 +533,7 @@ export function EpicDetailPage() {
                 <>
                   <label htmlFor="new-bug-severity">Bug severity</label>
                   <SelectV2
+                    size="sm"
                     id="new-bug-severity"
                     value={newBugSeverity}
                     onChange={(event) => setNewBugSeverity(event.target.value)}

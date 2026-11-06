@@ -53,7 +53,7 @@ export function OrganizationPage() {
 
   if (loading)
     return (
-      <CardV2>
+      <CardV2 variant="outlined">
         <FeedbackStateV2 state="loading" title="Loading Workspace…" />
       </CardV2>
     );
@@ -100,7 +100,7 @@ export function OrganizationPage() {
         </AlertV2>
       )}
       {selectedWorkspace.archived_at && (
-        <CardV2 className={styles.archivedNotice}>
+        <CardV2 variant="outlined" className={styles.archivedNotice}>
           <BadgeV2 tone="warning">Archived Workspace</BadgeV2>
           <p>This Workspace is archived. Restore it in settings to create projects.</p>
         </CardV2>
@@ -175,7 +175,7 @@ export function OrganizationPage() {
         </section>
 
         {visibleProjects.length === 0 ? (
-          <CardV2 className={styles.emptyProjects}>
+          <CardV2 variant="outlined" className={styles.emptyProjects}>
             {projects.length === 0 ? (
               <>
                 <h3>No projects yet</h3>
@@ -196,6 +196,8 @@ export function OrganizationPage() {
               const summary = summaries.find((item) => item.project.id === project.id);
               return (
                 <CardV2
+                  data-layout="flow"
+                  variant="outlined"
                   as="article"
                   key={project.id}
                   className={styles.projectCard}
@@ -331,7 +333,7 @@ export function OrganizationPage() {
 
 function Summary({ label, value, detail }: { label: string; value: number; detail: string }) {
   return (
-    <CardV2 className={styles.metricCard}>
+    <CardV2 data-layout="flow" variant="outlined" className={styles.metricCard}>
       <span className={styles.metricLabel}>{label}</span>
       <strong className={styles.metricValue}>{String(value).padStart(2, '0')}</strong>
       <small>{detail}</small>
@@ -357,7 +359,7 @@ function WorkspaceEmptyState({
   error: string;
 }) {
   return (
-    <CardV2 className={styles.emptyState}>
+    <CardV2 variant="outlined" className={styles.emptyState}>
       <BadgeV2 tone="warning">Getting started</BadgeV2>
       <h1>No workspaces yet</h1>
       <p>Create a Workspace to organize projects and planning.</p>
