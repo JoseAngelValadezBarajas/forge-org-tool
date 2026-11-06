@@ -117,7 +117,7 @@
   min-height: 32px;
   padding: 0 10px;
   /* Same quiet outline as the V2 fields beside it so the toolbar reads as one row. */
-  border: 1px solid var(--cf-v2-outline);
+  border: 1px solid var(--cf-v2-outline-variant);
   border-radius: 8px;
   background: transparent;
   color: var(--forge-text-primary);

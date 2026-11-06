@@ -35,3 +35,10 @@ a:focus-visible {
 [data-variant='outlined'][class] {
   border-color: var(--cf-v2-outline-variant);
 }
+
+/* Field borders use the quieter `outlineVariant` role like the Figma frames. The strong 3:1
+   `outline` returns in High contrast mode, which the engine reserves for that need. */
+[data-cf-theme-mode]:not([data-cf-theme-mode='high-contrast'])
+  :is(select, input)[data-size][class] {
+  border-color: var(--cf-v2-outline-variant);
+}

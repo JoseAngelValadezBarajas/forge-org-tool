@@ -529,7 +529,7 @@
     top: 0;
     z-index: 5;
     display: grid;
-    grid-template-columns: 28px minmax(0, 1fr) auto auto;
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
     align-items: center;
     gap: var(--forge-space-2);
     min-height: 56px;
@@ -581,15 +581,23 @@
     font-size: 17px;
   }
   .mobileHeader > .brand {
-    width: 28px;
-    overflow: hidden;
+    width: 36px;
+    overflow: visible;
     font-size: 0;
   }
   .mobileEpicHeader.mobileHeader > .brand {
     width: auto;
     font-size: 17px;
   }
-  .mobileHeader .mark {
+  .mobileHeader:not(.mobileEpicHeader) .mark {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    border-radius: 10px;
+    font-size: 18px;
+  }
+  .mobileEpicHeader .mark {
     margin: 0;
     font-size: 14px;
   }
