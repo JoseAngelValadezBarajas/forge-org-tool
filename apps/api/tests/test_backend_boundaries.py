@@ -142,12 +142,9 @@ def test_remaining_capabilities_own_their_handler_implementations() -> None:
 def test_repository_facade_delegates_to_cohesive_persistence_mixins() -> None:
     from forge_org.infrastructure.persistence import OrganizationRepository
 
-    assert OrganizationRepository.list_workspaces.__qualname__.startswith(
-        'OrganizationPlanningPersistence.'
-    )
-    assert OrganizationRepository.list_epics.__qualname__.startswith(
-        'OrganizationPlanningPersistence.'
-    )
+    assert OrganizationRepository.list_workspaces.__qualname__.startswith('WorkspacePersistence.')
+    assert OrganizationRepository.list_epics.__qualname__.startswith('EpicPersistence.')
+    assert OrganizationRepository.list_tasks.__qualname__.startswith('TaskPersistence.')
 
 
 def test_representative_http_status_and_openapi_metadata_are_preserved(

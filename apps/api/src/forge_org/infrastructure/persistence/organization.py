@@ -4,12 +4,26 @@ import sqlite3
 from typing import Any
 
 from .common import row_dict, unique_as_duplicate
-from .organization_planning import OrganizationPlanningPersistence
+from .criteria import CriteriaPersistence
+from .dependencies import DependencyPersistence
+from .epics import EpicPersistence
+from .features import FeaturePersistence
+from .projects import ProjectPersistence
+from .tasks import TaskPersistence
+from .workspaces import WorkspacePersistence
 
 __all__ = ['OrganizationRepository', 'row_dict']
 
 
-class OrganizationRepository(OrganizationPlanningPersistence):
+class OrganizationRepository(
+    WorkspacePersistence,
+    ProjectPersistence,
+    EpicPersistence,
+    FeaturePersistence,
+    CriteriaPersistence,
+    TaskPersistence,
+    DependencyPersistence,
+):
     """Stable repository facade composed from cohesive persistence groups."""
 
     def __init__(self, connection: sqlite3.Connection) -> None:
