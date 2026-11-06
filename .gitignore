@@ -21,6 +21,9 @@ build/
 **/playwright-report/
 **/target/
 **/src-tauri/gen/
+**/keystore.properties
+**/*keystore*.jks
+**/*keystore*.p12
 apps/desktop/src-tauri/binaries/
 .DS_Store
 *.log
