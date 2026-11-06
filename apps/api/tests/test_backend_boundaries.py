@@ -130,24 +130,7 @@ def test_connection_exposes_migration_and_repository_boundaries() -> None:
 
 def test_remaining_capabilities_own_their_handler_implementations() -> None:
     capability_handlers = {
-        'planning': tuple(
-            handler
-            for handler in planning._HANDLERS
-            if not handler.startswith(
-                (
-                    'list_decision',
-                    'create_decision',
-                    'update_decision',
-                    'decision_',
-                    'accept_decision',
-                    'link_decision',
-                    'create_invariant',
-                    'list_invariant',
-                    'update_invariant',
-                    'invariant_',
-                )
-            )
-        ),
+        'planning': planning._HANDLERS,
         'organization': organization._HANDLERS,
         'transfer': transfer._HANDLERS,
     }

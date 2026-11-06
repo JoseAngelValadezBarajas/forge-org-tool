@@ -601,116 +601,12 @@ class OrganizationPlanningPersistence:
         self.connection.commit()
         return cursor.rowcount == 1
 
-    def create_decision(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
-        now, decision_id = utc_now(), str(uuid4())
-        self.connection.execute(
-            'INSERT INTO decisions(id, project_id, title, context, decision, rationale, alternatives_considered, tradeoffs, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                decision_id,
-                project_id,
-                values['title'],
-                values['context'],
-                values['decision'],
-                values['rationale'],
-                values.get('alternatives_considered'),
-                values.get('tradeoffs'),
-                now,
-                now,
-            ),
-        )
-        self._snapshot_decision(decision_id, 1)
-        self.connection.commit()
-        return (
-            row_dict(
-                self.connection.execute(
-                    'SELECT * FROM decisions WHERE id = ?', (decision_id,)
-                ).fetchone()
-            )
-            or {}
-        )
-
-    def _snapshot_decision(self, decision_id: str, revision: int) -> None:
-        decision = self.connection.execute(
-            'SELECT * FROM decisions WHERE id = ?', (decision_id,)
-        ).fetchone()
-        if decision is None:
-            return
-        self.connection.execute(
-            'INSERT INTO decision_revisions(id, decision_id, revision, title, context, decision, rationale, alternatives_considered, tradeoffs, status, superseded_by_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                str(uuid4()),
-                decision_id,
-                revision,
-                decision['title'],
-                decision['context'],
-                decision['decision'],
-                decision['rationale'],
-                decision['alternatives_considered'],
-                decision['tradeoffs'],
-                decision['status'],
-                decision['superseded_by_id'],
-                utc_now(),
-            ),
-        )
-
     def get_decision(self, project_id: str, decision_id: str) -> dict[str, Any] | None:
         return row_dict(
             self.connection.execute(
                 'SELECT * FROM decisions WHERE project_id = ? AND id = ?', (project_id, decision_id)
             ).fetchone()
         )
-
-    def list_decisions(self, project_id: str) -> list[dict[str, Any]]:
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT * FROM decisions WHERE project_id = ? ORDER BY updated_at DESC',
-                (project_id,),
-            ).fetchall()
-        ]
-
-    def update_decision(
-        self, project_id: str, decision_id: str, values: dict[str, Any]
-    ) -> dict[str, Any] | None:
-        decision = self.get_decision(project_id, decision_id)
-        if decision is None:
-            return None
-        values = {key: value for key, value in values.items() if value is not None}
-        if values:
-            assignments = ', '.join(f'{key} = ?' for key in values)
-            revision = int(decision['revision']) + 1
-            params = [*values.values(), revision, utc_now(), project_id, decision_id]
-            self.connection.execute(
-                f"UPDATE decisions SET {assignments}, revision = ?, status = 'proposed', updated_at = ? WHERE project_id = ? AND id = ?",
-                params,
-            )
-            self._snapshot_decision(decision_id, revision)
-            self.connection.commit()
-        return self.get_decision(project_id, decision_id)
-
-    def accept_decision(self, project_id: str, decision_id: str) -> dict[str, Any] | None:
-        self.connection.execute(
-            "UPDATE decisions SET status = 'accepted', updated_at = ? WHERE project_id = ? AND id = ?",
-            (utc_now(), project_id, decision_id),
-        )
-        self.connection.commit()
-        return self.get_decision(project_id, decision_id)
-
-    def link_decision(self, decision_id: str, feature_id: str) -> None:
-        self.connection.execute(
-            'INSERT INTO decision_feature_links(decision_id, feature_id) VALUES (?, ?)',
-            (decision_id, feature_id),
-        )
-        self.connection.commit()
-
-    def feature_decisions(self, feature_id: str) -> list[dict[str, Any]]:
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT d.* FROM decisions d JOIN decision_feature_links l ON l.decision_id = d.id WHERE l.feature_id = ? ORDER BY d.updated_at DESC',
-                (feature_id,),
-            ).fetchall()
-        ]
 
     def decision_revisions(self, project_id: str, decision_id: str) -> list[dict[str, Any]]:
         if self.get_decision(project_id, decision_id) is None:
@@ -723,65 +619,6 @@ class OrganizationPlanningPersistence:
             ).fetchall()
         ]
 
-    def create_invariant(self, project_id: str, values: dict[str, Any]) -> dict[str, Any]:
-        now, invariant_id = utc_now(), str(uuid4())
-        self.connection.execute(
-            'INSERT INTO invariants(id, project_id, feature_id, title, statement, rationale, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                invariant_id,
-                project_id,
-                values.get('feature_id'),
-                values['title'],
-                values['statement'],
-                values['rationale'],
-                now,
-                now,
-            ),
-        )
-        self._snapshot_invariant(invariant_id, 1)
-        self.connection.commit()
-        return (
-            row_dict(
-                self.connection.execute(
-                    'SELECT * FROM invariants WHERE id = ?', (invariant_id,)
-                ).fetchone()
-            )
-            or {}
-        )
-
-    def _snapshot_invariant(self, invariant_id: str, revision: int) -> None:
-        item = self.connection.execute(
-            'SELECT * FROM invariants WHERE id = ?', (invariant_id,)
-        ).fetchone()
-        if item is None:
-            return
-        self.connection.execute(
-            'INSERT INTO invariant_revisions(id, invariant_id, revision, title, statement, rationale, status, feature_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                str(uuid4()),
-                invariant_id,
-                revision,
-                item['title'],
-                item['statement'],
-                item['rationale'],
-                item['status'],
-                item['feature_id'],
-                utc_now(),
-            ),
-        )
-
-    def list_invariants(
-        self, project_id: str, include_retired: bool = True
-    ) -> list[dict[str, Any]]:
-        clause = '' if include_retired else " AND status = 'active'"
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                f'SELECT * FROM invariants WHERE project_id = ?{clause} ORDER BY updated_at DESC',
-                (project_id,),
-            ).fetchall()
-        ]
-
     def get_invariant(self, project_id: str, invariant_id: str) -> dict[str, Any] | None:
         return row_dict(
             self.connection.execute(
@@ -789,49 +626,6 @@ class OrganizationPlanningPersistence:
                 (project_id, invariant_id),
             ).fetchone()
         )
-
-    def update_invariant(
-        self, project_id: str, invariant_id: str, values: dict[str, Any]
-    ) -> dict[str, Any] | None:
-        item = self.get_invariant(project_id, invariant_id)
-        if item is None:
-            return None
-        values = {key: value for key, value in values.items() if value is not None}
-        assignments = ', '.join(f'{key} = ?' for key in values)
-        revision = int(item['revision']) + 1
-        self.connection.execute(
-            f'UPDATE invariants SET {assignments}, revision = ?, updated_at = ? WHERE project_id = ? AND id = ?',
-            [*values.values(), revision, utc_now(), project_id, invariant_id],
-        )
-        self._snapshot_invariant(invariant_id, revision)
-        self.connection.commit()
-        return self.get_invariant(project_id, invariant_id)
-
-    def acknowledge(self, feature_id: str, invariant_id: str, revision: int) -> dict[str, Any]:
-        now = utc_now()
-        self.connection.execute(
-            'INSERT INTO invariant_acknowledgements(feature_id, invariant_id, acknowledged_revision, acknowledged_at) VALUES (?, ?, ?, ?) ON CONFLICT(feature_id, invariant_id) DO UPDATE SET acknowledged_revision = excluded.acknowledged_revision, acknowledged_at = excluded.acknowledged_at',
-            (feature_id, invariant_id, revision, now),
-        )
-        self.connection.commit()
-        return (
-            row_dict(
-                self.connection.execute(
-                    'SELECT * FROM invariant_acknowledgements WHERE feature_id = ? AND invariant_id = ?',
-                    (feature_id, invariant_id),
-                ).fetchone()
-            )
-            or {}
-        )
-
-    def feature_invariants(self, project_id: str, feature_id: str) -> list[dict[str, Any]]:
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                "SELECT i.*, a.acknowledged_revision FROM invariants i LEFT JOIN invariant_acknowledgements a ON a.invariant_id = i.id AND a.feature_id = ? WHERE i.project_id = ? AND i.status = 'active' AND (i.feature_id IS NULL OR i.feature_id = ?) ORDER BY i.updated_at DESC",
-                (feature_id, project_id, feature_id),
-            ).fetchall()
-        ]
 
     def invariant_revisions(self, project_id: str, invariant_id: str) -> list[dict[str, Any]]:
         if self.get_invariant(project_id, invariant_id) is None:
@@ -841,42 +635,5 @@ class OrganizationPlanningPersistence:
             for row in self.connection.execute(
                 'SELECT * FROM invariant_revisions WHERE invariant_id = ? ORDER BY revision',
                 (invariant_id,),
-            ).fetchall()
-        ]
-
-    def save_evaluation(self, values: dict[str, Any]) -> dict[str, Any]:
-        evaluation_id = str(uuid4())
-        self.connection.execute(
-            'INSERT INTO readiness_evaluations(id, feature_id, evaluated_at, rule_set_version, input_fingerprint, outcome, passed_checks, failed_checks, blockers, results, input_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                evaluation_id,
-                values['feature_id'],
-                values['evaluated_at'],
-                values['rule_set_version'],
-                values['input_fingerprint'],
-                values['outcome'],
-                values['passed_checks'],
-                values['failed_checks'],
-                values['blockers'],
-                values['results'],
-                values['input_snapshot'],
-            ),
-        )
-        self.connection.commit()
-        return (
-            row_dict(
-                self.connection.execute(
-                    'SELECT * FROM readiness_evaluations WHERE id = ?', (evaluation_id,)
-                ).fetchone()
-            )
-            or {}
-        )
-
-    def list_evaluations(self, feature_id: str) -> list[dict[str, Any]]:
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT * FROM readiness_evaluations WHERE feature_id = ? ORDER BY evaluated_at DESC',
-                (feature_id,),
             ).fetchall()
         ]
