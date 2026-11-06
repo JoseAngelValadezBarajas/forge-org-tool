@@ -14,6 +14,7 @@ import {
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
+import { PriorityOptions, StatusOptions } from './components';
 import styles from './EpicDetailPage.module.css';
 import { useEpicDetailController, statuses } from './useEpicDetailController';
 
@@ -134,9 +135,7 @@ export function EpicDetailPage() {
                   void moveFeature(feature, { priority: event.target.value as Feature['priority'] })
                 }
               >
-                {['low', 'medium', 'high', 'critical'].map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
+                <PriorityOptions />
               </SelectV2>
             </label>
             <label>
@@ -149,11 +148,7 @@ export function EpicDetailPage() {
                   void moveFeature(feature, { status: event.target.value as Feature['status'] })
                 }
               >
-                {PLANNING_COLUMN_STATUSES.map((column) => (
-                  <option key={column.value} value={column.value}>
-                    {column.label}
-                  </option>
-                ))}
+                <StatusOptions />
                 {!PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status) && (
                   <option value={feature.status}>Unsupported: {feature.status}</option>
                 )}
@@ -191,9 +186,7 @@ export function EpicDetailPage() {
         onChange={(event) => setFeaturePriority(event.target.value)}
       >
         <option value="all">Priority</option>
-        {['low', 'medium', 'high', 'critical'].map((value) => (
-          <option key={value}>{value}</option>
-        ))}
+        <PriorityOptions />
       </SelectV2>
       <TextInputV2
         id="epic-board-tag"
@@ -538,9 +531,7 @@ export function EpicDetailPage() {
                     value={newBugSeverity}
                     onChange={(event) => setNewBugSeverity(event.target.value)}
                   >
-                    {['low', 'medium', 'high', 'critical'].map((value) => (
-                      <option key={value}>{value}</option>
-                    ))}
+                    <PriorityOptions />
                   </SelectV2>
                   <label htmlFor="new-bug-steps">Steps to reproduce</label>
                   <Textarea

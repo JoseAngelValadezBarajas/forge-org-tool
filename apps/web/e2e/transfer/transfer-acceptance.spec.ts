@@ -1,18 +1,16 @@
 import { expect, test } from '@playwright/test';
+import { createWorkspaceWithProject } from '../support/api';
 
 test('PA-TRN-001 exports real planning data, downloads bytes, imports through UI, and rejects invalid documents without writes', async ({
   page,
 }) => {
   test.setTimeout(60_000);
   const suffix = test.info().project.name;
-  const workspace = await (
-    await page.request.post('/api/v1/workspaces', { data: { name: `Transfer source ${suffix}` } })
-  ).json();
-  const project = await (
-    await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
-      data: { name: `Export ${suffix}`, description: 'Transfer fixture' },
-    })
-  ).json();
+  const { workspace, project } = await createWorkspaceWithProject(page, {
+    workspace: `Transfer source ${suffix}`,
+    project: `Export ${suffix}`,
+    projectExtra: { description: 'Transfer fixture' },
+  });
   const feature = await (
     await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, {
       data: { title: `Feature ${suffix}`, goal: 'Preserve transfer state' },

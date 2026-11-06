@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
+import { createWorkspaceWithProject } from '../support/api';
 
 const syntheticPng = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg==',
@@ -11,14 +12,10 @@ test('PA-TRN-002 ZIP export/import preserves a Bug screenshot across workspaces'
   page,
 }) => {
   const suffix = `${test.info().project.name}-${Date.now()}`;
-  const workspace = await (
-    await page.request.post('/api/v1/workspaces', { data: { name: `Package source ${suffix}` } })
-  ).json();
-  const project = await (
-    await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
-      data: { name: `Package project ${suffix}` },
-    })
-  ).json();
+  const { workspace, project } = await createWorkspaceWithProject(page, {
+    workspace: `Package source ${suffix}`,
+    project: `Package project ${suffix}`,
+  });
   const bug = await (
     await page.request.post(`/api/v1/workspaces/${workspace.id}/projects/${project.id}/features`, {
       data: {

@@ -2,6 +2,7 @@
   display: grid;
   gap: 18px;
   min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 .createEpicMode {
   gap: 16px;
@@ -431,5 +432,13 @@ dialog.createEpicDrawer {
 @media (min-width: 721px) and (max-width: 1200px) {
   .board.epicBoard {
     grid-template-columns: repeat(5, minmax(222px, 1fr));
+  }
+}
+
+/* The fixed-width Epic filter chips need ~930px; wrap them before they push the page sideways. */
+@media (max-width: 1100px) {
+  .epicToolbar {
+    height: auto;
+    flex-wrap: wrap;
   }
 }

@@ -8,3 +8,4 @@ export { EpicCard } from './EpicCard';
 export { ProjectPlanningHome } from './ProjectPlanningHome';
 export { TaskItem } from './TaskItem';
 export { CriterionItem } from './CriterionItem';
+export { PRIORITIES, PriorityOptions, StatusOptions } from './PlanningOptions';

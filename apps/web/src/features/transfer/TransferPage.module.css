@@ -1,5 +1,6 @@
 .stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--forge-space-4);
 }
 .contextStack {
@@ -278,5 +279,13 @@
     bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     padding-block: var(--forge-space-2);
     background: var(--forge-surface);
+  }
+}
+
+/* The two-column contextual workflow needs ~1130px; stack it earlier than the phone breakpoint. */
+@media (max-width: 1100px) {
+  .workflowGrid,
+  .contextWorkflowGrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

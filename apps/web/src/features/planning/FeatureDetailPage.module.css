@@ -3,6 +3,7 @@
   gap: var(--forge-space-4);
   min-width: 0;
   color: var(--forge-text-primary);
+  grid-template-columns: minmax(0, 1fr);
 }
 .detailHeader {
   display: flex;

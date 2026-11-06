@@ -8,6 +8,7 @@ import {
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import type { WorkspaceTag } from '@forge-org/api-client';
+import { PriorityOptions } from './components';
 import styles from './CreateEpicDrawer.module.css';
 
 type Props = {
@@ -93,11 +94,7 @@ export function CreateEpicDrawer({
             value={priority}
             onChange={(event) => onPriorityChange(event.target.value)}
           >
-            {['low', 'medium', 'high', 'critical'].map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
+            <PriorityOptions />
           </SelectV2>
         </FormField>
         <fieldset className={styles.tagChoices}>

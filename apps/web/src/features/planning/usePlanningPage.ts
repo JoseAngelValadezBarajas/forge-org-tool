@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useIsMobile } from '../../platform/useIsMobile';
 import { useParams } from 'react-router-dom';
 import { organizationApi, type EpicStatus, type WorkspaceTag } from '@forge-org/api-client';
 import { usePlanningController } from './usePlanningController';
@@ -16,15 +17,10 @@ export function usePlanningPage() {
   const [epicStatusFilter, setEpicStatusFilter] = useState('all');
   const [epicPriorityFilter, setEpicPriorityFilter] = useState('all');
   const [epicTagFilter, setEpicTagFilter] = useState('');
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 720);
+  const isMobile = useIsMobile();
   const epicCreateErrorAtSubmit = useRef<string | null>(null);
   const featureCreateErrorAtSubmit = useRef<string | null>(null);
   const epicTriggerRef = useRef<HTMLButtonElement | null>(null);
-  useEffect(() => {
-    const updateViewport = () => setIsMobile(window.innerWidth <= 720);
-    window.addEventListener('resize', updateViewport);
-    return () => window.removeEventListener('resize', updateViewport);
-  }, []);
   useEffect(() => {
     let current = true;
     void organizationApi.listWorkspaceTags(workspaceId).then(

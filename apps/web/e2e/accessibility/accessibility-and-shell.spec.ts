@@ -1,19 +1,16 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { createWorkspaceWithProject } from '../support/api';
 
 test('PA-A11Y-01 shell themes, keyboard command navigation, focus restoration and WCAG scan', async ({
   page,
 }) => {
   const suffix = `${test.info().project.name}-${Date.now()}`;
   const mobile = test.info().project.name === 'chromium-mobile';
-  const workspace = await (
-    await page.request.post('/api/v1/workspaces', { data: { name: `A11y ${suffix}` } })
-  ).json();
-  const project = await (
-    await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
-      data: { name: `Accessible project ${suffix}` },
-    })
-  ).json();
+  const { workspace, project } = await createWorkspaceWithProject(page, {
+    workspace: `A11y ${suffix}`,
+    project: `Accessible project ${suffix}`,
+  });
 
   await page.goto('/');
   const appearance = mobile

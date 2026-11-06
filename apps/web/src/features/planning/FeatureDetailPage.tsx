@@ -12,7 +12,7 @@ import {
 import { type Feature } from '@forge-org/api-client';
 import { PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
 import styles from './FeatureDetailPage.module.css';
-import { CriterionItem, TaskItem } from './components';
+import { CriterionItem, TaskItem, PriorityOptions, StatusOptions } from './components';
 import { useFeatureDetailPage } from './useFeatureDetailPage';
 
 const titleCase = (value?: string | null) => (value ? value.replaceAll('_', ' ') : 'Unknown');
@@ -292,11 +292,7 @@ export function FeatureDetailPage() {
             {!PLANNING_COLUMN_STATUSES.some((item) => item.value === feature.status) && (
               <option value={feature.status}>{titleCase(feature.status)}</option>
             )}
-            {PLANNING_COLUMN_STATUSES.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
+            <StatusOptions />
           </SelectV2>
           {isBug && (
             <BadgeV2 className={styles.pill}>
@@ -391,9 +387,7 @@ export function FeatureDetailPage() {
                       value={bugSeverity}
                       onChange={(event) => setBugSeverity(event.target.value)}
                     >
-                      {['low', 'medium', 'high', 'critical'].map((severity) => (
-                        <option key={severity}>{severity}</option>
-                      ))}
+                      <PriorityOptions />
                     </SelectV2>
                     <label htmlFor="steps-to-reproduce">Steps to reproduce</label>
                     <Textarea

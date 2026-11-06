@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useIsMobile } from '../../platform/useIsMobile';
 import { useParams } from 'react-router-dom';
 import {
   organizationApi,
@@ -41,7 +42,7 @@ export function useEpicDetailController() {
   const [newBugActual, setNewBugActual] = useState('');
   const [workspaceTags, setWorkspaceTags] = useState<WorkspaceTag[]>([]);
   const [mobileStatus, setMobileStatus] = useState('ready');
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 720);
+  const isMobile = useIsMobile();
   const [mobileCardDetails, setMobileCardDetails] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -96,14 +97,6 @@ export function useEpicDetailController() {
       current = false;
     };
   }, [workspaceId]);
-
-  useEffect(() => {
-    function updateViewport() {
-      setIsMobile(window.innerWidth <= 720);
-    }
-    window.addEventListener('resize', updateViewport);
-    return () => window.removeEventListener('resize', updateViewport);
-  }, []);
 
   useEffect(() => {
     if (!isMobile || features.length === 0) return;

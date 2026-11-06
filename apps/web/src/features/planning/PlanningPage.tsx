@@ -18,6 +18,8 @@ import {
   KanbanColumn,
   PLANNING_COLUMN_STATUSES,
   ProjectPlanningHome,
+  PriorityOptions,
+  StatusOptions,
 } from './components';
 import { usePlanningPage } from './usePlanningPage';
 
@@ -220,11 +222,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       value={bugSeverity}
                       onChange={(event) => setBugSeverity(event.target.value as typeof bugSeverity)}
                     >
-                      {['low', 'medium', 'high', 'critical'].map((severity) => (
-                        <option key={severity} value={severity}>
-                          {severity}
-                        </option>
-                      ))}
+                      <PriorityOptions />
                     </SelectV2>
                   </FormField>
                   <FormField label="Steps to reproduce">
@@ -293,9 +291,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 onChange={(event) => setEpicStatusFilter(event.target.value)}
               >
                 <option value="all">Status: All</option>
-                {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
-                  <option key={value} value={value}>{`Status: ${label}`}</option>
-                ))}
+                <StatusOptions prefix="Status: " />
               </SelectV2>
               <SelectV2
                 size="sm"
@@ -305,12 +301,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 onChange={(event) => setEpicPriorityFilter(event.target.value)}
               >
                 <option value="all">Priority&nbsp; ▾</option>
-                {['low', 'medium', 'high', 'critical'].map((priority) => (
-                  <option key={priority} value={priority}>
-                    {priority[0]?.toUpperCase()}
-                    {priority.slice(1)}
-                  </option>
-                ))}
+                <PriorityOptions capitalize />
               </SelectV2>
               <SelectV2
                 size="sm"
@@ -442,11 +433,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                   onChange={(event) => setMobileEpicStatus(event.target.value)}
                 >
                   <option value="all">All statuses</option>
-                  {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
+                  <StatusOptions />
                 </SelectV2>
               </FormField>
               <div className={styles.mobileCards}>
@@ -468,11 +455,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                             void updateEpic(epic, event.target.value as EpicStatus)
                           }
                         >
-                          {PLANNING_COLUMN_STATUSES.map((column) => (
-                            <option key={column.value} value={column.value}>
-                              {column.label}
-                            </option>
-                          ))}
+                          <StatusOptions />
                         </SelectV2>
                       </label>
                     </EpicCard>
@@ -522,11 +505,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                         }
                       >
                         <option value={epic.status}>Unsupported: {epic.status}</option>
-                        {PLANNING_COLUMN_STATUSES.map((column) => (
-                          <option key={column.value} value={column.value}>
-                            {column.label}
-                          </option>
-                        ))}
+                        <StatusOptions />
                       </SelectV2>
                     </label>
                   </EpicCard>
@@ -546,11 +525,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               >
                 <option value="all">All statuses</option>
                 <option value="refining">Legacy refining</option>
-                {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
+                <StatusOptions />
               </SelectV2>
             </FormField>
             <div className={styles.mobileCards}>
@@ -573,11 +548,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       {feature.status === 'refining' && (
                         <option value="refining">Legacy refining</option>
                       )}
-                      {PLANNING_COLUMN_STATUSES.map((column) => (
-                        <option key={column.value} value={column.value}>
-                          {column.label}
-                        </option>
-                      ))}
+                      <StatusOptions />
                     </SelectV2>
                   </label>
                 </FeatureCard>
@@ -608,11 +579,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                           void updateFeature(feature, { status: event.target.value })
                         }
                       >
-                        {PLANNING_COLUMN_STATUSES.map((column) => (
-                          <option key={column.value} value={column.value}>
-                            {column.label}
-                          </option>
-                        ))}
+                        <StatusOptions />
                       </SelectV2>
                     </label>
                   </FeatureCard>
