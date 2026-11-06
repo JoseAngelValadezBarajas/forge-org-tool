@@ -1,14 +1,16 @@
 import { type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Card,
-  Checkbox,
-  Dialog,
+  AlertV2,
+  BadgeV2,
+  ButtonV2,
+  CardV2,
+  CheckboxV2,
+  DialogV2,
+  FeedbackStateV2,
   FormField,
-  Input,
   SearchField,
-  StatusChip,
+  TextInputV2,
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import styles from './OrganizationPage.module.css';
@@ -51,14 +53,14 @@ export function OrganizationPage() {
 
   if (loading)
     return (
-      <Card>
-        <p role="status">Loading Workspace…</p>
-      </Card>
+      <CardV2 variant="outlined">
+        <FeedbackStateV2 state="loading" title="Loading Workspace…" />
+      </CardV2>
     );
   if (!selectedWorkspace) {
     return (
       <div className={styles.stack}>
-        {error && <p role="alert">{error}</p>}
+        {error && <AlertV2 tone="error">{error}</AlertV2>}
         <WorkspaceEmptyState
           workspaceName={workspaceName}
           setWorkspaceName={setWorkspaceName}
@@ -93,15 +95,15 @@ export function OrganizationPage() {
       </header>
 
       {error && (
-        <p role="alert" className={styles.pageError}>
+        <AlertV2 tone="error" className={styles.pageError}>
           {error}
-        </p>
+        </AlertV2>
       )}
       {selectedWorkspace.archived_at && (
-        <Card className={styles.archivedNotice}>
-          <StatusChip tone="warning">Archived Workspace</StatusChip>
+        <CardV2 variant="outlined" className={styles.archivedNotice}>
+          <BadgeV2 tone="warning">Archived Workspace</BadgeV2>
           <p>This Workspace is archived. Restore it in settings to create projects.</p>
-        </Card>
+        </CardV2>
       )}
 
       <section aria-labelledby="projects-heading" className={styles.projectSection}>
@@ -109,9 +111,9 @@ export function OrganizationPage() {
           <div className={styles.projectTitleGroup}>
             <h2 id="projects-heading">Projects</h2>
             <div className={styles.filterMenu}>
-              <Button
+              <ButtonV2
                 variant="ghost"
-                size="small"
+                size="sm"
                 type="button"
                 aria-label="Project filters"
                 aria-expanded={filtersOpen}
@@ -119,7 +121,7 @@ export function OrganizationPage() {
                 onClick={() => setFiltersOpen((open) => !open)}
               >
                 Filters
-              </Button>
+              </ButtonV2>
               {filtersOpen && (
                 <div id="project-filter-options" className={styles.filterPopover}>
                   <SearchField
@@ -129,7 +131,7 @@ export function OrganizationPage() {
                     onChange={(event) => setSearch(event.target.value)}
                   />
                   <div className={styles.archivedToggle}>
-                    <Checkbox
+                    <CheckboxV2
                       checked={showArchived}
                       onChange={(event) => setShowArchived(event.target.checked)}
                       aria-label="Show archived"
@@ -148,13 +150,13 @@ export function OrganizationPage() {
             Import Project
           </Link>
           {!selectedWorkspace.archived_at && (
-            <Button
+            <ButtonV2
               className={styles.newProject}
               aria-label="New project"
               onClick={() => setProjectDialogOpen(true)}
             >
               + New Project
-            </Button>
+            </ButtonV2>
           )}
         </header>
 
@@ -173,27 +175,29 @@ export function OrganizationPage() {
         </section>
 
         {visibleProjects.length === 0 ? (
-          <Card className={styles.emptyProjects}>
+          <CardV2 variant="outlined" className={styles.emptyProjects}>
             {projects.length === 0 ? (
               <>
                 <h3>No projects yet</h3>
                 <p>Create a project to start organizing Epics and work items.</p>
                 {!selectedWorkspace.archived_at && (
-                  <Button onClick={() => setProjectDialogOpen(true)}>
+                  <ButtonV2 onClick={() => setProjectDialogOpen(true)}>
                     Create your first project
-                  </Button>
+                  </ButtonV2>
                 )}
               </>
             ) : (
               <p>No projects match this search and archive filter.</p>
             )}
-          </Card>
+          </CardV2>
         ) : (
           <div className={styles.projects} aria-label="Projects">
             {visibleProjects.map((project) => {
               const summary = summaries.find((item) => item.project.id === project.id);
               return (
-                <Card
+                <CardV2
+                  data-layout="flow"
+                  variant="outlined"
                   as="article"
                   key={project.id}
                   className={styles.projectCard}
@@ -228,12 +232,12 @@ export function OrganizationPage() {
                     <div>
                       <Link to={`/planning/${workspaceId}/${project.id}`}>Open Board</Link>
                       <Link to={`/projects/${workspaceId}/${project.id}`}>Overview</Link>
-                      <Button variant="secondary" onClick={() => void toggleProject(project)}>
+                      <ButtonV2 variant="secondary" onClick={() => void toggleProject(project)}>
                         {project.status === 'active' ? 'Archive' : 'Restore'}
-                      </Button>
+                      </ButtonV2>
                     </div>
                   </details>
-                </Card>
+                </CardV2>
               );
             })}
           </div>
@@ -289,17 +293,18 @@ export function OrganizationPage() {
         )}
       </section>
 
-      <Dialog
+      <DialogV2
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setProjectDialogOpen(false);
+        }}
         title="Create project"
         description="Give this project a name. You can add its Epics from the project board."
         open={projectDialogOpen}
-        onClose={() => setProjectDialogOpen(false)}
-        onCancel={() => setProjectDialogOpen(false)}
       >
-        {error && <p role="alert">{error}</p>}
+        {error && <AlertV2 tone="error">{error}</AlertV2>}
         <form onSubmit={(event) => void submitProject(event)} className={styles.form}>
           <FormField label="Project name">
-            <Input
+            <TextInputV2
               aria-label="Project name"
               value={projectName}
               onChange={(event) => setProjectName(event.target.value)}
@@ -315,24 +320,24 @@ export function OrganizationPage() {
             />
           </FormField>
           <div className={styles.formActions}>
-            <Button type="button" variant="secondary" onClick={() => setProjectDialogOpen(false)}>
+            <ButtonV2 type="button" variant="secondary" onClick={() => setProjectDialogOpen(false)}>
               Cancel
-            </Button>
-            <Button type="submit">Create project</Button>
+            </ButtonV2>
+            <ButtonV2 type="submit">Create project</ButtonV2>
           </div>
         </form>
-      </Dialog>
+      </DialogV2>
     </div>
   );
 }
 
 function Summary({ label, value, detail }: { label: string; value: number; detail: string }) {
   return (
-    <Card className={styles.metricCard}>
+    <CardV2 data-layout="flow" variant="outlined" className={styles.metricCard}>
       <span className={styles.metricLabel}>{label}</span>
       <strong className={styles.metricValue}>{String(value).padStart(2, '0')}</strong>
       <small>{detail}</small>
-    </Card>
+    </CardV2>
   );
 }
 
@@ -354,18 +359,18 @@ function WorkspaceEmptyState({
   error: string;
 }) {
   return (
-    <Card className={styles.emptyState}>
-      <StatusChip tone="warning">Getting started</StatusChip>
+    <CardV2 variant="outlined" className={styles.emptyState}>
+      <BadgeV2 tone="warning">Getting started</BadgeV2>
       <h1>No workspaces yet</h1>
       <p>Create a Workspace to organize projects and planning.</p>
       {error && (
-        <Button variant="secondary" onClick={() => void retryWorkspaces()}>
+        <ButtonV2 variant="secondary" onClick={() => void retryWorkspaces()}>
           Retry loading workspaces
-        </Button>
+        </ButtonV2>
       )}
       <form onSubmit={createWorkspace} className={styles.form} aria-label="Create first workspace">
         <FormField label="Workspace name">
-          <Input
+          <TextInputV2
             aria-label="Workspace name"
             value={workspaceName}
             onChange={(event) => setWorkspaceName(event.target.value)}
@@ -380,8 +385,8 @@ function WorkspaceEmptyState({
             onChange={(event) => setWorkspaceDescription(event.target.value)}
           />
         </FormField>
-        <Button type="submit">Create Workspace</Button>
+        <ButtonV2 type="submit">Create Workspace</ButtonV2>
       </form>
-    </Card>
+    </CardV2>
   );
 }

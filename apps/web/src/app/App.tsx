@@ -1,13 +1,21 @@
 import { lazy, Suspense } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
-import { Button, SearchField } from '@corefoundry-labs/forge-ui';
 import {
-  ArrowLeft,
-  ArrowRight,
+  AlertV2,
+  ButtonV2,
+  DropdownMenuV2,
+  SearchField,
+  SelectV2,
+  ThemeScope,
+  TooltipV2,
+} from '@corefoundry-labs/forge-ui';
+import {
   ChevronDown,
   ChevronRight,
   Folder,
   Layers,
+  PanelLeft,
+  PanelRight,
   Search,
   Settings,
 } from '@corefoundry-labs/forge-icons';
@@ -59,8 +67,6 @@ function ApplicationShell() {
     setProjectQuery,
     sidebarCollapsed,
     setSidebarCollapsed,
-    storageMenuOpen,
-    setStorageMenuOpen,
     storageSnapshot,
     configuredStorageProviders,
     storageRevision,
@@ -68,8 +74,6 @@ function ApplicationShell() {
     context,
     navigationWorkspaceId,
     activeWorkspace,
-    storageMenuTriggerRef,
-    registerStorageMenuItem,
     workspaceFallbackName,
     isMobileEpicBoard,
     activeProject,
@@ -84,14 +88,19 @@ function ApplicationShell() {
     productDestinations,
     theme,
     resolvedTheme,
+    forgeTheme,
     setTheme,
     go,
     selectStorageProvider,
-    handleStorageMenuKeyDown,
     selectWorkspace,
   } = useApplicationShell();
   return (
-    <div className={styles.app} data-testid="application-shell" data-theme={resolvedTheme}>
+    <ThemeScope
+      theme={forgeTheme}
+      className={styles.app}
+      data-testid="application-shell"
+      data-theme={resolvedTheme}
+    >
       <header
         className={`${styles.mobileHeader} ${isMobileEpicBoard ? styles.mobileEpicHeader : ''}`}
         aria-label="Workspace controls"
@@ -113,16 +122,21 @@ function ApplicationShell() {
             currentName={activeWorkspace?.name ?? workspaceFallbackName}
           />
         </div>
-        <Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
+        <ButtonV2 variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
           {isMobileEpicBoard ? '⌕' : 'Search'}
-        </Button>
+        </ButtonV2>
         <label className={`${styles.themeControl} ${styles.mobileTheme}`}>
           Appearance{' '}
-          <select value={theme} onChange={(event) => setTheme(event.target.value as typeof theme)}>
+          <SelectV2
+            size="sm"
+            value={theme}
+            onChange={(event) => setTheme(event.target.value as typeof theme)}
+          >
             <option value="dark">Dark</option>
             <option value="light">Light</option>
             <option value="system">System</option>
-          </select>
+            <option value="high-contrast">High contrast</option>
+          </SelectV2>
         </label>
       </header>
       <div
@@ -141,22 +155,26 @@ function ApplicationShell() {
               <span className={styles.mark}>F</span>
               <span className={styles.brandName}>FORGE</span>
             </Link>
-            <button
-              type="button"
-              className={styles.sidebarToggle}
-              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              aria-controls="app-sidebar"
-              aria-expanded={!sidebarCollapsed}
-              data-testid="sidebar-toggle"
-              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            <TooltipV2
+              content={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              placement="right"
             >
-              {sidebarCollapsed ? (
-                <ArrowRight aria-hidden="true" size={16} />
-              ) : (
-                <ArrowLeft aria-hidden="true" size={16} />
-              )}
-            </button>
+              <button
+                type="button"
+                className={styles.sidebarToggle}
+                aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-controls="app-sidebar"
+                aria-expanded={!sidebarCollapsed}
+                data-testid="sidebar-toggle"
+                onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+              >
+                {sidebarCollapsed ? (
+                  <PanelRight aria-hidden="true" size={16} />
+                ) : (
+                  <PanelLeft aria-hidden="true" size={16} />
+                )}
+              </button>
+            </TooltipV2>
           </div>
           <Link to="/" className={styles.mobileBrand} aria-label="F FORGE Workspace home">
             <span className={styles.mark}>F</span> FORGE
@@ -174,9 +192,9 @@ function ApplicationShell() {
             compact={sidebarCollapsed}
           />
           {navigationError && (
-            <p role="alert" className={styles.navigationError}>
+            <AlertV2 tone="error" className={styles.navigationError}>
               {navigationError}
-            </p>
+            </AlertV2>
           )}
           {navigationWorkspaceId && (
             <nav aria-label="Project navigation" className={styles.projectNav}>
@@ -250,62 +268,40 @@ function ApplicationShell() {
             </nav>
           )}
           <div className={styles.localMode}>
-            <button
-              type="button"
-              className={styles.storageMenuTrigger}
-              ref={storageMenuTriggerRef}
-              aria-label={`Storage providers: ${storageProviderLabel(storageSnapshot)}`}
-              aria-haspopup="menu"
-              aria-expanded={storageMenuOpen}
-              onClick={() => setStorageMenuOpen((open) => !open)}
-            >
-              <Settings aria-hidden="true" size={15} />
-              <span className={styles.storageMenuLabel}>
-                {storageProviderLabel(storageSnapshot)}
-              </span>
-              <ChevronDown aria-hidden="true" size={14} className={styles.storageMenuChevron} />
-            </button>
-            {storageMenuOpen && (
-              <div
-                className={styles.storageMenu}
-                role="menu"
-                aria-label="Storage providers"
-                tabIndex={-1}
-                onKeyDown={handleStorageMenuKeyDown}
-              >
+            <DropdownMenuV2
+              aria-label="Storage providers"
+              placement="top"
+              density="comfortable"
+              trigger={
                 <button
                   type="button"
-                  role="menuitem"
-                  className={styles.storageMenuItem}
-                  ref={(node) => {
-                    registerStorageMenuItem(0, node);
-                  }}
-                  onClick={() => go('/settings/storage')}
+                  className={styles.storageMenuTrigger}
+                  aria-label={`Storage providers: ${storageProviderLabel(storageSnapshot)}`}
                 >
                   <Settings aria-hidden="true" size={15} />
-                  <span>Configure storage</span>
+                  <span className={styles.storageMenuLabel}>
+                    {storageProviderLabel(storageSnapshot)}
+                  </span>
+                  <ChevronDown aria-hidden="true" size={14} className={styles.storageMenuChevron} />
                 </button>
-                <div className={styles.storageMenuSeparator} role="separator" />
-                {configuredStorageProviders.map((provider, index) => (
-                  <button
-                    key={provider}
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={storageSnapshot.provider === provider}
-                    className={styles.storageMenuItem}
-                    ref={(node) => {
-                      registerStorageMenuItem(index + 1, node);
-                    }}
-                    onClick={() => selectStorageProvider(provider)}
-                  >
-                    <span className={styles.storageMenuIndicator} aria-hidden="true">
-                      {storageSnapshot.provider === provider ? '•' : ''}
-                    </span>
-                    <span>{provider === 'local' ? 'Local SQLite' : 'Supabase'}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+              }
+              items={[
+                {
+                  id: 'configure-storage',
+                  label: 'Configure storage',
+                  icon: <Settings aria-hidden="true" size={15} />,
+                  onSelect: () => go('/settings/storage'),
+                },
+                { type: 'separator', id: 'storage-separator' },
+                ...configuredStorageProviders.map((provider) => ({
+                  id: `storage-${provider}`,
+                  label: `${provider === 'local' ? 'Local SQLite' : 'Supabase'}${
+                    storageSnapshot.provider === provider ? ' (active)' : ''
+                  }`,
+                  onSelect: () => selectStorageProvider(provider),
+                })),
+              ]}
+            />
           </div>
         </aside>
         <div
@@ -365,16 +361,17 @@ function ApplicationShell() {
               </nav>
             )}
             <div className={styles.topbarActions}>
-              <Button
+              <ButtonV2
                 variant="ghost"
                 onClick={() => setPaletteOpen(true)}
                 aria-label="Search"
                 data-node-id="344:107"
               >
                 ⌕ Search
-              </Button>
-              <label className={styles.themeControl}>
-                <select
+              </ButtonV2>
+              <div className={styles.themeControl}>
+                <SelectV2
+                  size="sm"
                   aria-label="Appearance"
                   data-node-id="344:109"
                   value={theme}
@@ -383,11 +380,9 @@ function ApplicationShell() {
                   <option value="dark">Dark</option>
                   <option value="light">Light</option>
                   <option value="system">System</option>
-                </select>
-                <span className={styles.themeLabel} aria-hidden="true">
-                  ☀ / ☾
-                </span>
-              </label>
+                  <option value="high-contrast">High contrast</option>
+                </SelectV2>
+              </div>
             </div>
           </header>
           <main
@@ -471,9 +466,9 @@ function ApplicationShell() {
         ) : (
           <span aria-disabled="true">Board</span>
         )}
-        <Button variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
+        <ButtonV2 variant="ghost" onClick={() => setPaletteOpen(true)} aria-label="Search">
           Search
-        </Button>
+        </ButtonV2>
         {mobileWorkspaceId ? (
           <Link to={`/workspaces/${mobileWorkspaceId}/settings`}>Settings</Link>
         ) : (
@@ -504,6 +499,6 @@ function ApplicationShell() {
             : []),
         ]}
       />
-    </div>
+    </ThemeScope>
   );
 }

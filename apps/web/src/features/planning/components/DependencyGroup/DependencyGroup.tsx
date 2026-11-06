@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Card } from '@corefoundry-labs/forge-ui';
+import { CardV2 } from '@corefoundry-labs/forge-ui';
 import styles from './DependencyGroup.module.css';
 
 export type DependencyGroupState = 'Blocked' | 'Clear' | 'Archived';
@@ -22,7 +22,9 @@ export function DependencyGroup({
   const displayState = archived ? 'Archived' : state;
 
   return (
-    <Card
+    <CardV2
+      data-layout="flow"
+      variant="outlined"
       className={styles.group}
       data-state={displayState}
       role="group"
@@ -35,6 +37,6 @@ export function DependencyGroup({
         <strong>{blocked}</strong>
       </p>
       {children}
-    </Card>
+    </CardV2>
   );
 }

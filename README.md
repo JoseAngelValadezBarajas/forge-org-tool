@@ -40,7 +40,7 @@ npm run dev
 uv sync --project apps/api --group dev
 uv run --project apps/api uvicorn forge_org.main:app --app-dir apps/api/src --reload
 uv run --project apps/api pytest -q
-python tooling/scripts/export-openapi.py --check
+python tooling/release/export-openapi.py --check
 ```
 
 Open Vite's local URL for the shell. In development only, `/__components` previews shared UI and in-scope product compositions. The backend exposes the local feature API and owns durable SQLite data. Package portability is verified with `npm run test:packages`, which builds and consumes packed artifacts outside workspace resolution.

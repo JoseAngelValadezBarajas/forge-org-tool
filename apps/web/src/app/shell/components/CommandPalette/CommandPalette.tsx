@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { Button, SearchField } from '@corefoundry-labs/forge-ui';
+import { ButtonV2, SearchField } from '@corefoundry-labs/forge-ui';
 import styles from './CommandPalette.module.css';
 export interface PaletteCommand {
   id: string;
@@ -74,20 +74,20 @@ function CommandPaletteDialog({ commands, onClose }: Omit<CommandPaletteProps, '
         />
         <div className={styles.commands}>
           {visible.map((command) => (
-            <Button
+            <ButtonV2
               key={command.id}
               variant="ghost"
               onClick={command.onSelect}
               aria-label={`Go to ${command.label}`}
             >
               {command.label}
-            </Button>
+            </ButtonV2>
           ))}
           {visible.length === 0 && <p role="status">No matching commands.</p>}
         </div>
-        <Button variant="ghost" onClick={onClose}>
+        <ButtonV2 variant="ghost" onClick={onClose}>
           Close
-        </Button>
+        </ButtonV2>
         <p>Press Escape to close.</p>
       </dialog>
     </div>

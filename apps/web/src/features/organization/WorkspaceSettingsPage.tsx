@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Card,
-  Dialog,
+  AlertV2,
+  BadgeV2,
+  ButtonV2,
+  CardV2,
+  DialogV2,
+  FeedbackStateV2,
   FormField,
-  Input,
-  StatusChip,
+  TextInputV2,
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import styles from './WorkspaceSettingsPage.module.css';
@@ -40,20 +42,20 @@ export function WorkspaceSettingsPage() {
     deleteTag,
   } = useWorkspaceSettingsController();
 
-  if (loading) return <p role="status">Loading Workspace settings…</p>;
+  if (loading) return <FeedbackStateV2 state="loading" title="Loading Workspace settings…" />;
   if (!workspace) {
     return (
-      <Card>
-        <p role="alert">{error || 'Workspace not found.'}</p>
+      <CardV2 variant="outlined">
+        <AlertV2 tone="error">{error || 'Workspace not found.'}</AlertV2>
         <Link to="/">Back to Projects</Link>
-      </Card>
+      </CardV2>
     );
   }
 
   const newTagForm = (
     <form className={styles.newTagForm} onSubmit={(event) => void createTag(event)}>
       <FormField label="New tag name">
-        <Input
+        <TextInputV2
           aria-label="New tag name"
           value={newTagName}
           onChange={(event) => setNewTagName(event.target.value)}
@@ -62,14 +64,14 @@ export function WorkspaceSettingsPage() {
         />
       </FormField>
       <FormField label="New tag color">
-        <Input
+        <TextInputV2
           aria-label="New tag color"
           type="color"
           value={newTagColor}
           onChange={(event) => setNewTagColor(event.target.value)}
         />
       </FormField>
-      <Button type="submit">Create workspace tag</Button>
+      <ButtonV2 type="submit">Create workspace tag</ButtonV2>
     </form>
   );
   const editorTags = [...tags].sort(
@@ -85,7 +87,7 @@ export function WorkspaceSettingsPage() {
           <p>Create once, reuse across every Project, Epic, Story and Bug.</p>
         </div>
         {!workspace.archived_at && (
-          <Button
+          <ButtonV2
             className={styles.newTag}
             aria-label="New tag"
             onClick={() => {
@@ -94,17 +96,22 @@ export function WorkspaceSettingsPage() {
             }}
           >
             + New Tag
-          </Button>
+          </ButtonV2>
         )}
       </header>
       {error && !newTagOpen && (
-        <p className={styles.error} role="alert">
+        <AlertV2 className={styles.error} tone="error">
           {error}
-        </p>
+        </AlertV2>
       )}
       {!workspace.archived_at ? (
         <div className={styles.tagsComposition} aria-label="Workspace tag composition">
-          <Card as="section" aria-label={`Tags in ${workspace.name}`} className={styles.catalog}>
+          <CardV2
+            variant="outlined"
+            as="section"
+            aria-label={`Tags in ${workspace.name}`}
+            className={styles.catalog}
+          >
             <h2>Tags in {workspace.name}</h2>
             <p className={styles.catalogIntro}>
               Tags belong to a workspace and can be reused in all projects.
@@ -131,7 +138,7 @@ export function WorkspaceSettingsPage() {
                           </span>
                         </div>
                       </div>
-                      <Button
+                      <ButtonV2
                         type="button"
                         variant="ghost"
                         aria-label={`Edit tag ${tag.name}`}
@@ -141,13 +148,13 @@ export function WorkspaceSettingsPage() {
                         }}
                       >
                         Edit
-                      </Button>
+                      </ButtonV2>
                     </li>
                   );
                 })}
               </ul>
             )}
-          </Card>
+          </CardV2>
           <aside className={styles.guidance} aria-labelledby="tag-guidance-heading">
             <h2 id="tag-guidance-heading">Consistency by design</h2>
             <p>
@@ -164,11 +171,11 @@ export function WorkspaceSettingsPage() {
           </aside>
         </div>
       ) : (
-        <Card className={styles.archivedNotice}>
-          <StatusChip tone="warning">Archived</StatusChip>
+        <CardV2 variant="outlined" className={styles.archivedNotice}>
+          <BadgeV2 tone="warning">Archived</BadgeV2>
           <h2>Manage workspace tags</h2>
           <p>Restore this Workspace to manage its shared tags.</p>
-        </Card>
+        </CardV2>
       )}
 
       <details className={styles.profileDetails}>
@@ -176,7 +183,7 @@ export function WorkspaceSettingsPage() {
         <h2>Workspace profile</h2>
         <form onSubmit={(event) => void saveWorkspace(event)} className={styles.profileForm}>
           <FormField label="Workspace name">
-            <Input
+            <TextInputV2
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
@@ -192,22 +199,23 @@ export function WorkspaceSettingsPage() {
             />
           </FormField>
           <div className={styles.profileActions}>
-            <Button type="submit">Save Workspace</Button>
-            <Button type="button" variant="secondary" onClick={() => void toggleArchive()}>
+            <ButtonV2 type="submit">Save Workspace</ButtonV2>
+            <ButtonV2 type="button" variant="secondary" onClick={() => void toggleArchive()}>
               {workspace.archived_at ? 'Restore Workspace' : 'Archive Workspace'}
-            </Button>
+            </ButtonV2>
           </div>
         </form>
       </details>
 
-      <Dialog
+      <DialogV2
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setNewTagOpen(false);
+        }}
         title="Edit workspace tags"
         description="Create, rename, recolor or remove shared workspace tags."
         open={newTagOpen}
-        onClose={() => setNewTagOpen(false)}
-        onCancel={() => setNewTagOpen(false)}
       >
-        {error && <p role="alert">{error}</p>}
+        {error && <AlertV2 tone="error">{error}</AlertV2>}
         <div className={styles.tagEditor}>
           {!editingTagId && newTagForm}
           {editorTags.map((tag) => {
@@ -221,7 +229,7 @@ export function WorkspaceSettingsPage() {
                 }}
               >
                 <FormField label={`Name for tag ${tag.name}`}>
-                  <Input
+                  <TextInputV2
                     aria-label={`Name for tag ${tag.name}`}
                     value={draft.name}
                     maxLength={40}
@@ -235,7 +243,7 @@ export function WorkspaceSettingsPage() {
                   />
                 </FormField>
                 <FormField label={`Color for tag ${tag.name}`}>
-                  <Input
+                  <TextInputV2
                     aria-label={`Color for tag ${tag.name}`}
                     type="color"
                     value={draft.color}
@@ -247,19 +255,19 @@ export function WorkspaceSettingsPage() {
                     }
                   />
                 </FormField>
-                <Button type="submit">Save tag {tag.name}</Button>
-                <Button type="button" variant="secondary" onClick={() => void deleteTag(tag.id)}>
+                <ButtonV2 type="submit">Save tag {tag.name}</ButtonV2>
+                <ButtonV2 type="button" variant="secondary" onClick={() => void deleteTag(tag.id)}>
                   Delete tag {tag.name}
-                </Button>
+                </ButtonV2>
               </form>
             );
           })}
           {editingTagId && newTagForm}
-          <Button type="button" variant="secondary" onClick={() => setNewTagOpen(false)}>
+          <ButtonV2 type="button" variant="secondary" onClick={() => setNewTagOpen(false)}>
             Done
-          </Button>
+          </ButtonV2>
         </div>
-      </Dialog>
+      </DialogV2>
       <Link className={styles.backLink} to="/">
         Back to Projects
       </Link>

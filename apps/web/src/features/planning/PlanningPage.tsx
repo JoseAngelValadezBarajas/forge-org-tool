@@ -1,5 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Button, Dialog, FormField, Input, Select, Textarea } from '@corefoundry-labs/forge-ui';
+import {
+  AlertV2,
+  ButtonV2,
+  DialogV2,
+  FormField,
+  SelectV2,
+  TextInputV2,
+  Textarea,
+} from '@corefoundry-labs/forge-ui';
 import { type EpicStatus } from '@forge-org/api-client';
 import styles from './PlanningPage.module.css';
 import { CreateEpicDrawer } from './CreateEpicDrawer';
@@ -10,6 +18,8 @@ import {
   KanbanColumn,
   PLANNING_COLUMN_STATUSES,
   ProjectPlanningHome,
+  PriorityOptions,
+  StatusOptions,
 } from './components';
 import { usePlanningPage } from './usePlanningPage';
 
@@ -106,7 +116,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 : 'Track the big outcomes. Open an Epic to manage its work items.'}
             </p>
           </div>
-          <Button
+          <ButtonV2
             type="button"
             aria-label="New Epic"
             data-node-id="343:12"
@@ -118,11 +128,17 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
             }}
           >
             + New Epic
-          </Button>
+          </ButtonV2>
         </section>
-        {error && <p role="alert">{error}</p>}
+        {error && <AlertV2 tone="error">{error}</AlertV2>}
         {featureDialogOpen && (
-          <Dialog open title="Create work item" onCancel={() => setFeatureDialogOpen(false)}>
+          <DialogV2
+            onOpenChange={(nextOpen) => {
+              if (!nextOpen) setFeatureDialogOpen(false);
+            }}
+            open
+            title="Create work item"
+          >
             <form
               className={styles.dialogForm}
               onSubmit={(event) => {
@@ -131,14 +147,15 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               }}
             >
               <label htmlFor="feature-title">Feature title</label>
-              <Input
+              <TextInputV2
                 id="feature-title"
                 value={featureTitle}
                 onChange={(event) => setFeatureTitle(event.target.value)}
                 required
               />
               <FormField label="Epic for new feature">
-                <Select
+                <SelectV2
+                  size="sm"
                   aria-label="Epic for new feature"
                   value={featureEpicId}
                   onChange={(event) => setFeatureEpicId(event.target.value)}
@@ -149,13 +166,13 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       {epic.title}
                     </option>
                   ))}
-                </Select>
+                </SelectV2>
               </FormField>
               <fieldset className={styles.workItemType}>
                 <legend>Work item type</legend>
                 <div className={styles.workItemTypeButtons}>
                   {(['story', 'bug'] as const).map((kind) => (
-                    <Button
+                    <ButtonV2
                       key={kind}
                       type="button"
                       variant={featureKind === kind ? 'primary' : 'secondary'}
@@ -163,7 +180,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       onClick={() => setFeatureKind(kind)}
                     >
                       {kind === 'story' ? 'Story' : 'Bug'}
-                    </Button>
+                    </ButtonV2>
                   ))}
                 </div>
               </fieldset>
@@ -199,17 +216,14 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               {featureKind === 'bug' && (
                 <div aria-label="Bug details">
                   <FormField label="Bug severity">
-                    <Select
+                    <SelectV2
+                      size="sm"
                       aria-label="Bug severity"
                       value={bugSeverity}
                       onChange={(event) => setBugSeverity(event.target.value as typeof bugSeverity)}
                     >
-                      {['low', 'medium', 'high', 'critical'].map((severity) => (
-                        <option key={severity} value={severity}>
-                          {severity}
-                        </option>
-                      ))}
-                    </Select>
+                      <PriorityOptions />
+                    </SelectV2>
                   </FormField>
                   <FormField label="Steps to reproduce">
                     <Textarea
@@ -234,9 +248,9 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                   </FormField>
                 </div>
               )}
-              <Button type="submit">Create Feature</Button>
+              <ButtonV2 type="submit">Create Feature</ButtonV2>
             </form>
-          </Dialog>
+          </DialogV2>
         )}
         <section className={styles.epicBoardSection} aria-label="Project Board">
           {!epicDialogOpen && (
@@ -250,46 +264,47 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 <div>
                   <span aria-current="page">Epics</span>
                   <Link to={`/projects/${workspaceId}/${projectId}`}>Project overview</Link>
-                  <Button type="button" variant="ghost" onClick={() => setFeatureDialogOpen(true)}>
+                  <ButtonV2
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setFeatureDialogOpen(true)}
+                  >
                     New work item
-                  </Button>
+                  </ButtonV2>
                   <p>Planning status and dependencies are manual product records only.</p>
                 </div>
               </details>
-              <Input
-                className={`${styles.epicFilter} ${styles.epicSearch}`}
+              <TextInputV2
+                size="sm"
+                className={styles.epicSearch}
                 type="search"
                 aria-label="Search Epics"
                 placeholder="Search Epics    ⌕"
                 value={epicSearch}
                 onChange={(event) => setEpicSearch(event.target.value)}
               />
-              <Select
+              <SelectV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicStatusFilter}`}
                 aria-label="Filter Epics by status"
                 value={epicStatusFilter}
                 onChange={(event) => setEpicStatusFilter(event.target.value)}
               >
                 <option value="all">Status: All</option>
-                {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
-                  <option key={value} value={value}>{`Status: ${label}`}</option>
-                ))}
-              </Select>
-              <Select
+                <StatusOptions prefix="Status: " />
+              </SelectV2>
+              <SelectV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicPriorityFilter}`}
                 aria-label="Filter Epics by priority"
                 value={epicPriorityFilter}
                 onChange={(event) => setEpicPriorityFilter(event.target.value)}
               >
                 <option value="all">Priority&nbsp; ▾</option>
-                {['low', 'medium', 'high', 'critical'].map((priority) => (
-                  <option key={priority} value={priority}>
-                    {priority[0]?.toUpperCase()}
-                    {priority.slice(1)}
-                  </option>
-                ))}
-              </Select>
-              <Select
+                <PriorityOptions capitalize />
+              </SelectV2>
+              <SelectV2
+                size="sm"
                 className={`${styles.epicFilter} ${styles.epicTagFilter}`}
                 aria-label="Filter Epics by tag"
                 value={epicTagFilter}
@@ -301,7 +316,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                     {tag.name}
                   </option>
                 ))}
-              </Select>
+              </SelectV2>
               <Link
                 className={`${styles.epicFilter} ${styles.importEpic}`}
                 to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}
@@ -411,18 +426,15 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
           {isMobile && (
             <section aria-label="Mobile Epic board" className={styles.mobileBoard}>
               <FormField label="Epic status">
-                <Select
+                <SelectV2
+                  size="sm"
                   aria-label="Mobile Epic status"
                   value={mobileEpicStatus}
                   onChange={(event) => setMobileEpicStatus(event.target.value)}
                 >
                   <option value="all">All statuses</option>
-                  {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </Select>
+                  <StatusOptions />
+                </SelectV2>
               </FormField>
               <div className={styles.mobileCards}>
                 {workflowEpics
@@ -435,19 +447,16 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                     >
                       <label>
                         Move Epic
-                        <Select
+                        <SelectV2
+                          size="sm"
                           aria-label={`Status for Epic ${epic.title}`}
                           value={epic.status}
                           onChange={(event) =>
                             void updateEpic(epic, event.target.value as EpicStatus)
                           }
                         >
-                          {PLANNING_COLUMN_STATUSES.map((column) => (
-                            <option key={column.value} value={column.value}>
-                              {column.label}
-                            </option>
-                          ))}
-                        </Select>
+                          <StatusOptions />
+                        </SelectV2>
                       </label>
                     </EpicCard>
                   ))}
@@ -487,7 +496,8 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                   >
                     <label>
                       Recover Epic status
-                      <Select
+                      <SelectV2
+                        size="sm"
                         aria-label={`Status for Epic ${epic.title}`}
                         value={epic.status}
                         onChange={(event) =>
@@ -495,12 +505,8 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                         }
                       >
                         <option value={epic.status}>Unsupported: {epic.status}</option>
-                        {PLANNING_COLUMN_STATUSES.map((column) => (
-                          <option key={column.value} value={column.value}>
-                            {column.label}
-                          </option>
-                        ))}
-                      </Select>
+                        <StatusOptions />
+                      </SelectV2>
                     </label>
                   </EpicCard>
                 ))}
@@ -511,19 +517,16 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
         {isMobile && (
           <section aria-label="Mobile work item board" className={styles.mobileBoard}>
             <FormField label="Work item status">
-              <Select
+              <SelectV2
+                size="sm"
                 aria-label="Mobile work item status"
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
               >
                 <option value="all">All statuses</option>
                 <option value="refining">Legacy refining</option>
-                {PLANNING_COLUMN_STATUSES.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </Select>
+                <StatusOptions />
+              </SelectV2>
             </FormField>
             <div className={styles.mobileCards}>
               {visibleFeatures.map((feature) => (
@@ -534,7 +537,8 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                 >
                   <label>
                     Move work item
-                    <Select
+                    <SelectV2
+                      size="sm"
                       aria-label={`Mobile status for ${feature.title}`}
                       value={feature.status}
                       onChange={(event) =>
@@ -544,12 +548,8 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                       {feature.status === 'refining' && (
                         <option value="refining">Legacy refining</option>
                       )}
-                      {PLANNING_COLUMN_STATUSES.map((column) => (
-                        <option key={column.value} value={column.value}>
-                          {column.label}
-                        </option>
-                      ))}
-                    </Select>
+                      <StatusOptions />
+                    </SelectV2>
                   </label>
                 </FeatureCard>
               ))}
@@ -571,19 +571,16 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
                   >
                     <label>
                       Move to workflow status
-                      <Select
+                      <SelectV2
+                        size="sm"
                         aria-label={`Status for ${feature.title}`}
                         value={feature.status}
                         onChange={(event) =>
                           void updateFeature(feature, { status: event.target.value })
                         }
                       >
-                        {PLANNING_COLUMN_STATUSES.map((column) => (
-                          <option key={column.value} value={column.value}>
-                            {column.label}
-                          </option>
-                        ))}
-                      </Select>
+                        <StatusOptions />
+                      </SelectV2>
                     </label>
                   </FeatureCard>
                 ))}

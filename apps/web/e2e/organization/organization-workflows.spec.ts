@@ -2,6 +2,11 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 type Workspace = { id: string; name: string };
 
+function workspaceMenuItemName(name: string) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^${escaped}( \\(active\\))?$`);
+}
+
 async function selectWorkspace(page: Page, name: string) {
   await page
     .getByRole('button', { name: /^Workspace:/ })
@@ -9,7 +14,7 @@ async function selectWorkspace(page: Page, name: string) {
     .click();
   await page
     .getByRole('menu', { name: 'Workspaces' })
-    .getByRole('menuitemradio', { name, exact: true })
+    .getByRole('menuitem', { name: workspaceMenuItemName(name) })
     .click();
 }
 
@@ -265,7 +270,7 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
       .click();
   }
   await expect(page).toHaveURL(`/projects/${workspace.id}/${project.id}`);
-  await expect(page.getByRole('heading', { name: 'Project Overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Project Overview', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Edit project' })).toBeVisible();
   await page.screenshot({ path: test.info().outputPath('project-overview.png'), fullPage: true });
   await page.getByRole('button', { name: 'Edit project' }).click();
@@ -309,7 +314,7 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
       .locator(`a[href="/projects/${workspace.id}/${project.id}"]`)
       .click();
   }
-  await expect(page.getByRole('heading', { name: 'Project Overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Project Overview', exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Transfer / export' }).click();
   await expect(page).toHaveURL(`/transfer/${workspace.id}/${project.id}`);
   await expect(page.getByRole('heading', { name: 'Project transfer' })).toBeVisible();

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { createWorkspaceWithProject } from '../support/api';
 
 test('PA-SHELL-02 collapsible sidebar preserves navigation and viewport geometry', async ({
   page,
@@ -9,14 +10,10 @@ test('PA-SHELL-02 collapsible sidebar preserves navigation and viewport geometry
   );
 
   const suffix = `${testInfo.project.name}-${Date.now()}`;
-  const workspace = await (
-    await page.request.post('/api/v1/workspaces', { data: { name: `Sidebar ${suffix}` } })
-  ).json();
-  const project = await (
-    await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
-      data: { name: `Compact project ${suffix}` },
-    })
-  ).json();
+  const { workspace, project } = await createWorkspaceWithProject(page, {
+    workspace: `Sidebar ${suffix}`,
+    project: `Compact project ${suffix}`,
+  });
 
   await page.goto(`/planning/${workspace.id}/${project.id}`);
   const sidebar = page.getByTestId('app-sidebar');

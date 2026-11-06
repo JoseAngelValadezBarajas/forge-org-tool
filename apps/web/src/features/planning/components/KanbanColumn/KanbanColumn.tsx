@@ -1,5 +1,5 @@
 import { Children, type ReactNode } from 'react';
-import { Card } from '@corefoundry-labs/forge-ui';
+import { CardV2 } from '@corefoundry-labs/forge-ui';
 import styles from './KanbanColumn.module.css';
 
 export const PLANNING_COLUMN_STATUSES = [
@@ -34,7 +34,9 @@ export function KanbanColumn({
       data-testid={`kanban-column-${status}`}
       className={[styles.column, compact && styles.compact].filter(Boolean).join(' ')}
     >
-      <Card
+      <CardV2
+        data-layout="flow"
+        variant="outlined"
         className={[styles.surface, compact && styles.compactSurface].filter(Boolean).join(' ')}
         data-kanban-status={status}
         onDragOver={(event) => {
@@ -59,7 +61,7 @@ export function KanbanColumn({
         <div className={styles.cards} data-state={empty ? 'Empty' : 'HasCards'}>
           {empty ? <p className={styles.empty}>{emptyMessage}</p> : children}
         </div>
-      </Card>
+      </CardV2>
     </section>
   );
 }

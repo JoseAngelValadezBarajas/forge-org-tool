@@ -1,16 +1,15 @@
 import { Link, useParams } from 'react-router-dom';
 import {
-  Alert,
-  Button,
-  Card,
-  Dialog,
-  ErrorState,
+  AlertV2,
+  BadgeV2,
+  ButtonV2,
+  CardV2,
+  DialogV2,
+  FeedbackStateV2,
   FormField,
-  Input,
-  LoadingState,
   MetricCard,
   SectionHeader,
-  StatusChip,
+  TextInputV2,
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import styles from './ProjectOverviewPage.module.css';
@@ -60,26 +59,24 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
         <Link to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}>Import Epic</Link>
       </nav>
       {loadError ? (
-        <ErrorState
+        <FeedbackStateV2
+          state="error"
           title="Project overview unavailable"
           description={loadError}
-          actions={<Button onClick={retryLoad}>Retry loading overview</Button>}
+          actions={<ButtonV2 onClick={retryLoad}>Retry loading overview</ButtonV2>}
         />
       ) : !overview || !project ? (
-        <LoadingState label="Loading project overview" />
+        <FeedbackStateV2 state="loading" title="Loading project overview" />
       ) : (
         <>
-          {success && (
-            <Alert tone="success" role="status">
-              {success}
-            </Alert>
-          )}
+          {success && <AlertV2 tone="success">{success}</AlertV2>}
           {mutationError && (
-            <ErrorState
+            <FeedbackStateV2
+              state="error"
               title="Project update failed"
               description={mutationError.message}
               actions={
-                <Button
+                <ButtonV2
                   disabled={busy}
                   onClick={() => {
                     if (mutationError.action === 'archive') {
@@ -89,17 +86,17 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                   }}
                 >
                   Retry update
-                </Button>
+                </ButtonV2>
               }
             />
           )}
           <section aria-label="Project details">
-            <Card>
+            <CardV2 variant="outlined">
               <SectionHeader
                 title={project.name}
                 actions={
                   <div className={styles.actions}>
-                    <Button
+                    <ButtonV2
                       variant="secondary"
                       disabled={busy || editing}
                       onClick={() => {
@@ -110,8 +107,8 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                       }}
                     >
                       Edit project
-                    </Button>
-                    <Button
+                    </ButtonV2>
+                    <ButtonV2
                       variant="secondary"
                       disabled={busy || editing}
                       onClick={() => {
@@ -123,13 +120,13 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                       }}
                     >
                       {project.status === 'archived' ? 'Restore project' : 'Archive project'}
-                    </Button>
+                    </ButtonV2>
                   </div>
                 }
               />
-              <StatusChip tone={project.status === 'archived' ? 'neutral' : 'success'}>
+              <BadgeV2 tone={project.status === 'archived' ? 'neutral' : 'success'}>
                 {project.status}
-              </StatusChip>
+              </BadgeV2>
               <p className={styles.description}>{project.description || 'No description.'}</p>
               <dl className={styles.metadata}>
                 <div>
@@ -162,7 +159,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
               {editing && (
                 <form onSubmit={save} className={styles.form}>
                   <FormField label="Project name">
-                    <Input
+                    <TextInputV2
                       id="overview-project-name"
                       required
                       value={name}
@@ -180,10 +177,10 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                     />
                   </FormField>
                   <div className={styles.actions}>
-                    <Button type="submit" disabled={busy}>
+                    <ButtonV2 type="submit" disabled={busy}>
                       Save project
-                    </Button>
-                    <Button
+                    </ButtonV2>
+                    <ButtonV2
                       variant="secondary"
                       disabled={busy}
                       onClick={() => {
@@ -192,11 +189,11 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                       }}
                     >
                       Cancel edit
-                    </Button>
+                    </ButtonV2>
                   </div>
                 </form>
               )}
-            </Card>
+            </CardV2>
           </section>
           <section aria-label="Project summary" className={styles.stack}>
             <h2>Planning summary</h2>
@@ -220,7 +217,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
             </div>
           </section>
           <section aria-label="Pending Features">
-            <Card>
+            <CardV2 variant="outlined">
               <h2>Pending Features</h2>
               {pending.length === 0 ? (
                 <p>No pending Features.</p>
@@ -238,10 +235,10 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                   ))}
                 </ul>
               )}
-            </Card>
+            </CardV2>
           </section>
           <section aria-label="Workspace details">
-            <Card>
+            <CardV2 variant="outlined">
               <h2>Owning Workspace</h2>
               <p>{overview.workspace.name}</p>
               {overview.workspace.description && <p>{overview.workspace.description}</p>}
@@ -263,21 +260,22 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
                   </dd>
                 </div>
               </dl>
-            </Card>
+            </CardV2>
           </section>
           {confirmArchive && (
-            <Dialog
+            <DialogV2
+              onOpenChange={(nextOpen) => {
+                if (!nextOpen) setConfirmArchive(false);
+              }}
               open
               title="Archive project?"
-              variant="destructive"
               description={`Archive ${project.name}? Planning will be read-only until the Project is restored.`}
-              onCancel={() => setConfirmArchive(false)}
-              actions={
+              footer={
                 <>
-                  <Button variant="secondary" onClick={() => setConfirmArchive(false)}>
+                  <ButtonV2 variant="secondary" onClick={() => setConfirmArchive(false)}>
                     Cancel
-                  </Button>
-                  <Button onClick={() => void mutate('archive')}>Confirm archive</Button>
+                  </ButtonV2>
+                  <ButtonV2 onClick={() => void mutate('archive')}>Confirm archive</ButtonV2>
                 </>
               }
             />

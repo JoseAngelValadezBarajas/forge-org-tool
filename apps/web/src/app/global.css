@@ -22,3 +22,23 @@ a:focus-visible {
   outline: 2px solid var(--forge-accent);
   outline-offset: 3px;
 }
+
+/* CardV2 wraps its children in a body element. Cards that act as flex/grid containers
+   (data-layout="flow") flatten it so their children keep participating in the layout. */
+[data-layout='flow'] > div {
+  display: contents;
+}
+
+/* Form fields keep the engine's 3:1 `outline`. Card borders are decorative, so they use the
+   quieter `outlineVariant` role like the Figma frames. */
+/* [class] raises specificity above the component's own `.outlined` rule regardless of load order. */
+[data-variant='outlined'][class] {
+  border-color: var(--cf-v2-outline-variant);
+}
+
+/* Field borders use the quieter `outlineVariant` role like the Figma frames. The strong 3:1
+   `outline` returns in High contrast mode, which the engine reserves for that need. */
+[data-cf-theme-mode]:not([data-cf-theme-mode='high-contrast'])
+  :is(select, input)[data-size][class] {
+  border-color: var(--cf-v2-outline-variant);
+}

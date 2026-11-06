@@ -1,6 +1,6 @@
 import type { DragEventHandler, PointerEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, StatusChip } from '@corefoundry-labs/forge-ui';
+import { BadgeV2, CardV2 } from '@corefoundry-labs/forge-ui';
 import type { Epic, EpicStatus, Feature } from '@forge-org/api-client';
 import styles from './EpicCard.module.css';
 
@@ -49,7 +49,9 @@ export function EpicCard({
   const progress = epic.progress ?? (total ? Math.round((completed / total) * 100) : 0);
   if (compact) {
     return (
-      <Card
+      <CardV2
+        data-layout="flow"
+        variant="outlined"
         as="article"
         className={`${styles.card} ${styles.compact}`}
         data-state={state}
@@ -79,11 +81,11 @@ export function EpicCard({
           {total} items{epic.tags?.[0] ? `  ·  ${epic.tags[0].toLowerCase()}` : ''}
         </p>
         {children}
-      </Card>
+      </CardV2>
     );
   }
   return (
-    <Card className={styles.card} data-state={state}>
+    <CardV2 data-layout="flow" variant="outlined" className={styles.card} data-state={state}>
       <header className={styles.header}>
         <div>
           <h3>{href ? <Link to={href}>{epic.title}</Link> : epic.title}</h3>
@@ -91,17 +93,17 @@ export function EpicCard({
             {total} {total === 1 ? 'work item' : 'work items'} · {progress}% complete
           </p>
         </div>
-        <StatusChip
+        <BadgeV2
           tone={
             state === 'done'
               ? 'success'
               : state === 'in_progress' || state === 'verify'
-                ? 'accent'
+                ? 'primary'
                 : 'neutral'
           }
         >
           {label}
-        </StatusChip>
+        </BadgeV2>
       </header>
       <p>Priority: {epic.priority ?? 'medium'}</p>
       {epic.description && <p className={styles.description}>{epic.description}</p>}
@@ -113,6 +115,6 @@ export function EpicCard({
         </ul>
       ) : null}
       {children && <div className={styles.features}>{children}</div>}
-    </Card>
+    </CardV2>
   );
 }

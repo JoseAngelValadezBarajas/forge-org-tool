@@ -2,6 +2,7 @@
   display: grid;
   gap: 20px;
   min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 .heading {
   display: flex;
@@ -44,6 +45,7 @@
 }
 .workspace {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 20px;

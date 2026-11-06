@@ -1,17 +1,20 @@
 import { Link } from 'react-router-dom';
 import { type EpicStatus, type Feature } from '@forge-org/api-client';
 import {
-  Button,
-  Badge,
-  Card,
-  Dialog,
-  Input,
+  AlertV2,
+  BadgeV2,
+  ButtonV2,
+  CardV2,
+  DialogV2,
+  FeedbackStateV2,
   MultiSelect,
-  Select,
-  Tabs,
+  SelectV2,
+  TabsV2,
+  TextInputV2,
   Textarea,
 } from '@corefoundry-labs/forge-ui';
 import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
+import { PriorityOptions, StatusOptions } from './components';
 import styles from './EpicDetailPage.module.css';
 import { useEpicDetailController, statuses } from './useEpicDetailController';
 
@@ -75,7 +78,9 @@ export function EpicDetailPage() {
   } = useEpicDetailController();
 
   const itemCard = (feature: Feature) => (
-    <Card
+    <CardV2
+      data-layout="flow"
+      variant="outlined"
       as="article"
       key={feature.id}
       aria-label={feature.title}
@@ -122,45 +127,42 @@ export function EpicDetailPage() {
           <div className={styles.itemControls}>
             <label>
               Priority
-              <select
+              <SelectV2
+                size="sm"
                 aria-label={`Priority for ${feature.title}`}
                 value={feature.priority}
                 onChange={(event) =>
                   void moveFeature(feature, { priority: event.target.value as Feature['priority'] })
                 }
               >
-                {['low', 'medium', 'high', 'critical'].map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
-              </select>
+                <PriorityOptions />
+              </SelectV2>
             </label>
             <label>
               Move to status
-              <select
+              <SelectV2
+                size="sm"
                 aria-label={`Status for ${feature.title}`}
                 value={feature.status}
                 onChange={(event) =>
                   void moveFeature(feature, { status: event.target.value as Feature['status'] })
                 }
               >
-                {PLANNING_COLUMN_STATUSES.map((column) => (
-                  <option key={column.value} value={column.value}>
-                    {column.label}
-                  </option>
-                ))}
+                <StatusOptions />
                 {!PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status) && (
                   <option value={feature.status}>Unsupported: {feature.status}</option>
                 )}
-              </select>
+              </SelectV2>
             </label>
           </div>
         </details>
       )}
-    </Card>
+    </CardV2>
   );
   const featureFilters = (
     <div className={styles.filters} aria-label="Work item filters">
-      <Select
+      <SelectV2
+        size="sm"
         aria-label="Filter Work Items by type"
         value={featureKind}
         onChange={(event) => setFeatureKind(event.target.value)}
@@ -168,26 +170,27 @@ export function EpicDetailPage() {
         <option value="all">All items</option>
         <option value="story">Stories</option>
         <option value="bug">Bugs</option>
-      </Select>
-      <Input
+      </SelectV2>
+      <TextInputV2
+        size="sm"
         id="epic-board-search"
         aria-label="Find Work Items"
         placeholder="Search Stories & Bugs"
         value={featureSearch}
         onChange={(event) => setFeatureSearch(event.target.value)}
       />
-      <Select
+      <SelectV2
+        size="sm"
         id="epic-board-priority"
         aria-label="Filter Work Items by priority"
         value={featurePriority}
         onChange={(event) => setFeaturePriority(event.target.value)}
       >
         <option value="all">Priority</option>
-        {['low', 'medium', 'high', 'critical'].map((value) => (
-          <option key={value}>{value}</option>
-        ))}
-      </Select>
-      <Input
+        <PriorityOptions />
+      </SelectV2>
+      <TextInputV2
+        size="sm"
         id="epic-board-tag"
         aria-label="Filter Work Items by tag"
         placeholder="Tags"
@@ -211,23 +214,23 @@ export function EpicDetailPage() {
           )}
         </div>
         {epic && !readOnly && !isMobile && (
-          <Button
+          <ButtonV2
             className={styles.primaryAction}
             aria-label="New Work Item"
             onClick={() => setCreateItemOpen(true)}
           >
             + New Item
-          </Button>
+          </ButtonV2>
         )}
         {epic && !readOnly && isMobile && (
-          <Button
+          <ButtonV2
             variant="secondary"
             className={styles.mobileEditAction}
             aria-label="Edit Epic"
             onClick={() => setEditing(true)}
           >
             ✎
-          </Button>
+          </ButtonV2>
         )}
       </header>
       {!isMobile && (
@@ -258,34 +261,44 @@ export function EpicDetailPage() {
           </nav>
         </details>
       )}
-      {loading && <p role="status">Loading Epic…</p>}
+      {loading && <FeedbackStateV2 state="loading" title="Loading Epic…" />}
       {error && (
-        <div role="alert">
-          <p>{error}</p>
-          <Button type="button" variant="secondary" onClick={() => void load()}>
-            Retry
-          </Button>
-        </div>
+        <AlertV2
+          tone="error"
+          actions={
+            <ButtonV2 type="button" variant="secondary" onClick={() => void load()}>
+              Retry
+            </ButtonV2>
+          }
+        >
+          {error}
+        </AlertV2>
       )}
       {epic?.id === epicId && !loading && (
         <>
           {readOnly && (
-            <p role="status">
+            <AlertV2 tone="info">
               {project?.status !== 'active'
                 ? 'This is an archived project. Epic details are read-only.'
                 : 'This Epic is archived. Epic details are read-only.'}
-            </p>
+            </AlertV2>
           )}
-          {saved && <p role="status">Epic saved.</p>}
-          <Card as="section" aria-label="Epic context" className={styles.epicSummary}>
+          {saved && <AlertV2 tone="success">Epic saved.</AlertV2>}
+          <CardV2
+            data-layout="flow"
+            variant="outlined"
+            as="section"
+            aria-label="Epic context"
+            className={styles.epicSummary}
+          >
             <p className={styles.progress}>
               {features.length} work items <span>•</span> {completedCount} completed <span>•</span>{' '}
               {features.length ? Math.round((completedCount / features.length) * 100) : 0}% progress
             </p>
-            <Badge className={styles.priority}>{epic.priority} priority</Badge>
+            <BadgeV2 className={styles.priority}>{epic.priority} priority</BadgeV2>
             <div className={styles.epicTags}>
               {epic.tags?.map((tag: string) => (
-                <Badge key={tag}>{tag}</Badge>
+                <BadgeV2 key={tag}>{tag}</BadgeV2>
               ))}
             </div>
             <Link
@@ -296,25 +309,27 @@ export function EpicDetailPage() {
               Export ↗
             </Link>
             {!readOnly && (
-              <Button
+              <ButtonV2
                 variant="ghost"
                 className={styles.editEpicAction}
                 aria-label="Edit Epic"
                 onClick={() => setEditing(true)}
               >
                 ⋯
-              </Button>
+              </ButtonV2>
             )}
-          </Card>
-          <Dialog
+          </CardV2>
+          <DialogV2
+            onOpenChange={(nextOpen) => {
+              if (!nextOpen) setEditing(false);
+            }}
             title="Edit Epic"
             description="Update the Epic summary and workflow status."
             open={editing}
-            onClose={() => setEditing(false)}
           >
             <form className={styles.form} onSubmit={save}>
               <label htmlFor="epic-title">Epic title</label>
-              <Input
+              <TextInputV2
                 id="epic-title"
                 aria-label="Epic title"
                 required
@@ -330,7 +345,8 @@ export function EpicDetailPage() {
                 onChange={(event) => setDescription(event.target.value)}
               />
               <label htmlFor="epic-status">Status</label>
-              <Select
+              <SelectV2
+                size="sm"
                 id="epic-status"
                 aria-label="Epic status"
                 value={status}
@@ -344,15 +360,15 @@ export function EpicDetailPage() {
                     {value}
                   </option>
                 ))}
-              </Select>
+              </SelectV2>
               <div className={styles.formActions}>
-                <Button type="button" variant="secondary" onClick={() => setEditing(false)}>
+                <ButtonV2 type="button" variant="secondary" onClick={() => setEditing(false)}>
                   Cancel
-                </Button>
-                <Button type="submit">Save Epic</Button>
+                </ButtonV2>
+                <ButtonV2 type="submit">Save Epic</ButtonV2>
               </div>
             </form>
-          </Dialog>
+          </DialogV2>
           <section aria-label="Epic Board" className={styles.boardSection}>
             {!isMobile && featureFilters}
             {features.length === 0 && <p>No Work Items linked to this Epic yet.</p>}
@@ -360,11 +376,11 @@ export function EpicDetailPage() {
               <>
                 {isMobile ? (
                   <div className={styles.mobileBoard}>
-                    <Tabs
-                      label="Epic Work Item status"
+                    <TabsV2
+                      aria-label="Epic Work Item status"
                       defaultValue={mobileStatus}
-                      onChange={setMobileStatus}
-                      tabs={PLANNING_COLUMN_STATUSES.filter(({ value }) =>
+                      onValueChange={setMobileStatus}
+                      items={PLANNING_COLUMN_STATUSES.filter(({ value }) =>
                         ['ready', 'in_progress', 'verify'].includes(value),
                       ).map(({ value, label }) => {
                         const mobileLabel = value === 'in_progress' ? 'In Progress' : label;
@@ -423,22 +439,25 @@ export function EpicDetailPage() {
                           .filter((feature) => feature.status === boardStatus)
                           .map(itemCard)}
                         {!readOnly && (
-                          <Button
+                          <ButtonV2
                             variant="ghost"
                             className={styles.addItem}
                             onClick={() => setCreateItemOpen(true)}
                           >
                             + Add item
-                          </Button>
+                          </ButtonV2>
                         )}
                       </KanbanColumn>
                     ))}
                   </div>
                 )}
                 {isMobile && !readOnly && (
-                  <Button className={styles.mobileNewItem} onClick={() => setCreateItemOpen(true)}>
+                  <ButtonV2
+                    className={styles.mobileNewItem}
+                    onClick={() => setCreateItemOpen(true)}
+                  >
                     New Work Item
-                  </Button>
+                  </ButtonV2>
                 )}
                 {isMobile &&
                   filteredFeatures.some(
@@ -466,17 +485,19 @@ export function EpicDetailPage() {
               </>
             }
           </section>
-          <Dialog
+          <DialogV2
+            onOpenChange={(nextOpen) => {
+              if (!nextOpen) setCreateItemOpen(false);
+            }}
             title="Create Work Item"
             description={`Add a Story or Bug to ${epic.title}.`}
             open={createItemOpen}
-            onClose={() => setCreateItemOpen(false)}
           >
             <form className={styles.form} onSubmit={(event) => void createWorkItem(event)}>
               <fieldset className={styles.kindChoice}>
                 <legend>Work Item type</legend>
                 {(['story', 'bug'] as const).map((kind) => (
-                  <Button
+                  <ButtonV2
                     key={kind}
                     type="button"
                     variant={newItemKind === kind ? 'primary' : 'secondary'}
@@ -484,11 +505,11 @@ export function EpicDetailPage() {
                     onClick={() => setNewItemKind(kind)}
                   >
                     {kind === 'story' ? 'Story' : 'Bug'}
-                  </Button>
+                  </ButtonV2>
                 ))}
               </fieldset>
               <label htmlFor="new-work-item-title">Title</label>
-              <Input
+              <TextInputV2
                 id="new-work-item-title"
                 aria-label="Work Item title"
                 value={newItemTitle}
@@ -506,15 +527,14 @@ export function EpicDetailPage() {
               {newItemKind === 'bug' && (
                 <>
                   <label htmlFor="new-bug-severity">Bug severity</label>
-                  <Select
+                  <SelectV2
+                    size="sm"
                     id="new-bug-severity"
                     value={newBugSeverity}
                     onChange={(event) => setNewBugSeverity(event.target.value)}
                   >
-                    {['low', 'medium', 'high', 'critical'].map((value) => (
-                      <option key={value}>{value}</option>
-                    ))}
-                  </Select>
+                    <PriorityOptions />
+                  </SelectV2>
                   <label htmlFor="new-bug-steps">Steps to reproduce</label>
                   <Textarea
                     id="new-bug-steps"
@@ -539,13 +559,17 @@ export function EpicDetailPage() {
                 </>
               )}
               <div className={styles.formActions}>
-                <Button type="button" variant="secondary" onClick={() => setCreateItemOpen(false)}>
+                <ButtonV2
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setCreateItemOpen(false)}
+                >
                   Cancel
-                </Button>
-                <Button type="submit">Create Work Item</Button>
+                </ButtonV2>
+                <ButtonV2 type="submit">Create Work Item</ButtonV2>
               </div>
             </form>
-          </Dialog>
+          </DialogV2>
         </>
       )}
     </div>

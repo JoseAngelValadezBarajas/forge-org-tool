@@ -71,7 +71,7 @@ jobs:
           node-version: '24'
 
       - name: Verify release version matches the tag
-        run: node tooling/scripts/release-version.mjs
+        run: node tooling/release/release-version.mjs
 
   android-release:
     needs: release-ref
@@ -118,7 +118,7 @@ jobs:
         run: npm ci
 
       - name: Verify release version
-        run: node tooling/scripts/release-version.mjs
+        run: node tooling/release/release-version.mjs
 
       - name: Build production frontend
         run: npm run build
@@ -169,7 +169,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: node tooling/scripts/configure-android-signing.mjs
+        run: node tooling/release/configure-android-signing.mjs
 
       - name: Build signed Android release APK
         working-directory: apps/desktop/src-tauri
@@ -240,7 +240,7 @@ jobs:
 
       - name: Verify release version
         shell: pwsh
-        run: node tooling/scripts/release-version.mjs
+        run: node tooling/release/release-version.mjs
 
       - name: Build production frontend and sidecar
         shell: pwsh

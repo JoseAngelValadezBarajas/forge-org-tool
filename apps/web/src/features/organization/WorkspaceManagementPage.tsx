@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Button, Card, Dialog, FormField, Input, Textarea } from '@corefoundry-labs/forge-ui';
+import {
+  AlertV2,
+  ButtonV2,
+  CardV2,
+  DialogV2,
+  FeedbackStateV2,
+  FormField,
+  TextInputV2,
+  Textarea,
+} from '@corefoundry-labs/forge-ui';
 import styles from './WorkspaceManagementPage.module.css';
 import { useWorkspaceManagementController } from './useWorkspaceManagementController';
 
@@ -34,30 +43,32 @@ export function WorkspaceManagementPage() {
             Providers stay separate; switching Storage changes this list.
           </p>
         </div>
-        <Button type="button" onClick={() => setCreateOpen(true)}>
+        <ButtonV2 type="button" onClick={() => setCreateOpen(true)}>
           New workspace
-        </Button>
+        </ButtonV2>
       </header>
 
       {error && (
-        <p role="alert" className={styles.error}>
+        <AlertV2 tone="error" className={styles.error}>
           {error}
-        </p>
+        </AlertV2>
       )}
       {loading ? (
-        <p role="status">Loading workspaces…</p>
+        <FeedbackStateV2 state="loading" title="Loading workspaces…" />
       ) : workspaces.length === 0 ? (
-        <Card className={styles.empty}>
+        <CardV2 data-layout="flow" variant="outlined" className={styles.empty}>
           <h2>No workspaces yet</h2>
           <p>Create the first workspace for this storage provider.</p>
-          <Button type="button" onClick={() => setCreateOpen(true)}>
+          <ButtonV2 type="button" onClick={() => setCreateOpen(true)}>
             New workspace
-          </Button>
-        </Card>
+          </ButtonV2>
+        </CardV2>
       ) : (
         <section aria-label="Available workspaces" className={styles.list}>
           {workspaces.map((workspace) => (
-            <Card
+            <CardV2
+              data-layout="flow"
+              variant="outlined"
               key={workspace.id}
               className={styles.workspace}
               role="article"
@@ -71,11 +82,11 @@ export function WorkspaceManagementPage() {
                 <p>{workspace.description || 'No description.'}</p>
               </div>
               <div className={styles.actions}>
-                <Button type="button" onClick={() => openWorkspace(workspace)}>
+                <ButtonV2 type="button" onClick={() => openWorkspace(workspace)}>
                   Open workspace
-                </Button>
+                </ButtonV2>
                 <Link to={`/workspaces/${workspace.id}/settings`}>Settings</Link>
-                <Button
+                <ButtonV2
                   type="button"
                   variant="secondary"
                   onClick={() => setWorkspaceToDelete(workspace)}
@@ -83,23 +94,24 @@ export function WorkspaceManagementPage() {
                   aria-label={`Delete workspace ${workspace.name}`}
                 >
                   Delete
-                </Button>
+                </ButtonV2>
               </div>
-            </Card>
+            </CardV2>
           ))}
         </section>
       )}
 
-      <Dialog
+      <DialogV2
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setCreateOpen(false);
+        }}
         title="Create workspace"
         description="Create a workspace in the currently selected storage provider."
         open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onCancel={() => setCreateOpen(false)}
       >
         <form className={styles.form} onSubmit={(event) => void createWorkspace(event)}>
           <FormField label="Workspace name">
-            <Input
+            <TextInputV2
               aria-label="Workspace name"
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -117,34 +129,35 @@ export function WorkspaceManagementPage() {
             />
           </FormField>
           <div className={styles.formActions}>
-            <Button type="button" variant="secondary" onClick={() => setCreateOpen(false)}>
+            <ButtonV2 type="button" variant="secondary" onClick={() => setCreateOpen(false)}>
               Cancel
-            </Button>
-            <Button type="submit" disabled={saving}>
+            </ButtonV2>
+            <ButtonV2 type="submit" disabled={saving}>
               Create workspace
-            </Button>
+            </ButtonV2>
           </div>
         </form>
-      </Dialog>
+      </DialogV2>
 
-      <Dialog
+      <DialogV2
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setWorkspaceToDelete(null);
+        }}
         title={
           workspaceToDelete ? `Delete workspace ${workspaceToDelete.name}?` : 'Delete workspace?'
         }
         description="This permanently removes the workspace and its projects, Epics and work items from the selected provider. This cannot be undone."
         open={workspaceToDelete !== null}
-        onClose={() => setWorkspaceToDelete(null)}
-        onCancel={() => setWorkspaceToDelete(null)}
       >
         <div className={styles.formActions}>
-          <Button type="button" variant="secondary" onClick={() => setWorkspaceToDelete(null)}>
+          <ButtonV2 type="button" variant="secondary" onClick={() => setWorkspaceToDelete(null)}>
             Cancel
-          </Button>
-          <Button type="button" onClick={() => void deleteWorkspace()} disabled={saving}>
+          </ButtonV2>
+          <ButtonV2 type="button" onClick={() => void deleteWorkspace()} disabled={saving}>
             Delete permanently
-          </Button>
+          </ButtonV2>
         </div>
-      </Dialog>
+      </DialogV2>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 .stack {
   display: grid;
   gap: var(--forge-space-4);
+  grid-template-columns: minmax(0, 1fr);
 }
 .stack h3 {
   margin: var(--forge-space-4) 0 var(--forge-space-2);

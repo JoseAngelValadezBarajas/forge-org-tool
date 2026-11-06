@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider, useTheme } from './theme';
 
 function ThemeProbe() {
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, forgeTheme, setTheme } = useTheme();
   return (
     <div data-testid="theme-root" data-theme={resolvedTheme}>
       <label>
@@ -13,9 +13,11 @@ function ThemeProbe() {
           <option value="dark">Dark</option>
           <option value="light">Light</option>
           <option value="system">System</option>
+          <option value="high-contrast">High contrast</option>
         </select>
       </label>
       <output>{resolvedTheme}</output>
+      <output data-testid="engine-mode">{forgeTheme.mode}</output>
     </div>
   );
 }
@@ -45,6 +47,20 @@ describe('application theme state', () => {
     });
     expect(localStorage.getItem('forge-theme')).toBe('dark');
     expect(screen.getByTestId('theme-root')).toHaveAttribute('data-theme', 'dark');
+  });
+
+  it('drives the Forge Theme Engine V2 mode, including high contrast', () => {
+    renderTheme();
+    const appearance = screen.getByRole('combobox', { name: 'Appearance' });
+
+    expect(screen.getByTestId('engine-mode')).toHaveTextContent('dark');
+    fireEvent.change(appearance, { target: { value: 'light' } });
+    expect(screen.getByTestId('engine-mode')).toHaveTextContent('light');
+    fireEvent.change(appearance, { target: { value: 'high-contrast' } });
+    // V2 gets its own mode while the V1 token family stays dark.
+    expect(screen.getByTestId('engine-mode')).toHaveTextContent('high-contrast');
+    expect(screen.getByTestId('theme-root')).toHaveAttribute('data-theme', 'dark');
+    expect(localStorage.getItem('forge-theme')).toBe('high-contrast');
   });
 
   it('follows system appearance changes only while System is selected', () => {

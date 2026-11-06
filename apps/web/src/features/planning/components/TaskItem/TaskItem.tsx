@@ -1,5 +1,5 @@
 import type { Task } from '@forge-org/api-client';
-import { Button, Checkbox, Select } from '@corefoundry-labs/forge-ui';
+import { ButtonV2, CheckboxV2, SelectV2 } from '@corefoundry-labs/forge-ui';
 import styles from './TaskItem.module.css';
 
 type TaskItemProps = {
@@ -40,7 +40,7 @@ export function TaskItem({
       data-state={state}
     >
       {compact && (
-        <Checkbox
+        <CheckboxV2
           aria-label={`Complete ${task.title}`}
           checked={task.status === 'done'}
           disabled={archived}
@@ -48,7 +48,8 @@ export function TaskItem({
         />
       )}
       <strong className={styles.title}>{task.title}</strong>
-      <Select
+      <SelectV2
+        size="sm"
         aria-label={`Status for ${task.title}`}
         value={task.status}
         disabled={archived}
@@ -57,9 +58,9 @@ export function TaskItem({
         <option value="todo">todo</option>
         <option value="in_progress">in progress</option>
         <option value="done">done</option>
-      </Select>
+      </SelectV2>
       <div className={styles.actions}>
-        <Button
+        <ButtonV2
           type="button"
           variant="secondary"
           disabled={isFirst || archived}
@@ -67,8 +68,8 @@ export function TaskItem({
           aria-label={`Move ${task.title} up`}
         >
           Move up
-        </Button>
-        <Button
+        </ButtonV2>
+        <ButtonV2
           type="button"
           variant="secondary"
           disabled={isLast || archived}
@@ -76,7 +77,7 @@ export function TaskItem({
           aria-label={`Move ${task.title} down`}
         >
           Move down
-        </Button>
+        </ButtonV2>
       </div>
     </article>
   );

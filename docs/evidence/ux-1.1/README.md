@@ -23,7 +23,7 @@ The fixture creates synthetic workspaces, projects, Epics, Stories, Bugs, tags, 
 | 347:308 Contextual Transfer | 501,636 / 1,382,400 (36.29%) | Transfer is a normal shell page (not a blocking modal), uses the shared FilePicker, and states the human-readable destination. The capture keeps the advanced JSON source closed after preview. Remaining copy, count, card geometry, and source-state differences require review. |
 | 348:57 Workspace Tags | 281,215 / 1,382,400 (20.34%) | Tag usage counts are not present in the API and are not fabricated. |
 | 348:129 Project Board (light) | 43,494 / 1,382,400 (3.15%) | Automated comparison only; exact color/typography/spacing review remains open. |
-| 348:210 Mobile Epic Board | 120,164 / 329,160 (36.51%) | Principal geometry is asserted exactly in `DetailPages.spec.ts`. Figma omits the working `Move` and `Other workflow statuses` controls, which remain visible/functioning in product; the Figma summary count and inferred lane totals also need human resolution. |
+| 348:210 Mobile Epic Board | 120,164 / 329,160 (36.51%) | Principal geometry is asserted exactly in `e2e/visual/detail-pages.spec.ts`. Figma omits the working `Move` and `Other workflow statuses` controls, which remain visible/functioning in product; the Figma summary count and inferred lane totals also need human resolution. |
 
 All reports are under `visual-parity/reports/`; references, actuals, differences, and overlays are retained in their corresponding subdirectories. The 19-image `screenshots/` set is the earlier UX evidence set and is not the source used by the current pixel comparator.
 

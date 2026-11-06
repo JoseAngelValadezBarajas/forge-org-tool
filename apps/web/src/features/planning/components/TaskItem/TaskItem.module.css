@@ -24,7 +24,7 @@
   border: 0;
   font-size: 12px;
 }
-.compact > input {
+.compact > span:has(input[type='checkbox']) {
   flex: 0 0 14px;
   width: 14px;
   height: 14px;
@@ -32,7 +32,7 @@
 .compact .title {
   font-weight: 400;
 }
-.compact > select,
+.compact > span:has(> select),
 .compact .actions {
   position: absolute;
   z-index: 1;
@@ -40,7 +40,7 @@
   opacity: 0;
   background: var(--forge-surface-raised);
 }
-.compact > select {
+.compact > span:has(> select) {
   width: 94px;
   min-height: 28px;
   height: 28px;
@@ -56,8 +56,8 @@
   padding: 4px;
   font-size: 11px;
 }
-.compact:hover > select,
-.compact:focus-within > select,
+.compact:hover > span:has(> select),
+.compact:focus-within > span:has(> select),
 .compact:hover .actions,
 .compact:focus-within .actions {
   opacity: 1;
@@ -68,7 +68,7 @@
     grid-template-columns: 14px minmax(0, 1fr);
     padding-block: 6px;
   }
-  .compact > select,
+  .compact > span:has(> select),
   .compact .actions {
     position: static;
     opacity: 1;

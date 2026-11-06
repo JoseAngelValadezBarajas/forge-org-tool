@@ -2,6 +2,7 @@
   display: grid;
   gap: 18px;
   min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
 }
 .createEpicMode {
   gap: 16px;
@@ -109,20 +110,31 @@
 }
 .epicFilter,
 .boardViewMenu > summary {
-  display: block;
+  display: flex;
+  align-items: center;
   box-sizing: border-box;
-  height: 27px;
-  min-height: 27px;
-  padding: 6px;
-  border: 0;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+  /* Same quiet outline as the V2 fields beside it so the toolbar reads as one row. */
+  border: 1px solid var(--cf-v2-outline-variant);
   border-radius: 8px;
-  background: var(--forge-surface-interactive);
+  background: transparent;
   color: var(--forge-text-primary);
   font:
     500 11px/15px Inter,
     sans-serif;
   text-decoration: none;
   white-space: nowrap;
+}
+.epicFilter:has(> select) {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+.epicFilter select {
+  width: 100%;
 }
 .boardViewMenu {
   position: relative;
@@ -208,7 +220,8 @@
 .board.epicBoard > section > div.compactSurface {
   height: 100%;
 }
-.board.epicBoard > section > [data-kanban-status] > [data-state] {
+.board.epicBoard > section > [data-kanban-status] > [data-state],
+.board.epicBoard > section > [data-kanban-status] > div > [data-state] {
   width: calc(100% + 2px);
 }
 .board:focus-visible {
@@ -430,5 +443,13 @@ dialog.createEpicDrawer {
 @media (min-width: 721px) and (max-width: 1200px) {
   .board.epicBoard {
     grid-template-columns: repeat(5, minmax(222px, 1fr));
+  }
+}
+
+/* The fixed-width Epic filter chips need ~930px; wrap them before they push the page sideways. */
+@media (max-width: 1100px) {
+  .epicToolbar {
+    height: auto;
+    flex-wrap: wrap;
   }
 }

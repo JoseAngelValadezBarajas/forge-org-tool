@@ -7,7 +7,7 @@ import {
   assertOwnedRunEnvironment,
   assertPortAvailable,
   getRunEnvironmentPaths,
-} from '../../tooling/scripts/e2e-environment.mjs';
+} from '../../tooling/e2e/e2e-environment.mjs';
 
 const webRoot = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(webRoot, '../..');
@@ -60,7 +60,7 @@ process.env.FORGE_E2E_EVIDENCE_DIR = evidenceDirectory;
 
 export default defineConfig({
   testDir: webRoot,
-  testMatch: ['e2e/**/*.spec.ts', 'evidence/ux11-capture.spec.ts', '**/DetailPages.spec.ts'],
+  testMatch: ['e2e/**/*.spec.ts'],
   outputDir: join(runOutputDirectory, 'playwright'),
   globalSetup: join(webRoot, 'e2e', 'global-setup.ts'),
   globalTeardown: join(webRoot, 'e2e', 'global-teardown.ts'),

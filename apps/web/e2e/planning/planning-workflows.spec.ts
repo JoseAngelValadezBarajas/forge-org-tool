@@ -1,17 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createWorkspaceWithProject } from '../support/api';
 
 async function createProject(page: Page, suffix: string) {
-  const workspaceResponse = await page.request.post('/api/v1/workspaces', {
-    data: { name: `Planning ${suffix}` },
+  return createWorkspaceWithProject(page, {
+    workspace: `Planning ${suffix}`,
+    project: `Project ${suffix}`,
   });
-  expect(workspaceResponse.status()).toBe(201);
-  const workspace = await workspaceResponse.json();
-  const projectResponse = await page.request.post(`/api/v1/workspaces/${workspace.id}/projects`, {
-    data: { name: `Project ${suffix}` },
-  });
-  expect(projectResponse.status()).toBe(201);
-  const project = await projectResponse.json();
-  return { workspace, project };
 }
 
 async function createWorkspaceTags(page: Page, workspaceId: string, names: string[]) {

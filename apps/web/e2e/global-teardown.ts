@@ -1,6 +1,6 @@
 export default async function globalTeardown() {
   if (process.env.FORGE_E2E_DEFER_CLEANUP === '1') return;
-  const { cleanupRunEnvironment } = await import('../../../tooling/scripts/e2e-environment.mjs');
+  const { cleanupRunEnvironment } = await import('../../../tooling/e2e/e2e-environment.mjs');
   const { join } = await import('node:path');
   const root = process.env.FORGE_E2E_RUN_ROOT;
   if (!root) throw new Error('Playwright did not provide an isolated acceptance run directory.');

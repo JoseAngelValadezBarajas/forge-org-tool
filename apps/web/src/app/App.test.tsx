@@ -282,21 +282,15 @@ describe('M1 application shell', () => {
     const menu = screen.getByRole('menu', { name: 'Storage providers' });
     expect(within(menu).getByRole('menuitem', { name: 'Configure storage' })).toBeInTheDocument();
     expect(within(menu).getByRole('separator')).toBeInTheDocument();
-    expect(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' })).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
-    expect(within(menu).getByRole('menuitemradio', { name: 'Supabase' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
+    expect(within(menu).getByRole('menuitem', { name: 'Local SQLite' })).toBeInTheDocument();
+    expect(within(menu).getByRole('menuitem', { name: 'Supabase (active)' })).toBeInTheDocument();
 
-    fireEvent.click(within(menu).getByRole('menuitemradio', { name: 'Local SQLite' }));
+    fireEvent.click(within(menu).getByRole('menuitem', { name: 'Local SQLite' }));
     expect(getStorageSnapshot().provider).toBe('local');
 
     fireEvent.click(within(sidebar).getByRole('button', { name: /Storage providers.*Local DB/i }));
     fireEvent.click(
-      within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitemradio', {
+      within(screen.getByRole('menu', { name: 'Storage providers' })).getByRole('menuitem', {
         name: 'Supabase',
       }),
     );
@@ -399,8 +393,8 @@ describe('M1 application shell', () => {
     fireEvent.click(storageButton);
     const menu = screen.getByRole('menu', { name: 'Storage providers' });
     const configureItem = within(menu).getByRole('menuitem', { name: 'Configure storage' });
-    const localItem = within(menu).getByRole('menuitemradio', { name: 'Local SQLite' });
-    const supabaseItem = within(menu).getByRole('menuitemradio', { name: 'Supabase' });
+    const localItem = within(menu).getByRole('menuitem', { name: 'Local SQLite (active)' });
+    const supabaseItem = within(menu).getByRole('menuitem', { name: 'Supabase' });
 
     expect(configureItem).toHaveFocus();
     fireEvent.keyDown(menu, { key: 'ArrowDown' });
@@ -636,7 +630,7 @@ describe('M1 application shell', () => {
     );
     fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: Research' }));
     fireEvent.click(
-      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitemradio', {
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitem', {
         name: 'Studio',
       }),
     );
@@ -699,10 +693,10 @@ describe('M1 application shell', () => {
     const sidebar = screen.getByRole('complementary');
     await within(sidebar).findByRole('button', { name: 'Workspace: One' });
     fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: One' }));
-    await screen.findByRole('menuitemradio', { name: 'One' });
+    await screen.findByRole('menuitem', { name: 'One (active)' });
     await waitFor(() => expect(pending.get('w1')).toHaveLength(2));
     fireEvent.click(
-      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitemradio', {
+      within(screen.getByRole('menu', { name: 'Workspaces' })).getByRole('menuitem', {
         name: 'Two',
       }),
     );

@@ -86,8 +86,8 @@ excluded from the reusable inventory; tokens remain foundation evidence.
 | OrganizationEmptyState | `apps/web/src/features/organization/components/OrganizationEmptyState.tsx` | Closest product screen `4:32`; exact page-20 master unconfirmed. |
 | DeliverySummary        | `apps/web/src/features/delivery/DeliverySummary.tsx`                       | Count summary, not VerificationSummary or ReleaseGate.           |
 
-Validate with `node tooling/scripts/validate-design-system-parity.mjs` and
-`node --test tooling/scripts/validate-design-system-parity.test.mjs`.
+Validate with `node tooling/checks/validate-design-system-parity.mjs` and
+`node --test tooling/checks/validate-design-system-parity.test.mjs`.
 The validator freezes exact IDs/names/categories, mappings, statuses, unique
 preview IDs and ButtonSize integration without requiring future source files.
 
