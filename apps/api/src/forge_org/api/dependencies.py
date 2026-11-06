@@ -19,7 +19,11 @@ from forge_org.application.ports import PlanningStore
 from forge_org.application.project_package import ProjectPackageService
 from forge_org.application.transfer import ProjectTransferService
 from forge_org.infrastructure.connection import connect, database_path
-from forge_org.infrastructure.persistence import OrganizationRepository
+from forge_org.infrastructure.persistence import (
+    OrganizationRepository,
+    SqliteAttachmentStore,
+    SqliteTransferStore,
+)
 
 
 def database() -> Iterator[sqlite3.Connection]:
@@ -55,20 +59,25 @@ def planning_service(store: PlanningStore = Depends(planning_store)) -> Planning
 
 
 def transfer_service(connection: sqlite3.Connection = Depends(database)) -> ProjectTransferService:
-    return ProjectTransferService(connection, database_path().parent / 'bug-attachments')
-
-
-def project_package_service(
-    transfer: ProjectTransferService = Depends(transfer_service),
-) -> ProjectPackageService:
-    return ProjectPackageService(transfer, database_path().parent / 'bug-attachments')
-
-
-def knowledge_service(store: PlanningStore = Depends(planning_store)) -> KnowledgeService:
-    return KnowledgeService(store)
+    return ProjectTransferService(
+        SqliteTransferStore(connection), database_path().parent / 'bug-attachments'
+    )
 
 
 def bug_attachment_service(
     connection: sqlite3.Connection = Depends(database),
 ) -> BugAttachmentService:
-    return BugAttachmentService(connection, database_path().parent / 'bug-attachments')
+    return BugAttachmentService(
+        SqliteAttachmentStore(connection), database_path().parent / 'bug-attachments'
+    )
+
+
+def project_package_service(
+    transfer: ProjectTransferService = Depends(transfer_service),
+    attachments: BugAttachmentService = Depends(bug_attachment_service),
+) -> ProjectPackageService:
+    return ProjectPackageService(transfer, attachments, database_path().parent / 'bug-attachments')
+
+
+def knowledge_service(store: PlanningStore = Depends(planning_store)) -> KnowledgeService:
+    return KnowledgeService(store)

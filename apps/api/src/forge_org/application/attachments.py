@@ -5,13 +5,13 @@ import binascii
 import hashlib
 import os
 import re
-import sqlite3
 import struct
 import uuid
 from pathlib import Path
 from typing import Any
 
-from forge_org.infrastructure.connection import utc_now
+from forge_org.application.ports import AttachmentStore
+from forge_org.domain.clock import utc_now
 
 MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024
 MAX_ATTACHMENTS_PER_BUG = 5
@@ -23,8 +23,8 @@ CONTENT_TYPES = {
 
 
 class BugAttachmentService:
-    def __init__(self, connection: sqlite3.Connection, storage_root: Path) -> None:
-        self.connection = connection
+    def __init__(self, store: AttachmentStore, storage_root: Path) -> None:
+        self.store = store
         self.storage_root = storage_root
 
     @staticmethod
@@ -53,28 +53,16 @@ class BugAttachmentService:
     def _bug(
         self, workspace_id: str, project_id: str, feature_id: str, *, write: bool = False
     ) -> dict[str, Any]:
-        row = self.connection.execute(
-            'SELECT f.*, p.status AS project_status FROM features f JOIN projects p ON p.id = f.project_id '
-            "WHERE p.workspace_id = ? AND p.id = ? AND f.id = ? AND f.kind = 'bug'",
-            (workspace_id, project_id, feature_id),
-        ).fetchone()
-        if row is None:
+        bug = self.store.find_bug(workspace_id, project_id, feature_id)
+        if bug is None:
             raise LookupError('Bug not found in this workspace and project')
-        bug = dict(row)
         if write and bug['project_status'] != 'active':
             raise ValueError('Archived projects are read-only')
         return bug
 
     def list(self, workspace_id: str, project_id: str, feature_id: str) -> list[dict[str, Any]]:
         self._bug(workspace_id, project_id, feature_id)
-        return [
-            dict(row)
-            for row in self.connection.execute(
-                'SELECT id, feature_id, file_name, content_type, byte_size, sha256, created_at '
-                'FROM bug_attachments WHERE feature_id = ? ORDER BY created_at, id',
-                (feature_id,),
-            ).fetchall()
-        ]
+        return self.store.list_attachments(feature_id)
 
     def add(
         self,
@@ -105,45 +93,40 @@ class BugAttachmentService:
             allowed_suffixes.add('.jpeg')
         if Path(safe_name).suffix.casefold() not in allowed_suffixes:
             raise ValueError('Screenshot extension does not match its content')
-        self.connection.execute('BEGIN IMMEDIATE')
-        count = self.connection.execute(
-            'SELECT count(*) FROM bug_attachments WHERE feature_id = ?', (feature_id,)
-        ).fetchone()[0]
-        if count >= MAX_ATTACHMENTS_PER_BUG:
-            self.connection.rollback()
-            raise ValueError('A Bug can have at most five screenshots')
-
         attachment_id = str(uuid.uuid4())
         relative_path = f'{attachment_id}{CONTENT_TYPES[detected_type]}'
         self.storage_root.mkdir(parents=True, exist_ok=True)
         destination = self.storage_root / relative_path
         temporary = self.storage_root / f'.{attachment_id}.tmp'
-        try:
+
+        def persist_file() -> None:
             with temporary.open('xb') as output:
                 output.write(content)
                 output.flush()
                 os.fsync(output.fileno())
             os.replace(temporary, destination)
-            self.connection.execute(
-                'INSERT INTO bug_attachments(id, feature_id, relative_path, file_name, '
-                'content_type, byte_size, sha256, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                (
-                    attachment_id,
-                    feature_id,
-                    relative_path,
-                    safe_name,
-                    detected_type,
-                    len(content),
-                    hashlib.sha256(content).hexdigest(),
-                    utc_now(),
-                ),
+
+        try:
+            accepted = self.store.add_attachment(
+                feature_id,
+                {
+                    'id': attachment_id,
+                    'relative_path': relative_path,
+                    'file_name': safe_name,
+                    'content_type': detected_type,
+                    'byte_size': len(content),
+                    'sha256': hashlib.sha256(content).hexdigest(),
+                    'created_at': utc_now(),
+                },
+                limit=MAX_ATTACHMENTS_PER_BUG,
+                before_commit=persist_file,
             )
-            self.connection.commit()
         except Exception:
-            self.connection.rollback()
             temporary.unlink(missing_ok=True)
             destination.unlink(missing_ok=True)
             raise
+        if not accepted:
+            raise ValueError('A Bug can have at most five screenshots')
         return next(
             item
             for item in self.list(workspace_id, project_id, feature_id)
@@ -154,10 +137,7 @@ class BugAttachmentService:
         self, workspace_id: str, project_id: str, feature_id: str, attachment_id: str
     ) -> tuple[dict[str, Any], Path]:
         self._bug(workspace_id, project_id, feature_id)
-        row = self.connection.execute(
-            'SELECT * FROM bug_attachments WHERE id = ? AND feature_id = ?',
-            (attachment_id, feature_id),
-        ).fetchone()
+        row = self.store.get_attachment(feature_id, attachment_id)
         if row is None:
             raise LookupError('Screenshot not found')
         relative_path = row['relative_path']
@@ -171,16 +151,12 @@ class BugAttachmentService:
             or not path.is_file()
         ):
             raise LookupError('Screenshot content not found')
-        return dict(row), path
+        return row, path
 
     def remove(
         self, workspace_id: str, project_id: str, feature_id: str, attachment_id: str
     ) -> None:
         self._bug(workspace_id, project_id, feature_id, write=True)
         _, path = self.content(workspace_id, project_id, feature_id, attachment_id)
-        self.connection.execute(
-            'DELETE FROM bug_attachments WHERE id = ? AND feature_id = ?',
-            (attachment_id, feature_id),
-        )
-        self.connection.commit()
+        self.store.delete_attachment(feature_id, attachment_id)
         path.unlink(missing_ok=True)

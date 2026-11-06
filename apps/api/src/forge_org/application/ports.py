@@ -1,5 +1,6 @@
 """Ports the application layer depends on. Infrastructure implements them."""
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -109,3 +110,123 @@ class PlanningStore(Protocol):
     def workspace_projects(
         self, workspace_id: str, search: str | None, status: str
     ) -> list[Record]: ...
+
+
+class AttachmentStore(Protocol):
+    """Bug attachment metadata persistence. File bytes stay with the application service."""
+
+    def find_bug(self, workspace_id: str, project_id: str, feature_id: str) -> Record | None: ...
+
+    def list_attachments(self, feature_id: str) -> list[Record]: ...
+
+    def get_attachment(self, feature_id: str, attachment_id: str) -> Record | None: ...
+
+    def add_attachment(
+        self,
+        feature_id: str,
+        attachment: Record,
+        *,
+        limit: int,
+        before_commit: Callable[[], None],
+    ) -> bool: ...
+
+    def delete_attachment(self, feature_id: str, attachment_id: str) -> None: ...
+
+
+class TransferStore(Protocol):
+    """Everything project import/export needs from persistence.
+
+    Writes do not commit; the service controls the transaction so that a package
+    import can include attachment metadata atomically.
+    """
+
+    def begin_immediate(self) -> None: ...
+
+    def commit(self) -> None: ...
+
+    def rollback(self) -> None: ...
+
+    def workspace_exists(self, workspace_id: str) -> bool: ...
+
+    def project_status(self, workspace_id: str, project_id: str) -> str | None: ...
+
+    def epic_exists(self, project_id: str, epic_id: str) -> bool: ...
+
+    def feature_exists(self, project_id: str, feature_id: str) -> bool: ...
+
+    def feature_kind(self, project_id: str, feature_id: str) -> str | None: ...
+
+    def export_project_row(self, workspace_id: str, project_id: str) -> Record | None: ...
+
+    def export_epics(self, project_id: str) -> list[Record]: ...
+
+    def export_features(self, project_id: str) -> list[Record]: ...
+
+    def feature_kinds_in_export_order(self, project_id: str) -> list[Record]: ...
+
+    def export_tasks(self, feature_id: str) -> list[Record]: ...
+
+    def export_criteria(self, feature_id: str) -> list[Record]: ...
+
+    def export_dependencies(self, project_id: str) -> list[Record]: ...
+
+    def tag_names(self, item_type: str, item_id: str) -> list[str]: ...
+
+    def epic_ids_in_export_order(self, project_id: str) -> list[str]: ...
+
+    def feature_ids_in_export_order(self, project_id: str) -> list[str]: ...
+
+    def insert_project(
+        self, project_id: str, workspace_id: str, name: str, description: str | None, now: str
+    ) -> None: ...
+
+    def insert_epic(
+        self,
+        epic_id: str,
+        project_id: str,
+        title: str,
+        description: str | None,
+        priority: str,
+        now: str,
+    ) -> None: ...
+
+    def insert_feature(
+        self, feature_id: str, project_id: str, values: Record, now: str
+    ) -> None: ...
+
+    def set_work_item_tags(
+        self, workspace_id: str, item_type: str, item_id: str, tags: list[Any]
+    ) -> None: ...
+
+    def insert_task(
+        self,
+        task_id: str,
+        feature_id: str,
+        title: str,
+        description: str | None,
+        status: str,
+        position: int,
+        now: str,
+    ) -> None: ...
+
+    def insert_criterion(
+        self,
+        criterion_id: str,
+        feature_id: str,
+        description: str,
+        satisfied: bool,
+        position: int,
+        now: str,
+    ) -> None: ...
+
+    def insert_dependency(
+        self, dependency_id: str, project_id: str, blocking_id: str, blocked_id: str, now: str
+    ) -> None: ...
+
+    def insert_attachment(self, feature_id: str, attachment: Record) -> None: ...
+
+    def next_task_position(self, feature_id: str) -> int: ...
+
+    def adopt_staged_project(
+        self, scope: str, staged_project_id: str, project_id: str, destination_id: str
+    ) -> None: ...
