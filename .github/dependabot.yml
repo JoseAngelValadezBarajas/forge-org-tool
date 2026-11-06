@@ -1,29 +1,41 @@
 version: 2
+# One grouped PR per ecosystem per month keeps update noise low.
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 1
     groups:
       actions:
         patterns: ['*']
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-  - package-ecosystem: cargo
-    directory: /apps/desktop
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 3
+      interval: monthly
+    open-pull-requests-limit: 1
+    ignore:
+      # typescript-eslint, openapi-typescript and eslint-plugin-jsx-a11y do not support these majors yet.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+    groups:
+      npm:
+        patterns: ['*']
   - package-ecosystem: cargo
     directory: /apps/desktop/src-tauri
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 3
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      cargo:
+        patterns: ['*']
   - package-ecosystem: uv
     directory: /apps/api
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 3
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      python:
+        patterns: ['*']
