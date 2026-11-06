@@ -8,16 +8,10 @@ from fastapi import APIRouter, Depends, Query
 
 from forge_org.api.dependencies import knowledge_service, planning_service, service_error
 from forge_org.api.schemas import (
-    AcknowledgeRequest,
-    AcknowledgeResponse,
     CriterionCreate,
     CriterionReorderRequest,
     CriterionResponse,
     CriterionUpdate,
-    DecisionCreate,
-    DecisionResponse,
-    DecisionRevisionResponse,
-    DecisionUpdate,
     DependencyCreate,
     DependencyResponse,
     EpicCreate,
@@ -26,10 +20,6 @@ from forge_org.api.schemas import (
     FeatureCreate,
     FeatureResponse,
     FeatureUpdate,
-    InvariantCreate,
-    InvariantResponse,
-    InvariantRevisionResponse,
-    InvariantUpdate,
     TaskCreate,
     TaskResponse,
     TaskUpdate,
@@ -42,7 +32,6 @@ from forge_org.application.organization import DuplicateName, InvalidInput, NotF
 from forge_org.application.planning import PlanningService
 
 capability_router = APIRouter(prefix='/api/v1', tags=['organization'])
-_retired_knowledge_router = APIRouter(prefix='/api/v1', tags=['legacy-inactive'])
 
 
 @capability_router.get('/workspaces/{workspace_id}/projects/{project_id}/planning/overview')
@@ -459,197 +448,3 @@ def create_criterion(
         raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc:
         raise service_error(InvalidInput(str(exc))) from exc
-
-
-@_retired_knowledge_router.get(
-    '/workspaces/{workspace_id}/projects/{project_id}/decisions',
-    response_model=list[DecisionResponse],
-)
-def list_decisions(
-    workspace_id: str, project_id: str, knowledge: KnowledgeService = Depends(knowledge_service)
-) -> list[dict[str, Any]]:
-    try:
-        return knowledge.decisions(workspace_id, project_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.post(
-    '/workspaces/{workspace_id}/projects/{project_id}/decisions',
-    response_model=DecisionResponse,
-    status_code=201,
-)
-def create_decision(
-    workspace_id: str,
-    project_id: str,
-    payload: DecisionCreate,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> dict[str, Any]:
-    try:
-        return knowledge.create_decision(workspace_id, project_id, payload.model_dump())
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
-
-
-@_retired_knowledge_router.patch(
-    '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}',
-    response_model=DecisionResponse,
-)
-def update_decision(
-    workspace_id: str,
-    project_id: str,
-    decision_id: str,
-    payload: DecisionUpdate,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> dict[str, Any]:
-    try:
-        return knowledge.update_decision(
-            workspace_id, project_id, decision_id, payload.model_dump(exclude_unset=True)
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.get(
-    '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/revisions',
-    response_model=list[DecisionRevisionResponse],
-)
-def decision_revisions(
-    workspace_id: str,
-    project_id: str,
-    decision_id: str,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> list[dict[str, Any]]:
-    try:
-        return knowledge.decision_revisions(workspace_id, project_id, decision_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.post(
-    '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/accept',
-    response_model=DecisionResponse,
-)
-def accept_decision(
-    workspace_id: str,
-    project_id: str,
-    decision_id: str,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> dict[str, Any]:
-    try:
-        return knowledge.accept_decision(workspace_id, project_id, decision_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.post(
-    '/workspaces/{workspace_id}/projects/{project_id}/decisions/{decision_id}/features/{feature_id}',
-    status_code=204,
-)
-def link_decision(
-    workspace_id: str,
-    project_id: str,
-    decision_id: str,
-    feature_id: str,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> None:
-    try:
-        knowledge.link_decision(workspace_id, project_id, decision_id, feature_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except sqlite3.IntegrityError as exc:
-        raise service_error(DuplicateName('Decision already linked')) from exc
-
-
-@_retired_knowledge_router.post(
-    '/workspaces/{workspace_id}/projects/{project_id}/invariants',
-    response_model=InvariantResponse,
-    status_code=201,
-)
-def create_invariant(
-    workspace_id: str,
-    project_id: str,
-    payload: InvariantCreate,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> dict[str, Any]:
-    try:
-        return knowledge.create_invariant(workspace_id, project_id, payload.model_dump())
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except ValueError as exc:
-        raise service_error(InvalidInput(str(exc))) from exc
-
-
-@_retired_knowledge_router.get(
-    '/workspaces/{workspace_id}/projects/{project_id}/invariants',
-    response_model=list[InvariantResponse],
-)
-def list_invariants(
-    workspace_id: str,
-    project_id: str,
-    feature_id: str | None = None,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> list[dict[str, Any]]:
-    try:
-        return knowledge.invariants(workspace_id, project_id, feature_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.patch(
-    '/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}',
-    response_model=InvariantResponse,
-)
-def update_invariant(
-    workspace_id: str,
-    project_id: str,
-    invariant_id: str,
-    payload: InvariantUpdate,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> dict[str, Any]:
-    try:
-        return knowledge.update_invariant(
-            workspace_id, project_id, invariant_id, payload.model_dump(exclude_unset=True)
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.get(
-    '/workspaces/{workspace_id}/projects/{project_id}/invariants/{invariant_id}/revisions',
-    response_model=list[InvariantRevisionResponse],
-)
-def invariant_revisions(
-    workspace_id: str,
-    project_id: str,
-    invariant_id: str,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> list[dict[str, Any]]:
-    try:
-        return knowledge.invariant_revisions(workspace_id, project_id, invariant_id)
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-
-
-@_retired_knowledge_router.post(
-    '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/invariants/{invariant_id}/acknowledge',
-    response_model=AcknowledgeResponse,
-)
-def acknowledge_invariant(
-    workspace_id: str,
-    project_id: str,
-    feature_id: str,
-    invariant_id: str,
-    payload: AcknowledgeRequest,
-    knowledge: KnowledgeService = Depends(knowledge_service),
-) -> dict[str, Any]:
-    try:
-        return knowledge.acknowledge(
-            workspace_id, project_id, feature_id, invariant_id, payload.expected_revision
-        )
-    except LookupError as exc:
-        raise service_error(NotFound(str(exc))) from exc
-    except RuntimeError as exc:
-        raise service_error(exc) from exc
