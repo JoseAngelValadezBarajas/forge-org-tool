@@ -31,6 +31,7 @@ a:focus-visible {
 
 /* Form fields keep the engine's 3:1 `outline`. Card borders are decorative, so they use the
    quieter `outlineVariant` role like the Figma frames. */
-[data-variant='outlined'] {
+/* [class] raises specificity above the component's own `.outlined` rule regardless of load order. */
+[data-variant='outlined'][class] {
   border-color: var(--cf-v2-outline-variant);
 }

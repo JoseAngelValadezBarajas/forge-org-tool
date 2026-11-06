@@ -172,6 +172,7 @@ export function EpicDetailPage() {
         <option value="bug">Bugs</option>
       </SelectV2>
       <TextInputV2
+        size="sm"
         id="epic-board-search"
         aria-label="Find Work Items"
         placeholder="Search Stories & Bugs"
@@ -189,6 +190,7 @@ export function EpicDetailPage() {
         <PriorityOptions />
       </SelectV2>
       <TextInputV2
+        size="sm"
         id="epic-board-tag"
         aria-label="Filter Work Items by tag"
         placeholder="Tags"
