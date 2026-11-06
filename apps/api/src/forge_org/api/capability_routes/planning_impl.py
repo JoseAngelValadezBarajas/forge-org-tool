@@ -1,7 +1,6 @@
 # ruff: noqa: B008
 """planning HTTP capability routes."""
 
-import sqlite3
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query
@@ -30,6 +29,7 @@ from forge_org.api.schemas import (
 from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
 from forge_org.application.knowledge import KnowledgeService
 from forge_org.application.planning import PlanningService
+from forge_org.domain.errors import DuplicateRecord
 
 capability_router = APIRouter(prefix='/api/v1', tags=['organization'])
 
@@ -106,7 +106,7 @@ def create_workspace_tag(
         raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc:
         raise service_error(InvalidInput(str(exc))) from exc
-    except sqlite3.IntegrityError as exc:
+    except DuplicateRecord as exc:
         raise service_error(DuplicateName('Tag name already exists in this workspace')) from exc
 
 
@@ -127,7 +127,7 @@ def update_workspace_tag(
         raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc:
         raise service_error(InvalidInput(str(exc))) from exc
-    except sqlite3.IntegrityError as exc:
+    except DuplicateRecord as exc:
         raise service_error(DuplicateName('Tag name already exists in this workspace')) from exc
 
 
@@ -395,7 +395,7 @@ def create_dependency(
         raise service_error(NotFound(str(exc))) from exc
     except ValueError as exc:
         raise service_error(InvalidInput(str(exc))) from exc
-    except sqlite3.IntegrityError as exc:
+    except DuplicateRecord as exc:
         raise service_error(DuplicateName('Dependency already exists')) from exc
 
 

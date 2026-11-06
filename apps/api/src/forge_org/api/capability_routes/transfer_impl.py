@@ -3,7 +3,6 @@
 
 import base64
 import binascii
-import sqlite3
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query
@@ -20,6 +19,7 @@ from forge_org.api.schemas import (
 from forge_org.application.errors import DuplicateName, InvalidInput, NotFound
 from forge_org.application.project_package import MAX_PACKAGE_BYTES, ProjectPackageService
 from forge_org.application.transfer import ProjectTransferService
+from forge_org.domain.errors import DuplicateRecord
 
 capability_router = APIRouter(prefix='/api/v1', tags=['organization'])
 
@@ -59,7 +59,7 @@ def import_project(
         raise service_error(InvalidInput(str(exc))) from exc
     except RuntimeError as exc:
         raise service_error(exc) from exc
-    except sqlite3.IntegrityError as exc:
+    except DuplicateRecord as exc:
         raise service_error(DuplicateName('Project name already exists in this workspace')) from exc
 
 
@@ -128,7 +128,7 @@ def import_contextual(
         raise service_error(InvalidInput(str(exc))) from exc
     except RuntimeError as exc:
         raise service_error(exc) from exc
-    except sqlite3.IntegrityError as exc:
+    except DuplicateRecord as exc:
         raise service_error(
             DuplicateName('Contextual import conflicts with existing records')
         ) from exc
@@ -223,5 +223,5 @@ def import_project_package(
         raise service_error(InvalidInput(str(exc))) from exc
     except RuntimeError as exc:
         raise service_error(exc) from exc
-    except sqlite3.IntegrityError as exc:
+    except DuplicateRecord as exc:
         raise service_error(DuplicateName('Project name already exists in this workspace')) from exc

@@ -59,3 +59,8 @@ def test_legacy_application_allowlist_only_lists_modules_that_still_violate() ->
 
 def test_infrastructure_does_not_depend_on_the_api_layer() -> None:
     assert _violations('infrastructure', FORBIDDEN_FOR_INFRASTRUCTURE) == []
+
+
+def test_api_routes_do_not_touch_sqlite_or_infrastructure() -> None:
+    """Only the composition root (dependencies.py) may bind adapters."""
+    assert _violations('api', ('sqlite3', 'forge_org.infrastructure'), {'dependencies'}) == []
