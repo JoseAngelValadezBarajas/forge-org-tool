@@ -19,6 +19,19 @@ Rules, enforced by `apps/api/tests/test_layer_dependencies.py` (no allowlist):
 4. Adapters translate driver errors into domain errors (`DuplicateRecord`); callers never see `sqlite3.IntegrityError`.
 5. Domain and application raise typed errors (`NotFound`, `InvalidInput`, `Conflict`, `DuplicateName`) that subclass the matching built-ins. `api/error_handlers.py` is the only place that maps them to HTTP statuses; route modules do not repeat `try/except` mappings.
 
+## Transaction ownership
+
+Two levels, both behind the ports:
+
+- **Single-aggregate writes** (create an Epic with its tags, add a criterion) are one unit of work inside the store method. Stores wrap them in `persistence.common.transaction(connection)`, the only place that commits or rolls back for these writes, so an error never leaves a half-written row.
+- **Multi-step workflows** (project import, package commit) are controlled by `application`, which calls `begin_immediate`, `commit` and `rollback` on the transfer port and compensates file storage.
+
+A store method that only reads, or issues one statement, does not open a transaction of its own. Application services never import `sqlite3`.
+
+## Connection lifecycle
+
+`infrastructure/connection.py` opens a plain `sqlite3` connection per request (`foreign_keys = ON`, row factory, a 15 s busy timeout so overlapping writers wait instead of failing at once). It does not use an ORM or an engine, and the project depends on neither SQLAlchemy nor Alembic: the versioned runner in `infrastructure/migrations` is the only migration mechanism. Write-ahead logging is intentionally off, so the database stays a single file that can be copied or backed up as such.
+
 ## Two storage providers
 
 Local SQLite is the Python adapter described above. The Supabase (BYOC) provider is a client-side adapter implemented in SQL and TypeScript, so it cannot literally implement the Python ports. The product rules it shares with the domain (limits, screenshot validation) are pinned by `contracts/transfer/conformance.json` and tested in both languages (see `transfer-conformance.md`). New shared rules start in the domain module and the conformance file.

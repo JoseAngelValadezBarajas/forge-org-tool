@@ -6,7 +6,7 @@ from uuid import uuid4
 from forge_org.domain.clock import utc_now
 
 from .base import PersistenceBase
-from .common import row_dict
+from .common import row_dict, transaction
 
 
 class CriteriaPersistence(PersistenceBase):
@@ -76,15 +76,11 @@ class CriteriaPersistence(PersistenceBase):
         return False
 
     def reorder_criteria(self, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
-        try:
+        with transaction(self.connection):
             for position, criterion_id in enumerate(ids):
                 self.connection.execute(
                     'UPDATE acceptance_criteria SET position = ?, updated_at = ? '
                     'WHERE feature_id = ? AND id = ?',
                     (position, utc_now(), feature_id, criterion_id),
                 )
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
         return self.list_criteria(feature_id)

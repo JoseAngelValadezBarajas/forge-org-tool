@@ -16,6 +16,10 @@ test('reads the Forge 0.1.3 preview version contract from all manifests', () => 
     tauriVersion: '0.1.3',
     cargoVersion: '0.1.3',
     cargoLockVersion: '0.1.3',
+    webVersion: '0.1.3',
+    apiClientVersion: '0.1.3',
+    apiProjectVersion: '0.1.3',
+    apiAppVersion: '0.1.3',
   });
   assert.doesNotThrow(() =>
     assertReleaseMetadata(repoRoot, { version: '0.1.3', tag: 'v0.1.3-preview.1' }),
@@ -43,6 +47,22 @@ test('rejects a mismatched version or release tag', () => {
     'version = 4\n\n[[package]]\nname = "forge-org-desktop"\nversion = "0.1.2"\n',
   );
 
+  fs.mkdirSync(path.join(fixtureRoot, 'apps/web'), { recursive: true });
+  fs.mkdirSync(path.join(fixtureRoot, 'packages/api-client'), { recursive: true });
+  fs.mkdirSync(path.join(fixtureRoot, 'apps/api/src/forge_org'), { recursive: true });
+  fs.writeFileSync(path.join(fixtureRoot, 'apps/web/package.json'), '{"version":"0.1.3"}\n');
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'packages/api-client/package.json'),
+    '{"version":"0.1.3"}\n',
+  );
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'apps/api/pyproject.toml'),
+    '[project]\nname = "x"\nversion = "0.1.3"\n',
+  );
+  fs.writeFileSync(
+    path.join(fixtureRoot, 'apps/api/src/forge_org/main.py'),
+    "app = FastAPI(title='x', version='0.1.3')\n",
+  );
   assert.throws(
     () => assertReleaseMetadata(fixtureRoot, { version: '0.1.3', tag: 'v0.1.3-preview.2' }),
     /version|tag/i,

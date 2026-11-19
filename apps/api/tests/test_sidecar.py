@@ -25,3 +25,23 @@ def test_sidecar_requires_the_per_launch_bearer_token(
 def test_sidecar_rejects_weak_or_empty_tokens() -> None:
     with pytest.raises(ValueError, match='at least 32'):
         create_sidecar_app('short-token')
+
+
+def test_sidecar_refuses_websocket_connections_instead_of_skipping_authentication(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from fastapi import WebSocket
+    from starlette.websockets import WebSocketDisconnect
+
+    monkeypatch.setenv('FORGE_DATABASE_PATH', str(tmp_path / 'sidecar.db'))
+    app = create_sidecar_app('a' * 48)
+
+    @app.websocket('/ws')
+    async def echo(websocket: WebSocket) -> None:  # would accept anyone if auth were skipped
+        await websocket.accept()
+        await websocket.send_text('open')
+
+    with TestClient(app) as client:
+        with pytest.raises(WebSocketDisconnect):
+            with client.websocket_connect('/ws'):
+                pass

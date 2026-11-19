@@ -1,5 +1,7 @@
 # ORG-004 Repositories and context packages
 
+> **Status: retired from the active product (MVP 1.0).** Kept as a historical record. The code was removed; legacy SQLite tables are preserved by migrations only. See [`docs/product/mvp-1.0.md`](../../product/mvp-1.0.md).
+
 Repositories are optional, local, and read-only observations. A connection is
 allowed only beneath `FORGE_ALLOWED_REPOSITORY_ROOTS`, resolves to a Git work
 tree, and never reads source content or contacts remotes. Observations append

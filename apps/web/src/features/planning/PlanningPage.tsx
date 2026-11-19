@@ -1,13 +1,4 @@
-import { Link } from 'react-router-dom';
-import {
-  AlertV2,
-  ButtonV2,
-  DialogV2,
-  FormField,
-  SelectV2,
-  TextInputV2,
-  Textarea,
-} from '@corefoundry-labs/forge-ui';
+import { AlertV2, ButtonV2, SelectV2 } from '@corefoundry-labs/forge-ui';
 import { type EpicStatus } from '@forge-org/api-client';
 import styles from './PlanningPage.module.css';
 import { CreateEpicDrawer } from './CreateEpicDrawer';
@@ -18,12 +9,16 @@ import {
   KanbanColumn,
   PLANNING_COLUMN_STATUSES,
   ProjectPlanningHome,
-  PriorityOptions,
   StatusOptions,
 } from './components';
 import { usePlanningPage } from './usePlanningPage';
+import { EpicToolbar } from './planning-board/EpicToolbar';
+import { FeatureCreateDialog } from './planning-board/FeatureCreateDialog';
+import { MobileEpicBoard } from './planning-board/MobileEpicBoard';
+import { MobileWorkItemBoard } from './planning-board/MobileWorkItemBoard';
 
 export function PlanningPage({ projectName = 'Project' }: { projectName?: string }) {
+  const model = usePlanningPage();
   const {
     workspaceId,
     projectId,
@@ -32,50 +27,19 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
     epicDialogOpen,
     setEpicDialogOpen,
     featureDialogOpen,
-    setFeatureDialogOpen,
-    mobileEpicStatus,
-    setMobileEpicStatus,
-    epicSearch,
-    setEpicSearch,
-    epicStatusFilter,
-    setEpicStatusFilter,
-    epicPriorityFilter,
-    setEpicPriorityFilter,
-    epicTagFilter,
-    setEpicTagFilter,
     isMobile,
     rememberEpicCreateError,
-    rememberFeatureCreateError,
     epicTriggerRef,
     createEpic,
-    createFeature,
-    actualResult,
-    bugSeverity,
     epicPriority,
     epicTags,
     error,
-    featureEpicId,
-    featureKind,
-    featureTags,
-    featureTitle,
     overview,
-    setFeatureTitle,
-    setFeatureEpicId,
-    setFeatureKind,
-    setFeatureTags,
-    setBugSeverity,
-    setStepsToReproduce,
-    setExpectedResult,
-    setActualResult,
     setEpicPriority,
     setEpicTags,
-    stepsToReproduce,
-    expectedResult,
     epicDescription,
     setEpicDescription,
-    setStatusFilter,
     setTitle,
-    statusFilter,
     title,
     updateFeature,
     updateEpic,
@@ -85,7 +49,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
     legacyEpics,
     filteredWorkflowEpics,
     epicPointerDrag,
-  } = usePlanningPage();
+  } = model;
 
   return (
     <ProjectPlanningHome>
@@ -131,200 +95,9 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
           </ButtonV2>
         </section>
         {error && <AlertV2 tone="error">{error}</AlertV2>}
-        {featureDialogOpen && (
-          <DialogV2
-            onOpenChange={(nextOpen) => {
-              if (!nextOpen) setFeatureDialogOpen(false);
-            }}
-            open
-            title="Create work item"
-          >
-            <form
-              className={styles.dialogForm}
-              onSubmit={(event) => {
-                rememberFeatureCreateError();
-                void createFeature(event);
-              }}
-            >
-              <label htmlFor="feature-title">Feature title</label>
-              <TextInputV2
-                id="feature-title"
-                value={featureTitle}
-                onChange={(event) => setFeatureTitle(event.target.value)}
-                required
-              />
-              <FormField label="Epic for new feature">
-                <SelectV2
-                  size="sm"
-                  aria-label="Epic for new feature"
-                  value={featureEpicId}
-                  onChange={(event) => setFeatureEpicId(event.target.value)}
-                >
-                  <option value="">Unassigned</option>
-                  {overview.epics.map((epic) => (
-                    <option key={epic.id} value={epic.id}>
-                      {epic.title}
-                    </option>
-                  ))}
-                </SelectV2>
-              </FormField>
-              <fieldset className={styles.workItemType}>
-                <legend>Work item type</legend>
-                <div className={styles.workItemTypeButtons}>
-                  {(['story', 'bug'] as const).map((kind) => (
-                    <ButtonV2
-                      key={kind}
-                      type="button"
-                      variant={featureKind === kind ? 'primary' : 'secondary'}
-                      aria-pressed={featureKind === kind}
-                      onClick={() => setFeatureKind(kind)}
-                    >
-                      {kind === 'story' ? 'Story' : 'Bug'}
-                    </ButtonV2>
-                  ))}
-                </div>
-              </fieldset>
-              <fieldset className={styles.tagChoices}>
-                <legend>Work item tags</legend>
-                {workspaceTags.map((tag) => (
-                  <label key={tag.id} className={styles.tagChoice}>
-                    <input
-                      type="checkbox"
-                      aria-label={`Work item tag ${tag.name}`}
-                      checked={featureTags
-                        .split(',')
-                        .map((value) => value.trim())
-                        .includes(tag.name)}
-                      onChange={(event) => {
-                        const selected = featureTags
-                          .split(',')
-                          .map((value) => value.trim())
-                          .filter(Boolean);
-                        setFeatureTags(
-                          (event.target.checked
-                            ? [...selected, tag.name]
-                            : selected.filter((value) => value !== tag.name)
-                          ).join(', '),
-                        );
-                      }}
-                    />
-                    <span>{tag.name}</span>
-                  </label>
-                ))}
-                {workspaceTags.length === 0 && <p>No workspace tags yet.</p>}
-              </fieldset>
-              {featureKind === 'bug' && (
-                <div aria-label="Bug details">
-                  <FormField label="Bug severity">
-                    <SelectV2
-                      size="sm"
-                      aria-label="Bug severity"
-                      value={bugSeverity}
-                      onChange={(event) => setBugSeverity(event.target.value as typeof bugSeverity)}
-                    >
-                      <PriorityOptions />
-                    </SelectV2>
-                  </FormField>
-                  <FormField label="Steps to reproduce">
-                    <Textarea
-                      aria-label="Steps to reproduce"
-                      value={stepsToReproduce}
-                      onChange={(event) => setStepsToReproduce(event.target.value)}
-                    />
-                  </FormField>
-                  <FormField label="Expected result">
-                    <Textarea
-                      aria-label="Expected result"
-                      value={expectedResult}
-                      onChange={(event) => setExpectedResult(event.target.value)}
-                    />
-                  </FormField>
-                  <FormField label="Actual result">
-                    <Textarea
-                      aria-label="Actual result"
-                      value={actualResult}
-                      onChange={(event) => setActualResult(event.target.value)}
-                    />
-                  </FormField>
-                </div>
-              )}
-              <ButtonV2 type="submit">Create Feature</ButtonV2>
-            </form>
-          </DialogV2>
-        )}
+        {featureDialogOpen && <FeatureCreateDialog {...model} />}
         <section className={styles.epicBoardSection} aria-label="Project Board">
-          {!epicDialogOpen && (
-            <div
-              className={styles.epicToolbar}
-              aria-label="Epic board filters"
-              data-node-id="344:118"
-            >
-              <details className={styles.boardViewMenu}>
-                <summary>Board&nbsp; ▾</summary>
-                <div>
-                  <span aria-current="page">Epics</span>
-                  <Link to={`/projects/${workspaceId}/${projectId}`}>Project overview</Link>
-                  <ButtonV2
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setFeatureDialogOpen(true)}
-                  >
-                    New work item
-                  </ButtonV2>
-                  <p>Planning status and dependencies are manual product records only.</p>
-                </div>
-              </details>
-              <TextInputV2
-                size="sm"
-                className={styles.epicSearch}
-                type="search"
-                aria-label="Search Epics"
-                placeholder="Search Epics    ⌕"
-                value={epicSearch}
-                onChange={(event) => setEpicSearch(event.target.value)}
-              />
-              <SelectV2
-                size="sm"
-                className={`${styles.epicFilter} ${styles.epicStatusFilter}`}
-                aria-label="Filter Epics by status"
-                value={epicStatusFilter}
-                onChange={(event) => setEpicStatusFilter(event.target.value)}
-              >
-                <option value="all">Status: All</option>
-                <StatusOptions prefix="Status: " />
-              </SelectV2>
-              <SelectV2
-                size="sm"
-                className={`${styles.epicFilter} ${styles.epicPriorityFilter}`}
-                aria-label="Filter Epics by priority"
-                value={epicPriorityFilter}
-                onChange={(event) => setEpicPriorityFilter(event.target.value)}
-              >
-                <option value="all">Priority&nbsp; ▾</option>
-                <PriorityOptions capitalize />
-              </SelectV2>
-              <SelectV2
-                size="sm"
-                className={`${styles.epicFilter} ${styles.epicTagFilter}`}
-                aria-label="Filter Epics by tag"
-                value={epicTagFilter}
-                onChange={(event) => setEpicTagFilter(event.target.value)}
-              >
-                <option value="">Tags&nbsp; ▾</option>
-                {workspaceTags.map((tag) => (
-                  <option key={tag.id} value={tag.name}>
-                    {tag.name}
-                  </option>
-                ))}
-              </SelectV2>
-              <Link
-                className={`${styles.epicFilter} ${styles.importEpic}`}
-                to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}
-              >
-                ⇩ Import Epic
-              </Link>
-            </div>
-          )}
+          {!epicDialogOpen && <EpicToolbar {...model} />}
           <section className={styles.visuallyHidden} aria-label="Epic visibility summary">
             {overview.epics.length} total · {workflowEpics.length} in workflow ·{' '}
             {archivedEpics.length} archived · {legacyEpics.length} legacy
@@ -423,49 +196,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
               />
             )}
           </div>
-          {isMobile && (
-            <section aria-label="Mobile Epic board" className={styles.mobileBoard}>
-              <FormField label="Epic status">
-                <SelectV2
-                  size="sm"
-                  aria-label="Mobile Epic status"
-                  value={mobileEpicStatus}
-                  onChange={(event) => setMobileEpicStatus(event.target.value)}
-                >
-                  <option value="all">All statuses</option>
-                  <StatusOptions />
-                </SelectV2>
-              </FormField>
-              <div className={styles.mobileCards}>
-                {workflowEpics
-                  .filter((epic) => mobileEpicStatus === 'all' || epic.status === mobileEpicStatus)
-                  .map((epic) => (
-                    <EpicCard
-                      key={epic.id}
-                      epic={epic}
-                      href={`/planning/${workspaceId}/${projectId}/epics/${epic.id}`}
-                    >
-                      <label>
-                        Move Epic
-                        <SelectV2
-                          size="sm"
-                          aria-label={`Status for Epic ${epic.title}`}
-                          value={epic.status}
-                          onChange={(event) =>
-                            void updateEpic(epic, event.target.value as EpicStatus)
-                          }
-                        >
-                          <StatusOptions />
-                        </SelectV2>
-                      </label>
-                    </EpicCard>
-                  ))}
-                {workflowEpics.filter(
-                  (epic) => mobileEpicStatus === 'all' || epic.status === mobileEpicStatus,
-                ).length === 0 && <p>No Epics in this status.</p>}
-              </div>
-            </section>
-          )}
+          {isMobile && <MobileEpicBoard {...model} />}
           {archivedEpics.length > 0 && (
             <section aria-label="Archived Epics">
               <h3>Archived Epics</h3>
@@ -514,49 +245,7 @@ export function PlanningPage({ projectName = 'Project' }: { projectName?: string
             </section>
           )}
         </section>
-        {isMobile && (
-          <section aria-label="Mobile work item board" className={styles.mobileBoard}>
-            <FormField label="Work item status">
-              <SelectV2
-                size="sm"
-                aria-label="Mobile work item status"
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
-              >
-                <option value="all">All statuses</option>
-                <option value="refining">Legacy refining</option>
-                <StatusOptions />
-              </SelectV2>
-            </FormField>
-            <div className={styles.mobileCards}>
-              {visibleFeatures.map((feature) => (
-                <FeatureCard
-                  key={`mobile-${feature.id}`}
-                  feature={feature}
-                  href={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
-                >
-                  <label>
-                    Move work item
-                    <SelectV2
-                      size="sm"
-                      aria-label={`Mobile status for ${feature.title}`}
-                      value={feature.status}
-                      onChange={(event) =>
-                        void updateFeature(feature, { status: event.target.value })
-                      }
-                    >
-                      {feature.status === 'refining' && (
-                        <option value="refining">Legacy refining</option>
-                      )}
-                      <StatusOptions />
-                    </SelectV2>
-                  </label>
-                </FeatureCard>
-              ))}
-              {visibleFeatures.length === 0 && <p>No work items match these filters.</p>}
-            </div>
-          </section>
-        )}
+        {isMobile && <MobileWorkItemBoard {...model} />}
         {visibleFeatures.some((feature) => feature.status === 'refining') && (
           <section aria-label="Legacy refining work items">
             <h3>Legacy status: Refining</h3>

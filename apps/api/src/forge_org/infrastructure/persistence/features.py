@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from forge_org.domain.clock import utc_now
 
-from .common import row_dict
+from .common import row_dict, transaction
 from .tags import TagPersistence
 
 
@@ -42,7 +42,7 @@ class FeaturePersistence(TagPersistence):
     ) -> dict[str, Any]:
         now, feature_id = utc_now(), str(uuid4())
         tags = values.pop('tags', [])
-        try:
+        with transaction(self.connection):
             self.connection.execute(
                 'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, kind, bug_severity, steps_to_reproduce, expected_result, actual_result, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 (
@@ -65,10 +65,6 @@ class FeaturePersistence(TagPersistence):
                 ),
             )
             self._set_work_item_tags(workspace_id, 'feature', feature_id, tags)
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
         return self.feature(project_id, feature_id) or {}
 
     def feature(self, project_id: str, feature_id: str) -> dict[str, Any] | None:
@@ -91,7 +87,7 @@ class FeaturePersistence(TagPersistence):
         tags = values.pop('tags', None)
         if not values and tags is None:
             return self.feature(project_id, feature_id)
-        try:
+        with transaction(self.connection):
             if values:
                 assignments = ', '.join(f'{key} = ?' for key in values)
                 self.connection.execute(
@@ -100,8 +96,4 @@ class FeaturePersistence(TagPersistence):
                 )
             if tags is not None:
                 self._set_work_item_tags(workspace_id, 'feature', feature_id, tags)
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
         return self.feature(project_id, feature_id)

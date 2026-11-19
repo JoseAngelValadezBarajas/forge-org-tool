@@ -1,7 +1,8 @@
 """Shared SQLite persistence helpers."""
 
 import sqlite3
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from functools import wraps
 from typing import Any, ParamSpec, TypeVar
 
@@ -26,3 +27,18 @@ def unique_as_duplicate(method: Callable[_P, _R]) -> Callable[_P, _R]:
             raise DuplicateRecord(str(exc)) from exc
 
     return wrapper
+
+
+@contextmanager
+def transaction(connection: sqlite3.Connection) -> Iterator[None]:
+    """Commit when the block succeeds, roll back and re-raise when it fails.
+
+    The single place stores use for all-or-nothing writes.
+    """
+    try:
+        yield
+    except Exception:
+        connection.rollback()
+        raise
+    else:
+        connection.commit()

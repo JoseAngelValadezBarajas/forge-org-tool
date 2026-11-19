@@ -1,5 +1,7 @@
 # ORG-003 Decisions, invariants, and readiness
 
+> **Status: retired from the active product (MVP 1.0).** Kept as a historical record. The code was removed; legacy SQLite tables are preserved by migrations only. See [`docs/product/mvp-1.0.md`](../../product/mvp-1.0.md).
+
 Decisions and invariants are project-scoped planning records. Decisions carry
 explicit status and revision snapshots; invariants carry revision snapshots and
 feature-scoped acknowledgements guarded by the expected revision. The readiness

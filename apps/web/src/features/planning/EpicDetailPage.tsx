@@ -1,204 +1,50 @@
 import { Link } from 'react-router-dom';
-import { type EpicStatus, type Feature } from '@forge-org/api-client';
+import { type Feature } from '@forge-org/api-client';
 import {
   AlertV2,
   BadgeV2,
   ButtonV2,
   CardV2,
-  DialogV2,
   FeedbackStateV2,
-  MultiSelect,
-  SelectV2,
   TabsV2,
-  TextInputV2,
-  Textarea,
 } from '@corefoundry-labs/forge-ui';
 import { KanbanColumn, PLANNING_COLUMN_STATUSES } from './components/KanbanColumn/KanbanColumn';
-import { PriorityOptions, StatusOptions } from './components';
 import styles from './EpicDetailPage.module.css';
-import { useEpicDetailController, statuses } from './useEpicDetailController';
+import { useEpicDetailController } from './useEpicDetailController';
+import { EpicEditDialog } from './epic-detail/EpicEditDialog';
+import { EpicItemCard } from './epic-detail/EpicItemCard';
+import { FeatureFilters } from './epic-detail/FeatureFilters';
+import { WorkItemCreateDialog } from './epic-detail/WorkItemCreateDialog';
 
 export function EpicDetailPage() {
+  const model = useEpicDetailController();
   const {
     workspaceId,
     projectId,
     epicId,
     project,
     epic,
-    title,
-    setTitle,
-    description,
-    setDescription,
-    status,
-    setStatus,
     features,
-    featureSearch,
-    setFeatureSearch,
-    featureKind,
-    setFeatureKind,
-    featurePriority,
-    setFeaturePriority,
-    featureTag,
-    setFeatureTag,
     error,
     saved,
     loading,
-    editing,
     setEditing,
-    createItemOpen,
     setCreateItemOpen,
-    newItemTitle,
-    setNewItemTitle,
-    newItemKind,
-    setNewItemKind,
-    newItemTags,
-    setNewItemTags,
-    newBugSeverity,
-    setNewBugSeverity,
-    newBugSteps,
-    setNewBugSteps,
-    newBugExpected,
-    setNewBugExpected,
-    newBugActual,
-    setNewBugActual,
-    workspaceTags,
     mobileStatus,
     setMobileStatus,
     isMobile,
-    mobileCardDetails,
     load,
-    save,
     moveFeature,
-    createWorkItem,
     filteredFeatures,
     readOnly,
     completedCount,
     legacyFeatures,
-    featurePointerDrag,
-  } = useEpicDetailController();
+  } = model;
 
   const itemCard = (feature: Feature) => (
-    <CardV2
-      data-layout="flow"
-      variant="outlined"
-      as="article"
-      key={feature.id}
-      aria-label={feature.title}
-      className={styles.itemCard}
-      data-dragging={featurePointerDrag.draggingId === feature.id ? 'true' : undefined}
-      draggable={false}
-      onPointerDown={!readOnly ? (event) => featurePointerDrag.start(feature.id, event) : undefined}
-      onDragStart={(event) => {
-        event.dataTransfer.setData('text/forge-feature-id', feature.id);
-        event.dataTransfer.setData('text/plain', feature.id);
-        event.dataTransfer.effectAllowed = 'move';
-      }}
-    >
-      <p className={styles.itemKind}>
-        {feature.kind === 'bug' ? 'Bug' : 'Story'} · {feature.priority}
-      </p>
-      <Link
-        className={styles.itemTitle}
-        draggable={false}
-        onDragStart={(event) => {
-          event.dataTransfer.setData('text/forge-feature-id', feature.id);
-          event.dataTransfer.setData('text/plain', feature.id);
-          event.dataTransfer.effectAllowed = 'move';
-        }}
-        to={`/planning/${workspaceId}/${projectId}/features/${feature.id}`}
-      >
-        {feature.title}
-      </Link>
-      <p className={styles.itemTags}>
-        {isMobile
-          ? [
-              mobileCardDetails[feature.id],
-              feature.kind === 'bug'
-                ? `${feature.status.charAt(0).toUpperCase()}${feature.status.slice(1)}`
-                : feature.tags?.join(', '),
-            ]
-              .filter(Boolean)
-              .join(' · ')
-          : feature.tags?.join(' · ') || 'No tags'}
-      </p>
-      {!readOnly && (
-        <details className={styles.itemActions}>
-          <summary>Move</summary>
-          <div className={styles.itemControls}>
-            <label>
-              Priority
-              <SelectV2
-                size="sm"
-                aria-label={`Priority for ${feature.title}`}
-                value={feature.priority}
-                onChange={(event) =>
-                  void moveFeature(feature, { priority: event.target.value as Feature['priority'] })
-                }
-              >
-                <PriorityOptions />
-              </SelectV2>
-            </label>
-            <label>
-              Move to status
-              <SelectV2
-                size="sm"
-                aria-label={`Status for ${feature.title}`}
-                value={feature.status}
-                onChange={(event) =>
-                  void moveFeature(feature, { status: event.target.value as Feature['status'] })
-                }
-              >
-                <StatusOptions />
-                {!PLANNING_COLUMN_STATUSES.some((column) => column.value === feature.status) && (
-                  <option value={feature.status}>Unsupported: {feature.status}</option>
-                )}
-              </SelectV2>
-            </label>
-          </div>
-        </details>
-      )}
-    </CardV2>
+    <EpicItemCard {...model} key={feature.id} feature={feature} />
   );
-  const featureFilters = (
-    <div className={styles.filters} aria-label="Work item filters">
-      <SelectV2
-        size="sm"
-        aria-label="Filter Work Items by type"
-        value={featureKind}
-        onChange={(event) => setFeatureKind(event.target.value)}
-      >
-        <option value="all">All items</option>
-        <option value="story">Stories</option>
-        <option value="bug">Bugs</option>
-      </SelectV2>
-      <TextInputV2
-        size="sm"
-        id="epic-board-search"
-        aria-label="Find Work Items"
-        placeholder="Search Stories & Bugs"
-        value={featureSearch}
-        onChange={(event) => setFeatureSearch(event.target.value)}
-      />
-      <SelectV2
-        size="sm"
-        id="epic-board-priority"
-        aria-label="Filter Work Items by priority"
-        value={featurePriority}
-        onChange={(event) => setFeaturePriority(event.target.value)}
-      >
-        <option value="all">Priority</option>
-        <PriorityOptions />
-      </SelectV2>
-      <TextInputV2
-        size="sm"
-        id="epic-board-tag"
-        aria-label="Filter Work Items by tag"
-        placeholder="Tags"
-        value={featureTag}
-        onChange={(event) => setFeatureTag(event.target.value)}
-      />
-    </div>
-  );
+  const featureFilters = <FeatureFilters {...model} />;
   return (
     <div className={styles.stack}>
       <header className={styles.heading}>
@@ -319,56 +165,7 @@ export function EpicDetailPage() {
               </ButtonV2>
             )}
           </CardV2>
-          <DialogV2
-            onOpenChange={(nextOpen) => {
-              if (!nextOpen) setEditing(false);
-            }}
-            title="Edit Epic"
-            description="Update the Epic summary and workflow status."
-            open={editing}
-          >
-            <form className={styles.form} onSubmit={save}>
-              <label htmlFor="epic-title">Epic title</label>
-              <TextInputV2
-                id="epic-title"
-                aria-label="Epic title"
-                required
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
-              <label htmlFor="epic-description">Description</label>
-              <Textarea
-                id="epic-description"
-                aria-label="Epic description"
-                rows={4}
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-              />
-              <label htmlFor="epic-status">Status</label>
-              <SelectV2
-                size="sm"
-                id="epic-status"
-                aria-label="Epic status"
-                value={status}
-                onChange={(event) => setStatus(event.target.value)}
-              >
-                {!statuses.includes(status as EpicStatus) && (
-                  <option value={status}>Unsupported: {status}</option>
-                )}
-                {statuses.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </SelectV2>
-              <div className={styles.formActions}>
-                <ButtonV2 type="button" variant="secondary" onClick={() => setEditing(false)}>
-                  Cancel
-                </ButtonV2>
-                <ButtonV2 type="submit">Save Epic</ButtonV2>
-              </div>
-            </form>
-          </DialogV2>
+          <EpicEditDialog {...model} />
           <section aria-label="Epic Board" className={styles.boardSection}>
             {!isMobile && featureFilters}
             {features.length === 0 && <p>No Work Items linked to this Epic yet.</p>}
@@ -485,91 +282,7 @@ export function EpicDetailPage() {
               </>
             }
           </section>
-          <DialogV2
-            onOpenChange={(nextOpen) => {
-              if (!nextOpen) setCreateItemOpen(false);
-            }}
-            title="Create Work Item"
-            description={`Add a Story or Bug to ${epic.title}.`}
-            open={createItemOpen}
-          >
-            <form className={styles.form} onSubmit={(event) => void createWorkItem(event)}>
-              <fieldset className={styles.kindChoice}>
-                <legend>Work Item type</legend>
-                {(['story', 'bug'] as const).map((kind) => (
-                  <ButtonV2
-                    key={kind}
-                    type="button"
-                    variant={newItemKind === kind ? 'primary' : 'secondary'}
-                    aria-pressed={newItemKind === kind}
-                    onClick={() => setNewItemKind(kind)}
-                  >
-                    {kind === 'story' ? 'Story' : 'Bug'}
-                  </ButtonV2>
-                ))}
-              </fieldset>
-              <label htmlFor="new-work-item-title">Title</label>
-              <TextInputV2
-                id="new-work-item-title"
-                aria-label="Work Item title"
-                value={newItemTitle}
-                onChange={(event) => setNewItemTitle(event.target.value)}
-                required
-              />
-              <MultiSelect
-                label="Workspace tags"
-                options={workspaceTags.map((tag) => ({ value: tag.name, label: tag.name }))}
-                value={newItemTags}
-                onValuesChange={setNewItemTags}
-                presentation="checkboxList"
-                emptyMessage="No workspace tags available. Manage tags in Workspace settings."
-              />
-              {newItemKind === 'bug' && (
-                <>
-                  <label htmlFor="new-bug-severity">Bug severity</label>
-                  <SelectV2
-                    size="sm"
-                    id="new-bug-severity"
-                    value={newBugSeverity}
-                    onChange={(event) => setNewBugSeverity(event.target.value)}
-                  >
-                    <PriorityOptions />
-                  </SelectV2>
-                  <label htmlFor="new-bug-steps">Steps to reproduce</label>
-                  <Textarea
-                    id="new-bug-steps"
-                    value={newBugSteps}
-                    onChange={(event) => setNewBugSteps(event.target.value)}
-                    rows={3}
-                  />
-                  <label htmlFor="new-bug-expected">Expected result</label>
-                  <Textarea
-                    id="new-bug-expected"
-                    value={newBugExpected}
-                    onChange={(event) => setNewBugExpected(event.target.value)}
-                    rows={2}
-                  />
-                  <label htmlFor="new-bug-actual">Actual result</label>
-                  <Textarea
-                    id="new-bug-actual"
-                    value={newBugActual}
-                    onChange={(event) => setNewBugActual(event.target.value)}
-                    rows={2}
-                  />
-                </>
-              )}
-              <div className={styles.formActions}>
-                <ButtonV2
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setCreateItemOpen(false)}
-                >
-                  Cancel
-                </ButtonV2>
-                <ButtonV2 type="submit">Create Work Item</ButtonV2>
-              </div>
-            </form>
-          </DialogV2>
+          <WorkItemCreateDialog {...model} />
         </>
       )}
     </div>
