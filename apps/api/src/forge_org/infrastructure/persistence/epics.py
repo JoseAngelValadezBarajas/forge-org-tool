@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from forge_org.domain.clock import utc_now
 
-from .common import row_dict
+from .common import row_dict, transaction
 from .tags import TagPersistence
 
 
@@ -48,16 +48,12 @@ class EpicPersistence(TagPersistence):
         tags: list[str],
     ) -> dict[str, Any]:
         now, epic_id = utc_now(), str(uuid4())
-        try:
+        with transaction(self.connection):
             self.connection.execute(
                 "INSERT INTO epics(id, project_id, title, description, status, priority, created_at, updated_at) VALUES (?, ?, ?, ?, 'backlog', ?, ?, ?)",
                 (epic_id, project_id, title, description, priority, now, now),
             )
             self._set_work_item_tags(workspace_id, 'epic', epic_id, tags)
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
         return self.get_epic(project_id, epic_id) or {}
 
     def update_epic(
@@ -66,7 +62,7 @@ class EpicPersistence(TagPersistence):
         tags = values.pop('tags', None)
         if not values and tags is None:
             return self.get_epic(project_id, epic_id)
-        try:
+        with transaction(self.connection):
             if values:
                 assignments = ', '.join(f'{key} = ?' for key in values)
                 self.connection.execute(
@@ -75,8 +71,4 @@ class EpicPersistence(TagPersistence):
                 )
             if tags is not None:
                 self._set_work_item_tags(workspace_id, 'epic', epic_id, tags)
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
         return self.get_epic(project_id, epic_id)

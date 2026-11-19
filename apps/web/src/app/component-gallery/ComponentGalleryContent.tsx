@@ -356,27 +356,7 @@ const productAccessibility: Record<string, string> = {
   'dependency-group':
     'The directed dependency is a labeled group with explicit text for its state.',
   'filter-bar': 'The filter region is labeled and result counts are announced politely.',
-  'feature-overview': 'Readiness outcome and stale evaluation are conveyed with text.',
   'project-planning-home': 'Composes child content within a named project-planning section.',
-  'rule-card': 'Rule identifier, result, and explanation remain text content.',
-  'evaluation-snapshot': 'Fingerprint and timestamp are grouped with an explicit freshness label.',
-  'rule-action': 'Uses a native button and disables it for archived/unavailable cases.',
-  'decision-card': 'Decision title, revision, and status are grouped semantically.',
-  'revision-history': 'Revision entries are presented as an ordered list.',
-  'invariant-card': 'Acknowledgement and current revision are stated in text.',
-  'repository-card':
-    'Repository metadata uses definition-list semantics and explicit source-content disclosure.',
-  'context-package-card': 'Snapshot metadata is in a definition list; freshness is labeled.',
-  'report-field':
-    'A labeled group distinguishes HAS VALUE from EMPTY and states that reported data is not proof.',
-  'provenance-notice':
-    'Reported, Observed, and Unknown provenance are labeled explicitly; none implies verification by itself.',
-  'trust-disclosure':
-    'Disclosure is announced as a note and does not imply a release or deployment.',
-  'download-action':
-    'Ready downloads are links; pending and failed outcomes use status/alert roles.',
-  'verification-summary': 'Outcome, fingerprint, stale state, and blockers are visible as text.',
-  'release-gate': 'Gate outcome is visible text; status is not represented by color alone.',
 };
 
 catalog.push(

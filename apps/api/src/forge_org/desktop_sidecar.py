@@ -18,8 +18,13 @@ class BearerTokenMiddleware:
         self.token = token.encode('utf-8')
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope['type'] != 'http':
+        if scope['type'] == 'lifespan':
             await self.app(scope, receive, send)
+            return
+        if scope['type'] != 'http':
+            # WebSocket and any future scope type carry no bearer check here, so refuse them.
+            if scope['type'] == 'websocket':
+                await send({'type': 'websocket.close', 'code': 1008})
             return
         headers = {key.lower(): value for key, value in scope.get('headers', [])}
         expected = b'Bearer ' + self.token

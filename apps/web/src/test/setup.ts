@@ -1,3 +1,10 @@
+import * as jestDomMatchers from '@testing-library/jest-dom/matchers';
+import { expect } from 'vitest';
+
+// Register jest-dom matchers on the runner's own `expect`. The package's `/vitest` entry extends the
+// `expect` of the vitest copy it resolves, which is not the instance the tests use under vitest 5.
+expect.extend(jestDomMatchers);
+
 /**
  * jsdom lacks the Popover API that the Forge V2 overlays use. Model it minimally so a popover
  * is visible only between showPopover() and hidePopover(), as in a real browser.

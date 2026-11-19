@@ -19,6 +19,17 @@ test('Tauri declares a visible, usable main FORGE window explicitly', () => {
   assert.match(config.app.security?.csp ?? '', /connect-src[^;]*https:\/\/\*\.supabase\.co/);
 });
 
+test('CSP lets Bug screenshots render from blob: URLs without opening other origins', async () => {
+  const android = JSON.parse(
+    await readFile('apps/desktop/src-tauri/tauri.android.conf.json', 'utf8'),
+  );
+  for (const csp of [config.app.security.csp, android.app.security.csp]) {
+    const imgSrc = /(?:^|;)\s*img-src([^;]*)/.exec(csp)?.[1] ?? '';
+    assert.deepEqual(imgSrc.trim().split(/\s+/).sort(), ["'self'", 'blob:', 'data:']);
+    assert.doesNotMatch(csp, /img-src[^;]*(https?:|\*)/);
+  }
+});
+
 test('Windows desktop host uses the single-instance activation plugin', async () => {
   const manifest = await readFile('apps/desktop/src-tauri/Cargo.toml', 'utf8');
   const host = await readFile('apps/desktop/src-tauri/src/lib.rs', 'utf8');

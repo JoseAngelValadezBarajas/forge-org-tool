@@ -4,6 +4,28 @@ import sqlite3
 from collections.abc import Callable
 from typing import Any
 
+from .common import transaction
+
+
+def insert_attachment_row(
+    connection: sqlite3.Connection, feature_id: str, attachment: dict[str, Any]
+) -> None:
+    """The single INSERT for ``bug_attachments``; callers own the transaction."""
+    connection.execute(
+        'INSERT INTO bug_attachments(id, feature_id, relative_path, file_name, '
+        'content_type, byte_size, sha256, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        (
+            attachment['id'],
+            feature_id,
+            attachment['relative_path'],
+            attachment['file_name'],
+            attachment['content_type'],
+            attachment['byte_size'],
+            attachment['sha256'],
+            attachment['created_at'],
+        ),
+    )
+
 
 class SqliteAttachmentStore:
     def __init__(self, connection: sqlite3.Connection) -> None:
@@ -56,26 +78,9 @@ class SqliteAttachmentStore:
         if count >= limit:
             self.connection.rollback()
             return False
-        try:
+        with transaction(self.connection):
             before_commit()
-            self.connection.execute(
-                'INSERT INTO bug_attachments(id, feature_id, relative_path, file_name, '
-                'content_type, byte_size, sha256, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                (
-                    attachment['id'],
-                    feature_id,
-                    attachment['relative_path'],
-                    attachment['file_name'],
-                    attachment['content_type'],
-                    attachment['byte_size'],
-                    attachment['sha256'],
-                    attachment['created_at'],
-                ),
-            )
-            self.connection.commit()
-        except Exception:
-            self.connection.rollback()
-            raise
+            insert_attachment_row(self.connection, feature_id, attachment)
         return True
 
     def delete_attachment(self, feature_id: str, attachment_id: str) -> None:

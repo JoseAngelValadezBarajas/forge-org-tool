@@ -3,6 +3,7 @@
 import sqlite3
 from typing import Any
 
+from .attachments import insert_attachment_row
 from .common import unique_as_duplicate
 from .organization import OrganizationRepository
 
@@ -260,20 +261,7 @@ class SqliteTransferStore:
 
     @unique_as_duplicate
     def insert_attachment(self, feature_id: str, attachment: dict[str, Any]) -> None:
-        self.connection.execute(
-            'INSERT INTO bug_attachments(id, feature_id, relative_path, file_name, '
-            'content_type, byte_size, sha256, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            (
-                attachment['id'],
-                feature_id,
-                attachment['relative_path'],
-                attachment['file_name'],
-                attachment['content_type'],
-                attachment['byte_size'],
-                attachment['sha256'],
-                attachment['created_at'],
-            ),
-        )
+        insert_attachment_row(self.connection, feature_id, attachment)
 
     def next_task_position(self, feature_id: str) -> int:
         return int(

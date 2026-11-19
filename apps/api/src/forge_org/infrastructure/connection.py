@@ -5,16 +5,16 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 from threading import RLock
-from typing import cast
-
-from sqlalchemy import create_engine
-from sqlalchemy.pool import NullPool
 
 from forge_org.domain.clock import utc_now
 
 __all__ = ['utc_now']
 
 _MIGRATION_LOCK = RLock()
+
+# How long a writer waits for another connection's lock before failing with "database is locked".
+# Requests run on a thread pool and each opens its own connection, so writers do overlap.
+BUSY_TIMEOUT_SECONDS = 15.0
 
 
 def database_path() -> Path:
@@ -53,14 +53,8 @@ def connect() -> sqlite3.Connection:
         needs_migration = not _schema_is_current(path, CURRENT_SCHEMA_VERSION)
         if needs_migration:
             backup_before_migration(path, current_version=CURRENT_SCHEMA_VERSION)
-        engine = create_engine(
-            f'sqlite:///{path.as_posix()}',
-            connect_args={'check_same_thread': False},
-            poolclass=NullPool,
-        )
-        raw_connection = engine.raw_connection()
-        cast(sqlite3.Connection, raw_connection.driver_connection).row_factory = sqlite3.Row
-        connection = cast(sqlite3.Connection, raw_connection)
+        connection = sqlite3.connect(path, check_same_thread=False, timeout=BUSY_TIMEOUT_SECONDS)
+        connection.row_factory = sqlite3.Row
         connection.execute('PRAGMA foreign_keys = ON')
         if needs_migration:
             migrate(connection)

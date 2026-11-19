@@ -1,6 +1,8 @@
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod desktop_host {
-    use forge_org_desktop_policy::{validate_request, MAX_JSON_BODY};
+    use forge_org_desktop_policy::{
+        recovery_for, validate_request, FailureStage, Recovery, MAX_JSON_BODY, MAX_RESPONSE_BYTES,
+    };
     use rand::{distr::Alphanumeric, RngExt};
     use std::io::{Read, Write};
     use std::net::{TcpListener, TcpStream};
@@ -13,6 +15,9 @@ mod desktop_host {
     use tauri_plugin_shell::{process::CommandChild, ShellExt};
 
     const READINESS_TIMEOUT: Duration = Duration::from_secs(15);
+    /// Imports and exports of a 5 MiB package can legitimately take longer than a plain read.
+    const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
+    const HEALTH_TIMEOUT: Duration = Duration::from_secs(3);
     const TRAY_SHOW_ID: &str = "tray-show";
     const TRAY_QUIT_ID: &str = "tray-quit";
 
@@ -149,23 +154,56 @@ mod desktop_host {
         Ok((port, token, child))
     }
 
+    /// A failed transport attempt, tagged with how far the request got.
+    struct TransportError {
+        stage: FailureStage,
+        rejected_locally: bool,
+        message: String,
+    }
+
+    impl TransportError {
+        fn before_send(message: String) -> Self {
+            Self {
+                stage: FailureStage::BeforeSend,
+                rejected_locally: false,
+                message,
+            }
+        }
+
+        fn after_send(message: String) -> Self {
+            Self {
+                stage: FailureStage::AfterSend,
+                rejected_locally: false,
+                message,
+            }
+        }
+    }
+
     fn http_request(
         port: u16,
         token: &str,
         method: &str,
         path: &str,
         body: &[u8],
-    ) -> Result<(u16, String), String> {
-        validate_request(method, path, body.len())
-            .map_err(|error| format!("request rejected: {error:?}"))?;
-        let address = format!("127.0.0.1:{port}")
-            .parse()
-            .map_err(|error| format!("sidecar address is invalid: {error}"))?;
-        let mut stream = TcpStream::connect_timeout(&address, Duration::from_secs(1))
-            .map_err(|error| format!("sidecar connection failed: {error}"))?;
+        read_timeout: Duration,
+    ) -> Result<(u16, String), TransportError> {
+        validate_request(method, path, body.len()).map_err(|error| TransportError {
+            stage: FailureStage::BeforeSend,
+            rejected_locally: true,
+            message: format!("request rejected: {error:?}"),
+        })?;
+        let address = format!("127.0.0.1:{port}").parse().map_err(|error| {
+            TransportError::before_send(format!("sidecar address is invalid: {error}"))
+        })?;
+        let mut stream =
+            TcpStream::connect_timeout(&address, Duration::from_secs(1)).map_err(|error| {
+                TransportError::before_send(format!("sidecar connection failed: {error}"))
+            })?;
         stream
-            .set_read_timeout(Some(Duration::from_secs(10)))
-            .map_err(|error| format!("sidecar read timeout setup failed: {error}"))?;
+            .set_read_timeout(Some(read_timeout))
+            .map_err(|error| {
+                TransportError::before_send(format!("sidecar read timeout setup failed: {error}"))
+            })?;
         let request = format!(
         "{method} {path} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nAuthorization: Bearer {token}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
         body.len()
@@ -173,41 +211,83 @@ mod desktop_host {
         stream
             .write_all(request.as_bytes())
             .and_then(|_| stream.write_all(body))
-            .map_err(|error| format!("sidecar request failed: {error}"))?;
+            .map_err(|error| {
+                TransportError::after_send(format!("sidecar request failed: {error}"))
+            })?;
 
         let mut response = Vec::new();
-        stream
+        (&mut stream)
+            .take(MAX_RESPONSE_BYTES as u64 + 1)
             .read_to_end(&mut response)
-            .map_err(|error| format!("sidecar response failed: {error}"))?;
+            .map_err(|error| {
+                TransportError::after_send(format!("sidecar response failed: {error}"))
+            })?;
+        if response.len() > MAX_RESPONSE_BYTES {
+            return Err(TransportError::after_send(
+                "sidecar response exceeds the desktop transport limit".to_string(),
+            ));
+        }
         let header_end = response
             .windows(4)
             .position(|window| window == b"\r\n\r\n")
-            .ok_or_else(|| "sidecar returned malformed HTTP".to_string())?;
-        let headers = std::str::from_utf8(&response[..header_end])
-            .map_err(|_| "sidecar returned invalid HTTP headers".to_string())?;
+            .ok_or_else(|| {
+                TransportError::after_send("sidecar returned malformed HTTP".to_string())
+            })?;
+        let headers = std::str::from_utf8(&response[..header_end]).map_err(|_| {
+            TransportError::after_send("sidecar returned invalid HTTP headers".to_string())
+        })?;
         let status = headers
             .lines()
             .next()
             .and_then(|line| line.split_whitespace().nth(1))
-            .ok_or_else(|| "sidecar returned no HTTP status".to_string())?
+            .ok_or_else(|| {
+                TransportError::after_send("sidecar returned no HTTP status".to_string())
+            })?
             .parse::<u16>()
-            .map_err(|_| "sidecar returned an invalid HTTP status".to_string())?;
-        let body = String::from_utf8(response[header_end + 4..].to_vec())
-            .map_err(|_| "sidecar returned a non-UTF-8 body".to_string())?;
+            .map_err(|_| {
+                TransportError::after_send("sidecar returned an invalid HTTP status".to_string())
+            })?;
+        let body = String::from_utf8(response[header_end + 4..].to_vec()).map_err(|_| {
+            TransportError::after_send("sidecar returned a non-UTF-8 body".to_string())
+        })?;
         Ok((status, body))
+    }
+
+    fn sidecar_is_healthy(port: u16, token: &str) -> bool {
+        matches!(
+            http_request(port, token, "GET", "/api/v1/health", &[], HEALTH_TIMEOUT),
+            Ok((200, _))
+        )
     }
 
     fn wait_for_readiness(port: u16, token: &str) -> Result<(), String> {
         let deadline = Instant::now() + READINESS_TIMEOUT;
         while Instant::now() < deadline {
-            if let Ok((status, _)) = http_request(port, token, "GET", "/api/v1/health", &[]) {
-                if status == 200 {
-                    return Ok(());
-                }
+            if sidecar_is_healthy(port, token) {
+                return Ok(());
             }
             std::thread::sleep(Duration::from_millis(50));
         }
         Err("sidecar did not become ready before the startup timeout".to_string())
+    }
+
+    /// Replaces the sidecar and returns the port and token of the new one.
+    fn restart_sidecar(app: &AppHandle, state: &DesktopTransport) -> Result<(u16, String), String> {
+        stop_sidecar(state);
+        let (port, token, child) = start_sidecar(app)?;
+        *state
+            .port
+            .lock()
+            .map_err(|_| "desktop transport port is unavailable".to_string())? = port;
+        *state
+            .token
+            .lock()
+            .map_err(|_| "desktop transport token is unavailable".to_string())? = token.clone();
+        *state
+            .child
+            .lock()
+            .map_err(|_| "desktop transport child is unavailable".to_string())? = Some(child);
+        Ok((port, token))
     }
 
     #[tauri::command]
@@ -226,45 +306,63 @@ mod desktop_host {
         if body.len() > MAX_JSON_BODY {
             return Err("request body exceeds the desktop transport limit".to_string());
         }
-        let port = *state
+        let mut port = *state
             .port
             .lock()
             .map_err(|_| "desktop transport port is unavailable".to_string())?;
-        let token = state
+        let mut token = state
             .token
             .lock()
             .map_err(|_| "desktop transport token is unavailable".to_string())?
             .clone();
-        let (status, response_body) =
-            match http_request(port, &token, &method, &path, body.as_bytes()) {
-                Ok(response) => response,
-                Err(first_error) => {
-                    stop_sidecar(&state);
-                    let (next_port, next_token, next_child) =
-                        start_sidecar(&app).map_err(|restart| {
+        let (status, response_body) = match http_request(
+            port,
+            &token,
+            &method,
+            &path,
+            body.as_bytes(),
+            REQUEST_TIMEOUT,
+        ) {
+            Ok(response) => response,
+            Err(failure) => {
+                let may_have_applied =
+                    failure.stage == FailureStage::AfterSend && !failure.rejected_locally;
+                let recovery = recovery_for(&method, failure.stage, failure.rejected_locally);
+                // A request the policy rejected says nothing about the sidecar: leave it running.
+                if !failure.rejected_locally && !sidecar_is_healthy(port, &token) {
+                    let (next_port, next_token) =
+                        restart_sidecar(&app, &state).map_err(|restart| {
                             format!(
-                                "desktop request failed: {first_error}; restart failed: {restart}"
+                                "desktop request failed: {}; restart failed: {restart}",
+                                failure.message
                             )
                         })?;
-                    *state
-                        .port
-                        .lock()
-                        .map_err(|_| "desktop transport port is unavailable".to_string())? =
-                        next_port;
-                    *state
-                        .token
-                        .lock()
-                        .map_err(|_| "desktop transport token is unavailable".to_string())? =
-                        next_token.clone();
-                    *state
-                        .child
-                        .lock()
-                        .map_err(|_| "desktop transport child is unavailable".to_string())? =
-                        Some(next_child);
-                    http_request(next_port, &next_token, &method, &path, body.as_bytes())
-                        .map_err(|error| format!("desktop request failed after restart: {error}"))?
+                    port = next_port;
+                    token = next_token;
                 }
-            };
+                if recovery == Recovery::Surface {
+                    return Err(if may_have_applied {
+                        format!(
+                            "desktop request failed: {}; the change may have been applied, so reload before retrying",
+                            failure.message
+                        )
+                    } else {
+                        format!("desktop request failed: {}", failure.message)
+                    });
+                }
+                http_request(
+                    port,
+                    &token,
+                    &method,
+                    &path,
+                    body.as_bytes(),
+                    REQUEST_TIMEOUT,
+                )
+                .map_err(|error| {
+                    format!("desktop request failed after recovery: {}", error.message)
+                })?
+            }
+        };
         Ok(format!("{status}\n{response_body}"))
     }
 

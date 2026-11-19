@@ -9,6 +9,37 @@ pub enum PolicyError {
 }
 
 pub const MAX_JSON_BODY: usize = 8 * 1024 * 1024;
+/// Upper bound for a sidecar response held in memory (a 5 MiB package is ~7 MiB as base64).
+pub const MAX_RESPONSE_BYTES: usize = 32 * 1024 * 1024;
+
+/// Where a transport attempt failed. This decides whether the request may be sent again.
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum FailureStage {
+    /// The request was rejected locally or the connection was never established: nothing reached
+    /// the sidecar.
+    BeforeSend,
+    /// Bytes were written. The sidecar may already have committed the change.
+    AfterSend,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Recovery {
+    /// Send the same request again (restarting the sidecar first if it is unhealthy).
+    Replay,
+    /// Report the failure. Never replay: a write could be applied twice.
+    Surface,
+}
+
+/// A policy rejection is never a sidecar fault, so it never replays or restarts anything.
+pub fn recovery_for(method: &str, stage: FailureStage, rejected_locally: bool) -> Recovery {
+    if rejected_locally {
+        return Recovery::Surface;
+    }
+    match (stage, method) {
+        (FailureStage::BeforeSend, _) | (FailureStage::AfterSend, "GET") => Recovery::Replay,
+        _ => Recovery::Surface,
+    }
+}
 
 pub fn validate_loopback_base_url(url: &str) -> Result<(), PolicyError> {
     let valid = url
@@ -35,11 +66,9 @@ pub fn validate_request(method: &str, path: &str, body_len: usize) -> Result<(),
         || !path.starts_with("/api/v1/")
         || route.contains("//")
         || route.contains("..")
-        || route.contains('#')
         || route.contains('%')
         || path.contains('#')
-        || path.contains('\r')
-        || path.contains('\n')
+        || path.bytes().any(|byte| byte <= 0x20 || byte == 0x7f)
     {
         return Err(if body_len > MAX_JSON_BODY {
             PolicyError::BodyTooLarge
@@ -50,8 +79,10 @@ pub fn validate_request(method: &str, path: &str, body_len: usize) -> Result<(),
     if !matches!(method, "GET" | "POST" | "PATCH" | "DELETE") {
         return Err(PolicyError::UnsupportedRoute);
     }
-    let allowed = ["/api/v1/health", "/api/v1/workspaces"];
-    if allowed.contains(&path) || path.starts_with("/api/v1/workspaces/") {
+    if route == "/api/v1/health"
+        || route == "/api/v1/workspaces"
+        || route.starts_with("/api/v1/workspaces/")
+    {
         Ok(())
     } else {
         Err(PolicyError::UnsupportedRoute)
@@ -114,5 +145,63 @@ mod tests {
             Ok(format!("Bearer {}", "a".repeat(32)))
         );
         assert_eq!(bearer_header("short"), Err(PolicyError::InvalidPath));
+    }
+
+    #[test]
+    fn rejects_whitespace_and_control_characters_in_the_path() {
+        for path in [
+            "/api/v1/workspaces/a b",
+            "/api/v1/workspaces/a\tb",
+            "/api/v1/workspaces/a\0b",
+            "/api/v1/workspaces/a\x7fb",
+        ] {
+            assert_eq!(
+                validate_request("GET", path, 0),
+                Err(PolicyError::InvalidPath),
+                "{path:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn accepts_a_query_on_the_collection_routes() {
+        assert_eq!(
+            validate_request("GET", "/api/v1/workspaces?status=active", 0),
+            Ok(())
+        );
+        assert_eq!(validate_request("GET", "/api/v1/health?probe=1", 0), Ok(()));
+        assert_eq!(
+            validate_request("GET", "/api/v1/other", 0),
+            Err(PolicyError::UnsupportedRoute)
+        );
+    }
+
+    #[test]
+    fn never_replays_a_write_that_may_have_been_applied() {
+        for method in ["POST", "PATCH", "DELETE"] {
+            assert_eq!(
+                recovery_for(method, FailureStage::AfterSend, false),
+                Recovery::Surface,
+                "{method} after send"
+            );
+            assert_eq!(
+                recovery_for(method, FailureStage::BeforeSend, false),
+                Recovery::Replay,
+                "{method} before send"
+            );
+        }
+    }
+
+    #[test]
+    fn replays_reads_and_never_acts_on_a_local_rejection() {
+        assert_eq!(
+            recovery_for("GET", FailureStage::AfterSend, false),
+            Recovery::Replay
+        );
+        for method in ["GET", "POST"] {
+            for stage in [FailureStage::BeforeSend, FailureStage::AfterSend] {
+                assert_eq!(recovery_for(method, stage, true), Recovery::Surface);
+            }
+        }
     }
 }

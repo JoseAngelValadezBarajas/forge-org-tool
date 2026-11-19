@@ -141,7 +141,7 @@ Verified in this worktree on 2026-10-26:
 - Node 24.13.0, npm 11.6.2, Vite, and the existing frontend dependencies are
   available.
 - Rust 1.99.1 and `rustfmt` are installed under
-  `C:\Users\josea\.cargo\bin`; they are not on the default `PATH`.
+  `%USERPROFILE%\.cargo\bin`; they are not on the default `PATH`.
 - Visual Studio Build Tools 2022, WebView2, Python 3.12, and `uv` are available.
 - Desktop `cargo check --locked` passes after generating the ignored local
   sidecar artifact, and both Desktop manifests pass `cargo fmt -- --check`.

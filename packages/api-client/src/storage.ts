@@ -332,11 +332,7 @@ export function switchStorageProvider(provider: StorageProvider): StorageSnapsho
   return getStorageSnapshot();
 }
 
-export function getActiveSupabaseProfile(): SupabaseProfile | null {
-  return profile ? { ...profile } : null;
-}
-
-export async function getValidSupabaseSession(): Promise<SupabaseSession | null> {
+async function getValidSupabaseSession(): Promise<SupabaseSession | null> {
   if (!session || !profile) return null;
   if (session.expiresAt > Math.floor(Date.now() / 1000) + 30) return session;
   if (!session.refreshToken) return null;

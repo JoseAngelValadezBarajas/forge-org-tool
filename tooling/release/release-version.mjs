@@ -27,6 +27,24 @@ function readCargoManifestVersion(filePath, packageName) {
   return packageBlock[1];
 }
 
+function readTomlProjectVersion(filePath) {
+  const contents = fs.readFileSync(filePath, 'utf8');
+  const match = contents.match(/\[project\][\s\S]*?\nversion = "([^"]+)"/);
+  if (!match) {
+    throw new Error(`Could not find [project] version in ${filePath}`);
+  }
+  return match[1];
+}
+
+function readPythonAppVersion(filePath) {
+  const contents = fs.readFileSync(filePath, 'utf8');
+  const match = contents.match(/FastAPI\([^)]*version='([^']+)'/);
+  if (!match) {
+    throw new Error(`Could not find the FastAPI version in ${filePath}`);
+  }
+  return match[1];
+}
+
 export function readReleaseMetadata(rootDir) {
   const packageJson = readJson(path.join(rootDir, 'package.json'));
   const packageLock = readJson(path.join(rootDir, 'package-lock.json'));
@@ -42,6 +60,10 @@ export function readReleaseMetadata(rootDir) {
       path.join(rootDir, 'apps/desktop/src-tauri/Cargo.lock'),
       'forge-org-desktop',
     ),
+    webVersion: readJson(path.join(rootDir, 'apps/web/package.json')).version,
+    apiClientVersion: readJson(path.join(rootDir, 'packages/api-client/package.json')).version,
+    apiProjectVersion: readTomlProjectVersion(path.join(rootDir, 'apps/api/pyproject.toml')),
+    apiAppVersion: readPythonAppVersion(path.join(rootDir, 'apps/api/src/forge_org/main.py')),
   };
 }
 

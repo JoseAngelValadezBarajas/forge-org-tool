@@ -12,7 +12,7 @@ import {
 } from './supabase-shared.js';
 import { decodeBytes, validateImage, sha256 } from './attachment-validation.js';
 
-export function concatChunks(chunks: Uint8Array[], byteLength: number): Uint8Array {
+function concatChunks(chunks: Uint8Array[], byteLength: number): Uint8Array {
   const bytes = new Uint8Array(byteLength);
   let offset = 0;
   for (const chunk of chunks) {
@@ -22,7 +22,7 @@ export function concatChunks(chunks: Uint8Array[], byteLength: number): Uint8Arr
   return bytes;
 }
 
-export function unzipEntriesBounded(archiveBytes: Uint8Array): Record<string, Uint8Array> {
+function unzipEntriesBounded(archiveBytes: Uint8Array): Record<string, Uint8Array> {
   const entries: Record<string, Uint8Array> = {};
   const seen = new Set<string>();
   let entryCount = 0;
@@ -204,7 +204,7 @@ export async function parsePackage(
   return { document, assets };
 }
 
-export type PackageAsset = {
+type PackageAsset = {
   featureRef: string;
   path: string;
   fileName: string;
