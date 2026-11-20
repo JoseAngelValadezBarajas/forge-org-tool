@@ -528,9 +528,8 @@ try {
   $process = Start-Process -FilePath $installedApp.FullName -PassThru
   $window = Get-ForgeWindow $process
   $root = Get-ForgeAutomationRoot $window.Handle
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'No workspaces yet'
-  $workspaceInput = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Edit) 'Workspace name'
-  $createButton = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Workspace'
+  # First launch lands on Today: there is no setup screen to fill in.
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Edit) 'Capture a task'
   $bounds = New-Object ForgeWindowNative+RECT
   $null = [ForgeWindowNative]::GetWindowRect($window.Handle, [ref]$bounds)
   $screenshotPath = Join-Path (Split-Path -Parent $installer.FullName) 'forge-desktop-startup-v0.1.1-smoke.bmp'
@@ -560,21 +559,20 @@ try {
     throw "Single-instance activation created additional sidecar processes; baseline=[$($sidecarPids -join ',')] current=[$(($sidecarsAfterSecondLaunch.Id) -join ',')] new=[$($newSidecarPids -join ',')]."
   }
 
-  $workspaceName = "Installed UI smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
-  $workspaceInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($workspaceName)
-  $createButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
+  # Today creates the Personal workspace and the Inbox project on first use.
+  $workspaceName = 'Personal'
+  $projectName = 'Inbox'
   $databasePath = Join-Path $isolatedLocalAppData 'ForgeOrgTool/data/forge.db'
-  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create your first project'
-  Assert-ForgeSqliteRecord $databasePath 'workspaces' $workspaceName
-
-  $projectName = "Installed project smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
-  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'New project'
-  $projectInput = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Edit) 'Project name'
-  $projectInput.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue($projectName)
-  $projectButton = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Button) 'Create Project'
-  $projectButton.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
+  Assert-ForgeSqliteRecord $databasePath 'workspaces' $workspaceName
   Assert-ForgeSqliteRecord $databasePath 'projects' $projectName
+
+  # One-line capture through the installed React UI, the authenticated sidecar and SQLite.
+  $taskName = "Installed task smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
+  Set-ForgeElementValue $root ([System.Windows.Automation.ControlType]::Edit) 'Capture a task' "$taskName tomorrow"
+  Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Button) 'Add'
+  $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $taskName
+  Assert-ForgeSqliteRecord $databasePath 'features' $taskName
 
   # Exercise a real Bug attachment through the installed React UI and local sidecar.
   $epicName = "Installed Epic smoke $([guid]::NewGuid().ToString('N').Substring(0, 10))"
@@ -640,6 +638,7 @@ try {
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
   Assert-ForgeSqliteRecord $databasePath 'workspaces' $workspaceName
   Assert-ForgeSqliteRecord $databasePath 'projects' $projectName
+  Assert-ForgeSqliteRecord $databasePath 'features' $taskName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $projectName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Text) 'Project Overview'
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) 'Open planning board'
@@ -647,7 +646,7 @@ try {
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $epicName
   Invoke-ForgeElement $root ([System.Windows.Automation.ControlType]::Hyperlink) $workItemName
   $null = Wait-ForgeAutomationElement $root ([System.Windows.Automation.ControlType]::Image) "Bug screenshot: $bugAttachmentName"
-  Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' epic='$epicName' bug='$workItemName' attachment='$bugAttachmentName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
+  Write-Output "PASS installed UI -> authenticated API -> SQLite -> restart; workspace='$workspaceName' project='$projectName' task='$taskName' epic='$epicName' bug='$workItemName' attachment='$bugAttachmentName' window='$($window.Title)' $($window.Width)x$($window.Height) database='$databasePath' screenshot='$screenshotPath'"
 }
 catch {
   $sidecarLog = Join-Path $isolatedLocalAppData 'ForgeOrgTool/logs/sidecar.log'
