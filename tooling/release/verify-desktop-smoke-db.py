@@ -10,6 +10,7 @@ from pathlib import Path
 TABLES = {
     "workspaces": ("workspaces", "name"),
     "projects": ("projects", "name"),
+    "features": ("features", "title"),
 }
 
 

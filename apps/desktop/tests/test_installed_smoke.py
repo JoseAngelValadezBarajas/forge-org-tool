@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).parents[2] / 'api' / 'src'))
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from forge_org.infrastructure.connection import connect  # noqa: E402
+from forge_org.infrastructure.migrations.runner import CURRENT_SCHEMA_VERSION  # noqa: E402
 from sidecar_launcher import app_data_root, backup_database, local_paths  # noqa: E402
 
 
@@ -81,7 +82,7 @@ class InstalledSmokeTests(unittest.TestCase):
                     )
                     self.assertEqual(
                         upgraded.execute("SELECT max(version) FROM schema_migrations").fetchone()[0],
-                        5,
+                        CURRENT_SCHEMA_VERSION,
                     )
                 finally:
                     upgraded.close()

@@ -22,8 +22,10 @@ class VerifyDesktopSmokeDatabaseTests(unittest.TestCase):
                     """
                     CREATE TABLE workspaces (name TEXT NOT NULL);
                     CREATE TABLE projects (name TEXT NOT NULL);
+                    CREATE TABLE features (title TEXT NOT NULL);
                     INSERT INTO workspaces VALUES ('Synthetic workspace');
                     INSERT INTO projects VALUES ('Synthetic project');
+                    INSERT INTO features VALUES ('Synthetic task');
                     """
                 )
 
@@ -33,6 +35,7 @@ class VerifyDesktopSmokeDatabaseTests(unittest.TestCase):
             self.assertEqual(
                 MODULE.record_count(database, "projects", "Synthetic project"), 1
             )
+            self.assertEqual(MODULE.record_count(database, "features", "Synthetic task"), 1)
             self.assertEqual(MODULE.record_count(database, "workspaces", "missing"), 0)
 
     def test_rejects_unknown_table_and_missing_database_without_creating_it(
