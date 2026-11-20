@@ -12,6 +12,7 @@ import { OrganizeDialog } from './OrganizeDialog';
 import { ReminderSettings } from './ReminderSettings';
 import styles from './TodayPage.module.css';
 import { dueLabel, TODAY_SECTIONS, type TodayItem } from './todayModel';
+import { TODAY_VIEWS } from './viewsModel';
 import { useTodayController } from './useTodayController';
 
 export function TodayPage() {
@@ -36,6 +37,10 @@ export function TodayPage() {
     complete,
     changeDueDate,
     moveOverdueToToday,
+    view,
+    entries,
+    counts,
+    setView,
     projects,
     epicsByProject,
     organizing,
@@ -100,6 +105,21 @@ export function TodayPage() {
 
       <ReminderSettings />
 
+      <div role="group" aria-label="Views" className={styles.views}>
+        {TODAY_VIEWS.map(({ id, label }) => (
+          <ButtonV2
+            key={id}
+            size="sm"
+            variant={view === id ? 'primary' : 'ghost'}
+            aria-pressed={view === id}
+            onClick={() => setView(id)}
+          >
+            {label}
+            {counts[id] > 0 && <span className={styles.viewCount}>{counts[id]}</span>}
+          </ButtonV2>
+        ))}
+      </div>
+
       {error && (
         <AlertV2 tone="error">
           {error}{' '}
@@ -130,7 +150,37 @@ export function TodayPage() {
         </div>
       )}
 
-      {openCount === 0 ? (
+      {view !== 'due' ? (
+        <section className={styles.section} aria-labelledby="today-view-title">
+          <h2 id="today-view-title">
+            {TODAY_VIEWS.find((candidate) => candidate.id === view)?.label}{' '}
+            <span className={styles.count}>{entries.length}</span>
+          </h2>
+          {entries.length === 0 ? (
+            <CardV2 variant="outlined">
+              <FeedbackStateV2
+                state="empty"
+                title={TODAY_VIEWS.find((candidate) => candidate.id === view)?.empty ?? ''}
+              />
+            </CardV2>
+          ) : (
+            <ul className={styles.list}>
+              {entries.map(({ item, note }) => (
+                <TaskRow
+                  key={`${item.projectId}:${item.feature.id}`}
+                  item={item}
+                  note={note}
+                  todayIso={todayIso}
+                  showProject={showProject}
+                  onComplete={complete}
+                  onChangeDate={changeDueDate}
+                  onOrganize={openOrganize}
+                />
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : openCount === 0 ? (
         <CardV2 variant="outlined">
           <FeedbackStateV2
             state="empty"
@@ -188,6 +238,7 @@ export function TodayPage() {
 
 function TaskRow({
   item,
+  note,
   todayIso,
   showProject,
   onComplete,
@@ -195,6 +246,7 @@ function TaskRow({
   onOrganize,
 }: {
   item: TodayItem;
+  note?: string;
   todayIso: string;
   showProject: boolean;
   onComplete: (item: TodayItem) => void;
@@ -209,12 +261,15 @@ function TaskRow({
         checked={false}
         onChange={() => onComplete(item)}
       />
-      <Link
-        className={styles.title}
-        to={`/planning/${item.workspaceId}/${item.projectId}/features/${feature.id}`}
-      >
-        {feature.title}
-      </Link>
+      <div className={styles.titleCell}>
+        <Link
+          className={styles.title}
+          to={`/planning/${item.workspaceId}/${item.projectId}/features/${feature.id}`}
+        >
+          {feature.title}
+        </Link>
+        {note && <small className={styles.note}>{note}</small>}
+      </div>
       <div className={styles.meta}>
         {feature.kind === 'bug' && (
           <BadgeV2 tone="error" variant="subtle" size="sm">

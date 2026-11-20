@@ -1,4 +1,10 @@
-import { organizationApi, type Epic, type Project, type Workspace } from '@forge-org/api-client';
+import {
+  organizationApi,
+  type Dependency,
+  type Epic,
+  type Project,
+  type Workspace,
+} from '@forge-org/api-client';
 import type { TodayItem } from './todayModel';
 
 export const ACTIVE_WORKSPACE_KEY = 'forge-active-workspace';
@@ -12,6 +18,8 @@ export type LoadedToday = {
   projects: Project[];
   /** Epics of each project, keyed by project id. */
   epicsByProject: Record<string, Epic[]>;
+  /** Dependencies of every project, only when requested (the Blocked view needs them). */
+  dependencies: Dependency[];
   items: TodayItem[];
 };
 
@@ -24,9 +32,16 @@ function announce(name: string, detail: unknown) {
  * With `bootstrap` (the Today page) a missing workspace or Inbox is created on first use;
  * without it (background reminders) nothing is ever created and `null` means "nothing to read".
  */
-export async function loadTodayData(options: { bootstrap: true }): Promise<LoadedToday>;
-export async function loadTodayData(options: { bootstrap: false }): Promise<LoadedToday | null>;
-export async function loadTodayData(options: { bootstrap: boolean }): Promise<LoadedToday | null> {
+type LoadOptions = { dependencies?: boolean };
+export async function loadTodayData(
+  options: LoadOptions & { bootstrap: true },
+): Promise<LoadedToday>;
+export async function loadTodayData(
+  options: LoadOptions & { bootstrap: false },
+): Promise<LoadedToday | null>;
+export async function loadTodayData(
+  options: LoadOptions & { bootstrap: boolean },
+): Promise<LoadedToday | null> {
   const workspaces = await organizationApi.listWorkspaces();
   const saved = localStorage.getItem(ACTIVE_WORKSPACE_KEY) ?? '';
   const open = workspaces.filter((candidate) => !candidate.archived_at);
@@ -76,11 +91,19 @@ export async function loadTodayData(options: { bootstrap: boolean }): Promise<Lo
   const epicsByProject = Object.fromEntries(
     overviews.map(({ project, overview }) => [project.id, overview.epics]),
   );
+  const dependencies = options.dependencies
+    ? (
+        await Promise.all(
+          projects.map((project) => organizationApi.listDependencies(workspaceId, project.id)),
+        )
+      ).flat()
+    : [];
   return {
     target: { workspaceId, project: inbox },
     projectCount: projects.length,
     projects,
     epicsByProject,
+    dependencies,
     items,
   };
 }

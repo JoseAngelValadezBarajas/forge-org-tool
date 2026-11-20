@@ -65,6 +65,7 @@ describe('Today', () => {
     vi.spyOn(organizationApi, 'listWorkspaces').mockResolvedValue([workspace]);
     vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([inbox]);
     vi.spyOn(organizationApi, 'planningOverview').mockResolvedValue(overview());
+    vi.spyOn(organizationApi, 'listDependencies').mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -342,6 +343,7 @@ describe('Organize', () => {
     localStorage.clear();
     vi.spyOn(organizationApi, 'listWorkspaces').mockResolvedValue([workspace]);
     vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([inbox, atlas]);
+    vi.spyOn(organizationApi, 'listDependencies').mockResolvedValue([]);
     vi.spyOn(organizationApi, 'planningOverview').mockImplementation(async (_w, projectId) =>
       projectId === 'p1'
         ? overview(feature('Fix login', { tags: ['auth'] }))
@@ -459,5 +461,112 @@ describe('Organize', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('up to 40 characters');
     expect(update).not.toHaveBeenCalled();
+  });
+});
+
+describe('Decision views', () => {
+  function renderAt(entry: string) {
+    return render(
+      <MemoryRouter initialEntries={[entry]}>
+        <TodayPage />
+      </MemoryRouter>,
+    );
+  }
+
+  const daysAgo = (days: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString();
+  };
+
+  beforeEach(() => {
+    localStorage.clear();
+    vi.spyOn(organizationApi, 'listWorkspaces').mockResolvedValue([workspace]);
+    vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([inbox]);
+    vi.spyOn(organizationApi, 'listDependencies').mockResolvedValue([
+      {
+        id: 'd1',
+        project_id: 'p1',
+        blocking_feature_id: 'api',
+        blocked_feature_id: 'ui',
+        ...stamps,
+      },
+    ] as never);
+    vi.spyOn(organizationApi, 'planningOverview').mockResolvedValue(
+      overview(
+        feature('api', { status: 'in_progress', updated_at: daysAgo(1) }),
+        feature('ui', { status: 'ready', updated_at: daysAgo(2) }),
+        feature('Review copy', { status: 'verify', due_date: addDays(5), updated_at: daysAgo(1) }),
+        feature('Old spike', { status: 'in_progress', updated_at: daysAgo(30) }),
+        feature('Loose idea'),
+      ),
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('shows how many items each view has before it is opened', async () => {
+    renderAt('/');
+    const views = await screen.findByRole('group', { name: 'Views' });
+    expect(within(views).getByRole('button', { name: /Blocked/ })).toHaveTextContent('1');
+    expect(within(views).getByRole('button', { name: /Verify/ })).toHaveTextContent('1');
+    expect(within(views).getByRole('button', { name: /Stalled/ })).toHaveTextContent('1');
+    expect(within(views).getByRole('button', { name: /Upcoming/ })).toHaveTextContent('1');
+    expect(within(views).getByRole('button', { name: /Unorganized/ })).toHaveTextContent('5');
+    expect(within(views).getByRole('button', { name: /^Due/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('opens Blocked and says what each item is waiting on', async () => {
+    renderAt('/');
+    fireEvent.click(await screen.findByRole('button', { name: /Blocked/ }));
+    const region = await screen.findByRole('region', { name: /Blocked/ });
+    expect(within(region).getByRole('link', { name: 'ui' })).toBeInTheDocument();
+    expect(within(region).getByText('Blocked by api')).toBeInTheDocument();
+    expect(within(region).queryByRole('link', { name: 'api' })).not.toBeInTheDocument();
+  });
+
+  it('opens a view straight from its URL, so it can be linked', async () => {
+    renderAt('/?view=verify');
+    const region = await screen.findByRole('region', { name: /Verify/ });
+    expect(within(region).getByRole('link', { name: 'Review copy' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Verify/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('explains how stale an item is', async () => {
+    renderAt('/?view=stalled');
+    expect(await screen.findByText('No activity for 30 days')).toBeInTheDocument();
+  });
+
+  it('shows an empty message when a view has nothing, and falls back from an unknown view', async () => {
+    vi.mocked(organizationApi.planningOverview).mockResolvedValue(overview());
+    renderAt('/?view=blocked');
+    expect(await screen.findByText('Nothing is waiting on a dependency.')).toBeInTheDocument();
+    cleanup();
+
+    renderAt('/?view=everything');
+    expect(await screen.findByRole('button', { name: /^Due/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('acts on an item inside a view like anywhere else', async () => {
+    const update = vi
+      .spyOn(organizationApi, 'updateFeature')
+      .mockResolvedValue(feature('Review copy', { status: 'done' }));
+    renderAt('/?view=verify');
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'Complete Review copy' }));
+    await waitFor(() =>
+      expect(update).toHaveBeenCalledWith('w1', 'p1', 'Review copy', { status: 'done' }),
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole('link', { name: 'Review copy' })).not.toBeInTheDocument(),
+    );
   });
 });

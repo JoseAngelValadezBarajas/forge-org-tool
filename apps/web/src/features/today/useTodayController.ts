@@ -1,8 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { organizationApi, type Epic, type Feature, type Project } from '@forge-org/api-client';
+import { useSearchParams } from 'react-router-dom';
+import {
+  organizationApi,
+  type Dependency,
+  type Epic,
+  type Feature,
+  type Project,
+} from '@forge-org/api-client';
 import { formatLocalDate, parseQuickCapture } from './quickCapture';
 import { planOrganize, tagsProblem, type OrganizeValues } from './organize';
 import { INBOX_NAME, loadTodayData } from './todayData';
+import {
+  entriesForView,
+  isViewId,
+  viewCounts,
+  type TodayView,
+  type ViewContext,
+} from './viewsModel';
 import { attentionCount, dueLabel, groupTodayItems, type TodayItem } from './todayModel';
 
 type Notice = { message: string; undo?: { item: TodayItem } };
@@ -17,6 +31,8 @@ export function useTodayController() {
   const [target, setTarget] = useState<{ workspaceId: string; project: Project } | null>(null);
   const [projectCount, setProjectCount] = useState(0);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [dependencies, setDependencies] = useState<Dependency[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [epicsByProject, setEpicsByProject] = useState<Record<string, Epic[]>>({});
   const [organizing, setOrganizing] = useState<TodayItem | null>(null);
   const [organizeError, setOrganizeError] = useState('');
@@ -33,15 +49,30 @@ export function useTodayController() {
   const todayIso = formatLocalDate(now);
   const preview = useMemo(() => parseQuickCapture(text, new Date()), [text]);
   const groups = useMemo(() => groupTodayItems(items, todayIso), [items, todayIso]);
+  const requestedView = searchParams.get('view');
+  const view: TodayView = isViewId(requestedView) ? requestedView : 'due';
+  const viewContext: ViewContext = useMemo(
+    () => ({ todayIso, dependencies, inboxProjectId: target?.project.id ?? null }),
+    [todayIso, dependencies, target],
+  );
+  const entries = useMemo(
+    () => (view === 'due' ? [] : entriesForView(view, items, viewContext)),
+    [view, items, viewContext],
+  );
+  const counts = useMemo(
+    () => viewCounts(items, viewContext, attentionCount(groups)),
+    [items, viewContext, groups],
+  );
 
   useEffect(() => {
     let current = true;
-    void loadTodayData({ bootstrap: true })
+    void loadTodayData({ bootstrap: true, dependencies: true })
       .then((loaded) => {
         if (!current) return;
         setTarget(loaded.target);
         setProjectCount(loaded.projectCount);
         setProjects(loaded.projects);
+        setDependencies(loaded.dependencies);
         setEpicsByProject(loaded.epicsByProject);
         setItems(loaded.items);
         setLoading(false);
@@ -227,6 +258,11 @@ export function useTodayController() {
     dismissNotice: () => setNotice(null),
     undoCompletion: (item: TodayItem) => void setStatus(item, 'backlog'),
     captureRef,
+    view,
+    entries,
+    counts,
+    setView: (next: TodayView) =>
+      setSearchParams(next === 'due' ? {} : { view: next }, { replace: true }),
     projects,
     epicsByProject,
     organizing,
