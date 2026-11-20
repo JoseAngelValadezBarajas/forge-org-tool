@@ -87,12 +87,20 @@ never shifts with the viewer's clock). It exists in:
   on SQLite. On Supabase they carry it once the owner has applied
   [20261119_byoc_0007.sql](../../supabase/migrations/20261119_byoc_0007.sql); before that, export and
   import drop the deadlines. See the [migration runbook](../operations/byoc-due-dates-migration.md).
-- **Reminders.** One digest a day, at a time the user chooses, for what is due today or overdue.
-  It is off until the user turns it on from the row under the Today heading, which also asks the
-  system for notification permission and offers a test notification. It runs for the whole session
-  (also while the desktop window is hidden in the tray) and never creates data. It is not
-  per-task: due dates carry no time of day, so there is nothing to schedule more finely, and the
-  Android shell has no notification support. The preference lives in the installation
-  (`localStorage`), not in the database, so it is not shared between devices.
+- **Reminders.** One reminder a day, at a time the user chooses. It is off until the user turns it
+  on from the row under the Today heading, which also asks the system for notification permission
+  and offers a test notification. It is not per-task: due dates carry no time of day, so there is
+  nothing to schedule more finely. The preference lives in the installation (`localStorage`), not in
+  the database, so it is not shared between devices. How it is delivered depends on the platform:
+  - **Desktop and browser:** a digest with the real counts ("3 due today · 2 overdue"), checked by the
+    running app (also while the desktop window is hidden in the tray). It only reads and never
+    creates data. In a browser it needs the page to be open.
+  - **Android:** a daily notification scheduled in the operating system, so it appears with the app
+    closed. A suspended web page cannot run a timer, which is why it is not the same mechanism. The
+    phone shows it without opening FORGE, so the text cannot carry counts: it says "Open FORGE to see
+    what is due today and what is overdue". The app re-arms the schedule whenever it is opened or the
+    preference changes. Android may deliver it a few minutes late in battery saver or Doze (it is
+    not an alarm clock), and some manufacturers kill background alarms. This has been compiled
+    but not run on a device; try the test button and wait for one real morning.
 - **Global shortcut.** `n` works inside the app only. A system-wide capture shortcut needs a
   narrow desktop capability and is not part of this change.

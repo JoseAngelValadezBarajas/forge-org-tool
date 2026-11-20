@@ -314,30 +314,54 @@ test('Desktop acceptance captures the live Bug detail surface when the native pi
   assert.match(smoke, /CaptureWindow\(\$root\.Current\.NativeWindowHandle, \$screenshotPath\)/);
 });
 
-test('system notifications are desktop-only and the webview holds exactly three notification permissions', async () => {
+test('system notifications: the plugin is registered by both hosts and each webview holds only its own exact permissions', async () => {
   const manifest = await readFile('apps/desktop/src-tauri/Cargo.toml', 'utf8');
   const host = await readFile('apps/desktop/src-tauri/src/lib.rs', 'utf8');
-  const capability = JSON.parse(
+  const desktop = JSON.parse(
     await readFile('apps/desktop/src-tauri/capabilities/default.json', 'utf8'),
   );
-
-  const desktopDependencies = manifest.slice(manifest.indexOf("[target.'cfg(not(any("));
-  assert.match(desktopDependencies, /tauri-plugin-notification\s*=/);
-  const beforeDesktopDependencies = manifest.slice(0, manifest.indexOf("[target.'cfg(not(any("));
-  assert.doesNotMatch(
-    beforeDesktopDependencies,
-    /tauri-plugin-notification/,
-    'the mobile build must not depend on the desktop notification plugin',
+  const mobile = JSON.parse(
+    await readFile('apps/desktop/src-tauri/capabilities/mobile.json', 'utf8'),
   );
-  assert.equal(host.match(/tauri_plugin_notification::init\(\)/g)?.length, 1);
 
-  const notification = capability.permissions.filter((permission) =>
-    permission.startsWith('notification:'),
+  // Compiled for desktop and Android (a common dependency), registered once by each host.
+  const commonDependencies = manifest.slice(
+    manifest.indexOf('[dependencies]'),
+    manifest.indexOf("[target.'cfg(not(any("),
   );
-  assert.deepEqual(notification.sort(), [
+  assert.match(commonDependencies, /tauri-plugin-notification\s*=/);
+  const mobileHost = host.slice(host.indexOf('#[cfg(any(target_os = "android"'));
+  assert.equal(host.match(/tauri_plugin_notification::init\(\)/g)?.length, 2);
+  assert.equal(mobileHost.match(/tauri_plugin_notification::init\(\)/g)?.length, 1);
+
+  const notification = (capability) =>
+    capability.permissions.filter((permission) => permission.startsWith('notification:')).sort();
+  assert.deepEqual(notification(desktop), [
     'notification:allow-is-permission-granted',
     'notification:allow-notify',
     'notification:allow-request-permission',
   ]);
-  assert.ok(!capability.permissions.includes('notification:default'));
+  // Android may also cancel the scheduled daily reminder.
+  assert.deepEqual(notification(mobile), [
+    'notification:allow-cancel',
+    'notification:allow-is-permission-granted',
+    'notification:allow-notify',
+    'notification:allow-request-permission',
+  ]);
+  for (const capability of [desktop, mobile]) {
+    assert.ok(!capability.permissions.includes('notification:default'));
+    assert.ok(
+      !capability.permissions.some(
+        (permission) => permission.startsWith('shell:') || permission.startsWith('fs:scope-'),
+      ),
+      'no shell, process or filesystem scope in the webview',
+    );
+  }
+  assert.deepEqual(mobile.platforms, ['android']);
+  assert.deepEqual(desktop.platforms, ['windows', 'macOS', 'linux']);
+  // The mobile capability stays minimal: no dialog or file reads, which the Android shell never uses.
+  assert.deepEqual(
+    mobile.permissions.filter((permission) => !permission.startsWith('notification:')),
+    ['core:default'],
+  );
 });
