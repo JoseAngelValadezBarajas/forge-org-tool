@@ -20,6 +20,9 @@ const platform = vi.hoisted(() => ({
   getNotificationPermission: vi.fn(),
   askNotificationPermission: vi.fn(),
   showNotification: vi.fn(),
+  reminderDelivery: vi.fn(),
+  scheduleDailyNotification: vi.fn(),
+  cancelDailyNotification: vi.fn(),
 }));
 vi.mock('../../platform/nativeNotifications', () => platform);
 
@@ -41,6 +44,9 @@ function item(id: string, due_date: string | null, status = 'backlog'): TodayIte
 beforeEach(() => {
   localStorage.clear();
   platform.notificationsAvailable.mockReturnValue(true);
+  platform.reminderDelivery.mockReturnValue('watcher');
+  platform.scheduleDailyNotification.mockResolvedValue(true);
+  platform.cancelDailyNotification.mockResolvedValue(undefined);
   platform.getNotificationPermission.mockResolvedValue('granted');
   platform.askNotificationPermission.mockResolvedValue('granted');
   platform.showNotification.mockResolvedValue(true);
@@ -221,5 +227,101 @@ describe('useDueReminders', () => {
     await run();
     await waitFor(() => expect(loadReminderPreferences().lastDigestDate).toBe('2026-11-19'));
     expect(platform.showNotification).not.toHaveBeenCalled();
+  });
+});
+
+describe('Android: a reminder the system fires', () => {
+  beforeEach(() => {
+    platform.reminderDelivery.mockReturnValue('scheduled');
+    localStorage.clear();
+  });
+
+  function enable(time = '09:00') {
+    localStorage.setItem(
+      REMINDER_STORAGE_KEY,
+      JSON.stringify({ enabled: true, time, lastDigestDate: null }),
+    );
+  }
+
+  async function mount() {
+    renderHook(() => useDueReminders());
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
+
+  it('keeps one daily schedule at the chosen time with text that is always true', async () => {
+    enable('07:30');
+    await mount();
+    await waitFor(() =>
+      expect(platform.scheduleDailyNotification).toHaveBeenCalledWith(
+        '07:30',
+        'FORGE',
+        'Open FORGE to see what is due today and what is overdue.',
+      ),
+    );
+    // The system fires it, so the app must not also read data and notify by itself.
+    expect(data.loadTodayData).not.toHaveBeenCalled();
+    expect(platform.showNotification).not.toHaveBeenCalled();
+  });
+
+  it('cancels the schedule when the reminder is off or permission is gone', async () => {
+    await mount();
+    await waitFor(() => expect(platform.cancelDailyNotification).toHaveBeenCalled());
+    expect(platform.scheduleDailyNotification).not.toHaveBeenCalled();
+    cleanup();
+    platform.cancelDailyNotification.mockClear();
+
+    enable();
+    platform.getNotificationPermission.mockResolvedValue('denied');
+    await mount();
+    await waitFor(() => expect(platform.cancelDailyNotification).toHaveBeenCalled());
+    expect(platform.scheduleDailyNotification).not.toHaveBeenCalled();
+  });
+
+  it('re-arms the schedule when the preference changes and when the app comes back', async () => {
+    enable('09:00');
+    await mount();
+    await waitFor(() => expect(platform.scheduleDailyNotification).toHaveBeenCalledTimes(1));
+
+    localStorage.setItem(
+      REMINDER_STORAGE_KEY,
+      JSON.stringify({ enabled: true, time: '18:15', lastDigestDate: null }),
+    );
+    window.dispatchEvent(new CustomEvent('forge:reminders-changed'));
+    await waitFor(() =>
+      expect(platform.scheduleDailyNotification).toHaveBeenLastCalledWith(
+        '18:15',
+        expect.any(String),
+        expect.any(String),
+      ),
+    );
+
+    window.dispatchEvent(new Event('focus'));
+    await waitFor(() => expect(platform.scheduleDailyNotification).toHaveBeenCalledTimes(3));
+  });
+
+  it('survives a scheduling failure and tries again next time', async () => {
+    enable();
+    platform.scheduleDailyNotification.mockRejectedValueOnce(new Error('plugin unavailable'));
+    await mount();
+    await waitFor(() => expect(platform.scheduleDailyNotification).toHaveBeenCalledTimes(1));
+    window.dispatchEvent(new Event('focus'));
+    await waitFor(() => expect(platform.scheduleDailyNotification).toHaveBeenCalledTimes(2));
+  });
+
+  it('tells the user what to expect, in the settings row', async () => {
+    enable();
+    render(<ReminderSettings />);
+    expect(await screen.findByText(/even with the app closed/)).toBeInTheDocument();
+    expect(screen.getByText(/cannot include counts/)).toBeInTheDocument();
+  });
+
+  it('does not show that note on a platform where the app watches the data itself', async () => {
+    platform.reminderDelivery.mockReturnValue('watcher');
+    enable();
+    render(<ReminderSettings />);
+    await screen.findByLabelText('Reminder time');
+    expect(screen.queryByText(/even with the app closed/)).not.toBeInTheDocument();
   });
 });

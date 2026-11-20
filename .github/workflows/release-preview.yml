@@ -140,6 +140,9 @@ jobs:
         working-directory: apps/desktop/src-tauri
         run: npx tauri android init --ci --skip-targets-install
 
+      - name: Keep the web content clear of the Android system bars
+        run: node tooling/release/configure-android-insets.mjs
+
       - name: Prepare persistent Android signing
         shell: bash
         env:

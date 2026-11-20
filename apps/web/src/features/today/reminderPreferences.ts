@@ -65,6 +65,15 @@ export function isDigestDue(preferences: ReminderPreferences, now: Date): boolea
   return now.getHours() * 60 + now.getMinutes() >= minutesOfDay(preferences.time);
 }
 
+/**
+ * Text of the reminder the operating system fires on Android. The phone shows it without opening
+ * the app, so it cannot know today's counts; it must stay true whatever the data is.
+ */
+export const SCHEDULED_REMINDER = {
+  title: 'FORGE',
+  body: 'Open FORGE to see what is due today and what is overdue.',
+};
+
 /** The notification text, or `null` when there is nothing that needs attention. */
 export function digestMessage(counts: {
   overdue: number;

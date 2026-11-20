@@ -73,6 +73,9 @@ jobs:
         working-directory: apps/desktop/src-tauri
         run: npx tauri android init --ci --skip-targets-install
 
+      - name: Keep the web content clear of the Android system bars
+        run: node tooling/release/configure-android-insets.mjs
+
       - name: Build debug APK
         working-directory: apps/desktop/src-tauri
         run: npx tauri android build --debug --apk --target aarch64 --ci

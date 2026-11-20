@@ -4,7 +4,8 @@ import { useReminderSettings } from './useReminderSettings';
 
 /** One row on Today: a daily digest of what is due, off until the user turns it on. */
 export function ReminderSettings() {
-  const { available, preferences, message, setEnabled, setTime, sendTest } = useReminderSettings();
+  const { available, delivery, preferences, message, setEnabled, setTime, sendTest } =
+    useReminderSettings();
   if (!available) return null;
 
   return (
@@ -29,6 +30,12 @@ export function ReminderSettings() {
             Send a test
           </ButtonV2>
         </>
+      )}
+      {preferences.enabled && delivery === 'scheduled' && (
+        <span className={styles.message}>
+          Android shows it at about this time, even with the app closed. It cannot include counts,
+          because the phone shows it without opening FORGE.
+        </span>
       )}
       {message && (
         <span className={styles.message} role="status">

@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Android capability: the cloud-only shell may check notification permission, ask for it, show a notification, schedule the daily reminder and cancel it. It has no sidecar, shell, filesystem or URL access.",
+  "windows": ["main"],
+  "platforms": ["android"],
+  "permissions": [
+    "core:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "notification:allow-cancel"
+  ]
+}

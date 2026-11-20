@@ -71,4 +71,21 @@ describe('Android shell contract', () => {
     assert.match(workflow, /! -path "\$extracted_apk\/lib\/\*" -print0/);
     assert.equal(packageJson.scripts.tauri, 'tauri');
   });
+
+  it('pads the web content by the system bars in every Android build, after init and before build', async () => {
+    for (const [workflow, build] of [
+      ['.github/workflows/android-debug.yml', 'npx tauri android build'],
+      ['.github/workflows/release-preview.yml', 'npx tauri android build'],
+    ]) {
+      const source = await read(workflow);
+      const init = source.indexOf('npx tauri android init');
+      const insets = source.indexOf('node tooling/release/configure-android-insets.mjs');
+      const buildStep = source.indexOf(build);
+      assert.ok(
+        init >= 0 && insets > init,
+        `${workflow} patches insets after generating the project`,
+      );
+      assert.ok(buildStep > insets, `${workflow} patches insets before building the APK`);
+    }
+  });
 });

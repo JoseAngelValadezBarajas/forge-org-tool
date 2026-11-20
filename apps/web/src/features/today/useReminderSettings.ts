@@ -3,6 +3,7 @@ import {
   askNotificationPermission,
   getNotificationPermission,
   notificationsAvailable,
+  reminderDelivery,
   showNotification,
   type NotificationPermissionState,
 } from '../../platform/nativeNotifications';
@@ -19,6 +20,7 @@ export function useReminderSettings() {
   const [permission, setPermission] = useState<NotificationPermissionState>('default');
   const [message, setMessage] = useState('');
   const available = notificationsAvailable();
+  const delivery = reminderDelivery();
 
   useEffect(() => {
     let current = true;
@@ -80,5 +82,5 @@ export function useReminderSettings() {
     setMessage(shown ? 'Test sent.' : 'Could not show a notification. Check system settings.');
   }
 
-  return { available, preferences, permission, message, setEnabled, setTime, sendTest };
+  return { available, delivery, preferences, permission, message, setEnabled, setTime, sendTest };
 }
