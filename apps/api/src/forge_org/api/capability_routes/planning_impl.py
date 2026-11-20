@@ -17,6 +17,7 @@ from forge_org.api.schemas import (
     EpicResponse,
     EpicUpdate,
     FeatureCreate,
+    FeatureMove,
     FeatureResponse,
     FeatureUpdate,
     TaskCreate,
@@ -177,6 +178,22 @@ def update_feature(
 ) -> dict[str, Any]:
     return planning.update_feature(
         workspace_id, project_id, feature_id, payload.model_dump(exclude_unset=True)
+    )
+
+
+@capability_router.post(
+    '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/move',
+    response_model=FeatureResponse,
+)
+def move_feature(
+    workspace_id: str,
+    project_id: str,
+    feature_id: str,
+    payload: FeatureMove,
+    planning: PlanningService = Depends(planning_service),
+) -> dict[str, Any]:
+    return planning.move_feature(
+        workspace_id, project_id, feature_id, payload.project_id, payload.epic_id
     )
 
 

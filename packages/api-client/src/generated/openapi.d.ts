@@ -440,6 +440,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Move Feature */
+        post: operations["move_feature_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__move_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/tasks": {
         parameters: {
             query?: never;
@@ -856,6 +873,13 @@ export interface components {
             tags?: string[];
             /** Title */
             title: string;
+        };
+        /** FeatureMove */
+        FeatureMove: {
+            /** Epic Id */
+            epic_id?: string | null;
+            /** Project Id */
+            project_id: string;
         };
         /** FeatureResponse */
         FeatureResponse: {
@@ -2388,6 +2412,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    move_feature_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__move_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+                project_id: string;
+                feature_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeatureMove"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeatureResponse"];
                 };
             };
             /** @description Validation Error */

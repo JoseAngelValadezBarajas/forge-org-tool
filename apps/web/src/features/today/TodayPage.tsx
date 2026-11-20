@@ -8,6 +8,7 @@ import {
   FeedbackStateV2,
   TextInputV2,
 } from '@corefoundry-labs/forge-ui';
+import { OrganizeDialog } from './OrganizeDialog';
 import { ReminderSettings } from './ReminderSettings';
 import styles from './TodayPage.module.css';
 import { dueLabel, TODAY_SECTIONS, type TodayItem } from './todayModel';
@@ -35,6 +36,14 @@ export function TodayPage() {
     complete,
     changeDueDate,
     moveOverdueToToday,
+    projects,
+    epicsByProject,
+    organizing,
+    organizeError,
+    organizeSaving,
+    openOrganize,
+    closeOrganize,
+    saveOrganize,
     retry,
   } = useTodayController();
 
@@ -152,12 +161,26 @@ export function TodayPage() {
                     showProject={showProject}
                     onComplete={complete}
                     onChangeDate={changeDueDate}
+                    onOrganize={openOrganize}
                   />
                 ))}
               </ul>
             </section>
           );
         })
+      )}
+
+      {organizing && (
+        <OrganizeDialog
+          key={`${organizing.projectId}:${organizing.feature.id}`}
+          item={organizing}
+          projects={projects}
+          epicsByProject={epicsByProject}
+          saving={organizeSaving}
+          error={organizeError}
+          onSave={(values) => saveOrganize(organizing, values)}
+          onClose={closeOrganize}
+        />
       )}
     </div>
   );
@@ -169,12 +192,14 @@ function TaskRow({
   showProject,
   onComplete,
   onChangeDate,
+  onOrganize,
 }: {
   item: TodayItem;
   todayIso: string;
   showProject: boolean;
   onComplete: (item: TodayItem) => void;
   onChangeDate: (item: TodayItem, dueDate: string | null) => void;
+  onOrganize: (item: TodayItem) => void;
 }) {
   const { feature } = item;
   return (
@@ -217,6 +242,14 @@ function TaskRow({
             Move to today
           </ButtonV2>
         )}
+        <ButtonV2
+          variant="ghost"
+          size="sm"
+          aria-label={`Organize ${feature.title}`}
+          onClick={() => onOrganize(item)}
+        >
+          Organize
+        </ButtonV2>
         <TextInputV2
           size="sm"
           type="date"

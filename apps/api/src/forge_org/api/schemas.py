@@ -167,6 +167,11 @@ class FeatureUpdate(BaseModel):
     due_date: date | None = None
 
 
+class FeatureMove(BaseModel):
+    project_id: str
+    epic_id: str | None = None
+
+
 class FeatureResponse(BaseModel):
     id: str
     project_id: str

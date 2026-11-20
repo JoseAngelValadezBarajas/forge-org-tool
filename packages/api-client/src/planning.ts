@@ -146,6 +146,21 @@ export const planningCapability = {
       `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}`,
       { method: 'PATCH', body: JSON.stringify(values) },
     ),
+  /** Moves a work item to another project of the workspace, optionally into one of its Epics. */
+  moveFeature: (
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    destinationProjectId: string,
+    epicId?: string | null,
+  ) =>
+    sendJson<Feature>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/move`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ project_id: destinationProjectId, epic_id: epicId ?? null }),
+      },
+    ),
   createCriterion: (
     workspaceId: string,
     projectId: string,

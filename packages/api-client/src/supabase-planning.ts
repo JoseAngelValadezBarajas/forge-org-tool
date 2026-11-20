@@ -1,5 +1,6 @@
 /** Workspace, project, epic and feature reads plus workspace create/delete. */
 
+import { ApiError } from './errors.js';
 import type { Epic, Feature, Project, Workspace } from './types.js';
 import { type JsonRecord, one, query } from './supabase-shared.js';
 import type { SupabaseTransport } from './supabase-transport.js';
@@ -113,7 +114,75 @@ export function createPlanningOps({
     };
   }
 
+  /**
+   * Moves a work item to another active project of the same workspace. Supabase scopes Bug
+   * screenshots by their storage path (workspace/project/feature) and dependencies by project,
+   * so an item that has either is refused instead of being left half-moved.
+   */
+  async function moveFeature(
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    body: JsonRecord,
+  ): Promise<Feature> {
+    const destination = typeof body.project_id === 'string' ? body.project_id : '';
+    const epicId = typeof body.epic_id === 'string' && body.epic_id ? body.epic_id : null;
+    if (!destination) throw new ApiError(422, 'A destination project is required.');
+    if (destination === projectId) {
+      throw new ApiError(422, 'The work item is already in this project.');
+    }
+    const projects = await table<Array<{ id: string; status: string }>>(
+      'projects',
+      query({ select: 'id,status', id: `eq.${destination}`, workspace_id: `eq.${workspaceId}` }),
+    );
+    if (projects.length === 0) throw new ApiError(404, 'Destination project not found.');
+    if (projects[0].status !== 'active') {
+      throw new ApiError(422, 'Archived projects cannot receive work items.');
+    }
+    if (epicId) {
+      const epics = await table<Array<{ id: string }>>(
+        'epics',
+        query({ select: 'id', id: `eq.${epicId}`, project_id: `eq.${destination}` }),
+      );
+      if (epics.length === 0) {
+        throw new ApiError(404, 'Epic not found in the destination project.');
+      }
+    }
+    const dependencies = await table<Array<{ id: string }>>(
+      'feature_dependencies',
+      query({
+        select: 'id',
+        or: `(blocking_feature_id.eq.${featureId},blocked_feature_id.eq.${featureId})`,
+        limit: '1',
+      }),
+    );
+    if (dependencies.length > 0) {
+      throw new ApiError(
+        409,
+        'This work item has dependencies. Remove them before moving it to another project.',
+      );
+    }
+    const screenshots = await table<Array<{ id: string }>>(
+      'bug_attachments',
+      query({ select: 'id', feature_id: `eq.${featureId}`, limit: '1' }),
+    );
+    if (screenshots.length > 0) {
+      throw new ApiError(
+        409,
+        'This work item has screenshots stored under its current project. Remove them before moving it.',
+      );
+    }
+    return one(
+      await table<Feature[]>(
+        'features',
+        query({ id: `eq.${featureId}`, project_id: `eq.${projectId}` }),
+        { method: 'PATCH', body: JSON.stringify({ project_id: destination, epic_id: epicId }) },
+      ),
+    );
+  }
+
   return {
+    moveFeature,
     listWorkspaces,
     createWorkspace,
     deleteWorkspace,

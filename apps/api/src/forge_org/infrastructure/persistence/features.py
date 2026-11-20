@@ -78,6 +78,18 @@ class FeaturePersistence(TagPersistence):
             item['tags'] = self._work_item_tags('feature', feature_id)
         return item
 
+    def move_feature(
+        self, feature_id: str, project_id: str, epic_id: str | None
+    ) -> dict[str, Any] | None:
+        with transaction(self.connection):
+            cursor = self.connection.execute(
+                'UPDATE features SET project_id = ?, epic_id = ?, updated_at = ? WHERE id = ?',
+                (project_id, epic_id, utc_now(), feature_id),
+            )
+        if not cursor.rowcount:
+            return None
+        return self.feature(project_id, feature_id)
+
     def update_feature(
         self,
         workspace_id: str,

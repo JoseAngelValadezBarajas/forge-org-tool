@@ -512,3 +512,118 @@ def test_task_can_be_deleted_and_a_missing_task_is_reported(tmp_path: Path) -> N
             )
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def _move_fixture(client: TestClient):
+    workspace = client.post('/api/v1/workspaces', json={'name': 'Move'}).json()
+    base = f'/api/v1/workspaces/{workspace["id"]}/projects'
+    inbox = client.post(base, json={'name': 'Inbox'}).json()
+    atlas = client.post(base, json={'name': 'Atlas'}).json()
+    epic = client.post(f'{base}/{atlas["id"]}/epics', json={'title': 'Launch'}).json()
+    return workspace, base, inbox, atlas, epic
+
+
+def test_work_item_moves_to_another_project_and_epic_with_its_children(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'move.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace, base, inbox, atlas, epic = _move_fixture(client)
+            item = client.post(
+                f'{base}/{inbox["id"]}/features',
+                json={'title': 'Fix login', 'due_date': '2026-12-01', 'tags': ['auth']},
+            ).json()
+            client.post(
+                f'{base}/{inbox["id"]}/features/{item["id"]}/tasks', json={'title': 'Repro'}
+            )
+
+            moved = client.post(
+                f'{base}/{inbox["id"]}/features/{item["id"]}/move',
+                json={'project_id': atlas['id'], 'epic_id': epic['id']},
+            )
+            assert moved.status_code == 200, moved.text
+            body = moved.json()
+            assert body['project_id'] == atlas['id']
+            assert body['epic_id'] == epic['id']
+            assert body['due_date'] == '2026-12-01'
+            assert body['tags'] == ['auth']
+
+            assert client.get(f'{base}/{inbox["id"]}/features').json() == []
+            assert [f['id'] for f in client.get(f'{base}/{atlas["id"]}/features').json()] == [
+                item['id']
+            ]
+            tasks = client.get(f'{base}/{atlas["id"]}/features/{item["id"]}/tasks').json()
+            assert [task['title'] for task in tasks] == ['Repro']
+            overview = client.get(f'{base}/{atlas["id"]}/planning/overview').json()
+            assert overview['epics'][0]['features'][0]['id'] == item['id']
+            # Gone from the source project: the old URL no longer finds it.
+            assert (
+                client.get(f'{base}/{inbox["id"]}/features/{item["id"]}/tasks').status_code == 404
+            )
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_move_without_an_epic_lands_unassigned_in_the_destination(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'move-plain.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace, base, inbox, atlas, _ = _move_fixture(client)
+            item = client.post(f'{base}/{inbox["id"]}/features', json={'title': 'Plain'}).json()
+            moved = client.post(
+                f'{base}/{inbox["id"]}/features/{item["id"]}/move',
+                json={'project_id': atlas['id']},
+            ).json()
+            assert moved['project_id'] == atlas['id'] and moved['epic_id'] is None
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_move_is_refused_for_invalid_destinations_and_dependencies(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'move-refused.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace, base, inbox, atlas, epic = _move_fixture(client)
+            other_ws = client.post('/api/v1/workspaces', json={'name': 'Elsewhere'}).json()
+            foreign = client.post(
+                f'/api/v1/workspaces/{other_ws["id"]}/projects', json={'name': 'Foreign'}
+            ).json()
+            item = client.post(f'{base}/{inbox["id"]}/features', json={'title': 'Item'}).json()
+            move = f'{base}/{inbox["id"]}/features/{item["id"]}/move'
+
+            same = client.post(move, json={'project_id': inbox['id']})
+            assert same.status_code == 422
+            assert client.post(move, json={'project_id': foreign['id']}).status_code == 404
+            assert client.post(move, json={'project_id': 'missing'}).status_code == 404
+            # An Epic of the source project is not valid in the destination.
+            inbox_epic = client.post(
+                f'{base}/{inbox["id"]}/epics', json={'title': 'Source epic'}
+            ).json()
+            bad_epic = client.post(
+                move, json={'project_id': atlas['id'], 'epic_id': inbox_epic['id']}
+            )
+            assert bad_epic.status_code == 404
+            assert (
+                client.get(f'{base}/{inbox["id"]}/features').json()[0]['project_id'] == inbox['id']
+            )
+
+            blocker = client.post(
+                f'{base}/{inbox["id"]}/features', json={'title': 'Blocker'}
+            ).json()
+            client.post(
+                f'{base}/{inbox["id"]}/dependencies',
+                json={'blocking_feature_id': blocker['id'], 'blocked_feature_id': item['id']},
+            )
+            dependent = client.post(move, json={'project_id': atlas['id']})
+            assert dependent.status_code == 409
+            assert 'dependencies' in dependent.json()['detail']
+
+            # An archived destination cannot receive work.
+            client.post(f'{base}/{atlas["id"]}/archive')
+            fresh = client.post(f'{base}/{inbox["id"]}/features', json={'title': 'Fresh'}).json()
+            archived = client.post(
+                f'{base}/{inbox["id"]}/features/{fresh["id"]}/move',
+                json={'project_id': atlas['id']},
+            )
+            assert archived.status_code == 422
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)

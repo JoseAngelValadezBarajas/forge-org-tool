@@ -1,4 +1,4 @@
-import { organizationApi, type Project, type Workspace } from '@forge-org/api-client';
+import { organizationApi, type Epic, type Project, type Workspace } from '@forge-org/api-client';
 import type { TodayItem } from './todayModel';
 
 export const ACTIVE_WORKSPACE_KEY = 'forge-active-workspace';
@@ -8,6 +8,10 @@ export const INBOX_NAME = 'Inbox';
 export type LoadedToday = {
   target: { workspaceId: string; project: Project };
   projectCount: number;
+  /** Active projects of the workspace, to choose a destination when organizing. */
+  projects: Project[];
+  /** Epics of each project, keyed by project id. */
+  epicsByProject: Record<string, Epic[]>;
   items: TodayItem[];
 };
 
@@ -69,5 +73,14 @@ export async function loadTodayData(options: { bootstrap: boolean }): Promise<Lo
       }),
     ),
   );
-  return { target: { workspaceId, project: inbox }, projectCount: projects.length, items };
+  const epicsByProject = Object.fromEntries(
+    overviews.map(({ project, overview }) => [project.id, overview.epics]),
+  );
+  return {
+    target: { workspaceId, project: inbox },
+    projectCount: projects.length,
+    projects,
+    epicsByProject,
+    items,
+  };
 }

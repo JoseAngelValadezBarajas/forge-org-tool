@@ -16,6 +16,7 @@ _HANDLERS = (
     'list_features',
     'create_feature',
     'update_feature',
+    'move_feature',
     'update_criterion',
     'delete_criterion',
     'reorder_criteria',

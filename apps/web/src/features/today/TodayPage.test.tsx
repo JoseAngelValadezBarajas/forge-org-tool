@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   organizationApi,
+  type Epic,
   type Feature,
   type PlanningOverview,
   type Project,
@@ -320,5 +321,143 @@ describe('Today', () => {
     expect(input).not.toHaveFocus();
     fireEvent.keyDown(document.body, { key: 'n' });
     expect(input).toHaveFocus();
+  });
+});
+
+describe('Organize', () => {
+  const atlas: Project = { ...inbox, id: 'p2', name: 'Atlas' };
+  const launch = {
+    id: 'e1',
+    project_id: 'p2',
+    title: 'Launch',
+    description: null,
+    status: 'backlog',
+    priority: 'medium',
+    tags: [],
+    archived_at: null,
+    ...stamps,
+  } as unknown as Epic;
+
+  beforeEach(() => {
+    localStorage.clear();
+    vi.spyOn(organizationApi, 'listWorkspaces').mockResolvedValue([workspace]);
+    vi.spyOn(organizationApi, 'listProjects').mockResolvedValue([inbox, atlas]);
+    vi.spyOn(organizationApi, 'planningOverview').mockImplementation(async (_w, projectId) =>
+      projectId === 'p1'
+        ? overview(feature('Fix login', { tags: ['auth'] }))
+        : { epics: [{ ...launch, features: [] }], unassigned_features: [] },
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  async function openDialog() {
+    renderToday();
+    fireEvent.click(await screen.findByRole('button', { name: 'Organize Fix login' }));
+    return screen.findByRole('dialog', { name: /Organize task/ });
+  }
+
+  it('opens with the current project, type, priority and tags', async () => {
+    const dialog = await openDialog();
+    expect(within(dialog).getByLabelText('Project')).toHaveValue('p1');
+    expect(within(dialog).getByLabelText('Epic')).toHaveValue('');
+    expect(within(dialog).getByLabelText('Type')).toHaveValue('story');
+    expect(within(dialog).getByLabelText('Priority')).toHaveValue('medium');
+    expect(within(dialog).getByLabelText('Tags')).toHaveValue('auth');
+  });
+
+  it('closes without calling the API when nothing changed', async () => {
+    const update = vi.spyOn(organizationApi, 'updateFeature');
+    const move = vi.spyOn(organizationApi, 'moveFeature');
+    const dialog = await openDialog();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(update).not.toHaveBeenCalled();
+    expect(move).not.toHaveBeenCalled();
+  });
+
+  it('changes priority, type and tags in place with one update', async () => {
+    const update = vi
+      .spyOn(organizationApi, 'updateFeature')
+      .mockResolvedValue(
+        feature('Fix login', { priority: 'high', kind: 'bug', tags: ['auth', 'urgent'] }),
+      );
+    const dialog = await openDialog();
+    fireEvent.change(within(dialog).getByLabelText('Priority'), { target: { value: 'high' } });
+    fireEvent.change(within(dialog).getByLabelText('Type'), { target: { value: 'bug' } });
+    fireEvent.change(within(dialog).getByLabelText('Tags'), { target: { value: 'auth, urgent' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(update).toHaveBeenCalledWith('w1', 'p1', 'Fix login', {
+        priority: 'high',
+        kind: 'bug',
+        bug_severity: 'medium',
+        tags: ['auth', 'urgent'],
+      }),
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('status')).toHaveTextContent('Organized “Fix login”');
+    expect(screen.getByText('Bug')).toBeInTheDocument();
+  });
+
+  it('moves the task to another project and Epic and shows its new project', async () => {
+    const move = vi
+      .spyOn(organizationApi, 'moveFeature')
+      .mockResolvedValue(feature('Fix login', { project_id: 'p2', epic_id: 'e1' }));
+    const dialog = await openDialog();
+    fireEvent.change(within(dialog).getByLabelText('Project'), { target: { value: 'p2' } });
+    expect(within(dialog).getByText('Launch')).toBeInTheDocument();
+    fireEvent.change(within(dialog).getByLabelText('Epic'), { target: { value: 'e1' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(move).toHaveBeenCalledWith('w1', 'p1', 'Fix login', 'p2', 'e1'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByText('Atlas')).toBeInTheDocument();
+  });
+
+  it('keeps the dialog open and explains a refused move without changing the task', async () => {
+    vi.spyOn(organizationApi, 'moveFeature').mockRejectedValue(
+      new Error('This work item has dependencies. Remove them before moving it to another project'),
+    );
+    const dialog = await openDialog();
+    fireEvent.change(within(dialog).getByLabelText('Project'), { target: { value: 'p2' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('has dependencies');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.queryByText('Atlas', { selector: 'span' })).not.toBeInTheDocument();
+  });
+
+  it('assigns an Epic inside the same project with a plain update and clears it again', async () => {
+    const update = vi
+      .spyOn(organizationApi, 'updateFeature')
+      .mockResolvedValue(feature('Fix login', { epic_id: 'e1' }));
+    vi.mocked(organizationApi.planningOverview).mockImplementation(async (_w, projectId) =>
+      projectId === 'p1'
+        ? {
+            epics: [{ ...launch, project_id: 'p1', features: [] }],
+            unassigned_features: [feature('Fix login', { tags: ['auth'] })],
+          }
+        : { epics: [], unassigned_features: [] },
+    );
+    const dialog = await openDialog();
+    fireEvent.change(within(dialog).getByLabelText('Epic'), { target: { value: 'e1' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(update).toHaveBeenCalledWith('w1', 'p1', 'Fix login', { epic_id: 'e1' }),
+    );
+  });
+
+  it('refuses tags the API would reject before sending anything', async () => {
+    const update = vi.spyOn(organizationApi, 'updateFeature');
+    const dialog = await openDialog();
+    fireEvent.change(within(dialog).getByLabelText('Tags'), { target: { value: 'x'.repeat(41) } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('up to 40 characters');
+    expect(update).not.toHaveBeenCalled();
   });
 });
