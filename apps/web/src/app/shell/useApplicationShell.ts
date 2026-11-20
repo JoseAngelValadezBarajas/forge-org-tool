@@ -12,12 +12,15 @@ import {
   type StorageSnapshot,
   type Workspace,
 } from '@forge-org/api-client';
+import { useDueReminders } from '../../features/today';
 import { useTheme } from '../theme';
 import { getProjectContext } from './navigationContext';
 
 const SIDEBAR_COLLAPSED_KEY = 'forge-sidebar-collapsed';
 
 export function useApplicationShell() {
+  // The morning digest runs for the whole session, including while the window is in the tray.
+  useDueReminders();
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, resolvedTheme, forgeTheme, setTheme } = useTheme();

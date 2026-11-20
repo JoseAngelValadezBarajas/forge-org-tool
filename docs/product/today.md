@@ -50,6 +50,12 @@ never shifts with the viewer's clock). It exists in:
   on SQLite. On Supabase they carry it once the owner has applied
   [20261119_byoc_0007.sql](../../supabase/migrations/20261119_byoc_0007.sql); before that, export and
   import drop the deadlines. See the [migration runbook](../operations/byoc-due-dates-migration.md).
-- **Reminders.** There are no notifications. A deadline is shown, not announced.
+- **Reminders.** One digest a day, at a time the user chooses, for what is due today or overdue.
+  It is off until the user turns it on from the row under the Today heading, which also asks the
+  system for notification permission and offers a test notification. It runs for the whole session
+  (also while the desktop window is hidden in the tray) and never creates data. It is not
+  per-task: due dates carry no time of day, so there is nothing to schedule more finely, and the
+  Android shell has no notification support. The preference lives in the installation
+  (`localStorage`), not in the database, so it is not shared between devices.
 - **Global shortcut.** `n` works inside the app only. A system-wide capture shortcut needs a
   narrow desktop capability and is not part of this change.

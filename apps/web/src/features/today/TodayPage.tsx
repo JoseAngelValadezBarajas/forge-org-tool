@@ -8,6 +8,7 @@ import {
   FeedbackStateV2,
   TextInputV2,
 } from '@corefoundry-labs/forge-ui';
+import { ReminderSettings } from './ReminderSettings';
 import styles from './TodayPage.module.css';
 import { dueLabel, TODAY_SECTIONS, type TodayItem } from './todayModel';
 import { useTodayController } from './useTodayController';
@@ -87,6 +88,8 @@ export function TodayPage() {
           </span>
         )}
       </form>
+
+      <ReminderSettings />
 
       {error && (
         <AlertV2 tone="error">

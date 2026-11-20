@@ -1,0 +1,17 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--forge-space-3, 12px);
+  color: var(--forge-text-muted);
+  font-size: 13px;
+}
+
+.time {
+  width: 120px;
+}
+
+.message {
+  color: var(--forge-text-muted);
+  font-size: 12px;
+}
