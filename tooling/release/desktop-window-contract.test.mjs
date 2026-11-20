@@ -233,9 +233,11 @@ test('installed WebView UI Automation supports stateful accessible buttons', asy
 test('installed acceptance opens Project Overview and follows its board link', async () => {
   const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
 
+  assert.match(smoke, /Edit\) 'Capture a task'/, 'the installed app lands on Today');
   assert.match(
     smoke,
-    /\$projectName = [\s\S]*?Invoke-ForgeElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Button\) 'New project'[\s\S]*?\$projectInput = Wait-ForgeAutomationElement \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Project name'/,
+    /\$workspaceName = 'Personal'[\s\S]*?\$projectName = 'Inbox'/,
+    'Today creates the Personal workspace and the Inbox project on first use',
   );
   assert.match(
     smoke,
@@ -252,21 +254,26 @@ test('installed acceptance opens Project Overview and follows its board link', a
   assert.doesNotMatch(smoke, /Select-ForgeOption \$root 'Epic for new feature'/);
 });
 
-test('installed acceptance follows the current workspace landing state and verifies workspace persistence in SQLite', async () => {
+test('installed acceptance follows the Today landing state and verifies capture persistence in SQLite', async () => {
   const smoke = await readFile('tooling/release/desktop-nsis-smoke.ps1', 'utf8');
   const databaseVerifier = await readFile('tooling/release/verify-desktop-smoke-db.py', 'utf8');
 
   assert.match(
     smoke,
-    /Create Workspace'[\s\S]*?\[System\.Windows\.Automation\.ControlType\]::Button\) 'Create your first project'/,
-    'workspace creation should be verified by the product landing action rather than a workspace label that is not rendered',
+    /Set-ForgeElementValue \$root \(\[System\.Windows\.Automation\.ControlType\]::Edit\) 'Capture a task' "\$taskName tomorrow"[\s\S]*?ControlType\]::Button\) 'Add'[\s\S]*?ControlType\]::Hyperlink\) \$taskName[\s\S]*?Assert-ForgeSqliteRecord \$databasePath 'features' \$taskName/,
+    'a task captured on Today is verified in SQLite',
+  );
+  assert.doesNotMatch(
+    smoke,
+    /'No workspaces yet'|'Create Workspace'/,
+    'Today replaces the first-run workspace form',
   );
   assert.match(smoke, /function Assert-ForgeSqliteRecord/);
   assert.match(smoke, /verify-desktop-smoke-db\.py \$databasePath \$table \$name/);
   assert.match(databaseVerifier, /SELECT COUNT\(\*\) FROM \{table\} WHERE \{column\} = \?/);
   assert.match(
     databaseVerifier,
-    /"workspaces": \("workspaces", "name"\),\s*"projects": \("projects", "name"\)/,
+    /"workspaces": \("workspaces", "name"\),\s*"projects": \("projects", "name"\),\s*"features": \("features", "title"\)/,
   );
   assert.match(databaseVerifier, /database_path\.is_file\(\)/);
   assert.match(smoke, /Assert-ForgeSqliteRecord \$databasePath 'workspaces' \$workspaceName/);

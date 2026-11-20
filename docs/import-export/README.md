@@ -17,3 +17,7 @@ Only PNG, JPEG and WebP images are supported. ZIP package v2 contains a UTF-8 `m
 Maintain fixtures for valid v1 and v2 round trips; unknown versions; malformed JSON; invalid schema; duplicate identifiers; missing/cross-project references; cross-workspace tags; dependency cycles; stale fingerprints; corrupt checksums; unsupported image formats; oversize assets; traversal paths; symlink entries; and interrupted staged writes. Tests use synthetic temporary data only.
 
 See [the product contract](../product/mvp-1.0.md) and [acceptance traceability](../quality/mvp-1.0-acceptance.md).
+
+## Known limit: due dates
+
+Work item due dates (`due_date`, used by Today) are not part of the transfer document or the package manifest yet. Export and re-import keeps every other field and drops the deadlines. See [Today](../product/today.md#known-limits).

@@ -192,7 +192,10 @@ describe('Project Overview route', () => {
       'href',
       '/transfer/w1/p1',
     );
-    expect(screen.getByRole('link', { name: 'Back to Organization' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Back to Organization' })).toHaveAttribute(
+      'href',
+      '/overview',
+    );
     expect(organizationApi.getProject).toHaveBeenCalledWith('w1', 'p1');
     expect(organizationApi.planningOverview).toHaveBeenCalledWith('w1', 'p1');
     for (const item of features) {
@@ -405,7 +408,10 @@ describe('Project Overview route', () => {
     renderOverview();
     await screen.findByRole('heading', { name: 'Atlas' });
     const nav = within(screen.getByRole('navigation', { name: 'Project navigation' }));
-    expect(nav.getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute('href', '/');
+    expect(nav.getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute(
+      'href',
+      '/overview',
+    );
     expect(nav.getByRole('link', { name: 'Atlas' })).toHaveAttribute('href', '/projects/w1/p1');
     const breadcrumb = within(screen.getByRole('navigation', { name: 'Breadcrumb' }));
     expect(breadcrumb.getByRole('link', { name: 'Project board' })).toHaveAttribute(
@@ -421,7 +427,7 @@ describe('Project Overview route', () => {
       unassigned_features: [],
     });
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={['/overview']}>
         <App />
       </MemoryRouter>,
     );

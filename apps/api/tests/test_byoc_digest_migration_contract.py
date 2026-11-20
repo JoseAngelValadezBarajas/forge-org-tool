@@ -60,3 +60,28 @@ def test_search_path_hardening_rollback_restores_the_0004_state() -> None:
 
     for function in TRANSFER_FUNCTIONS:
         assert f'alter function {function} set search_path = public, extensions;' in normalized
+
+
+DUE_DATE = ROOT / 'supabase' / 'migrations' / '20261119_byoc_0006.sql'
+DUE_DATE_ROLLBACK = ROOT / 'supabase' / 'rollback' / '20261119_byoc_0006.sql'
+
+
+def test_due_date_migration_adds_a_nullable_column_without_rewriting_data() -> None:
+    sql = DUE_DATE.read_text(encoding='utf-8').lower()
+    normalized = re.sub(r'\s+', ' ', sql)
+
+    assert 'begin;' in sql
+    assert 'commit;' in sql
+    assert 'from the installed application' in sql
+    assert 'alter table public.features add column if not exists due_date date;' in normalized
+    assert 'not null' not in normalized.split('due_date date')[1].split(';')[0]
+    for destructive in ('drop ', 'delete ', 'update '):
+        assert destructive not in normalized
+
+
+def test_due_date_rollback_drops_only_the_column_and_its_index() -> None:
+    sql = DUE_DATE_ROLLBACK.read_text(encoding='utf-8').lower()
+    normalized = re.sub(r'\s+', ' ', sql)
+
+    assert 'drop index if exists public.features_due_date_idx;' in normalized
+    assert 'alter table public.features drop column if exists due_date;' in normalized

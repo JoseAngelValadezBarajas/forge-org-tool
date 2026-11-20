@@ -57,7 +57,7 @@ def test_concurrent_first_connections_serialize_database_migrations(
     with ThreadPoolExecutor(max_workers=8) as pool:
         versions = list(pool.map(lambda _: open_database(), range(8)))
 
-    assert versions == [5] * 8
+    assert versions == [6] * 8
     assert maximum_active_migrations == 1
 
 
@@ -76,7 +76,7 @@ def test_current_database_does_not_rerun_schema_migrations_on_each_connection(
 
     monkeypatch.setattr(runner, 'migrate', unexpected_migration)
     second = connect()
-    assert second.execute('PRAGMA user_version').fetchone()[0] == 5
+    assert second.execute('PRAGMA user_version').fetchone()[0] == 6
     second.close()
     monkeypatch.setattr(runner, 'migrate', original_migrate)
 
@@ -190,7 +190,7 @@ def test_v5_normalizes_post_v3_default_rows_with_backup_and_without_deduplicatin
         ('failed-create-b', 'backlog'),
     ]
     assert next(row['archived_at'] for row in rows if row['id'] == 'archived') == 'archive-date'
-    assert upgraded.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] == 5
+    assert upgraded.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] == 6
     upgraded.close()
 
     backups = list(tmp_path.glob('post-v3-legacy-default.db.pre-migration-*.bak'))
@@ -220,8 +220,8 @@ def test_fresh_database_records_explicit_migration_versions(tmp_path, monkeypatc
             'SELECT version FROM schema_migrations ORDER BY version'
         ).fetchall()
     ]
-    assert versions == [1, 2, 3, 4, 5]
-    assert connection.execute('PRAGMA user_version').fetchone()[0] == 5
+    assert versions == [1, 2, 3, 4, 5, 6]
+    assert connection.execute('PRAGMA user_version').fetchone()[0] == 6
     assert 'archived_at' in {
         row[1] for row in connection.execute('PRAGMA table_info(workspaces)').fetchall()
     }
@@ -358,7 +358,7 @@ def test_previous_synthetic_schema_is_upgraded_without_losing_records(tmp_path, 
         connection.execute("SELECT name FROM workspaces WHERE id = 'workspace-1'").fetchone()[0]
         == 'Synthetic workspace'
     )
-    assert connection.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] == 5
+    assert connection.execute('SELECT max(version) FROM schema_migrations').fetchone()[0] == 6
     assert (
         connection.execute(
             "SELECT archived_at FROM workspaces WHERE id = 'workspace-1'"
@@ -377,7 +377,7 @@ def test_previous_synthetic_schema_is_upgraded_without_losing_records(tmp_path, 
     backup.close()
     connection.close()
     replayed = connect()
-    assert replayed.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 5
+    assert replayed.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 6
     assert len(list(tmp_path.glob('upgrade.db.pre-migration-*.bak'))) == 1
     replayed.close()
 
@@ -417,7 +417,7 @@ def test_interrupted_backup_is_cleaned_and_migration_can_retry(tmp_path, monkeyp
 
     monkeypatch.setattr(Path, 'replace', original_replace)
     connection = connect()
-    assert connection.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 5
+    assert connection.execute('SELECT max(version) FROM schema_version').fetchone()[0] == 6
     connection.close()
     assert len(list(tmp_path.glob('retry.db.pre-migration-*.bak'))) == 1
 
@@ -447,3 +447,18 @@ def test_unknown_future_schema_is_rejected_without_mutation(tmp_path, monkeypatc
         is None
     )
     check.close()
+
+
+def test_due_date_migration_is_idempotent_and_keeps_existing_rows():
+    migration = import_module('forge_org.infrastructure.migrations.v0006_feature_due_date')
+    assert migration.VERSION == 6
+    connection = sqlite3.connect(':memory:')
+    connection.execute('CREATE TABLE features (id TEXT PRIMARY KEY, project_id TEXT, title TEXT)')
+    connection.execute("INSERT INTO features VALUES ('f1', 'p1', 'Existing')")
+
+    migration.upgrade(connection)
+    migration.upgrade(connection)
+
+    columns = [row[1] for row in connection.execute('PRAGMA table_info(features)')]
+    assert columns.count('due_date') == 1
+    assert connection.execute('SELECT id, due_date FROM features').fetchall() == [('f1', None)]

@@ -47,7 +47,7 @@ export function WorkspaceSettingsPage() {
     return (
       <CardV2 variant="outlined">
         <AlertV2 tone="error">{error || 'Workspace not found.'}</AlertV2>
-        <Link to="/">Back to Projects</Link>
+        <Link to="/overview">Back to Projects</Link>
       </CardV2>
     );
   }
@@ -268,7 +268,7 @@ export function WorkspaceSettingsPage() {
           </ButtonV2>
         </div>
       </DialogV2>
-      <Link className={styles.backLink} to="/">
+      <Link className={styles.backLink} to="/overview">
         Back to Projects
       </Link>
     </div>

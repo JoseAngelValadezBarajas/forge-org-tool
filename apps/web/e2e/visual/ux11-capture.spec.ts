@@ -306,7 +306,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
 
   if (info.project.name === 'chromium-mobile') {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/');
+    await page.goto('/overview');
     await selectWorkspace(page, 'Personal');
     await page
       .getByRole('banner', { name: 'Workspace controls' })
@@ -415,7 +415,7 @@ test('captures the ten UX 1.1 targets at desktop and mobile viewports', async ({
   }
 
   await page.setViewportSize({ width: 1440, height: 960 });
-  await page.goto('/');
+  await page.goto('/overview');
   await selectWorkspace(page, 'Personal');
   await page.getByRole('combobox', { name: 'Appearance' }).selectOption('dark');
   await expect(

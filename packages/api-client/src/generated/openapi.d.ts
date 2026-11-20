@@ -823,6 +823,8 @@ export interface components {
             bug_severity?: ("low" | "medium" | "high" | "critical") | null;
             /** Description */
             description?: string | null;
+            /** Due Date */
+            due_date?: string | null;
             /** Epic Id */
             epic_id?: string | null;
             /** Expected Result */
@@ -867,6 +869,8 @@ export interface components {
             created_at: string;
             /** Description */
             description: string | null;
+            /** Due Date */
+            due_date?: string | null;
             /** Epic Id */
             epic_id: string | null;
             /** Expected Result */
@@ -913,6 +917,8 @@ export interface components {
             clear_epic: boolean;
             /** Description */
             description?: string | null;
+            /** Due Date */
+            due_date?: string | null;
             /** Epic Id */
             epic_id?: string | null;
             /** Expected Result */

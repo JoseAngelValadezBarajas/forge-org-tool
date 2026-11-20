@@ -110,6 +110,7 @@ export const planningCapability = {
         | 'actual_result'
         | 'tags'
         | 'notes'
+        | 'due_date'
       >
     >,
   ) =>
@@ -137,6 +138,7 @@ export const planningCapability = {
         | 'actual_result'
         | 'tags'
         | 'notes'
+        | 'due_date'
       >
     > & { clear_epic?: boolean },
   ) =>

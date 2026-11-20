@@ -18,7 +18,7 @@ export function Breadcrumbs({
       <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
         <ol>
           <li>
-            <Link to="/">Workspace</Link>
+            <Link to="/overview">Workspace</Link>
           </li>
           <li>
             <span aria-current="page">Manage workspaces</span>
@@ -32,7 +32,7 @@ export function Breadcrumbs({
       <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
         <ol>
           <li>
-            <Link to="/">Workspace</Link>
+            <Link to="/overview">Workspace</Link>
           </li>
           <li>
             <span aria-current="page">Settings</span>
@@ -49,7 +49,7 @@ export function Breadcrumbs({
   const isEpic = section === 'planning' && fourth === 'epics';
   const isWorkItem = section === 'planning' && fourth === 'features';
   const crumbs = [
-    { label: isMobileEpicBoard ? (workspaceName ?? 'Workspace') : 'Workspace', href: '/' },
+    { label: isMobileEpicBoard ? (workspaceName ?? 'Workspace') : 'Workspace', href: '/overview' },
     {
       label: isMobileEpicBoard ? (projectName ?? 'Project') : 'Project board',
       href: `/planning/${context.workspaceId}/${context.projectId}`,

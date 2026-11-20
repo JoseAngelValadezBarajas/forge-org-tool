@@ -53,7 +53,7 @@ function ProjectOverview({ workspaceId, projectId }: { workspaceId: string; proj
     <div className={styles.stack}>
       <SectionHeader title="Project Overview" eyebrow="FORGE / Organization" />
       <nav aria-label="Project sections" className={styles.actions}>
-        <Link to="/">Back to Organization</Link>
+        <Link to="/overview">Back to Organization</Link>
         <Link to={`/planning/${workspaceId}/${projectId}`}>Open planning board</Link>
         <Link to={`/transfer/${workspaceId}/${projectId}`}>Transfer / export</Link>
         <Link to={`/transfer/${workspaceId}/${projectId}/epics/${projectId}`}>Import Epic</Link>
