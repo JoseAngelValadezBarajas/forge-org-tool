@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Task } from '@forge-org/api-client';
 import { ButtonV2, CheckboxV2, SelectV2, TextInputV2 } from '@corefoundry-labs/forge-ui';
 import styles from './TaskItem.module.css';
@@ -32,6 +32,10 @@ export function TaskItem({
 }: TaskItemProps) {
   const [renaming, setRenaming] = useState(false);
   const [draft, setDraft] = useState(task.title);
+  const titleInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (renaming) titleInput.current?.focus();
+  }, [renaming]);
   const finishRename = (save: boolean) => {
     setRenaming(false);
     if (save && onRename) onRename(draft);
@@ -62,7 +66,7 @@ export function TaskItem({
       {renaming ? (
         <TextInputV2
           size="sm"
-          autoFocus
+          ref={titleInput}
           aria-label={`Title for ${task.title}`}
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
