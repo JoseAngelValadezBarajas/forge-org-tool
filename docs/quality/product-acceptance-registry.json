@@ -1,17 +1,43 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": {
     "file_key": "r10szKLgiIPVi2NBmbjTpm",
     "description": "Live Figma get_metadata, active pages 04, 10, 12, 14, 16, 17 and 18"
   },
   "frame_count": 119,
   "status_counts": {
-    "AUTOMATED_PASS": 26,
+    "AUTOMATED_PASS": 28,
     "AUTOMATED_FAIL": 0,
-    "NOT_IMPLEMENTED_PRODUCT_GAP": 69,
+    "NOT_IMPLEMENTED_PRODUCT_GAP": 67,
     "DESIGN_REFERENCE_ONLY": 12,
     "MANUAL_REVIEW_REQUIRED": 11,
     "BLOCKED_WITH_REASON": 1
+  },
+  "track_counts": {
+    "active": {
+      "AUTOMATED_PASS": 28,
+      "AUTOMATED_FAIL": 0,
+      "NOT_IMPLEMENTED_PRODUCT_GAP": 4,
+      "DESIGN_REFERENCE_ONLY": 4,
+      "MANUAL_REVIEW_REQUIRED": 8,
+      "BLOCKED_WITH_REASON": 1
+    },
+    "history": {
+      "AUTOMATED_PASS": 0,
+      "AUTOMATED_FAIL": 0,
+      "NOT_IMPLEMENTED_PRODUCT_GAP": 62,
+      "DESIGN_REFERENCE_ONLY": 8,
+      "MANUAL_REVIEW_REQUIRED": 3,
+      "BLOCKED_WITH_REASON": 0
+    },
+    "future": {
+      "AUTOMATED_PASS": 0,
+      "AUTOMATED_FAIL": 0,
+      "NOT_IMPLEMENTED_PRODUCT_GAP": 1,
+      "DESIGN_REFERENCE_ONLY": 0,
+      "MANUAL_REVIEW_REQUIRED": 0,
+      "BLOCKED_WITH_REASON": 0
+    }
   },
   "frames": [
     {
@@ -27,6 +53,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile UI journey and API-backed persistence passed; this is behavioral automation, not human visual parity certification.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -42,6 +69,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile creation and persisted planning records passed; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -57,6 +85,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile filtering and status transition passed with persisted API assertions; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -72,6 +101,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Desktop and mobile task, criterion, ordering, and persistence journey passed; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -87,6 +117,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "PA-RUN-01 and PA-HANDOFF-01 passed on chromium-desktop and chromium-mobile with API-backed persistence assertions; behavior only, not human Figma parity certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "navigation-and-core-reference-frames"
     },
     {
@@ -102,6 +133,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The integrated 50/50 desktop and responsive-viewport Playwright run passed the Release Gate and Delivery journeys; the former mobile pointer interception is no longer reproduced. Automated behavior evidence does not certify native visual parity. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "navigation-and-core-reference-frames"
     },
     {
@@ -117,6 +149,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -132,6 +165,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -147,6 +181,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -162,6 +197,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -177,6 +213,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -192,6 +229,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -207,6 +245,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The current focused test does not assert this empty-state composition.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -222,6 +261,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The current focused test covers explicit disconnect, not an unavailable filesystem path or its recovery interaction.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -237,6 +277,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "A mobile viewport project exists, but this focused test does not capture or assert this dedicated summary composition.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -252,6 +293,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma frame name identifies this as a legacy component catalog reference, not a product route.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -267,6 +309,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -282,6 +325,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -297,6 +341,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -312,6 +357,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -327,6 +373,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -342,6 +389,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -357,6 +405,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -372,6 +421,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -387,6 +437,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -402,6 +453,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -417,6 +469,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -432,6 +485,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -447,6 +501,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -462,6 +517,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -477,6 +533,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Current code exposes three fixed verification rules and no rule-configuration workflow.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -492,6 +549,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -507,6 +565,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -522,6 +581,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -537,6 +597,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -552,6 +613,7 @@
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile, including selecting a real downloaded project document for preview; behavior only, not native Desktop certification.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -570,6 +632,7 @@
       ],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 verifies JSON preview/commit and PA-TRN-002 verifies ZIP package preview/commit with its Bug screenshot in chromium-desktop and chromium-mobile.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -585,6 +648,7 @@
       "evidence": [],
       "status": "BLOCKED_WITH_REASON",
       "notes": "Current Windows UI Automation verifies installed startup, workspace/project CRUD, SQLite persistence, restart, single-instance activation and cleanup, but does not exercise the native transfer bridge failure or recovery flow.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -600,6 +664,7 @@
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile and validated the actual downloaded JSON bytes and schema.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -611,10 +676,11 @@
       "route": "/transfer/{workspaceId}/{projectId}",
       "user_action": "Finish an import and open the imported Project or begin another import.",
       "expected_result": "The completion state provides a usable next action for the newly created Project or another import.",
-      "test_ids": [],
-      "evidence": [],
-      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The current UI confirms the imported project ID and planning data, but does not expose the Figma Open project or Import another actions.",
+      "test_ids": ["PA-TRN-004"],
+      "evidence": ["apps/web/e2e/transfer/import-completion.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "The finished import lists the records created and offers Open project and Import another (PA-TRN-004). Behavioral automation, not human visual parity.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -633,6 +699,7 @@
       ],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 verifies downloaded JSON and PA-TRN-002 verifies downloaded ZIP bytes contain the stored screenshot and the complete round trip in both Chromium projects.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -648,6 +715,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "The frame is labeled UX-00 prototype and explicitly says its interactions are simulated; Project Overview behavior is separately covered by PA-ORG-002 without claiming this static composition is implemented.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -663,6 +731,7 @@
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "PA-TRN-001 verifies unsupported-schema feedback, no partial project writes, recovery to a valid preview and malformed-JSON feedback in desktop and mobile Chromium.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -681,6 +750,7 @@
       ],
       "status": "AUTOMATED_PASS",
       "notes": "Workspace list and project search/archived visibility behavior passed on desktop and mobile. PA-A11Y-01 verifies theme persistence, keyboard command navigation, focus restoration, and WCAG 2.1 A/AA axe scans; not visual Figma certification.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -696,6 +766,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Fresh-database first-use workspace and project creation passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -711,6 +782,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "The current route is a planning board, not this separate Project Home composition.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -726,6 +798,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "Epic creation and summary behavior passed, but this frame suggests an Epic explorer and the product has no separate Epic detail route; no visual parity is claimed.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -741,6 +814,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Search and status filtering passed in desktop/mobile acceptance journeys; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -756,6 +830,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Feature creation and Epic assignment passed in desktop/mobile journeys; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -771,6 +846,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Feature detail task/criterion operations and persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -786,6 +862,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Manual Feature status transition passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -801,6 +878,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Project archive/restore passed automated checks; workspace administration shown by this frame is not implemented. No full-frame parity is claimed.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -816,6 +894,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "No workspace/project delete workflow is present in the inspected Organization UI; deletion is not fabricated.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -831,6 +910,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Board status movement passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -846,6 +926,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Project archive/restore and API persistence passed on desktop and mobile; the frame's confirmation layout was not visual-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -861,6 +942,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "First-use workspace creation passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -876,6 +958,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The journey selects its created workspace, but broader workspace management/editing shown in the frame is not exposed; no full-frame parity is claimed.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -891,6 +974,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Project search, archived visibility, restore, and persistence passed on desktop and mobile; not visual Figma certification.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -906,6 +990,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Project creation is implemented and covered in the authored journey, but choosing an origin is not an available Organization control.",
+      "track": "future",
       "domain": "organization-planning-readiness"
     },
     {
@@ -921,6 +1006,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Current code renders Epic summaries and linked Features in the planning board; no separate Epic detail route exists.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -936,6 +1022,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "Feature editing exists in the UI but is not exercised by this shard's authored E2E journeys.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -951,6 +1038,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Task creation, status change, ordering, and SQLite-backed persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -966,6 +1054,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Acceptance criterion creation and persisted API behavior passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -981,6 +1070,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Self-dependency no-op and valid dependency persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -996,6 +1086,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "The inspected Organization/Planning/Readiness feature routes do not expose this global command/search screen.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1011,6 +1102,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Empty search and restoration of search results passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1026,6 +1118,7 @@
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Project archiving exists and is covered by the authored test; the Figma confirmation step is absent and is not fabricated.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1041,6 +1134,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "No Workspace edit form or management route is exposed by the inspected Organization UI.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1056,6 +1150,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "Retry control exists and component behavior has unit coverage, but no executable browser recovery journey is included in this shard.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1071,6 +1166,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma flow map is reference material, not a single executable product screen.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1082,10 +1178,11 @@
       "route": null,
       "user_action": null,
       "expected_result": null,
-      "test_ids": [],
-      "evidence": [],
-      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Current Feature detail supports Task creation, status, and ordering, but no Task deletion action.",
+      "test_ids": ["PA-TASK-001"],
+      "evidence": ["apps/web/e2e/planning/task-editing.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "Task rename and delete with Undo pass through the real API in desktop and mobile (PA-TASK-001). The \"proposal\" variant of the frame belongs to a retired area. Behavioral automation, not human visual parity.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1101,6 +1198,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1116,6 +1214,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1131,6 +1230,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1146,6 +1246,7 @@
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
       "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1161,6 +1262,7 @@
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Task reordering passed through UI and API on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1176,6 +1278,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Decision creation, linking, accepted state, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1191,6 +1294,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Decision acceptance and initial revision history passed on desktop/mobile. A reproduced case mismatch was fixed so Accept disappears for lowercase API status; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1206,6 +1310,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Invariant creation, acknowledgement, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1221,6 +1326,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Readiness outcomes and the non-verification boundary passed on desktop and mobile; automated behavior only, not visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1236,6 +1342,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The inspected UI evaluates a live preview and does not expose a saved evaluation snapshot/history workflow for stale snapshot review.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1251,6 +1358,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The current Readiness UI creates and accepts Decisions but does not expose decision replacement/editing.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1266,6 +1374,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "No Invariant retirement control is exposed in the inspected Readiness UI.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1281,6 +1390,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "READY_TO_START outcome was asserted after criterion, accepted decision, and invariant acknowledgement on desktop and mobile; no visual parity claim. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1296,6 +1406,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The authored journey opens history but only verifies the initial revision; a superseded historical revision is not created or certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1311,6 +1422,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Invariant form, create/acknowledge actions, and SQLite-backed API persistence passed on desktop and mobile; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1326,6 +1438,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Current UI renders an Invariant card but does not expose a separate detail/edit/retire route.",
+      "track": "history",
       "domain": "organization-planning-readiness"
     },
     {
@@ -1341,6 +1454,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma footer identifies this as a UX guide whose links connect editable Figma screens; do not fabricate an application hub.",
+      "track": "history",
       "domain": "navigation-and-core-reference-frames"
     },
     {
@@ -1356,6 +1470,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1371,6 +1486,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1386,6 +1502,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1401,6 +1518,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1416,6 +1534,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1431,6 +1550,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1446,6 +1566,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1461,6 +1582,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1476,6 +1598,7 @@
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Focused Playwright run passed on chromium-desktop and chromium-mobile, including export/import and invalid-document no-partial-write assertions. This is automated behavior evidence, not human Figma certification.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1491,6 +1614,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1506,6 +1630,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma text identifies this confirmation/post-action composition as simulated; it is treated as a design reference rather than a committed product requirement. The current repository page disconnects directly.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1521,6 +1646,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Fingerprint change and prior snapshot immutability passed in both Chromium projects; no dedicated stale badge is asserted. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1536,6 +1662,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1551,6 +1678,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1566,6 +1694,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1581,6 +1710,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1596,6 +1726,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma labels the error presentation as a simulation of optimistic revision control; no matching context-changed Handoff state is asserted by the current product UI.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1611,6 +1742,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1626,6 +1758,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1641,6 +1774,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1656,6 +1790,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1671,6 +1806,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1686,6 +1822,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1701,6 +1838,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1716,6 +1854,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1731,6 +1870,7 @@
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
       "notes": "Malformed JSON and invalid schema, fingerprint, reference and cycle inputs passed without partial writes on desktop and the responsive viewport.",
+      "track": "active",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1746,6 +1886,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma footer explicitly says this prototype result has no persistence or real transfer; it is not claimed as an application workflow test.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1761,6 +1902,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1776,6 +1918,7 @@
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
       "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history",
       "domain": "delivery-transfer-desktop"
     },
     {
@@ -1791,6 +1934,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma labels this a UX demonstration with no data mutation; it is not treated as evidence of a real disconnect operation.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     },
     {
@@ -1806,6 +1950,7 @@
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
       "notes": "Figma labels this a UX demonstration with no data mutation; the actual snapshot-save workflow is covered separately by executable frames and PA-CONTEXT-01.",
+      "track": "history",
       "domain": "repositories-context-workbench"
     }
   ]

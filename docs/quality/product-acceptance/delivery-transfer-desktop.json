@@ -14,7 +14,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The full isolated acceptance run passed Delivery overview and related behavior on desktop and the 390px responsive viewport; no human Figma visual certification is implied. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "76:97",
@@ -28,7 +29,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Evidence provenance, invalidation and inventory assertions passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "76:176",
@@ -42,7 +44,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Evidence was recorded through the UI and verified against API provenance in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "76:250",
@@ -56,7 +59,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The UX-02 journey opened the evidence detail route; the acceptance journey verified invalidation through UI and API on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "77:118",
@@ -70,7 +74,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Preview, evaluation, blockers, fingerprints and saved verification history passed in the full isolated desktop and responsive viewport acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "77:207",
@@ -84,7 +89,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Current code exposes three fixed verification rules and no rule-configuration workflow."
+      "notes": "Current code exposes three fixed verification rules and no rule-configuration workflow.",
+      "track": "history"
     },
     {
       "figma_node_id": "77:278",
@@ -98,7 +104,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The saved verification result and trace route were opened and asserted in the full isolated desktop and responsive viewport journey. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "77:347",
@@ -112,7 +119,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Candidate creation, gate evaluation and freeze passed through the UI in the desktop and responsive viewport journeys. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "78:234",
@@ -126,7 +134,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Blocked-to-pass gate progression and persisted gate evaluation passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "78:322",
@@ -140,7 +149,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Manifest save, JSON/Markdown downloads and NOT_PUBLISHED semantics passed in the full isolated desktop and responsive viewport run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "87:3",
@@ -154,7 +164,8 @@
       "test_ids": ["PA-TRN-001"],
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile, including selecting a real downloaded project document for preview; behavior only, not native Desktop certification."
+      "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile, including selecting a real downloaded project document for preview; behavior only, not native Desktop certification.",
+      "track": "active"
     },
     {
       "figma_node_id": "87:84",
@@ -171,7 +182,8 @@
         "apps/web/e2e/transfer/package-acceptance.spec.ts"
       ],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 verifies JSON preview/commit and PA-TRN-002 verifies ZIP package preview/commit with its Bug screenshot in chromium-desktop and chromium-mobile."
+      "notes": "PA-TRN-001 verifies JSON preview/commit and PA-TRN-002 verifies ZIP package preview/commit with its Bug screenshot in chromium-desktop and chromium-mobile.",
+      "track": "active"
     },
     {
       "figma_node_id": "87:187",
@@ -185,7 +197,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "BLOCKED_WITH_REASON",
-      "notes": "Current Windows UI Automation verifies installed startup, workspace/project CRUD, SQLite persistence, restart, single-instance activation and cleanup, but does not exercise the native transfer bridge failure or recovery flow."
+      "notes": "Current Windows UI Automation verifies installed startup, workspace/project CRUD, SQLite persistence, restart, single-instance activation and cleanup, but does not exercise the native transfer bridge failure or recovery flow.",
+      "track": "active"
     },
     {
       "figma_node_id": "87:256",
@@ -199,7 +212,8 @@
       "test_ids": ["PA-TRN-001"],
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile and validated the actual downloaded JSON bytes and schema."
+      "notes": "PA-TRN-001 passed in chromium-desktop and chromium-mobile and validated the actual downloaded JSON bytes and schema.",
+      "track": "active"
     },
     {
       "figma_node_id": "305:127",
@@ -210,10 +224,11 @@
       "route": "/transfer/{workspaceId}/{projectId}",
       "user_action": "Finish an import and open the imported Project or begin another import.",
       "expected_result": "The completion state provides a usable next action for the newly created Project or another import.",
-      "test_ids": [],
-      "evidence": [],
-      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The current UI confirms the imported project ID and planning data, but does not expose the Figma Open project or Import another actions."
+      "test_ids": ["PA-TRN-004"],
+      "evidence": ["apps/web/e2e/transfer/import-completion.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "The finished import lists the records created and offers Open project and Import another (PA-TRN-004). Behavioral automation, not human visual parity.",
+      "track": "active"
     },
     {
       "figma_node_id": "305:230",
@@ -230,7 +245,8 @@
         "apps/web/e2e/transfer/package-acceptance.spec.ts"
       ],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 verifies downloaded JSON and PA-TRN-002 verifies downloaded ZIP bytes contain the stored screenshot and the complete round trip in both Chromium projects."
+      "notes": "PA-TRN-001 verifies downloaded JSON and PA-TRN-002 verifies downloaded ZIP bytes contain the stored screenshot and the complete round trip in both Chromium projects.",
+      "track": "active"
     },
     {
       "figma_node_id": "309:218",
@@ -244,7 +260,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "The frame is labeled UX-00 prototype and explicitly says its interactions are simulated; Project Overview behavior is separately covered by PA-ORG-002 without claiming this static composition is implemented."
+      "notes": "The frame is labeled UX-00 prototype and explicitly says its interactions are simulated; Project Overview behavior is separately covered by PA-ORG-002 without claiming this static composition is implemented.",
+      "track": "active"
     },
     {
       "figma_node_id": "314:199",
@@ -258,7 +275,8 @@
       "test_ids": ["PA-TRN-001"],
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "PA-TRN-001 verifies unsupported-schema feedback, no partial project writes, recovery to a valid preview and malformed-JSON feedback in desktop and mobile Chromium."
+      "notes": "PA-TRN-001 verifies unsupported-schema feedback, no partial project writes, recovery to a valid preview and malformed-JSON feedback in desktop and mobile Chromium.",
+      "track": "active"
     },
     {
       "figma_node_id": "133:335",
@@ -272,7 +290,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Evidence inventory, provenance and invalidation behavior passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:391",
@@ -286,7 +305,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Verification and blocked-check journey passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:445",
@@ -300,7 +320,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Release candidate gate interactions passed on desktop and the 390px responsive viewport in the full isolated acceptance run. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:500",
@@ -314,7 +335,8 @@
       "test_ids": ["PA-TRN-001"],
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Focused Playwright run passed on chromium-desktop and chromium-mobile, including export/import and invalid-document no-partial-write assertions. This is automated behavior evidence, not human Figma certification."
+      "notes": "Focused Playwright run passed on chromium-desktop and chromium-mobile, including export/import and invalid-document no-partial-write assertions. This is automated behavior evidence, not human Figma certification.",
+      "track": "active"
     },
     {
       "figma_node_id": "142:39",
@@ -328,7 +350,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Reported evidence creation and API provenance assertions passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:114",
@@ -342,7 +365,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The UX-02 journey opened evidence detail, and the acceptance journey verified invalidation state on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:183",
@@ -356,7 +380,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Preview, evaluation and saved verification history passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:252",
@@ -370,7 +395,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The blocked outcome and missing VERIFIED-evidence blocker passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:321",
@@ -384,7 +410,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Candidate creation through the UI passed on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:390",
@@ -398,7 +425,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Freeze and persisted candidate revision assertions passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:459",
@@ -412,7 +440,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Gate outcome and blockers were evaluated and asserted on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:528",
@@ -426,7 +455,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Manifest save and downloaded JSON/Markdown bytes with NOT_PUBLISHED status passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "142:597",
@@ -440,7 +470,8 @@
       "test_ids": ["PA-TRN-001"],
       "evidence": ["apps/web/e2e/transfer/transfer-acceptance.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Malformed JSON and invalid schema, fingerprint, reference and cycle inputs passed without partial writes on desktop and the responsive viewport."
+      "notes": "Malformed JSON and invalid schema, fingerprint, reference and cycle inputs passed without partial writes on desktop and the responsive viewport.",
+      "track": "active"
     },
     {
       "figma_node_id": "143:119",
@@ -454,7 +485,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Invalidation state was asserted in the UI and API on desktop and the 390px responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "143:184",
@@ -468,7 +500,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Manifest downloads and NOT_PUBLISHED/non-deployment language passed on desktop and the responsive viewport. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     }
   ]
 }

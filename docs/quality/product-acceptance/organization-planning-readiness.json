@@ -14,7 +14,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Desktop and mobile UI journey and API-backed persistence passed; this is behavioral automation, not human visual parity certification."
+      "notes": "Desktop and mobile UI journey and API-backed persistence passed; this is behavioral automation, not human visual parity certification.",
+      "track": "active"
     },
     {
       "figma_node_id": "4:158",
@@ -28,7 +29,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Desktop and mobile creation and persisted planning records passed; visual Figma parity was not human-certified."
+      "notes": "Desktop and mobile creation and persisted planning records passed; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "4:271",
@@ -42,7 +44,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Desktop and mobile filtering and status transition passed with persisted API assertions; visual Figma parity was not human-certified."
+      "notes": "Desktop and mobile filtering and status transition passed with persisted API assertions; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "5:89",
@@ -56,7 +59,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Desktop and mobile task, criterion, ordering, and persistence journey passed; visual Figma parity was not human-certified."
+      "notes": "Desktop and mobile task, criterion, ordering, and persistence journey passed; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "98:3",
@@ -73,7 +77,8 @@
         "apps/web/e2e/accessibility/accessibility-and-shell.spec.ts"
       ],
       "status": "AUTOMATED_PASS",
-      "notes": "Workspace list and project search/archived visibility behavior passed on desktop and mobile. PA-A11Y-01 verifies theme persistence, keyboard command navigation, focus restoration, and WCAG 2.1 A/AA axe scans; not visual Figma certification."
+      "notes": "Workspace list and project search/archived visibility behavior passed on desktop and mobile. PA-A11Y-01 verifies theme persistence, keyboard command navigation, focus restoration, and WCAG 2.1 A/AA axe scans; not visual Figma certification.",
+      "track": "active"
     },
     {
       "figma_node_id": "98:82",
@@ -87,7 +92,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Fresh-database first-use workspace and project creation passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Fresh-database first-use workspace and project creation passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "98:166",
@@ -101,7 +107,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "The current route is a planning board, not this separate Project Home composition."
+      "notes": "The current route is a planning board, not this separate Project Home composition.",
+      "track": "active"
     },
     {
       "figma_node_id": "98:260",
@@ -115,7 +122,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "Epic creation and summary behavior passed, but this frame suggests an Epic explorer and the product has no separate Epic detail route; no visual parity is claimed."
+      "notes": "Epic creation and summary behavior passed, but this frame suggests an Epic explorer and the product has no separate Epic detail route; no visual parity is claimed.",
+      "track": "active"
     },
     {
       "figma_node_id": "98:352",
@@ -129,7 +137,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Search and status filtering passed in desktop/mobile acceptance journeys; visual Figma parity was not human-certified."
+      "notes": "Search and status filtering passed in desktop/mobile acceptance journeys; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "98:464",
@@ -143,7 +152,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Feature creation and Epic assignment passed in desktop/mobile journeys; visual Figma parity was not human-certified."
+      "notes": "Feature creation and Epic assignment passed in desktop/mobile journeys; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "101:20",
@@ -157,7 +167,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Feature detail task/criterion operations and persistence passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Feature detail task/criterion operations and persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "101:107",
@@ -171,7 +182,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Manual Feature status transition passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Manual Feature status transition passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "101:192",
@@ -185,7 +197,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Project archive/restore passed automated checks; workspace administration shown by this frame is not implemented. No full-frame parity is claimed."
+      "notes": "Project archive/restore passed automated checks; workspace administration shown by this frame is not implemented. No full-frame parity is claimed.",
+      "track": "active"
     },
     {
       "figma_node_id": "101:274",
@@ -199,7 +212,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "No workspace/project delete workflow is present in the inspected Organization UI; deletion is not fabricated."
+      "notes": "No workspace/project delete workflow is present in the inspected Organization UI; deletion is not fabricated.",
+      "track": "active"
     },
     {
       "figma_node_id": "101:349",
@@ -213,7 +227,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Board status movement passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Board status movement passed with API persistence checks on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "104:43",
@@ -227,7 +242,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Project archive/restore and API persistence passed on desktop and mobile; the frame's confirmation layout was not visual-certified."
+      "notes": "Project archive/restore and API persistence passed on desktop and mobile; the frame's confirmation layout was not visual-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:47",
@@ -241,7 +257,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "First-use workspace creation passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "First-use workspace creation passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:130",
@@ -255,7 +272,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The journey selects its created workspace, but broader workspace management/editing shown in the frame is not exposed; no full-frame parity is claimed."
+      "notes": "The journey selects its created workspace, but broader workspace management/editing shown in the frame is not exposed; no full-frame parity is claimed.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:213",
@@ -269,7 +287,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Project search, archived visibility, restore, and persistence passed on desktop and mobile; not visual Figma certification."
+      "notes": "Project search, archived visibility, restore, and persistence passed on desktop and mobile; not visual Figma certification.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:297",
@@ -283,7 +302,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Project creation is implemented and covered in the authored journey, but choosing an origin is not an available Organization control."
+      "notes": "Project creation is implemented and covered in the authored journey, but choosing an origin is not an available Organization control.",
+      "track": "future"
     },
     {
       "figma_node_id": "109:376",
@@ -297,7 +317,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Current code renders Epic summaries and linked Features in the planning board; no separate Epic detail route exists."
+      "notes": "Current code renders Epic summaries and linked Features in the planning board; no separate Epic detail route exists.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:463",
@@ -311,7 +332,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "Feature editing exists in the UI but is not exercised by this shard's authored E2E journeys."
+      "notes": "Feature editing exists in the UI but is not exercised by this shard's authored E2E journeys.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:555",
@@ -325,7 +347,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Task creation, status change, ordering, and SQLite-backed persistence passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Task creation, status change, ordering, and SQLite-backed persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:649",
@@ -339,7 +362,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Acceptance criterion creation and persisted API behavior passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Acceptance criterion creation and persisted API behavior passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:728",
@@ -353,7 +377,8 @@
       "test_ids": ["PA-PLAN-002"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Self-dependency no-op and valid dependency persistence passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Self-dependency no-op and valid dependency persistence passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:803",
@@ -367,7 +392,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "The inspected Organization/Planning/Readiness feature routes do not expose this global command/search screen."
+      "notes": "The inspected Organization/Planning/Readiness feature routes do not expose this global command/search screen.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:897",
@@ -381,7 +407,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Empty search and restoration of search results passed on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Empty search and restoration of search results passed on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:973",
@@ -395,7 +422,8 @@
       "test_ids": ["PA-ORG-001"],
       "evidence": ["apps/web/e2e/organization/organization-workflows.spec.ts"],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Project archiving exists and is covered by the authored test; the Figma confirmation step is absent and is not fabricated."
+      "notes": "Project archiving exists and is covered by the authored test; the Figma confirmation step is absent and is not fabricated.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:1045",
@@ -409,7 +437,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "No Workspace edit form or management route is exposed by the inspected Organization UI."
+      "notes": "No Workspace edit form or management route is exposed by the inspected Organization UI.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:1117",
@@ -423,7 +452,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "Retry control exists and component behavior has unit coverage, but no executable browser recovery journey is included in this shard."
+      "notes": "Retry control exists and component behavior has unit coverage, but no executable browser recovery journey is included in this shard.",
+      "track": "active"
     },
     {
       "figma_node_id": "109:1189",
@@ -437,7 +467,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma flow map is reference material, not a single executable product screen."
+      "notes": "Figma flow map is reference material, not a single executable product screen.",
+      "track": "history"
     },
     {
       "figma_node_id": "112:113",
@@ -448,10 +479,11 @@
       "route": null,
       "user_action": null,
       "expected_result": null,
-      "test_ids": [],
-      "evidence": [],
-      "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Current Feature detail supports Task creation, status, and ordering, but no Task deletion action."
+      "test_ids": ["PA-TASK-001"],
+      "evidence": ["apps/web/e2e/planning/task-editing.spec.ts"],
+      "status": "AUTOMATED_PASS",
+      "notes": "Task rename and delete with Undo pass through the real API in desktop and mobile (PA-TASK-001). The \"proposal\" variant of the frame belongs to a retired area. Behavioral automation, not human visual parity.",
+      "track": "active"
     },
     {
       "figma_node_id": "117:122",
@@ -465,7 +497,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition."
+      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active"
     },
     {
       "figma_node_id": "117:203",
@@ -479,7 +512,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition."
+      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active"
     },
     {
       "figma_node_id": "117:284",
@@ -493,7 +527,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition."
+      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active"
     },
     {
       "figma_node_id": "117:365",
@@ -507,7 +542,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition."
+      "notes": "The status is supported by the current Planning UI but is not exercised by this shard's automated transition.",
+      "track": "active"
     },
     {
       "figma_node_id": "118:134",
@@ -521,7 +557,8 @@
       "test_ids": ["PA-PLAN-001"],
       "evidence": ["apps/web/e2e/planning/planning-workflows.spec.ts"],
       "status": "AUTOMATED_PASS",
-      "notes": "Task reordering passed through UI and API on desktop and mobile; visual Figma parity was not human-certified."
+      "notes": "Task reordering passed through UI and API on desktop and mobile; visual Figma parity was not human-certified.",
+      "track": "active"
     },
     {
       "figma_node_id": "121:140",
@@ -535,7 +572,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Decision creation, linking, accepted state, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Decision creation, linking, accepted state, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "121:223",
@@ -549,7 +587,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Decision acceptance and initial revision history passed on desktop/mobile. A reproduced case mismatch was fixed so Accept disappears for lowercase API status; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Decision acceptance and initial revision history passed on desktop/mobile. A reproduced case mismatch was fixed so Accept disappears for lowercase API status; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "121:295",
@@ -563,7 +602,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Invariant creation, acknowledgement, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Invariant creation, acknowledgement, and API persistence passed on desktop and mobile; visual Figma parity was not human-certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "121:383",
@@ -577,7 +617,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Readiness outcomes and the non-verification boundary passed on desktop and mobile; automated behavior only, not visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Readiness outcomes and the non-verification boundary passed on desktop and mobile; automated behavior only, not visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "121:471",
@@ -591,7 +632,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The inspected UI evaluates a live preview and does not expose a saved evaluation snapshot/history workflow for stale snapshot review."
+      "notes": "The inspected UI evaluates a live preview and does not expose a saved evaluation snapshot/history workflow for stale snapshot review.",
+      "track": "history"
     },
     {
       "figma_node_id": "122:166",
@@ -605,7 +647,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The current Readiness UI creates and accepts Decisions but does not expose decision replacement/editing."
+      "notes": "The current Readiness UI creates and accepts Decisions but does not expose decision replacement/editing.",
+      "track": "history"
     },
     {
       "figma_node_id": "122:231",
@@ -619,7 +662,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "No Invariant retirement control is exposed in the inspected Readiness UI."
+      "notes": "No Invariant retirement control is exposed in the inspected Readiness UI.",
+      "track": "history"
     },
     {
       "figma_node_id": "122:288",
@@ -633,7 +677,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "READY_TO_START outcome was asserted after criterion, accepted decision, and invariant acknowledgement on desktop and mobile; no visual parity claim. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "READY_TO_START outcome was asserted after criterion, accepted decision, and invariant acknowledgement on desktop and mobile; no visual parity claim. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "126:184",
@@ -647,7 +692,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The authored journey opens history but only verifies the initial revision; a superseded historical revision is not created or certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The authored journey opens history but only verifies the initial revision; a superseded historical revision is not created or certified. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "126:240",
@@ -661,7 +707,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Invariant form, create/acknowledge actions, and SQLite-backed API persistence passed on desktop and mobile; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Invariant form, create/acknowledge actions, and SQLite-backed API persistence passed on desktop and mobile; not visual Figma certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "126:303",
@@ -675,7 +722,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Current UI renders an Invariant card but does not expose a separate detail/edit/retire route."
+      "notes": "Current UI renders an Invariant card but does not expose a separate detail/edit/retire route.",
+      "track": "history"
     }
   ]
 }

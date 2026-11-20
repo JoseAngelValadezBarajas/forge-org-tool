@@ -34,6 +34,9 @@ export function TransferPage({
     exported,
     fileName,
     importedProjectId,
+    importedCounts,
+    conversion,
+    startAnotherImport,
     importProject,
     packageBase64,
     preview,
@@ -156,11 +159,15 @@ export function TransferPage({
               accept={
                 contextualScope
                   ? 'application/json,.json'
-                  : 'application/json,.json,application/zip,.zip'
+                  : 'application/json,.json,application/zip,.zip,text/csv,.csv,.tsv'
               }
               aria-label="Choose a project transfer file"
               className={contextualScope ? styles.contextFilePicker : undefined}
-              title={contextualScope ? 'Drop a .json file here' : 'Choose a .json or .zip file'}
+              title={
+                contextualScope
+                  ? 'Drop a .json file here'
+                  : 'Choose a .json, .zip, .csv or GitHub issues file'
+              }
               description={contextualScope ? 'or browse your computer' : 'Browse for a local file.'}
               state={fileName ? 'selected' : 'empty'}
               onChange={(event) => {
@@ -184,6 +191,35 @@ export function TransferPage({
                   />
                 </FormField>
               </details>
+            )}
+            {conversion && (
+              <div className={styles.review} role="status" aria-label="Converted file">
+                <h4>Converted from {conversion.source === 'github' ? 'GitHub issues' : 'CSV'}</h4>
+                <p>
+                  {conversion.items} {conversion.items === 1 ? 'item' : 'items'} and{' '}
+                  {conversion.epics} {conversion.epics === 1 ? 'Epic' : 'Epics'} will be created in
+                  a new project named “{conversion.projectName}”. Review them before you confirm.
+                </p>
+                {conversion.skipped.length > 0 && (
+                  <details>
+                    <summary>{conversion.skipped.length} skipped</summary>
+                    <ul>
+                      {conversion.skipped.slice(0, 20).map((entry) => (
+                        <li key={`${entry.where}:${entry.reason}`}>
+                          {entry.where}: {entry.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+                {conversion.notices.length > 0 && (
+                  <ul aria-label="Adjustments">
+                    {conversion.notices.map((notice) => (
+                      <li key={notice}>{notice}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
             <div className={styles.actions}>
               <ButtonV2
@@ -312,7 +348,21 @@ export function TransferPage({
                 ? `Imported into project: ${importedProjectId}`
                 : `Created project: ${importedProjectId}`}
             </p>
-            <Link to={successPath}>{successLinkLabel}</Link>
+            {Object.keys(importedCounts).length > 0 && (
+              <ul aria-label="Records created">
+                {Object.entries(importedCounts).map(([key, count]) => (
+                  <li key={key}>
+                    {key.replaceAll('_', ' ')}: {String(count)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className={styles.actions}>
+              <Link to={successPath}>{successLinkLabel}</Link>
+              <ButtonV2 type="button" variant="secondary" onClick={startAnotherImport}>
+                Import another
+              </ButtonV2>
+            </div>
           </section>
         </CardV2>
       )}

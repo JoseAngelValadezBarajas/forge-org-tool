@@ -1,7 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { organizationApi, type Feature, type Project } from '@forge-org/api-client';
+import { useSearchParams } from 'react-router-dom';
+import {
+  organizationApi,
+  type Dependency,
+  type Epic,
+  type Feature,
+  type Project,
+} from '@forge-org/api-client';
 import { formatLocalDate, parseQuickCapture } from './quickCapture';
+import { planOrganize, tagsProblem, type OrganizeValues } from './organize';
 import { INBOX_NAME, loadTodayData } from './todayData';
+import {
+  entriesForView,
+  isViewId,
+  viewCounts,
+  type TodayView,
+  type ViewContext,
+} from './viewsModel';
 import { attentionCount, dueLabel, groupTodayItems, type TodayItem } from './todayModel';
 
 type Notice = { message: string; undo?: { item: TodayItem } };
@@ -15,6 +30,13 @@ export function useTodayController() {
   const [items, setItems] = useState<TodayItem[]>([]);
   const [target, setTarget] = useState<{ workspaceId: string; project: Project } | null>(null);
   const [projectCount, setProjectCount] = useState(0);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [dependencies, setDependencies] = useState<Dependency[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [epicsByProject, setEpicsByProject] = useState<Record<string, Epic[]>>({});
+  const [organizing, setOrganizing] = useState<TodayItem | null>(null);
+  const [organizeError, setOrganizeError] = useState('');
+  const [organizeSaving, setOrganizeSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [text, setText] = useState('');
@@ -27,14 +49,31 @@ export function useTodayController() {
   const todayIso = formatLocalDate(now);
   const preview = useMemo(() => parseQuickCapture(text, new Date()), [text]);
   const groups = useMemo(() => groupTodayItems(items, todayIso), [items, todayIso]);
+  const requestedView = searchParams.get('view');
+  const view: TodayView = isViewId(requestedView) ? requestedView : 'due';
+  const viewContext: ViewContext = useMemo(
+    () => ({ todayIso, dependencies, inboxProjectId: target?.project.id ?? null }),
+    [todayIso, dependencies, target],
+  );
+  const entries = useMemo(
+    () => (view === 'due' ? [] : entriesForView(view, items, viewContext)),
+    [view, items, viewContext],
+  );
+  const counts = useMemo(
+    () => viewCounts(items, viewContext, attentionCount(groups)),
+    [items, viewContext, groups],
+  );
 
   useEffect(() => {
     let current = true;
-    void loadTodayData({ bootstrap: true })
+    void loadTodayData({ bootstrap: true, dependencies: true })
       .then((loaded) => {
         if (!current) return;
         setTarget(loaded.target);
         setProjectCount(loaded.projectCount);
+        setProjects(loaded.projects);
+        setDependencies(loaded.dependencies);
+        setEpicsByProject(loaded.epicsByProject);
         setItems(loaded.items);
         setLoading(false);
       })
@@ -71,6 +110,70 @@ export function useTodayController() {
       ),
     );
   }, []);
+
+  const replaceItem = useCallback((previous: TodayItem, next: TodayItem) => {
+    setItems((existing) =>
+      existing.map((candidate) =>
+        candidate.feature.id === previous.feature.id && candidate.projectId === previous.projectId
+          ? next
+          : candidate,
+      ),
+    );
+  }, []);
+
+  /** Applies the Organize dialog: an optional move first, then the remaining field changes. */
+  async function saveOrganize(item: TodayItem, values: OrganizeValues) {
+    const problem = tagsProblem(values.tags);
+    if (problem) {
+      setOrganizeError(problem);
+      return;
+    }
+    const plan = planOrganize(item, values);
+    if (!plan.move && !plan.update) {
+      setOrganizing(null);
+      return;
+    }
+    setOrganizeSaving(true);
+    setOrganizeError('');
+    let current = item;
+    try {
+      if (plan.move) {
+        const moved = await organizationApi.moveFeature(
+          item.workspaceId,
+          item.projectId,
+          item.feature.id,
+          plan.move.projectId,
+          plan.move.epicId,
+        );
+        const destination = projects.find((project) => project.id === plan.move?.projectId);
+        const next = {
+          ...item,
+          feature: moved,
+          projectId: plan.move.projectId,
+          projectName: destination?.name ?? item.projectName,
+        };
+        replaceItem(item, next);
+        current = next;
+      }
+      if (plan.update) {
+        const updated = await updateFeature(current, plan.update);
+        const next = { ...current, feature: updated };
+        replaceItem(current, next);
+        current = next;
+      }
+      setOrganizing(null);
+      setNotice({ message: `Organized “${item.feature.title}”` });
+    } catch (cause) {
+      const reason = cause instanceof Error ? cause.message : 'Unable to organize the task.';
+      // A move that already happened is real: say so instead of implying nothing changed.
+      setOrganizeError(
+        current === item ? reason : `Moved, but the other changes failed: ${reason}`,
+      );
+      if (current !== item) setOrganizing(current);
+    } finally {
+      setOrganizeSaving(false);
+    }
+  }
 
   async function submitCapture(event: FormEvent) {
     event.preventDefault();
@@ -155,6 +258,22 @@ export function useTodayController() {
     dismissNotice: () => setNotice(null),
     undoCompletion: (item: TodayItem) => void setStatus(item, 'backlog'),
     captureRef,
+    view,
+    entries,
+    counts,
+    setView: (next: TodayView) =>
+      setSearchParams(next === 'due' ? {} : { view: next }, { replace: true }),
+    projects,
+    epicsByProject,
+    organizing,
+    organizeError,
+    organizeSaving,
+    openOrganize: (item: TodayItem) => {
+      setOrganizeError('');
+      setOrganizing(item);
+    },
+    closeOrganize: () => setOrganizing(null),
+    saveOrganize: (item: TodayItem, values: OrganizeValues) => void saveOrganize(item, values),
     submitCapture,
     complete: (item: TodayItem) => void setStatus(item, 'done'),
     changeDueDate: (item: TodayItem, dueDate: string | null) => void changeDueDate(item, dueDate),

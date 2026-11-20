@@ -337,6 +337,127 @@ describe('Supabase Data API adapter', () => {
     assert.equal(calls.filter(({ url }) => url.startsWith('/api/v1/')).length, 0);
   });
 
+  it('deletes a task through the scoped tasks row and never touches another feature', async () => {
+    const calls = [];
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), method: init.method });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight')) {
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      }
+      if (String(url).includes('/rest/v1/tasks'))
+        return new globalThis.Response(null, { status: 204 });
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+
+    await organizationApi.deleteTask('w1', 'p1', 'f1', 't1');
+
+    const call = calls.find(({ url }) => url.includes('/rest/v1/tasks'));
+    assert.equal(call.method, 'DELETE');
+    assert.match(call.url, /id=eq\.t1/);
+    assert.match(call.url, /feature_id=eq\.f1/);
+  });
+
+  describe('moving a work item between projects', () => {
+    function mockMove({
+      destination = { id: 'p2', status: 'active' },
+      epics = [{ id: 'e1' }],
+      dependencies = [],
+      screenshots = [],
+    } = {}) {
+      const calls = [];
+      globalThis.fetch = async (url, init = {}) => {
+        const target = String(url);
+        calls.push({ url: target, method: init.method ?? 'GET', body: init.body });
+        if (target.includes('/auth/v1/token')) return jsonResponse(session);
+        if (target.includes('/rpc/forge_storage_preflight')) {
+          return jsonResponse({ schema_version: 'forge-byoc-v2' });
+        }
+        if (target.includes('/rest/v1/projects'))
+          return jsonResponse(destination ? [destination] : []);
+        if (target.includes('/rest/v1/epics')) return jsonResponse(epics);
+        if (target.includes('/rest/v1/feature_dependencies')) return jsonResponse(dependencies);
+        if (target.includes('/rest/v1/bug_attachments')) return jsonResponse(screenshots);
+        if (target.includes('/rest/v1/features')) {
+          return jsonResponse([{ id: 'f1', project_id: 'p2', epic_id: 'e1' }]);
+        }
+        throw new Error(`unexpected request ${target}`);
+      };
+      return calls;
+    }
+
+    async function signedIn() {
+      configureStorage(profile);
+      await signInSupabase('a@example.test', 'temporary-password');
+      await inspectStorage();
+    }
+
+    it('patches only the scoped row after every guard passes', async () => {
+      const calls = mockMove();
+      await signedIn();
+
+      const moved = await organizationApi.moveFeature('w1', 'p1', 'f1', 'p2', 'e1');
+
+      assert.equal(moved.project_id, 'p2');
+      const patch = calls.find(
+        ({ method, url }) => method === 'PATCH' && url.includes('/features'),
+      );
+      assert.match(patch.url, /id=eq\.f1/);
+      assert.match(patch.url, /project_id=eq\.p1/);
+      assert.deepEqual(JSON.parse(patch.body), { project_id: 'p2', epic_id: 'e1' });
+      assert.match(
+        calls.find(({ url }) => url.includes('/rest/v1/projects')).url,
+        /workspace_id=eq\.w1/,
+      );
+    });
+
+    for (const [label, options, status, message] of [
+      ['a destination outside the workspace', { destination: null }, 404, /Destination project/],
+      [
+        'an archived destination',
+        { destination: { id: 'p2', status: 'archived' } },
+        422,
+        /Archived/,
+      ],
+      ['an Epic of another project', { epics: [] }, 404, /Epic not found/],
+      ['an item with dependencies', { dependencies: [{ id: 'd1' }] }, 409, /dependencies/],
+      ['an item with screenshots', { screenshots: [{ id: 's1' }] }, 409, /screenshots/],
+    ]) {
+      it(`refuses ${label} without changing anything`, async () => {
+        const calls = mockMove(options);
+        await signedIn();
+        await assert.rejects(
+          () => organizationApi.moveFeature('w1', 'p1', 'f1', 'p2', 'e1'),
+          (error) => {
+            assert.equal(error.status, status);
+            assert.match(error.message, message);
+            return true;
+          },
+        );
+        assert.equal(
+          calls.some(({ method }) => method === 'PATCH'),
+          false,
+        );
+      });
+    }
+
+    it('refuses to move into the same project', async () => {
+      const calls = mockMove();
+      await signedIn();
+      await assert.rejects(
+        () => organizationApi.moveFeature('w1', 'p1', 'f1', 'p1'),
+        /already in this project/,
+      );
+      assert.equal(
+        calls.some(({ url }) => url.includes('/rest/v1/features')),
+        false,
+      );
+    });
+  });
+
   it('explains how to enable due dates when the Supabase schema predates migration 0006', async () => {
     globalThis.fetch = async (url) => {
       if (String(url).includes('/auth/v1/token')) return jsonResponse(session);

@@ -14,7 +14,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "57:71",
@@ -28,7 +29,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "57:128",
@@ -42,7 +44,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "58:89",
@@ -56,7 +59,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "58:165",
@@ -70,7 +74,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "58:235",
@@ -84,7 +89,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "251:554",
@@ -98,7 +104,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The current focused test does not assert this empty-state composition."
+      "notes": "The current focused test does not assert this empty-state composition.",
+      "track": "history"
     },
     {
       "figma_node_id": "251:572",
@@ -112,7 +119,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "The current focused test covers explicit disconnect, not an unavailable filesystem path or its recovery interaction."
+      "notes": "The current focused test covers explicit disconnect, not an unavailable filesystem path or its recovery interaction.",
+      "track": "history"
     },
     {
       "figma_node_id": "251:594",
@@ -126,7 +134,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "MANUAL_REVIEW_REQUIRED",
-      "notes": "A mobile viewport project exists, but this focused test does not capture or assert this dedicated summary composition."
+      "notes": "A mobile viewport project exists, but this focused test does not capture or assert this dedicated summary composition.",
+      "track": "history"
     },
     {
       "figma_node_id": "251:618",
@@ -140,7 +149,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma frame name identifies this as a legacy component catalog reference, not a product route."
+      "notes": "Figma frame name identifies this as a legacy component catalog reference, not a product route.",
+      "track": "history"
     },
     {
       "figma_node_id": "67:3",
@@ -154,7 +164,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "67:92",
@@ -168,7 +179,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "67:170",
@@ -182,7 +194,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "67:242",
@@ -196,7 +209,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "68:118",
@@ -210,7 +224,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "68:178",
@@ -224,7 +239,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "68:265",
@@ -238,7 +254,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "68:342",
@@ -252,7 +269,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "70:234",
@@ -266,7 +284,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:75",
@@ -280,7 +299,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:129",
@@ -294,7 +314,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:170",
@@ -308,7 +329,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:227",
@@ -322,7 +344,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:280",
@@ -336,7 +359,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:23",
@@ -350,7 +374,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:90",
@@ -364,7 +389,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma text identifies this confirmation/post-action composition as simulated; it is treated as a design reference rather than a committed product requirement. The current repository page disconnects directly."
+      "notes": "Figma text identifies this confirmation/post-action composition as simulated; it is treated as a design reference rather than a committed product requirement. The current repository page disconnects directly.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:156",
@@ -378,7 +404,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Fingerprint change and prior snapshot immutability passed in both Chromium projects; no dedicated stale badge is asserted. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Fingerprint change and prior snapshot immutability passed in both Chromium projects; no dedicated stale badge is asserted. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:222",
@@ -392,7 +419,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:291",
@@ -406,7 +434,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:357",
@@ -420,7 +449,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:431",
@@ -434,7 +464,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "Automated assertions passed in chromium-desktop and chromium-mobile for the listed test IDs; this is behavior evidence, not human Figma visual certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "141:500",
@@ -448,7 +479,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma labels the error presentation as a simulation of optimistic revision control; no matching context-changed Handoff state is asserted by the current product UI."
+      "notes": "Figma labels the error presentation as a simulation of optimistic revision control; no matching context-changed Handoff state is asserted by the current product UI.",
+      "track": "history"
     },
     {
       "figma_node_id": "143:57",
@@ -462,7 +494,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma footer explicitly says this prototype result has no persistence or real transfer; it is not claimed as an application workflow test."
+      "notes": "Figma footer explicitly says this prototype result has no persistence or real transfer; it is not claimed as an application workflow test.",
+      "track": "history"
     },
     {
       "figma_node_id": "144:63",
@@ -476,7 +509,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma labels this a UX demonstration with no data mutation; it is not treated as evidence of a real disconnect operation."
+      "notes": "Figma labels this a UX demonstration with no data mutation; it is not treated as evidence of a real disconnect operation.",
+      "track": "history"
     },
     {
       "figma_node_id": "144:120",
@@ -490,7 +524,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma labels this a UX demonstration with no data mutation; the actual snapshot-save workflow is covered separately by executable frames and PA-CONTEXT-01."
+      "notes": "Figma labels this a UX demonstration with no data mutation; the actual snapshot-save workflow is covered separately by executable frames and PA-CONTEXT-01.",
+      "track": "history"
     }
   ]
 }

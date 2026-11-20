@@ -69,6 +69,17 @@ describe('TransferPage', () => {
         }),
       ),
     );
+
+    // The finished import offers a way forward: open it, or start another one.
+    expect(screen.getByRole('link', { name: 'Open project' })).toHaveAttribute(
+      'href',
+      '/projects/w1/imported-1',
+    );
+    const created = within(screen.getByRole('list', { name: 'Records created' }));
+    expect(created.getAllByRole('listitem').length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Import another' }));
+    expect(screen.queryByText('IMPORTED_PLANNING_ONLY')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Review import' })).toBeDisabled();
   });
 
   it('previews and imports a ZIP project package using its reviewed fingerprint', async () => {
@@ -439,5 +450,128 @@ describe('TransferPage', () => {
     expect(screen.queryByText('Epic board')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('link', { name: 'Back to Epic' }));
     expect(await screen.findByText('Epic board')).toBeInTheDocument();
+  });
+
+  describe('files from other tools', () => {
+    function pickFile(name: string, content: string, type: string) {
+      const file = new File([content], name, { type });
+      Object.defineProperty(file, 'text', { value: async () => content });
+      fireEvent.change(screen.getByLabelText('Choose a project transfer file'), {
+        target: { files: [file] },
+      });
+    }
+
+    function renderTransfer(path = '/transfer/w1/p1') {
+      return render(
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route path="/transfer/:workspaceId/:projectId" element={<TransferPage />} />
+            <Route
+              path="/transfer/:workspaceId/:projectId/:scope/:destinationId"
+              element={<TransferPage />}
+            />
+          </Routes>
+        </MemoryRouter>,
+      );
+    }
+
+    it('converts a CSV, summarizes it, and reviews the converted document through the normal flow', async () => {
+      const fetchMock = vi
+        .fn()
+        .mockImplementation((input: string) =>
+          Promise.resolve(
+            new Response(
+              String(input).endsWith('/projects/import/preview') ? JSON.stringify(preview) : '{}',
+              { status: 200 },
+            ),
+          ),
+        );
+      vi.stubGlobal('fetch', fetchMock);
+      renderTransfer();
+
+      pickFile(
+        'Sprint plan.csv',
+        'Title,Status,Due,Epic\nFix login,In Progress,2026-12-01,Launch\n,,,\nWrite docs,,01/12/2026,Launch',
+        'text/csv',
+      );
+
+      const summary = await screen.findByRole('status', { name: 'Converted file' });
+      expect(summary).toHaveTextContent('Converted from CSV');
+      expect(summary).toHaveTextContent('2 items and 1 Epic');
+      expect(summary).toHaveTextContent('“Sprint plan”');
+      expect(within(summary).getByRole('list', { name: 'Adjustments' })).toHaveTextContent(
+        'Date “01/12/2026” was not understood',
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Review import' }));
+      await screen.findByText('transfer-fp');
+      const call = fetchMock.mock.calls.find(([path]) =>
+        String(path).endsWith('/projects/import/preview'),
+      );
+      const sent = JSON.parse(String(call?.[1]?.body));
+      expect(sent.schema_version).toBe('forge-project-transfer-v2');
+      expect(sent.features.map((feature: { title: string }) => feature.title)).toEqual([
+        'Fix login',
+        'Write docs',
+      ]);
+      expect(sent.features[0]).toMatchObject({ status: 'in_progress', due_date: '2026-12-01' });
+    });
+
+    it('converts GitHub issues exported with gh and skips pull requests', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(new Response(JSON.stringify(preview), { status: 200 })),
+      );
+      renderTransfer();
+      pickFile(
+        'issues.json',
+        JSON.stringify([
+          {
+            number: 1,
+            title: 'Crash on start',
+            state: 'OPEN',
+            labels: [{ name: 'bug' }],
+            url: 'https://github.com/acme/app/issues/1',
+          },
+          { number: 2, title: 'Fix typo', state: 'OPEN', pull_request: {} },
+        ]),
+        'application/json',
+      );
+
+      const summary = await screen.findByRole('status', { name: 'Converted file' });
+      expect(summary).toHaveTextContent('Converted from GitHub issues');
+      expect(summary).toHaveTextContent('1 item and 0 Epics');
+      expect(summary).toHaveTextContent('“acme/app issues”');
+      expect(within(summary).getByText('1 skipped')).toBeInTheDocument();
+    });
+
+    it('leaves a FORGE transfer document untouched, with no conversion summary', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 200 })));
+      renderTransfer();
+      pickFile('export.json', JSON.stringify(document), 'application/json');
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Review import' })).toBeEnabled(),
+      );
+      expect(screen.queryByRole('status', { name: 'Converted file' })).not.toBeInTheDocument();
+    });
+
+    it('explains an unusable file instead of failing silently', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 200 })));
+      renderTransfer();
+      pickFile('empty.csv', 'name2,other\nA,B', 'text/csv');
+      expect(await screen.findByText(/needs a title column/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Review import' })).toBeDisabled();
+    });
+
+    it('clears the summary when another file is chosen or the text is edited', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 200 })));
+      renderTransfer();
+      pickFile('a.csv', 'title\nOne', 'text/csv');
+      await screen.findByRole('status', { name: 'Converted file' });
+      pickFile('export.json', JSON.stringify(document), 'application/json');
+      await waitFor(() =>
+        expect(screen.queryByRole('status', { name: 'Converted file' })).not.toBeInTheDocument(),
+      );
+    });
   });
 });

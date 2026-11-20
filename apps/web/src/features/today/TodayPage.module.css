@@ -126,8 +126,31 @@
   border-top: 1px solid var(--forge-border-subtle);
 }
 
-.title {
+.titleCell {
+  display: grid;
   flex: 1;
+  min-width: 0;
+}
+
+.note {
+  color: var(--forge-text-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--forge-space-2, 8px);
+}
+
+.viewCount {
+  margin-left: 6px;
+  color: var(--forge-text-subtle);
+  font-weight: 500;
+}
+
+.title {
   min-width: 0;
   overflow: hidden;
   color: var(--forge-text-primary);

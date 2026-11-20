@@ -45,6 +45,7 @@ export function createSupabaseHandler(
     compensateImportedProject,
   } = createPackageOps({ transport, attachmentContent });
   const {
+    moveFeature,
     listWorkspaces,
     createWorkspace,
     deleteWorkspace,
@@ -411,6 +412,26 @@ export function createSupabaseHandler(
           { method: 'PATCH', body: JSON.stringify(body) },
         ),
       ) as T;
+    }
+    if (
+      parts[2] === 'projects' &&
+      parts[4] === 'features' &&
+      parts[6] === 'move' &&
+      parts.length === 7 &&
+      method === 'POST'
+    ) {
+      return moveFeature(parts[1], parts[3], parts[5], body) as Promise<T>;
+    }
+    if (
+      parts[2] === 'projects' &&
+      parts[4] === 'features' &&
+      parts[6] === 'tasks' &&
+      parts.length === 8 &&
+      method === 'DELETE'
+    ) {
+      return table<void>('tasks', query({ id: `eq.${parts[7]}`, feature_id: `eq.${parts[5]}` }), {
+        method: 'DELETE',
+      }) as Promise<T>;
     }
     if (
       parts[2] === 'projects' &&

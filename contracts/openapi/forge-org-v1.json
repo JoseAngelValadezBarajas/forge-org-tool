@@ -622,6 +622,30 @@
         "title": "FeatureCreate",
         "type": "object"
       },
+      "FeatureMove": {
+        "properties": {
+          "epic_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Epic Id"
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "FeatureMove",
+        "type": "object"
+      },
       "FeatureResponse": {
         "properties": {
           "actual_result": {
@@ -3736,6 +3760,76 @@
         ]
       }
     },
+    "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/move": {
+      "post": {
+        "operationId": "move_feature_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__move_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "feature_id",
+            "required": true,
+            "schema": {
+              "title": "Feature Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeatureMove"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Move Feature",
+        "tags": [
+          "organization"
+        ]
+      }
+    },
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/tasks": {
       "get": {
         "operationId": "list_tasks_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__tasks_get",
@@ -3950,6 +4044,66 @@
       }
     },
     "/api/v1/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/tasks/{task_id}": {
+      "delete": {
+        "operationId": "delete_task_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__tasks__task_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "feature_id",
+            "required": true,
+            "schema": {
+              "title": "Feature Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Task",
+        "tags": [
+          "organization"
+        ]
+      },
       "patch": {
         "operationId": "update_task_api_v1_workspaces__workspace_id__projects__project_id__features__feature_id__tasks__task_id__patch",
         "parameters": [

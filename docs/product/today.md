@@ -30,6 +30,43 @@ can grow into it, but nothing about it is required to start.
 - A task opens in the normal work item page, where criteria, tasks, bug evidence and epics
   live. The Workspace Overview that used to be `/` is now `/overview`.
 
+## Organize a captured task
+
+Every row has an **Organize** button that opens one dialog: project, Epic, type (Story or Bug),
+priority and tags. It exists so a task captured in the Inbox can reach the structure that already
+exists without opening a heavy screen.
+
+- The smallest set of calls is planned in one pure function: a move first, then the field changes.
+  Nothing is sent when nothing changed.
+- **Moving between projects** is its own backend operation (`POST .../features/{id}/move`, one
+  transaction). It only targets an active project of the same workspace, optionally into one of
+  its Epics. Tasks, criteria, tags and (locally) screenshots follow the item.
+- A work item that **has dependencies is refused**, because dependencies are scoped to one project
+  and silently dropping them would change the plan. The message says so.
+- **Supabase** refuses a move when the item has screenshots as well: their Storage path embeds the
+  project, so they would become unreachable. This guard runs in the client and is not exercised
+  against a real project yet: rehearse it on a throwaway Supabase project before relying on it.
+- Turning a Story into a Bug gives it a `medium` severity; turning a Bug into a Story clears it.
+- If the move succeeds and a later field change fails, the dialog says the item already moved.
+
+## Decision views
+
+Today answers "what is due". The same page also answers the questions boards do not, as filters over
+the data it already loads (no new module). Each view shows its count before it is opened and has a
+link of its own (`/?view=blocked`).
+
+| View        | Shows                                                                            |
+| ----------- | -------------------------------------------------------------------------------- |
+| Due         | The default: overdue, today, next 7 days, later, no date                         |
+| Upcoming    | Open work due after today and within 14 days, soonest first                      |
+| Blocked     | Open work waiting on a dependency that is not done, naming the blocker           |
+| Verify      | Open work whose status is Verify                                                 |
+| Stalled     | Started work (refining, ready, in progress, verify) with no activity for 14 days |
+| Unorganized | Inbox items that have no Epic, oldest first                                      |
+
+These are planning facts from recorded data, in manual-planning language. "Stalled" means no
+recorded change, not that anything is wrong.
+
 ## Data
 
 `Feature.due_date` is an optional ISO date (`YYYY-MM-DD`, no time or timezone, so a deadline

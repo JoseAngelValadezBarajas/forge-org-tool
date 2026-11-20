@@ -30,8 +30,10 @@ Project Transfer supports legacy v1 JSON import, v2 JSON planning export/import,
 ## What you see first
 
 The app opens on **Today**: one field to capture a task (`Fix login friday`) and the list of what is
-due. Workspace, project and epic structure exist but are never required to start; see
-[Today](docs/product/today.md).
+due, with views for what is upcoming, blocked, waiting for verification, stalled or still
+unorganized. Workspace, project and epic structure exist but are never required to start, and a
+captured task can be organized into them in one dialog; see [Today](docs/product/today.md). A
+backlog from a spreadsheet or from GitHub issues can be imported from the Transfer page.
 
 ## Local bootstrap (Windows PowerShell)
 

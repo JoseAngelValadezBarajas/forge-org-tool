@@ -8,7 +8,7 @@ Start with the product contract, then the architecture. Everything else is eithe
 - [Today, the default landing page](product/today.md)
 - [Architecture](architecture/README.md), [decision records](architecture/decisions), [data model](architecture/data-model.md), [client components](architecture/client-components.md), [transfer conformance](architecture/transfer-conformance.md)
 - [Import / export](import-export/README.md)
-- [Quality and acceptance](quality/mvp-1.0-acceptance.md)
+- Quality and acceptance: [1.0 acceptance](quality/mvp-1.0-acceptance.md); the Figma coverage is split by track: [active product acceptance](quality/active-product-acceptance.md) (the only one that describes what ships), [design history](quality/design-history.md) (retired capabilities, not gaps) and [future candidates](quality/future-candidates.md); the [overview](quality/product-acceptance-matrix.md) links them
 - [Design intent and parity](design/figma.md)
 - [Releasing a preview](operations/releasing-preview.md)
 - Specs for retained areas: [ORG-001](specs/ORG-001-organization), [ORG-002](specs/ORG-002-planning), [ORG-007](specs/ORG-007-transfer), [ORG-008](specs/ORG-008-desktop), [ORG-009](specs/ORG-009-web-surfaces)

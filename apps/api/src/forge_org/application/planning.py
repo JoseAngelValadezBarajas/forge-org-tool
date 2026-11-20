@@ -2,7 +2,7 @@ from datetime import date
 from typing import Any
 
 from forge_org.application.ports import PlanningStore
-from forge_org.domain.errors import NotFound
+from forge_org.domain.errors import Conflict, InvalidInput, NotFound
 from forge_org.domain.ordering import ensure_exact_ordering
 from forge_org.domain.planning import (
     clean_description,
@@ -102,6 +102,41 @@ class PlanningService:
             values['title'] = clean_title(values['title'])
         _store_due_date(values)
         return self.repository.update_feature(workspace_id, project_id, feature_id, values) or {}
+
+    def move_feature(
+        self,
+        workspace_id: str,
+        project_id: str,
+        feature_id: str,
+        destination_project_id: str,
+        epic_id: str | None,
+    ) -> dict[str, Any]:
+        """Move a work item to another project of the same workspace, optionally into an Epic.
+
+        Dependencies are scoped to one project, so a work item that takes part in any is refused
+        instead of silently dropping them. Tasks, criteria, tags and screenshots follow the item.
+        """
+        self.feature(workspace_id, project_id, feature_id)
+        ensure_project_writable(self._project(workspace_id, project_id))
+        if destination_project_id == project_id:
+            raise InvalidInput('The work item is already in this project')
+        ensure_project_writable(self._project(workspace_id, destination_project_id))
+        if (
+            epic_id is not None
+            and self.repository.get_epic(destination_project_id, epic_id) is None
+        ):
+            raise NotFound('Epic not found in the destination project')
+        if any(
+            feature_id in (item['blocking_feature_id'], item['blocked_feature_id'])
+            for item in self.repository.list_dependencies(project_id)
+        ):
+            raise Conflict(
+                'This work item has dependencies. Remove them before moving it to another project'
+            )
+        moved = self.repository.move_feature(feature_id, destination_project_id, epic_id)
+        if moved is None:
+            raise NotFound('Feature not found')
+        return moved
 
     def workspace_tags(self, workspace_id: str) -> list[dict[str, Any]]:
         if self.repository.get_workspace(workspace_id) is None:
@@ -227,6 +262,14 @@ class PlanningService:
         if updated is None:
             raise NotFound('Task not found')
         return updated
+
+    def delete_task(
+        self, workspace_id: str, project_id: str, feature_id: str, task_id: str
+    ) -> None:
+        self.feature(workspace_id, project_id, feature_id)
+        ensure_project_writable(self._project(workspace_id, project_id))
+        if not self.repository.delete_task(feature_id, task_id):
+            raise NotFound('Task not found')
 
     def reorder_tasks(
         self, workspace_id: str, project_id: str, feature_id: str, ids: list[str]

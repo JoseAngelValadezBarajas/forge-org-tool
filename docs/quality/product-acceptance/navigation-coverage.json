@@ -14,7 +14,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "PA-RUN-01 and PA-HANDOFF-01 passed on chromium-desktop and chromium-mobile with API-backed persistence assertions; behavior only, not human Figma parity certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "PA-RUN-01 and PA-HANDOFF-01 passed on chromium-desktop and chromium-mobile with API-backed persistence assertions; behavior only, not human Figma parity certification. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "5:397",
@@ -28,7 +29,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "NOT_IMPLEMENTED_PRODUCT_GAP",
-      "notes": "The integrated 50/50 desktop and responsive-viewport Playwright run passed the Release Gate and Delivery journeys; the former mobile pointer interception is no longer reproduced. Automated behavior evidence does not certify native visual parity. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance."
+      "notes": "The integrated 50/50 desktop and responsive-viewport Playwright run passed the Release Gate and Delivery journeys; the former mobile pointer interception is no longer reproduced. Automated behavior evidence does not certify native visual parity. Retired capability is outside FORGE Org Tool 1.0 scope; this frame is retained as design history, not current product acceptance.",
+      "track": "history"
     },
     {
       "figma_node_id": "133:3",
@@ -42,7 +44,8 @@
       "test_ids": [],
       "evidence": [],
       "status": "DESIGN_REFERENCE_ONLY",
-      "notes": "Figma footer identifies this as a UX guide whose links connect editable Figma screens; do not fabricate an application hub."
+      "notes": "Figma footer identifies this as a UX guide whose links connect editable Figma screens; do not fabricate an application hub.",
+      "track": "history"
     }
   ]
 }

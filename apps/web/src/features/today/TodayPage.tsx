@@ -8,9 +8,11 @@ import {
   FeedbackStateV2,
   TextInputV2,
 } from '@corefoundry-labs/forge-ui';
+import { OrganizeDialog } from './OrganizeDialog';
 import { ReminderSettings } from './ReminderSettings';
 import styles from './TodayPage.module.css';
 import { dueLabel, TODAY_SECTIONS, type TodayItem } from './todayModel';
+import { TODAY_VIEWS } from './viewsModel';
 import { useTodayController } from './useTodayController';
 
 export function TodayPage() {
@@ -35,6 +37,18 @@ export function TodayPage() {
     complete,
     changeDueDate,
     moveOverdueToToday,
+    view,
+    entries,
+    counts,
+    setView,
+    projects,
+    epicsByProject,
+    organizing,
+    organizeError,
+    organizeSaving,
+    openOrganize,
+    closeOrganize,
+    saveOrganize,
     retry,
   } = useTodayController();
 
@@ -91,6 +105,21 @@ export function TodayPage() {
 
       <ReminderSettings />
 
+      <div role="group" aria-label="Views" className={styles.views}>
+        {TODAY_VIEWS.map(({ id, label }) => (
+          <ButtonV2
+            key={id}
+            size="sm"
+            variant={view === id ? 'primary' : 'ghost'}
+            aria-pressed={view === id}
+            onClick={() => setView(id)}
+          >
+            {label}
+            {counts[id] > 0 && <span className={styles.viewCount}>{counts[id]}</span>}
+          </ButtonV2>
+        ))}
+      </div>
+
       {error && (
         <AlertV2 tone="error">
           {error}{' '}
@@ -121,7 +150,37 @@ export function TodayPage() {
         </div>
       )}
 
-      {openCount === 0 ? (
+      {view !== 'due' ? (
+        <section className={styles.section} aria-labelledby="today-view-title">
+          <h2 id="today-view-title">
+            {TODAY_VIEWS.find((candidate) => candidate.id === view)?.label}{' '}
+            <span className={styles.count}>{entries.length}</span>
+          </h2>
+          {entries.length === 0 ? (
+            <CardV2 variant="outlined">
+              <FeedbackStateV2
+                state="empty"
+                title={TODAY_VIEWS.find((candidate) => candidate.id === view)?.empty ?? ''}
+              />
+            </CardV2>
+          ) : (
+            <ul className={styles.list}>
+              {entries.map(({ item, note }) => (
+                <TaskRow
+                  key={`${item.projectId}:${item.feature.id}`}
+                  item={item}
+                  note={note}
+                  todayIso={todayIso}
+                  showProject={showProject}
+                  onComplete={complete}
+                  onChangeDate={changeDueDate}
+                  onOrganize={openOrganize}
+                />
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : openCount === 0 ? (
         <CardV2 variant="outlined">
           <FeedbackStateV2
             state="empty"
@@ -152,6 +211,7 @@ export function TodayPage() {
                     showProject={showProject}
                     onComplete={complete}
                     onChangeDate={changeDueDate}
+                    onOrganize={openOrganize}
                   />
                 ))}
               </ul>
@@ -159,22 +219,39 @@ export function TodayPage() {
           );
         })
       )}
+
+      {organizing && (
+        <OrganizeDialog
+          key={`${organizing.projectId}:${organizing.feature.id}`}
+          item={organizing}
+          projects={projects}
+          epicsByProject={epicsByProject}
+          saving={organizeSaving}
+          error={organizeError}
+          onSave={(values) => saveOrganize(organizing, values)}
+          onClose={closeOrganize}
+        />
+      )}
     </div>
   );
 }
 
 function TaskRow({
   item,
+  note,
   todayIso,
   showProject,
   onComplete,
   onChangeDate,
+  onOrganize,
 }: {
   item: TodayItem;
+  note?: string;
   todayIso: string;
   showProject: boolean;
   onComplete: (item: TodayItem) => void;
   onChangeDate: (item: TodayItem, dueDate: string | null) => void;
+  onOrganize: (item: TodayItem) => void;
 }) {
   const { feature } = item;
   return (
@@ -184,12 +261,15 @@ function TaskRow({
         checked={false}
         onChange={() => onComplete(item)}
       />
-      <Link
-        className={styles.title}
-        to={`/planning/${item.workspaceId}/${item.projectId}/features/${feature.id}`}
-      >
-        {feature.title}
-      </Link>
+      <div className={styles.titleCell}>
+        <Link
+          className={styles.title}
+          to={`/planning/${item.workspaceId}/${item.projectId}/features/${feature.id}`}
+        >
+          {feature.title}
+        </Link>
+        {note && <small className={styles.note}>{note}</small>}
+      </div>
       <div className={styles.meta}>
         {feature.kind === 'bug' && (
           <BadgeV2 tone="error" variant="subtle" size="sm">
@@ -217,6 +297,14 @@ function TaskRow({
             Move to today
           </ButtonV2>
         )}
+        <ButtonV2
+          variant="ghost"
+          size="sm"
+          aria-label={`Organize ${feature.title}`}
+          onClick={() => onOrganize(item)}
+        >
+          Organize
+        </ButtonV2>
         <TextInputV2
           size="sm"
           type="date"
