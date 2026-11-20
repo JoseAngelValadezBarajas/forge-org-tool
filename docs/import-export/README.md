@@ -26,3 +26,34 @@ Importers reject anything that is not a real date and ignore the field in schema
 shared by SQLite, Supabase and the TypeScript client through `contracts/transfer/conformance.json`.
 On Supabase the transfer RPCs need migration 0007; see
 [the due dates runbook](../operations/byoc-due-dates-migration.md).
+
+## Import from a spreadsheet or GitHub
+
+The Transfer page accepts files from other tools and converts them, in the browser, into a normal
+`forge-project-transfer-v2` document. That document then goes through the same preview, fingerprint
+and confirmation as any other import, so the server validates everything and nothing is written
+until the user confirms. A converted import always creates a **new project**; it is not offered for
+Epic, work item or task transfers.
+
+**CSV** (`.csv` or `.tsv`; comma, semicolon or tab, quoted fields and line breaks inside quotes).
+The first row names the columns; only a title column is required. Recognized headers, English or
+Spanish: title / name / summary / task, description / body, status / state, priority, type / kind,
+severity, due / due date / deadline, tags / labels, epic / milestone / group. Status and priority
+words are mapped (`In Progress`, `Review`, `Closed`, `P0`, `Urgent`, `alta`...); anything unknown is
+imported as backlog or medium and reported. Dates must be `YYYY-MM-DD` (or `YYYY/MM/DD`); other
+formats are left empty and reported rather than guessed. Rows without a title are skipped and listed.
+
+**GitHub issues.** Export them with the GitHub CLI and choose the JSON file:
+
+```text
+gh issue list --state all --limit 1000 --json number,title,body,state,labels,milestone,url > issues.json
+```
+
+A closed issue becomes Done, a `bug` label makes it a Bug, a `priority: high` (or `P1`, `critical`)
+label sets the priority, other labels become tags, each milestone becomes an Epic and its due date
+becomes the deadline of its issues, and pull requests are skipped. The issue number and link are
+kept in the notes. Nothing is fetched from GitHub: only the file you choose is read.
+
+**Limits and honesty.** A project import takes at most 500 items and 100 Epics. Titles over 200
+characters and descriptions over 4000 are shortened and reported. A summary shows how many items and
+Epics will be created, what was skipped and every adjustment before the user confirms.

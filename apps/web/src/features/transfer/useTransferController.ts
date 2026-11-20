@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { convertForeignSource, type ConversionSummary } from './importers';
 import {
   organizationApi,
   type ContextualTransferScope,
@@ -52,6 +53,7 @@ export function useTransferController(
   const [preview, setPreview] = useState<ProjectTransferPreview | null>(null);
   const [exported, setExported] = useState(false);
   const [importedProjectId, setImportedProjectId] = useState('');
+  const [conversion, setConversion] = useState<ConversionSummary | null>(null);
   const [importedCounts, setImportedCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState('');
   const [packageBase64, setPackageBase64] = useState<string | null>(null);
@@ -89,6 +91,7 @@ export function useTransferController(
   }
 
   async function selectSourceFile(file: File) {
+    setConversion(null);
     setPreview(null);
     setImportedProjectId('');
     setExported(false);
@@ -103,7 +106,15 @@ export function useTransferController(
         return;
       }
       setPackageBase64(null);
-      setDocumentText(await file.text());
+      const text = await file.text();
+      const converted = convertForeignSource(file.name, text);
+      if (converted && scope) {
+        throw new Error(
+          'CSV and GitHub files create a new project. Import them from the project transfer page, not into an Epic, work item or task.',
+        );
+      }
+      setConversion(converted?.summary ?? null);
+      setDocumentText(converted ? JSON.stringify(converted.document, null, 2) : text);
       setFileName(file.name);
     } catch (cause) {
       setDocumentText('');
@@ -184,6 +195,7 @@ export function useTransferController(
   function startAnotherImport() {
     setImportedProjectId('');
     setImportedCounts({});
+    setConversion(null);
     setPreview(null);
     setDocumentText('');
     setPackageBase64(null);
@@ -192,6 +204,7 @@ export function useTransferController(
   }
 
   function updateDocumentText(value: string) {
+    setConversion(null);
     setPackageBase64(null);
     setDocumentText(value);
     setFileName(value.trim() ? 'Advanced JSON paste' : '');
@@ -210,6 +223,7 @@ export function useTransferController(
     fileName,
     importedProjectId,
     importedCounts,
+    conversion,
     importProject,
     startAnotherImport,
     packageBase64,
