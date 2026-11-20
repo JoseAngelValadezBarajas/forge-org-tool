@@ -38,6 +38,8 @@
   z-index: 1;
   right: 0;
   opacity: 0;
+  /* Hidden controls must not catch the pointer meant for the row above or below. */
+  pointer-events: none;
   background: var(--forge-surface-raised);
 }
 .compact > span:has(> select) {
@@ -61,6 +63,7 @@
 .compact:hover .actions,
 .compact:focus-within .actions {
   opacity: 1;
+  pointer-events: auto;
 }
 @media (hover: none) {
   .compact {
@@ -72,6 +75,7 @@
   .compact .actions {
     position: static;
     opacity: 1;
+    pointer-events: auto;
     grid-column: 2;
   }
 }
