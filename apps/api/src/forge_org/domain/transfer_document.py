@@ -1,6 +1,8 @@
 """Project transfer document rules: schema, limits, validation. Framework independent."""
 
 import json
+import re
+from datetime import date
 from typing import Any
 
 from forge_org.domain.errors import InvalidInput
@@ -13,10 +15,23 @@ MAX_DEPENDENCIES = 5000
 MAX_TASKS = 2000
 MAX_CRITERIA = 2000
 MAX_DOCUMENT_BYTES = 7 * 1024 * 1024
+# Shared with the SQL helper and the conformance vectors (contracts/transfer/conformance.json).
+DUE_DATE_PATTERN = re.compile(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
 
 
 def canonical_json(document: dict[str, Any]) -> str:
     return json.dumps(document, sort_keys=True, separators=(',', ':'), ensure_ascii=True)
+
+
+def is_iso_date(value: Any) -> bool:
+    """True for a real calendar date written as YYYY-MM-DD (no time, no zone)."""
+    if not isinstance(value, str) or not DUE_DATE_PATTERN.fullmatch(value):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
 
 
 def _validate_tags(tags: list[Any]) -> None:
@@ -128,6 +143,8 @@ def validate_document(document: dict[str, Any]) -> dict[str, Any]:
                 raise InvalidInput('Work Item status is invalid')
             if feature.get('kind') == 'bug' and feature.get('bug_severity') not in valid_priorities:
                 raise InvalidInput('Bug severity is invalid')
+            if feature.get('due_date') is not None and not is_iso_date(feature['due_date']):
+                raise InvalidInput('Work Item due date must be an ISO date (YYYY-MM-DD)')
             if not isinstance(feature.get('tags', []), list):
                 raise InvalidInput('Work Item tags must be an array')
             _validate_tags(feature.get('tags', []))

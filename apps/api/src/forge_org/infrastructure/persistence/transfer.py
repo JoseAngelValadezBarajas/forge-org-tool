@@ -187,7 +187,8 @@ class SqliteTransferStore:
         self.connection.execute(
             'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, '
             'status, kind, bug_severity, steps_to_reproduce, expected_result, actual_result, '
-            'notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'notes, due_date, created_at, updated_at) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             (
                 feature_id,
                 project_id,
@@ -203,6 +204,7 @@ class SqliteTransferStore:
                 values['expected_result'],
                 values['actual_result'],
                 values['notes'],
+                values['due_date'],
                 now,
                 now,
             ),

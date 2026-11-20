@@ -36,6 +36,13 @@ export function createSupabaseTransport(profile: SupabaseProfile, getSession: Se
         { message?: string } | undefined;
       if (response.status === 401)
         throw new ApiError(401, 'Supabase session expired. Sign in again.');
+      // PostgREST reports a missing column as a 400 that names it. Tell the owner what to apply.
+      if (response.status === 400 && /due_date/.test(detail?.message ?? '')) {
+        throw new ApiError(
+          409,
+          'This Supabase project does not support due dates yet. Apply 20261119_byoc_0006.sql, then try again.',
+        );
+      }
       if (response.status === 403) throw new ApiError(403, 'Supabase denied this operation.');
       throw new ApiError(
         response.status,
