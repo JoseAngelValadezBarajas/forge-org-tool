@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildRegistryFiles, validateRegistry } from './product-acceptance-registry.mjs';
+import {
+  TRACKS,
+  buildRegistryFiles,
+  renderDocuments,
+  validateRegistry,
+} from './product-acceptance-registry.mjs';
 
 const manifest = {
   schema_version: 1,
@@ -33,6 +38,7 @@ function frame(figma_node_id, test_ids = ['PA-001'], status = 'AUTOMATED_PASS') 
         ? ['test-results/product-acceptance/run/playwright-results.json']
         : [],
     status,
+    track: 'active',
     notes: null,
   };
 }
@@ -108,13 +114,95 @@ test('requires reasons for product gaps, manual reviews and blocked coverage', (
   );
 });
 
-test('generated matrix does not present a stale run result as current registry evidence', async () => {
+test('generated active acceptance does not present a stale run result as current registry evidence', async () => {
   const outputs = await buildRegistryFiles();
   const markdown = [...outputs.entries()].find(([path]) =>
-    path.endsWith('product-acceptance-matrix.md'),
+    path.endsWith('active-product-acceptance.md'),
   )?.[1];
 
   assert.ok(markdown);
   assert.match(markdown, /run-scoped acceptance report/i);
   assert.doesNotMatch(markdown, /passed 50\/50|CI run \d+ passed/i);
+});
+
+test('every frame needs a valid track so a retired capability cannot pose as a product gap', () => {
+  const missing = frame('4:32');
+  delete missing.track;
+  assert.throws(
+    () => validateRegistry(manifest, [{ domain: 'core', frames: [missing, frame('4:158')] }]),
+    /invalid track/i,
+  );
+  const unknown = { ...frame('4:32'), track: 'retired' };
+  assert.throws(
+    () => validateRegistry(manifest, [{ domain: 'core', frames: [unknown, frame('4:158')] }]),
+    /invalid track/i,
+  );
+});
+
+test('counts every status per track and keeps the total equal to the frame count', () => {
+  const retired = { ...frame('4:158', [], 'NOT_IMPLEMENTED_PRODUCT_GAP'), track: 'history' };
+  retired.notes = 'Retired capability.';
+  const registry = validateRegistry(manifest, [
+    { domain: 'core', frames: [frame('4:32'), retired] },
+  ]);
+
+  assert.equal(registry.track_counts.active.AUTOMATED_PASS, 1);
+  assert.equal(registry.track_counts.history.NOT_IMPLEMENTED_PRODUCT_GAP, 1);
+  assert.equal(registry.track_counts.future.AUTOMATED_PASS, 0);
+  const total = TRACKS.flatMap((track) => Object.values(registry.track_counts[track])).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
+  assert.equal(total, registry.frame_count);
+});
+
+test('splits the documents by track and keeps retired gaps out of the active numbers', () => {
+  const retired = { ...frame('4:158', [], 'NOT_IMPLEMENTED_PRODUCT_GAP'), track: 'history' };
+  retired.notes = 'Retired capability.';
+  const registry = validateRegistry(manifest, [
+    { domain: 'core', frames: [frame('4:32'), retired] },
+  ]);
+  const documents = Object.fromEntries(renderDocuments(registry));
+
+  assert.deepEqual(Object.keys(documents), [
+    'product-acceptance-matrix.md',
+    'active-product-acceptance.md',
+    'design-history.md',
+    'future-candidates.md',
+  ]);
+  assert.match(documents['active-product-acceptance.md'], /\| 4:32 \|/);
+  assert.doesNotMatch(documents['active-product-acceptance.md'], /\| 4:158 \|/);
+  assert.doesNotMatch(documents['active-product-acceptance.md'], /NOT_IMPLEMENTED_PRODUCT_GAP/);
+  assert.match(documents['design-history.md'], /\| 4:158 \|/);
+  assert.match(documents['design-history.md'], /not product gaps/i);
+  assert.match(documents['product-acceptance-matrix.md'], /Status of the active product/);
+  assert.doesNotMatch(documents['product-acceptance-matrix.md'], /NOT_IMPLEMENTED_PRODUCT_GAP/);
+  assert.match(documents['future-candidates.md'], /Assisted migration between Local and Supabase/);
+});
+
+test('the checked-in registry has a track for every frame and no retired gap in the active track', async () => {
+  const outputs = await buildRegistryFiles();
+  const registry = JSON.parse(
+    [...outputs.entries()].find(([path]) =>
+      path.endsWith('product-acceptance-registry.json'),
+    )?.[1] ?? '{}',
+  );
+  assert.equal(registry.frames.length, registry.frame_count);
+  assert.ok(registry.frames.every((item) => TRACKS.includes(item.track)));
+  const activeGaps = registry.frames.filter(
+    (item) => item.track === 'active' && item.status === 'NOT_IMPLEMENTED_PRODUCT_GAP',
+  );
+  for (const gap of activeGaps) {
+    assert.ok(gap.notes?.trim(), `active gap ${gap.figma_node_id} must explain itself`);
+  }
+  assert.ok(
+    registry.frames
+      .filter((item) => item.track === 'history')
+      .every(
+        (item) =>
+          item.domain !== 'organization-planning-readiness' ||
+          /^UX-00 \/ (27|3[4-9]|4[0-4]) /.test(item.screen_state),
+      ),
+    'only the retired Decisions, Invariants and Readiness frames may be history inside the active domain',
+  );
 });
