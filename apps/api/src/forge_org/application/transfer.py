@@ -113,6 +113,7 @@ class ProjectTransferService:
                         'expected_result': feature.get('expected_result'),
                         'actual_result': feature.get('actual_result'),
                         'notes': feature.get('notes'),
+                        'due_date': feature.get('due_date') if is_v2 else None,
                     },
                     now,
                 )
@@ -216,6 +217,8 @@ class ProjectTransferService:
                             'actual_result': feature.get('actual_result'),
                             'notes': feature.get('notes'),
                             'tags': self._tag_names('feature', item['id']),
+                            # Omitted when empty, so documents without deadlines are unchanged.
+                            **({'due_date': item['due_date']} if item.get('due_date') else {}),
                         }
                         if schema_version == SCHEMA_VERSION_V2
                         else {}

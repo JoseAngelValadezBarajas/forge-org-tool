@@ -48,3 +48,24 @@ def test_supabase_migrations_use_the_shared_limits() -> None:
     assert f'> {LIMITS["max_epics"]}' in normalized
     assert f'> {LIMITS["max_features"]}' in normalized
     assert f'> {LIMITS["max_dependencies"]}' in normalized
+
+
+DUE_DATE = CONFORMANCE['due_date']
+
+
+@pytest.mark.parametrize('value', DUE_DATE['valid'])
+def test_python_accepts_the_shared_valid_due_dates(value: str) -> None:
+    assert transfer.is_iso_date(value) is True
+    assert re.fullmatch(DUE_DATE['pattern'], value)
+
+
+@pytest.mark.parametrize('value', DUE_DATE['invalid'])
+def test_python_rejects_the_shared_invalid_due_dates(value: object) -> None:
+    assert transfer.is_iso_date(value) is False
+
+
+def test_python_and_sql_share_the_due_date_pattern() -> None:
+    assert transfer.DUE_DATE_PATTERN.pattern == DUE_DATE['pattern']
+    sql = (ROOT / 'supabase' / 'migrations' / '20261119_byoc_0007.sql').read_text('utf-8')
+    assert f"p_value !~ '{DUE_DATE['pattern']}'" in sql
+    assert DUE_DATE['omit_when_empty'] is True

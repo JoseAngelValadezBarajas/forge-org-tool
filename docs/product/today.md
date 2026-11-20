@@ -40,14 +40,16 @@ never shifts with the viewer's clock). It exists in:
 - the Supabase BYOC schema, through the owner-run
   [20261119_byoc_0006.sql](../../supabase/migrations/20261119_byoc_0006.sql) with a
   [rollback](../../supabase/rollback/20261119_byoc_0006.sql). Until it is applied the app works
-  against that project as before, only the due date is unavailable.
+  against that project as before, only the due date is unavailable.;
+- the transfer document (schema v2): an optional `due_date` on a work item, omitted when empty
+  so documents without deadlines are unchanged, and ignored in schema v1.
 
 ## Known limits
 
-- **Transfer.** JSON and ZIP exports and the Supabase transfer RPCs do not carry `due_date` yet.
-  Exporting and re-importing a project keeps every other field and drops the deadlines.
-  Carrying it needs a change to `contracts/transfer/conformance.json` first, then the Python,
-  TypeScript and SQL implementations (see [transfer conformance](../architecture/transfer-conformance.md)).
+- **Transfer (Supabase).** JSON and ZIP export/import and contextual transfer carry `due_date`
+  on SQLite. On Supabase they carry it once the owner has applied
+  [20261119_byoc_0007.sql](../../supabase/migrations/20261119_byoc_0007.sql); before that, export and
+  import drop the deadlines. See the [migration runbook](../operations/byoc-due-dates-migration.md).
 - **Reminders.** There are no notifications. A deadline is shown, not announced.
 - **Global shortcut.** `n` works inside the app only. A system-wide capture shortcut needs a
   narrow desktop capability and is not part of this change.

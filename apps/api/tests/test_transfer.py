@@ -456,3 +456,117 @@ def test_project_package_round_trips_bug_screenshots_and_rejects_traversal_atomi
             )
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def _due_date_document(**feature_extra: object) -> dict[str, object]:
+    return {
+        'schema_version': 'forge-project-transfer-v2',
+        'project': {'name': 'Deadlines'},
+        'epics': [],
+        'features': [
+            {'ref': 'item:dated', 'title': 'Ship', 'due_date': '2026-12-01', **feature_extra},
+            {'ref': 'item:undated', 'title': 'Someday'},
+        ],
+        'dependencies': [],
+    }
+
+
+def test_due_dates_round_trip_and_are_omitted_when_empty(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'due-transfer.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Due'}).json()
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects'
+            document = _due_date_document()
+            preview = client.post(f'{root}/import/preview', json=document)
+            assert preview.status_code == 200, preview.text
+            imported = client.post(
+                f'{root}/import',
+                json={'document': document, 'expected_fingerprint': preview.json()['fingerprint']},
+            )
+            assert imported.status_code == 201, imported.text
+            project_id = imported.json()['project_id']
+
+            listed = client.get(f'{root}/{project_id}/features').json()
+            assert {item['title']: item['due_date'] for item in listed} == {
+                'Ship': '2026-12-01',
+                'Someday': None,
+            }
+            exported = client.get(
+                f'{root}/{project_id}/export?schema_version=forge-project-transfer-v2'
+            ).json()
+            by_title = {item['title']: item for item in exported['features']}
+            assert by_title['Ship']['due_date'] == '2026-12-01'
+            assert 'due_date' not in by_title['Someday']
+
+            v1 = client.get(
+                f'{root}/{project_id}/export?schema_version=forge-project-import-v1'
+            ).json()
+            assert all('due_date' not in item for item in v1['features'])
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_due_dates_survive_a_zip_package_round_trip(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'due-package.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Package'}).json()
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects'
+            document = _due_date_document()
+            preview = client.post(f'{root}/import/preview', json=document).json()
+            project_id = client.post(
+                f'{root}/import',
+                json={'document': document, 'expected_fingerprint': preview['fingerprint']},
+            ).json()['project_id']
+            package = client.get(f'{root}/{project_id}/export/package')
+            assert package.status_code == 200
+            archive = base64.b64encode(package.content).decode('ascii')
+            body = {'archive_base64': archive}
+            other = client.post('/api/v1/workspaces', json={'name': 'Copy'}).json()
+            other_root = f'/api/v1/workspaces/{other["id"]}/projects'
+            package_preview = client.post(f'{other_root}/import/package/preview', json=body)
+            assert package_preview.status_code == 200, package_preview.text
+            imported = client.post(
+                f'{other_root}/import/package',
+                json={**body, 'expected_fingerprint': package_preview.json()['fingerprint']},
+            )
+            assert imported.status_code == 201, imported.text
+            copy_id = imported.json()['project_id']
+            dates = {
+                item['title']: item['due_date']
+                for item in client.get(f'{other_root}/{copy_id}/features').json()
+            }
+            assert dates == {'Ship': '2026-12-01', 'Someday': None}
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_invalid_due_dates_are_rejected_and_v1_ignores_the_field(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'due-invalid.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Invalid'}).json()
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects'
+            for bad in ('2026-02-31', 'tomorrow', '2026-12-01T00:00:00', 20261201):
+                response = client.post(
+                    f'{root}/import/preview', json=_due_date_document(due_date=bad)
+                )
+                assert response.status_code == 422, (bad, response.text)
+
+            legacy = {
+                'schema_version': 'forge-project-import-v1',
+                'project': {'name': 'Legacy'},
+                'epics': [],
+                'features': [{'ref': 'f:1', 'title': 'Old', 'due_date': 'not-a-date'}],
+                'dependencies': [],
+            }
+            preview = client.post(f'{root}/import/preview', json=legacy)
+            assert preview.status_code == 200, preview.text
+            project_id = client.post(
+                f'{root}/import',
+                json={'document': legacy, 'expected_fingerprint': preview.json()['fingerprint']},
+            ).json()['project_id']
+            assert client.get(f'{root}/{project_id}/features').json()[0]['due_date'] is None
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)

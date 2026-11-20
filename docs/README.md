@@ -15,7 +15,7 @@ Start with the product contract, then the architecture. Everything else is eithe
 
 ## Optional capabilities (opt-in, not required by the local product)
 
-- BYOC cloud mode (Supabase owned by the user): [byoc-supabase](operations/byoc-supabase.md), [byoc-0.2](architecture/byoc-0.2.md), [parity](byoc-0.2-parity.md), [verification](operations/byoc-0.2-verification.md)
+- BYOC cloud mode (Supabase owned by the user): [byoc-supabase](operations/byoc-supabase.md), [due dates migration](operations/byoc-due-dates-migration.md), [byoc-0.2](architecture/byoc-0.2.md), [parity](byoc-0.2-parity.md), [verification](operations/byoc-0.2-verification.md)
 - Android shell (cloud-only, native certification blocked): [android-0.1](architecture/android-0.1.md)
 
 ## Historical (kept for traceability, not current behavior)
