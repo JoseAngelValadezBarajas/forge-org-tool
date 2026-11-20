@@ -1,8 +1,15 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Desktop capability grants only file-dialog access and reads of dialog-selected files. The sidecar is spawned by the Rust host, never by the webview.",
+  "description": "Desktop capability grants only file-dialog access, reads of dialog-selected files, and showing a system notification (check permission, ask for it, notify). The sidecar is spawned by the Rust host, never by the webview.",
   "windows": ["main"],
   "platforms": ["windows", "macOS", "linux"],
-  "permissions": ["core:default", "dialog:allow-open", "fs:allow-read-file"]
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    "fs:allow-read-file",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify"
+  ]
 }

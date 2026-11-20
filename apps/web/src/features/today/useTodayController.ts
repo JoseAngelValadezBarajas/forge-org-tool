@@ -1,70 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { organizationApi, type Feature, type Project, type Workspace } from '@forge-org/api-client';
+import { organizationApi, type Feature, type Project } from '@forge-org/api-client';
 import { formatLocalDate, parseQuickCapture } from './quickCapture';
+import { INBOX_NAME, loadTodayData } from './todayData';
 import { attentionCount, dueLabel, groupTodayItems, type TodayItem } from './todayModel';
 
-const ACTIVE_WORKSPACE_KEY = 'forge-active-workspace';
-const DEFAULT_WORKSPACE_NAME = 'Personal';
-const INBOX_NAME = 'Inbox';
-
 type Notice = { message: string; undo?: { item: TodayItem } };
-
-function announce(name: string, detail: unknown) {
-  window.dispatchEvent(new CustomEvent(name, { detail }));
-}
-
-type LoadedToday = {
-  target: { workspaceId: string; project: Project };
-  projectCount: number;
-  items: TodayItem[];
-};
-
-/** Resolves the workspace and Inbox (creating them on first use) and every open work item. */
-async function loadToday(): Promise<LoadedToday> {
-  const workspaces = await organizationApi.listWorkspaces();
-  const saved = localStorage.getItem(ACTIVE_WORKSPACE_KEY) ?? '';
-  const open = workspaces.filter((candidate) => !candidate.archived_at);
-  let workspace: Workspace | undefined =
-    open.find((candidate) => candidate.id === saved) ?? open[0];
-  if (!workspace && workspaces.length === 0) {
-    workspace = await organizationApi.createWorkspace(DEFAULT_WORKSPACE_NAME);
-    announce('forge:workspace-created', { workspace });
-  }
-  if (!workspace) {
-    throw new Error('Every workspace is archived. Restore one from Workspaces to continue.');
-  }
-  const workspaceId = workspace.id;
-  localStorage.setItem(ACTIVE_WORKSPACE_KEY, workspaceId);
-  announce('forge:active-workspace-change', { workspaceId });
-
-  let projects = await organizationApi.listProjects(workspaceId);
-  if (projects.length === 0) {
-    const inbox = await organizationApi.createProject(workspaceId, INBOX_NAME);
-    projects = [inbox];
-    announce('forge:projects-changed', {});
-  }
-  const inbox =
-    projects.find((project) => project.name.toLowerCase() === INBOX_NAME.toLowerCase()) ??
-    projects[0];
-
-  const overviews = await Promise.all(
-    projects.map(async (project) => ({
-      project,
-      overview: await organizationApi.planningOverview(workspaceId, project.id),
-    })),
-  );
-  const loaded = overviews.flatMap(({ project, overview }) =>
-    [...overview.epics.flatMap((epic) => epic.features), ...overview.unassigned_features].map(
-      (feature): TodayItem => ({
-        feature,
-        workspaceId,
-        projectId: project.id,
-        projectName: project.name,
-      }),
-    ),
-  );
-  return { target: { workspaceId, project: inbox }, projectCount: projects.length, items: loaded };
-}
 
 /**
  * Today is the default landing page: one line to capture a task, one list of what is due.
@@ -90,7 +30,7 @@ export function useTodayController() {
 
   useEffect(() => {
     let current = true;
-    void loadToday()
+    void loadTodayData({ bootstrap: true })
       .then((loaded) => {
         if (!current) return;
         setTarget(loaded.target);

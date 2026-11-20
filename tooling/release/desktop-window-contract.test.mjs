@@ -313,3 +313,31 @@ test('Desktop acceptance captures the live Bug detail surface when the native pi
   assert.match(smoke, /Native picker failure UIA elements/);
   assert.match(smoke, /CaptureWindow\(\$root\.Current\.NativeWindowHandle, \$screenshotPath\)/);
 });
+
+test('system notifications are desktop-only and the webview holds exactly three notification permissions', async () => {
+  const manifest = await readFile('apps/desktop/src-tauri/Cargo.toml', 'utf8');
+  const host = await readFile('apps/desktop/src-tauri/src/lib.rs', 'utf8');
+  const capability = JSON.parse(
+    await readFile('apps/desktop/src-tauri/capabilities/default.json', 'utf8'),
+  );
+
+  const desktopDependencies = manifest.slice(manifest.indexOf("[target.'cfg(not(any("));
+  assert.match(desktopDependencies, /tauri-plugin-notification\s*=/);
+  const beforeDesktopDependencies = manifest.slice(0, manifest.indexOf("[target.'cfg(not(any("));
+  assert.doesNotMatch(
+    beforeDesktopDependencies,
+    /tauri-plugin-notification/,
+    'the mobile build must not depend on the desktop notification plugin',
+  );
+  assert.equal(host.match(/tauri_plugin_notification::init\(\)/g)?.length, 1);
+
+  const notification = capability.permissions.filter((permission) =>
+    permission.startsWith('notification:'),
+  );
+  assert.deepEqual(notification.sort(), [
+    'notification:allow-is-permission-granted',
+    'notification:allow-notify',
+    'notification:allow-request-permission',
+  ]);
+  assert.ok(!capability.permissions.includes('notification:default'));
+});

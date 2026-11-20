@@ -33,7 +33,22 @@ The workflow decodes the key only under the runner temporary directory, validate
 
 ## 2. Windows Authenticode signing
 
-Obtain a code-signing certificate from a trusted provider. Do not create a self-signed certificate and present it as publicly trusted. Export the certificate and private key as a password-protected PFX and configure these secrets in the protected `release` Environment:
+Obtain a code-signing certificate from a trusted provider. Do not create a self-signed certificate and present it as publicly trusted.
+
+### Which kind of certificate this pipeline can use today
+
+The workflow signs with a PFX file kept in protected secrets. That only works with a certificate whose private key can be exported. Since June 2023 the CA/Browser Forum requires the private key of a publicly trusted code-signing certificate (OV and EV) to live on FIPS 140-2 Level 2 or Common Criteria EAL4+ hardware, a token or a cloud HSM, and the key cannot be exported. In practice a **new** certificate from a public CA cannot be turned into a PFX for a GitHub secret. Check with the provider before buying: the PFX path below is for a certificate that already exists as an exportable file.
+
+For a new certificate there are two realistic routes, and each needs a small change to the Windows job that has not been made yet (it must be built against the real provider, so it cannot be tested before the account exists):
+
+- **Cloud signing service** (Microsoft's Artifact Signing, formerly Trusted Signing, or a CA's cloud HSM such as SSL.com eSigner or DigiCert KeyLocker). Tauri supports a custom `bundle.windows.signCommand`, so the job would call the provider's signing tool instead of importing a PFX. Artifact Signing is limited by identity and geography: reporting from March 2026 says individuals are accepted only in the USA and Canada and that onboarding was narrowed during the preview, so an organization identity in a supported country may be required. Confirm current eligibility and prices on Microsoft's pages before relying on this.
+- **Hardware token** held by the owner. It cannot be used from a hosted GitHub runner, so the installer would be signed on the owner's machine with `signtool` after the workflow produces the unsigned build.
+
+What signing does not do: it identifies the publisher and avoids the "unknown publisher" prompt, but SmartScreen reputation still builds with downloads. Sources disagree on whether an EV certificate still earns instant reputation after Microsoft's March 2024 change, so do not promise users that the warning disappears immediately.
+
+### Configure the PFX path (exportable certificates only)
+
+Configure these secrets in the protected `release` Environment:
 
 - `WINDOWS_PFX_BASE64`: base64 of the PFX file.
 - `WINDOWS_PFX_PASSWORD`: PFX export password.

@@ -13,6 +13,7 @@
 - Sidecar responses are capped in memory (`MAX_RESPONSE_BYTES`), request bodies at `MAX_JSON_BODY`.
 - The sidecar authenticates every HTTP request with the per-launch bearer token and refuses WebSocket connections and any other non-HTTP scope instead of skipping the check.
 - The webview CSP allows `img-src 'self' blob: data:` only, so Bug screenshots render from object URLs without allowing remote images.
+- The webview holds three notification permissions only (check permission, request it, show a notification). It has no shell, process, URL or unrestricted filesystem capability, and the notification plugin is registered by the desktop host only, never by the Android shell. A contract test pins the exact list.
 
 ## Accepted risk: remembered Supabase session
 
