@@ -18,6 +18,11 @@ Maintain fixtures for valid v1 and v2 round trips; unknown versions; malformed J
 
 See [the product contract](../product/mvp-1.0.md) and [acceptance traceability](../quality/mvp-1.0-acceptance.md).
 
-## Known limit: due dates
+## Work item due dates
 
-Work item due dates (`due_date`, used by Today) are not part of the transfer document or the package manifest yet. Export and re-import keeps every other field and drops the deadlines. See [Today](../product/today.md#known-limits).
+Schema v2 work items may carry `due_date`, an ISO calendar date (`YYYY-MM-DD`, no time or zone).
+Exporters omit the key when the date is empty, so documents without deadlines are unchanged.
+Importers reject anything that is not a real date and ignore the field in schema v1. The rule is
+shared by SQLite, Supabase and the TypeScript client through `contracts/transfer/conformance.json`.
+On Supabase the transfer RPCs need migration 0007; see
+[the due dates runbook](../operations/byoc-due-dates-migration.md).

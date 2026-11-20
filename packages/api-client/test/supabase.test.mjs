@@ -337,6 +337,38 @@ describe('Supabase Data API adapter', () => {
     assert.equal(calls.filter(({ url }) => url.startsWith('/api/v1/')).length, 0);
   });
 
+  it('explains how to enable due dates when the Supabase schema predates migration 0006', async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight')) {
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      }
+      if (String(url).includes('/rest/v1/features')) {
+        return jsonResponse(
+          {
+            code: 'PGRST204',
+            message: "Could not find the 'due_date' column of 'features' in the schema cache",
+          },
+          400,
+        );
+      }
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+
+    await assert.rejects(
+      () =>
+        organizationApi.createFeature('w1', 'p1', 'Ship', undefined, { due_date: '2026-12-01' }),
+      (error) => {
+        assert.equal(error.status, 409);
+        assert.match(error.message, /20261119_byoc_0006\.sql/);
+        return true;
+      },
+    );
+  });
+
   it('keeps a user without workspace membership isolated from another user', async () => {
     const calls = [];
     const userBSession = {

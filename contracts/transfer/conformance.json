@@ -13,6 +13,24 @@
     "max_tasks": 2000,
     "max_criteria": 2000
   },
+  "due_date": {
+    "description": "Optional work item deadline in transfer documents (schema v2 only). An ISO calendar date with no time or zone. Exporters omit the key when the date is empty, so documents without deadlines are unchanged.",
+    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+    "valid": ["2026-12-01", "2028-02-29", "2026-12-31"],
+    "invalid": [
+      "2026-02-31",
+      "2027-02-29",
+      "2026-13-01",
+      "2026-1-5",
+      "20261201",
+      "12/01/2026",
+      "tomorrow",
+      "2026-12-01T00:00:00",
+      " 2026-12-01",
+      20261201
+    ],
+    "omit_when_empty": true
+  },
   "image_vectors": [
     {
       "name": "valid png",
