@@ -54,8 +54,8 @@
     "quality": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
-    "@tauri-apps/cli": "^2.12.4",
+    "@eslint/js": "^10.0.1",
+    "@tauri-apps/cli": "^2.12.5",
     "@types/pngjs": "^6.0.5",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
@@ -64,8 +64,8 @@
     "openapi-typescript": "^7.13.0",
     "pixelmatch": "^8.0.0",
     "pngjs": "^7.0.0",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.73.0"
   }
 }
