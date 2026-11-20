@@ -509,6 +509,18 @@
             ],
             "title": "Description"
           },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
           "epic_id": {
             "anyOf": [
               {
@@ -649,6 +661,18 @@
               }
             ],
             "title": "Description"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
           },
           "epic_id": {
             "anyOf": [
@@ -805,6 +829,18 @@
               }
             ],
             "title": "Description"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
           },
           "epic_id": {
             "anyOf": [

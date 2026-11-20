@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -144,6 +144,7 @@ class FeatureCreate(BaseModel):
     actual_result: str | None = Field(default=None, max_length=4000)
     tags: list[str] = Field(default_factory=list, max_length=20)
     notes: str | None = Field(default=None, max_length=8000)
+    due_date: date | None = None
 
 
 class FeatureUpdate(BaseModel):
@@ -163,6 +164,7 @@ class FeatureUpdate(BaseModel):
     actual_result: str | None = Field(default=None, max_length=4000)
     tags: list[str] | None = Field(default=None, max_length=20)
     notes: str | None = Field(default=None, max_length=8000)
+    due_date: date | None = None
 
 
 class FeatureResponse(BaseModel):
@@ -181,6 +183,7 @@ class FeatureResponse(BaseModel):
     actual_result: str | None = None
     tags: list[str] = Field(default_factory=list)
     notes: str | None = None
+    due_date: date | None = None
     created_at: datetime
     updated_at: datetime
 

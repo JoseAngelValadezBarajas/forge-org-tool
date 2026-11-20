@@ -27,6 +27,12 @@ The 1.0 implementation keeps Organization, Planning, Project Transfer and shared
 
 Project Transfer supports legacy v1 JSON import, v2 JSON planning export/import, and v2 ZIP packages that include validated Bug screenshots. Package transfer is limited to 5 MiB compressed to remain within the Desktop sidecar request boundary; see [`docs/import-export/README.md`](docs/import-export/README.md) for the package manifest, checksums and rejected archive conditions.
 
+## What you see first
+
+The app opens on **Today**: one field to capture a task (`Fix login friday`) and the list of what is
+due. Workspace, project and epic structure exist but are never required to start; see
+[Today](docs/product/today.md).
+
 ## Local bootstrap (Windows PowerShell)
 
 Prerequisites: Node.js 24, npm 11, Python 3.12, uv and git. Rust toolchain is required for native Tauri development/builds.

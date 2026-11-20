@@ -64,7 +64,7 @@ def test_upgraded_legacy_database_creates_epic_with_backlog_status(tmp_path: Pat
         assert legacy['legacy-planning'] == ('backlog', None)
         assert legacy['legacy-planned'] == ('ready', None)
         assert legacy['legacy-archived'] == ('backlog', 'archived-updated')
-        assert schema_version == 5
+        assert schema_version == 6
         backups = list(tmp_path.glob('legacy-default.db.pre-migration-*.bak'))
         assert len(backups) == 1
         with sqlite3.connect(backups[0]) as backup:
@@ -446,5 +446,39 @@ def test_planning_records_support_manual_updates_and_reordering(tmp_path: Path) 
                 json={'blocking_feature_id': feature['id'], 'blocked_feature_id': feature['id']},
             ).status_code
             assert dependency == 422
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_feature_due_date_can_be_set_changed_and_cleared(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'due-date.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Personal'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'Inbox'}
+            ).json()
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+
+            created = client.post(
+                f'{root}/features', json={'title': 'Ship', 'due_date': '2026-12-01'}
+            )
+            assert created.status_code == 201
+            assert created.json()['due_date'] == '2026-12-01'
+            assert (
+                client.post(f'{root}/features', json={'title': 'No date'}).json()['due_date']
+                is None
+            )
+
+            feature_id = created.json()['id']
+            moved = client.patch(f'{root}/features/{feature_id}', json={'due_date': '2026-12-15'})
+            assert moved.json()['due_date'] == '2026-12-15'
+            untouched = client.patch(f'{root}/features/{feature_id}', json={'title': 'Ship it'})
+            assert untouched.json()['due_date'] == '2026-12-15'
+            cleared = client.patch(f'{root}/features/{feature_id}', json={'due_date': None})
+            assert cleared.json()['due_date'] is None
+
+            invalid = client.post(f'{root}/features', json={'title': 'Bad', 'due_date': 'tomorrow'})
+            assert invalid.status_code == 422
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)

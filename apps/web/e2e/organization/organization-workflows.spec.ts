@@ -37,7 +37,7 @@ test('PA-ORG-001 workspace first-use and project lifecycle persist through SQLit
   expect(listResponse.ok()).toBeTruthy();
   let workspaces = (await listResponse.json()) as Workspace[];
 
-  await page.goto('/');
+  await page.goto('/overview');
 
   const main = page.getByRole('main');
   await expect(
@@ -248,7 +248,7 @@ test('PA-ORG-002 Project Overview edits and status persist through Planning and 
   expect(projectResponse.status()).toBe(201);
   const project = await projectResponse.json();
 
-  await page.goto('/');
+  await page.goto('/overview');
   await selectWorkspace(page, workspace.name);
   const projectLink = page
     .getByRole('region', { name: 'Projects', exact: true })

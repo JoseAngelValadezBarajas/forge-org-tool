@@ -44,7 +44,7 @@ class FeaturePersistence(TagPersistence):
         tags = values.pop('tags', [])
         with transaction(self.connection):
             self.connection.execute(
-                'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, kind, bug_severity, steps_to_reproduce, expected_result, actual_result, notes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO features(id, project_id, epic_id, title, description, goal, priority, status, kind, bug_severity, steps_to_reproduce, expected_result, actual_result, notes, due_date, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 (
                     feature_id,
                     project_id,
@@ -60,6 +60,7 @@ class FeaturePersistence(TagPersistence):
                     values.get('expected_result'),
                     values.get('actual_result'),
                     values.get('notes'),
+                    values.get('due_date'),
                     now,
                     now,
                 ),

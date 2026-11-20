@@ -266,7 +266,8 @@ export function useApplicationShell() {
     window.dispatchEvent(
       new CustomEvent('forge:active-workspace-change', { detail: { workspaceId: id } }),
     );
-    navigate('/');
+    // Workspace-level pages stay where they are; anything deeper returns to Today.
+    navigate(location.pathname === '/overview' ? '/overview' : '/');
   }
   const isMobileEpicBoard = /^\/planning\/[^/]+\/[^/]+\/epics\/[^/]+(?:\/|$)/.test(
     location.pathname,
@@ -309,9 +310,9 @@ export function useApplicationShell() {
     {
       id: 'overview',
       label: 'Overview',
-      path: context ? `/projects/${context.workspaceId}/${context.projectId}` : '/',
+      path: context ? `/projects/${context.workspaceId}/${context.projectId}` : '/overview',
     },
-    { id: 'projects', label: 'Projects', path: '/' },
+    { id: 'projects', label: 'Projects', path: '/overview' },
     {
       id: 'planning',
       label: 'Planning',

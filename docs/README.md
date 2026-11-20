@@ -5,6 +5,7 @@ Start with the product contract, then the architecture. Everything else is eithe
 ## Active (describes the shipping 1.0 product)
 
 - [Product contract](product/mvp-1.0.md) and [charter](product/charter.md)
+- [Today, the default landing page](product/today.md)
 - [Architecture](architecture/README.md), [decision records](architecture/decisions), [data model](architecture/data-model.md), [client components](architecture/client-components.md), [transfer conformance](architecture/transfer-conformance.md)
 - [Import / export](import-export/README.md)
 - [Quality and acceptance](quality/mvp-1.0-acceptance.md)

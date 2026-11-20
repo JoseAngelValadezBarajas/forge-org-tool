@@ -12,6 +12,7 @@ import {
 import {
   ChevronDown,
   ChevronRight,
+  CalendarDays,
   Folder,
   Layers,
   PanelLeft,
@@ -27,6 +28,7 @@ import {
   WorkspaceSettingsPage,
 } from '../features/organization';
 import { EpicDetailPage, FeatureDetailPage, PlanningPage } from '../features/planning';
+import { TodayPage } from '../features/today';
 import { TransferPage } from '../features/transfer';
 import { CommandPalette, NavigationItem, WorkspaceSwitcher } from './shell';
 import { ThemeProvider } from './theme';
@@ -201,6 +203,14 @@ function ApplicationShell() {
               <NavigationItem
                 to="/"
                 end
+                label="Today"
+                aria-label="Today"
+                icon={<CalendarDays aria-hidden="true" size={16} />}
+                title="Today"
+              />
+              <NavigationItem
+                to="/overview"
+                end
                 label="Workspace Overview"
                 aria-label="Workspace Overview"
                 icon={<Folder aria-hidden="true" size={16} />}
@@ -320,7 +330,7 @@ function ApplicationShell() {
                 aria-label="Current location"
                 data-node-id="344:106"
               >
-                <Link to="/">{activeWorkspace?.name ?? 'Workspace'}</Link>
+                <Link to="/overview">{activeWorkspace?.name ?? 'Workspace'}</Link>
                 <span aria-hidden="true">/</span>
                 <Link to={`/projects/${context.workspaceId}/${context.projectId}`}>
                   {activeProject?.name ?? 'Project'}
@@ -397,7 +407,8 @@ function ApplicationShell() {
               projectName={activeProject?.name}
             />
             <Routes key={storageRevision}>
-              <Route path="/" element={<OrganizationPage />} />
+              <Route path="/" element={<TodayPage />} />
+              <Route path="/overview" element={<OrganizationPage />} />
               <Route path="/settings/storage" element={<StorageSettingsPage />} />
               <Route path="/workspaces/manage" element={<WorkspaceManagementPage />} />
               <Route path="/workspaces/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
@@ -453,7 +464,13 @@ function ApplicationShell() {
         aria-label="Mobile navigation"
         data-node-id={isMobileEpicBoard ? '348:237' : undefined}
       >
-        <Link to="/" aria-current={!context ? 'page' : undefined}>
+        <Link to="/" aria-current={location.pathname === '/' ? 'page' : undefined}>
+          Today
+        </Link>
+        <Link
+          to="/overview"
+          aria-current={!context && location.pathname !== '/' ? 'page' : undefined}
+        >
           Projects
         </Link>
         {mobileBoardPath ? (
@@ -479,7 +496,8 @@ function ApplicationShell() {
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         commands={[
-          { id: 'organization', label: 'Organization', onSelect: () => go('/') },
+          { id: 'today', label: 'Today', onSelect: () => go('/') },
+          { id: 'organization', label: 'Organization', onSelect: () => go('/overview') },
           {
             id: 'storage-settings',
             label: 'Storage settings',

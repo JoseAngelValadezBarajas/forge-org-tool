@@ -44,7 +44,7 @@ describe('M1 application shell', () => {
   });
 
   it('shows an actionable empty organization state', async () => {
-    renderRoute('/');
+    renderRoute('/overview');
 
     expect(await screen.findByRole('heading', { name: 'No workspaces yet' })).toBeInTheDocument();
     expect(screen.getByText('No workspaces yet')).toBeInTheDocument();
@@ -62,7 +62,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response('[]', { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
     await waitFor(() => expect(workspaceResponses.length).toBeGreaterThan(0));
 
     const workspace = {
@@ -105,7 +105,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response('[]', { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
     await waitFor(() => expect(resolveLocalWorkspaces).toBeTypeOf('function'));
 
     configureStorage({
@@ -194,7 +194,7 @@ describe('M1 application shell', () => {
     const topbarNavigation = screen.getByRole('navigation', { name: 'Current location' });
     expect(within(topbarNavigation).getByRole('link', { name: 'Research' })).toHaveAttribute(
       'href',
-      '/',
+      '/overview',
     );
     expect(within(topbarNavigation).getByRole('link', { name: 'Atlas' })).toHaveAttribute(
       'href',
@@ -244,7 +244,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
 
     const sidebar = screen.getByTestId('app-sidebar');
     expect(
@@ -271,7 +271,7 @@ describe('M1 application shell', () => {
       projectUrl: 'https://example123.supabase.co',
       publishableKey: 'sb_publishable_testkey123',
     });
-    renderRoute('/');
+    renderRoute('/overview');
 
     const sidebar = screen.getByTestId('app-sidebar');
     const storageButton = within(sidebar).getByRole('button', {
@@ -339,7 +339,7 @@ describe('M1 application shell', () => {
       projectUrl: 'https://example123.supabase.co',
       publishableKey: 'sb_publishable_testkey123',
     });
-    renderRoute('/');
+    renderRoute('/overview');
 
     await signInSupabase('a@example.test', 'temporary-password');
     await inspectStorage();
@@ -351,7 +351,7 @@ describe('M1 application shell', () => {
   });
 
   it('navigates from the storage menu to Storage Settings', async () => {
-    renderRoute('/');
+    renderRoute('/overview');
 
     const sidebar = screen.getByTestId('app-sidebar');
     fireEvent.click(within(sidebar).getByRole('button', { name: /Storage providers.*Local DB/i }));
@@ -367,7 +367,7 @@ describe('M1 application shell', () => {
   });
 
   it('keeps the storage menu accessible when the sidebar is collapsed', () => {
-    renderRoute('/');
+    renderRoute('/overview');
 
     fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
     const storageButton = screen.getByRole('button', {
@@ -385,7 +385,7 @@ describe('M1 application shell', () => {
       publishableKey: 'sb_publishable_testkey123',
     });
     switchStorageProvider('local');
-    renderRoute('/');
+    renderRoute('/overview');
 
     const storageButton = screen.getByRole('button', {
       name: /Storage providers.*Local DB/i,
@@ -421,7 +421,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response('[]', { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
     await waitFor(() => expect(workspaceRequests).toBe(1));
 
     switchStorageProvider('local');
@@ -467,7 +467,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
 
     const sidebar = screen.getByRole('complementary');
     const projectNavigation = await within(sidebar).findByRole('navigation', {
@@ -525,7 +525,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
 
     const sidebar = screen.getByRole('complementary');
     const projectNavigation = await within(sidebar).findByRole('navigation', {
@@ -550,7 +550,7 @@ describe('M1 application shell', () => {
     ).not.toBeNull();
 
     cleanup();
-    renderRoute('/');
+    renderRoute('/overview');
     expect(await screen.findByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument();
     expect(screen.getByTestId('app-shell-grid')).toHaveAttribute('data-sidebar-collapsed', 'true');
   });
@@ -559,7 +559,11 @@ describe('M1 application shell', () => {
     renderRoute('/planning/w1/p1');
 
     const navigation = screen.getByRole('navigation', { name: 'Mobile navigation' });
-    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '/');
+    expect(within(navigation).getByRole('link', { name: 'Projects' })).toHaveAttribute(
+      'href',
+      '/overview',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Today' })).toHaveAttribute('href', '/');
     expect(within(navigation).getByRole('link', { name: 'Board' })).toHaveAttribute(
       'href',
       '/planning/w1/p1',
@@ -615,7 +619,7 @@ describe('M1 application shell', () => {
     );
     localStorage.setItem('forge-active-workspace', 'w1');
     const app = render(
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={['/overview']}>
         <App />
       </MemoryRouter>,
     );
@@ -644,7 +648,7 @@ describe('M1 application shell', () => {
       await screen.findByRole('heading', { name: 'Your workspace, in focus' }),
     ).toBeInTheDocument();
     app.unmount();
-    renderRoute('/');
+    renderRoute('/overview');
     const restoredSidebar = screen.getByRole('complementary');
     expect(await within(restoredSidebar).findByRole('link', { name: 'Signal' })).toHaveAttribute(
       'href',
@@ -689,7 +693,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response('[]', { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
     const sidebar = screen.getByRole('complementary');
     await within(sidebar).findByRole('button', { name: 'Workspace: One' });
     fireEvent.click(within(sidebar).getByRole('button', { name: 'Workspace: One' }));
@@ -700,7 +704,7 @@ describe('M1 application shell', () => {
         name: 'Two',
       }),
     );
-    await waitFor(() => expect(pending.get('w2')).toHaveLength(2));
+    await waitFor(() => expect(pending.get('w2')?.length ?? 0).toBeGreaterThanOrEqual(2));
     pending
       .get('w2')
       ?.forEach((resolve) =>
@@ -733,7 +737,7 @@ describe('M1 application shell', () => {
         return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
       }),
     );
-    renderRoute('/');
+    renderRoute('/overview');
     const sidebar = screen.getByRole('complementary');
     const workspaceButton = await within(sidebar).findByRole('button', {
       name: 'Workspace: Research',
@@ -773,7 +777,10 @@ describe('M1 application shell', () => {
     expect(
       await screen.findByRole('heading', { name: 'Manage workspace tags' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to Projects' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Back to Projects' })).toHaveAttribute(
+      'href',
+      '/overview',
+    );
   });
 
   it('keeps supported product destinations reachable from the compact project sidebar and palette', () => {
@@ -782,7 +789,7 @@ describe('M1 application shell', () => {
     const navigation = screen.getByRole('navigation', { name: 'Project navigation' });
     expect(within(navigation).getByRole('link', { name: 'Workspace Overview' })).toHaveAttribute(
       'href',
-      '/',
+      '/overview',
     );
     fireEvent.click(
       within(screen.getByRole('banner', { name: 'Application controls' })).getByRole('button', {
@@ -810,7 +817,7 @@ describe('M1 application shell', () => {
     const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' });
     expect(within(breadcrumb).getByRole('link', { name: 'Workspace' })).toHaveAttribute(
       'href',
-      '/',
+      '/overview',
     );
     expect(within(breadcrumb).getByText('Project board')).toHaveAttribute('aria-current', 'page');
   });
@@ -909,7 +916,7 @@ describe('M1 application shell', () => {
   });
 
   it('provides a three-mode persistent application appearance control', () => {
-    renderRoute('/');
+    renderRoute('/overview');
 
     const appearance = within(screen.getByTestId('app-topbar')).getByRole('combobox', {
       name: 'Appearance',

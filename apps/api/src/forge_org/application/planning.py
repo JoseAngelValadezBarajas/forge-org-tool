@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any
 
 from forge_org.application.ports import PlanningStore
@@ -9,6 +10,13 @@ from forge_org.domain.planning import (
     dependency_endpoints,
     ensure_project_writable,
 )
+
+
+def _store_due_date(values: dict[str, Any]) -> None:
+    """Persist a due date as ISO text; an explicit null clears it."""
+    due = values.get('due_date')
+    if isinstance(due, date):
+        values['due_date'] = due.isoformat()
 
 
 class PlanningService:
@@ -74,6 +82,7 @@ class PlanningService:
         ):
             raise NotFound('Epic not found')
         values['title'] = title
+        _store_due_date(values)
         return self.repository.create_feature(workspace_id, project_id, values)
 
     def update_feature(
@@ -91,6 +100,7 @@ class PlanningService:
             raise NotFound('Epic not found')
         if 'title' in values:
             values['title'] = clean_title(values['title'])
+        _store_due_date(values)
         return self.repository.update_feature(workspace_id, project_id, feature_id, values) or {}
 
     def workspace_tags(self, workspace_id: str) -> list[dict[str, Any]]:
