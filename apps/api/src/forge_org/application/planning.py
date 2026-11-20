@@ -228,6 +228,14 @@ class PlanningService:
             raise NotFound('Task not found')
         return updated
 
+    def delete_task(
+        self, workspace_id: str, project_id: str, feature_id: str, task_id: str
+    ) -> None:
+        self.feature(workspace_id, project_id, feature_id)
+        ensure_project_writable(self._project(workspace_id, project_id))
+        if not self.repository.delete_task(feature_id, task_id):
+            raise NotFound('Task not found')
+
     def reorder_tasks(
         self, workspace_id: str, project_id: str, feature_id: str, ids: list[str]
     ) -> list[dict[str, Any]]:

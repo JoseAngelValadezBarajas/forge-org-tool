@@ -33,6 +33,7 @@ export function useFeatureDetailController(
   const [attachmentUrls, setAttachmentUrls] = useState<Record<string, string>>({});
   const [workspaceTags, setWorkspaceTags] = useState<WorkspaceTag[]>([]);
   const [taskTitle, setTaskTitle] = useState('');
+  const [removedTask, setRemovedTask] = useState<Task | null>(null);
   const [criterion, setCriterion] = useState('');
   const [error, setError] = useState('');
   const loadGeneration = useRef(0);
@@ -271,6 +272,49 @@ export function useFeatureDetailController(
     }
   }
 
+  async function renameTask(task: Task, title: string) {
+    const clean = title.trim();
+    if (!clean || clean === task.title) return;
+    try {
+      await organizationApi.updateTask(workspaceId, projectId, featureId, task.id, {
+        title: clean,
+      });
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to rename task.');
+    }
+  }
+
+  async function deleteTask(task: Task) {
+    try {
+      await organizationApi.deleteTask(workspaceId, projectId, featureId, task.id);
+      setRemovedTask(task);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to delete task.');
+    }
+  }
+
+  async function undoDeleteTask() {
+    const task = removedTask;
+    if (!task) return;
+    try {
+      await organizationApi.createTask(workspaceId, projectId, featureId, task.title, {
+        description: task.description,
+        status: task.status,
+        position: task.position,
+      });
+      setRemovedTask(null);
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to restore task.');
+    }
+  }
+
+  function dismissRemovedTask() {
+    setRemovedTask(null);
+  }
+
   async function moveTask(index: number, direction: -1 | 1) {
     const nextIndex = index + direction;
     if (nextIndex < 0 || nextIndex >= tasks.length) return;
@@ -293,6 +337,11 @@ export function useFeatureDetailController(
     moveCriterion,
     addTask,
     changeTask,
+    renameTask,
+    deleteTask,
+    undoDeleteTask,
+    dismissRemovedTask,
+    removedTask,
     criteria,
     criterion,
     dependencies,

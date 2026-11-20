@@ -34,6 +34,8 @@ export function TransferPage({
     exported,
     fileName,
     importedProjectId,
+    importedCounts,
+    startAnotherImport,
     importProject,
     packageBase64,
     preview,
@@ -312,7 +314,21 @@ export function TransferPage({
                 ? `Imported into project: ${importedProjectId}`
                 : `Created project: ${importedProjectId}`}
             </p>
-            <Link to={successPath}>{successLinkLabel}</Link>
+            {Object.keys(importedCounts).length > 0 && (
+              <ul aria-label="Records created">
+                {Object.entries(importedCounts).map(([key, count]) => (
+                  <li key={key}>
+                    {key.replaceAll('_', ' ')}: {String(count)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className={styles.actions}>
+              <Link to={successPath}>{successLinkLabel}</Link>
+              <ButtonV2 type="button" variant="secondary" onClick={startAnotherImport}>
+                Import another
+              </ButtonV2>
+            </div>
           </section>
         </CardV2>
       )}

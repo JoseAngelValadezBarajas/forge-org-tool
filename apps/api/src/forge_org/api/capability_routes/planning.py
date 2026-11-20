@@ -22,6 +22,7 @@ _HANDLERS = (
     'list_tasks',
     'create_task',
     'update_task',
+    'delete_task',
     'reorder_tasks',
     'list_dependencies',
     'create_dependency',

@@ -64,6 +64,15 @@ class TaskPersistence(PersistenceBase):
             self.connection.execute('SELECT * FROM tasks WHERE id = ?', (task_id,)).fetchone()
         )
 
+    def delete_task(self, feature_id: str, task_id: str) -> bool:
+        cursor = self.connection.execute(
+            'DELETE FROM tasks WHERE feature_id = ? AND id = ?', (feature_id, task_id)
+        )
+        if cursor.rowcount:
+            self.connection.commit()
+            return True
+        return False
+
     def reorder_tasks(self, feature_id: str, ids: list[str]) -> list[dict[str, Any]]:
         now = utc_now()
         for position, task_id in enumerate(ids):

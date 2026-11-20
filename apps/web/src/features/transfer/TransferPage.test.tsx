@@ -69,6 +69,17 @@ describe('TransferPage', () => {
         }),
       ),
     );
+
+    // The finished import offers a way forward: open it, or start another one.
+    expect(screen.getByRole('link', { name: 'Open project' })).toHaveAttribute(
+      'href',
+      '/projects/w1/imported-1',
+    );
+    const created = within(screen.getByRole('list', { name: 'Records created' }));
+    expect(created.getAllByRole('listitem').length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Import another' }));
+    expect(screen.queryByText('IMPORTED_PLANNING_ONLY')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Review import' })).toBeDisabled();
   });
 
   it('previews and imports a ZIP project package using its reviewed fingerprint', async () => {

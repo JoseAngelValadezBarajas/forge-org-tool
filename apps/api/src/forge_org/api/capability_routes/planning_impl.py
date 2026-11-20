@@ -274,6 +274,20 @@ def update_task(
     )
 
 
+@capability_router.delete(
+    '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/tasks/{task_id}',
+    status_code=204,
+)
+def delete_task(
+    workspace_id: str,
+    project_id: str,
+    feature_id: str,
+    task_id: str,
+    planning: PlanningService = Depends(planning_service),
+) -> None:
+    planning.delete_task(workspace_id, project_id, feature_id, task_id)
+
+
 @capability_router.post(
     '/workspaces/{workspace_id}/projects/{project_id}/features/{feature_id}/tasks/reorder',
     response_model=list[TaskResponse],

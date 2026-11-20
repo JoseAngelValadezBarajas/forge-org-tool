@@ -337,6 +337,30 @@ describe('Supabase Data API adapter', () => {
     assert.equal(calls.filter(({ url }) => url.startsWith('/api/v1/')).length, 0);
   });
 
+  it('deletes a task through the scoped tasks row and never touches another feature', async () => {
+    const calls = [];
+    globalThis.fetch = async (url, init = {}) => {
+      calls.push({ url: String(url), method: init.method });
+      if (String(url).includes('/auth/v1/token')) return jsonResponse(session);
+      if (String(url).includes('/rpc/forge_storage_preflight')) {
+        return jsonResponse({ schema_version: 'forge-byoc-v2' });
+      }
+      if (String(url).includes('/rest/v1/tasks'))
+        return new globalThis.Response(null, { status: 204 });
+      throw new Error(`unexpected request ${String(url)}`);
+    };
+    configureStorage(profile);
+    await signInSupabase('a@example.test', 'temporary-password');
+    await inspectStorage();
+
+    await organizationApi.deleteTask('w1', 'p1', 'f1', 't1');
+
+    const call = calls.find(({ url }) => url.includes('/rest/v1/tasks'));
+    assert.equal(call.method, 'DELETE');
+    assert.match(call.url, /id=eq\.t1/);
+    assert.match(call.url, /feature_id=eq\.f1/);
+  });
+
   it('explains how to enable due dates when the Supabase schema predates migration 0006', async () => {
     globalThis.fetch = async (url) => {
       if (String(url).includes('/auth/v1/token')) return jsonResponse(session);

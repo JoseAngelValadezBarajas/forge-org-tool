@@ -416,6 +416,17 @@ export function createSupabaseHandler(
       parts[2] === 'projects' &&
       parts[4] === 'features' &&
       parts[6] === 'tasks' &&
+      parts.length === 8 &&
+      method === 'DELETE'
+    ) {
+      return table<void>('tasks', query({ id: `eq.${parts[7]}`, feature_id: `eq.${parts[5]}` }), {
+        method: 'DELETE',
+      }) as Promise<T>;
+    }
+    if (
+      parts[2] === 'projects' &&
+      parts[4] === 'features' &&
+      parts[6] === 'tasks' &&
       parts[7] === 'reorder' &&
       parts.length === 8 &&
       method === 'POST'

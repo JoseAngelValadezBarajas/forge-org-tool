@@ -186,10 +186,16 @@ export const planningCapability = {
       `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/acceptance-criteria/reorder`,
       { method: 'POST', body: JSON.stringify({ ids }) },
     ),
-  createTask: (workspaceId: string, projectId: string, featureId: string, title: string) =>
+  createTask: (
+    workspaceId: string,
+    projectId: string,
+    featureId: string,
+    title: string,
+    values?: Partial<Pick<Task, 'description' | 'status' | 'position'>>,
+  ) =>
     sendJson<Task>(
       `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/tasks`,
-      { method: 'POST', body: JSON.stringify({ title }) },
+      { method: 'POST', body: JSON.stringify({ title, ...values }) },
     ),
   listTasks: (workspaceId: string, projectId: string, featureId: string) =>
     getApiJson<Task[]>({
@@ -205,6 +211,11 @@ export const planningCapability = {
     sendJson<Task>(
       `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/tasks/${taskId}`,
       { method: 'PATCH', body: JSON.stringify(values) },
+    ),
+  deleteTask: (workspaceId: string, projectId: string, featureId: string, taskId: string) =>
+    sendJson<void>(
+      `/api/v1/workspaces/${workspaceId}/projects/${projectId}/features/${featureId}/tasks/${taskId}`,
+      { method: 'DELETE', body: '{}' },
     ),
   reorderTasks: (workspaceId: string, projectId: string, featureId: string, ids: string[]) =>
     sendJson<Task[]>(

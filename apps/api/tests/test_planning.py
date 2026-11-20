@@ -482,3 +482,33 @@ def test_feature_due_date_can_be_set_changed_and_cleared(tmp_path: Path) -> None
             assert invalid.status_code == 422
     finally:
         os.environ.pop('FORGE_DATABASE_PATH', None)
+
+
+def test_task_can_be_deleted_and_a_missing_task_is_reported(tmp_path: Path) -> None:
+    os.environ['FORGE_DATABASE_PATH'] = str(tmp_path / 'task-delete.db')
+    try:
+        with TestClient(create_app()) as client:
+            workspace = client.post('/api/v1/workspaces', json={'name': 'Tasks'}).json()
+            project = client.post(
+                f'/api/v1/workspaces/{workspace["id"]}/projects', json={'name': 'Inbox'}
+            ).json()
+            root = f'/api/v1/workspaces/{workspace["id"]}/projects/{project["id"]}'
+            feature = client.post(f'{root}/features', json={'title': 'Ship'}).json()
+            tasks_url = f'{root}/features/{feature["id"]}/tasks'
+            first = client.post(tasks_url, json={'title': 'Write'}).json()
+            second = client.post(tasks_url, json={'title': 'Review'}).json()
+
+            deleted = client.delete(f'{tasks_url}/{first["id"]}')
+            assert deleted.status_code == 204
+            remaining = client.get(tasks_url).json()
+            assert [task['id'] for task in remaining] == [second['id']]
+
+            assert client.delete(f'{tasks_url}/{first["id"]}').status_code == 404
+            assert client.delete(f'{tasks_url}/missing').status_code == 404
+            other = client.post(f'{root}/features', json={'title': 'Other'}).json()
+            assert (
+                client.delete(f'{root}/features/{other["id"]}/tasks/{second["id"]}').status_code
+                == 404
+            )
+    finally:
+        os.environ.pop('FORGE_DATABASE_PATH', None)

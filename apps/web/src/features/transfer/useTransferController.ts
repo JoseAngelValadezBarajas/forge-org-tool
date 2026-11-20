@@ -52,6 +52,7 @@ export function useTransferController(
   const [preview, setPreview] = useState<ProjectTransferPreview | null>(null);
   const [exported, setExported] = useState(false);
   const [importedProjectId, setImportedProjectId] = useState('');
+  const [importedCounts, setImportedCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState('');
   const [packageBase64, setPackageBase64] = useState<string | null>(null);
 
@@ -152,6 +153,7 @@ export function useTransferController(
           preview.fingerprint,
         );
         setImportedProjectId(result.project_id);
+        setImportedCounts(preview.counts);
         setPreview(null);
         setError('');
         return;
@@ -169,12 +171,24 @@ export function useTransferController(
             )
           : await organizationApi.importProject(workspaceId, document, preview.fingerprint);
       setImportedProjectId(result.project_id);
+      setImportedCounts(preview.counts);
       setPreview(null);
       setError('');
     } catch (cause) {
       setPreview(null);
       setError(cause instanceof Error ? cause.message : 'Unable to import project.');
     }
+  }
+
+  /** Clears the finished import so another file can be chosen. */
+  function startAnotherImport() {
+    setImportedProjectId('');
+    setImportedCounts({});
+    setPreview(null);
+    setDocumentText('');
+    setPackageBase64(null);
+    setFileName('');
+    setError('');
   }
 
   function updateDocumentText(value: string) {
@@ -195,7 +209,9 @@ export function useTransferController(
     exported,
     fileName,
     importedProjectId,
+    importedCounts,
     importProject,
+    startAnotherImport,
     packageBase64,
     preview,
     previewImport,

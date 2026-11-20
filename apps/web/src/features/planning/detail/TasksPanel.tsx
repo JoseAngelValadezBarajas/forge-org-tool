@@ -5,7 +5,18 @@ import type { FeatureDetailModel } from './model';
 
 type Props = Pick<
   FeatureDetailModel,
-  'tasks' | 'archived' | 'changeTask' | 'moveTask' | 'addTask' | 'taskTitle' | 'setTaskTitle'
+  | 'tasks'
+  | 'archived'
+  | 'changeTask'
+  | 'moveTask'
+  | 'addTask'
+  | 'taskTitle'
+  | 'setTaskTitle'
+  | 'renameTask'
+  | 'deleteTask'
+  | 'removedTask'
+  | 'undoDeleteTask'
+  | 'dismissRemovedTask'
 >;
 
 export function TasksPanel({
@@ -16,6 +27,11 @@ export function TasksPanel({
   addTask,
   taskTitle,
   setTaskTitle,
+  renameTask,
+  deleteTask,
+  removedTask,
+  undoDeleteTask,
+  dismissRemovedTask,
 }: Props) {
   return (
     <CardV2 variant="outlined" as="section" aria-label="Tasks" className={styles.tasksCard}>
@@ -44,9 +60,22 @@ export function TasksPanel({
               onStatusChange={(status) => void changeTask(task, status)}
               onMoveUp={() => void moveTask(index, -1)}
               onMoveDown={() => void moveTask(index, 1)}
+              onRename={(title) => void renameTask(task, title)}
+              onDelete={() => void deleteTask(task)}
             />
           ))}
         </div>
+      )}
+      {removedTask && (
+        <p role="status" className={styles.muted}>
+          Deleted “{removedTask.title}”{' '}
+          <ButtonV2 variant="ghost" size="sm" onClick={() => void undoDeleteTask()}>
+            Undo
+          </ButtonV2>
+          <ButtonV2 variant="ghost" size="sm" aria-label="Dismiss" onClick={dismissRemovedTask}>
+            ×
+          </ButtonV2>
+        </p>
       )}
       {!archived && (
         <details className={styles.addDetails}>
